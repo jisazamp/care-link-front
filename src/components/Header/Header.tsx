@@ -14,7 +14,6 @@ export const Header = () => {
     <AntHeader
       style={{
         alignItems: "center",
-        backgroundColor: "#22075E",
         display: "flex",
         justifyContent: "space-between",
         padding: "13px 16px",
