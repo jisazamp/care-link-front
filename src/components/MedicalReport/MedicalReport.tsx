@@ -138,13 +138,35 @@ export const MedicalReport: React.FC = () => {
               title="Exploración física"
               className="detail-card"
             >
-              <Row gutter={24}>
-                <Col span={4}>Peso: <Input /></Col>
-                <Col span={4}>Presión Arterial: <Input /></Col>
-                <Col span={4}>Frecuencia Cardiaca: <Input /></Col>
-                <Col span={4}>Temperatura Corporal: <Input /></Col>
-                <Col span={4}>Pulsoximetría: <Input /></Col>
-              </Row>
+              <Form layout="vertical">
+                <Row gutter={24}>
+                  <Col span={4}>
+                    <Form.Item label="Peso">
+                      <Input placeholder="Ingrese el peso" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}>
+                    <Form.Item label="Presión Arterial">
+                      <Input placeholder="Ingrese la presión arterial" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}>
+                    <Form.Item label="Frecuencia Cardiaca">
+                      <Input placeholder="Ingrese la frecuencia cardiaca" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}>
+                    <Form.Item label="Temperatura Corporal">
+                      <Input placeholder="Ingrese la temperatura corporal" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}>
+                    <Form.Item label="Pulsoximetría">
+                      <Input placeholder="Ingrese la pulsoximetría" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form>
             </Card>
 
             <Card
