@@ -10,8 +10,10 @@ import {
   Input,
   Dropdown,
   Menu,
+  Avatar,
+  Tag,
 } from 'antd';
-import { SearchOutlined, DownOutlined } from '@ant-design/icons';
+import { SearchOutlined, DownOutlined, ReloadOutlined, SettingOutlined, FullscreenOutlined, } from '@ant-design/icons';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
 
@@ -45,11 +47,14 @@ export const UserList: React.FC = () => {
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <Card className="detail-card">
               <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <Input
-                  placeholder="Buscar por: Ingrese un valor"
-                  prefix={<SearchOutlined />}
-                  style={{ width: '50%' }}
-                />
+                <Space>
+                  <Typography.Text strong>Buscar por</Typography.Text>
+                  <Input
+                    placeholder="Ingrese un valor"
+                    prefix={<SearchOutlined />}
+                    style={{ width: '300px' }}
+                  />
+                </Space>
                 <Space size="small">
                   <Button type="default">Restablecer</Button>
                   <Button type="primary">Buscar</Button>
@@ -66,15 +71,21 @@ export const UserList: React.FC = () => {
               <Table
                 dataSource={Array.from({ length: 20 }, (_, i) => ({
                   key: i,
+                  avatar: <Avatar>{`P${i + 1}`}</Avatar>,
                   name: `Paciente ${i + 1}`,
                   description: 'Lorem ipsum dolor sit amet.',
-                  status: 'Activo',
+                  status: <Tag color="green">Activo</Tag>,
                   actions: [
                     <a key="edit" href="#">Editar</a>,
                     <a key="delete" href="#" style={{ marginLeft: 8 }}>Eliminar</a>,
                   ],
                 }))}
                 columns={[
+                  {
+                    title: '',
+                    dataIndex: 'avatar',
+                    key: 'avatar',
+                  },
                   {
                     title: 'Nombre',
                     dataIndex: 'name',
@@ -101,6 +112,16 @@ export const UserList: React.FC = () => {
                   showSizeChanger: true,
                   pageSizeOptions: ['10', '20', '30'],
                 }}
+                title={() => (
+                  <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <Typography.Text strong>Lista de usuarios</Typography.Text>
+                    <Space>
+                      <Button icon={<ReloadOutlined />} />
+                      <Button icon={<SettingOutlined />} />
+                      <Button icon={<FullscreenOutlined />} />
+                    </Space>
+                  </Space>
+                )}
               />
             </Card>
           </Space>
