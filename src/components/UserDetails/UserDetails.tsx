@@ -501,7 +501,11 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Reportes Clínicos"
               extra={
-                <Button icon={<EditOutlined />} type="primary" onClick={() => navigate('/MedicalReport')}>
+                <Button
+                  icon={<EditOutlined />}
+                  type="primary"
+                  onClick={() => navigate(`/usuarios/${userId}/reporte`)}
+                >
                   Agregar
                 </Button>
               }
