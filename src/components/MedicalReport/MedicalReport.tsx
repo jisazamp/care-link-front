@@ -6,11 +6,14 @@ import {
   Breadcrumb,
   Space,
   Button,
-  Divider,
   Table,
   Checkbox,
   Row,
   Col,
+  Form,
+  Input,
+  Select,
+  DatePicker,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Header } from '../Header/Header';
@@ -18,6 +21,7 @@ import { Sidebar } from '../Sidebar/Sidebar';
 
 const { Content, Sider } = Layout;
 const { Title } = Typography;
+const { Option } = Select;
 
 const reportData = [
   {
@@ -89,22 +93,45 @@ export const MedicalReport: React.FC = () => {
               title="Datos básicos del reporte"
               className="detail-card"
             >
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Typography.Text strong>Profesional:</Typography.Text>
-                  <div>Andrea Salazar</div>
-                  <Divider />
-                  <Typography.Text strong>Paciente:</Typography.Text>
-                  <div>Juan Antonio Lopez Orrego</div>
-                </Col>
-                <Col span={12}>
-                  <Typography.Text strong>Tipo de Reporte:</Typography.Text>
-                  <div>Enfermería</div>
-                  <Divider />
-                  <Typography.Text strong>Fecha de registro:</Typography.Text>
-                  <div>2024-11-08</div>
-                </Col>
-              </Row>
+              <Form layout="vertical">
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item label="Profesional" name="profesional">
+                      <Select placeholder="Seleccione un profesional">
+                        <Option value="andrea-salazar">Andrea Salazar</Option>
+                        <Option value="juan-perez">Juan Pérez</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="Tipo de Reporte" name="tipoReporte">
+                      <Select placeholder="Seleccione el tipo de reporte">
+                        <Option value="enfermeria">Enfermería</Option>
+                        <Option value="medico">Médico</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item label="Paciente" name="paciente">
+                      <Input defaultValue="Juan Antonio Lopez Orrego" disabled />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="Fecha de registro" name="fechaRegistro">
+                      <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={24}>
+                  <Col span={24}>
+                    <Form.Item label="Motivo de Consulta" name="motivoConsulta">
+                      <Input placeholder="Ingrese el motivo de consulta" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form>
             </Card>
 
             <Card
@@ -112,11 +139,11 @@ export const MedicalReport: React.FC = () => {
               className="detail-card"
             >
               <Row gutter={24}>
-                <Col span={4}>Peso: <input type="text" /></Col>
-                <Col span={4}>Presión Arterial: <input type="text" /></Col>
-                <Col span={4}>Frecuencia Cardiaca: <input type="text" /></Col>
-                <Col span={4}>Temperatura Corporal: <input type="text" /></Col>
-                <Col span={4}>Pulsoximetría: <input type="text" /></Col>
+                <Col span={4}>Peso: <Input /></Col>
+                <Col span={4}>Presión Arterial: <Input /></Col>
+                <Col span={4}>Frecuencia Cardiaca: <Input /></Col>
+                <Col span={4}>Temperatura Corporal: <Input /></Col>
+                <Col span={4}>Pulsoximetría: <Input /></Col>
               </Row>
             </Card>
 
