@@ -256,9 +256,7 @@ export const UserDetails: React.FC = () => {
         onSuccess: () => {
           setIsDeleteRecordModalOpen(false);
           queryClient.invalidateQueries({
-            queryKey: [
-              `user-medical-record-${userId}`,
-            ],
+            queryKey: [`user-medical-record-${userId}`],
           });
         },
       });
@@ -375,7 +373,7 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Historia Clínica"
               extra={
-                !!record?.data.data ? (
+                record?.data.data ? (
                   <Space>
                     <Button
                       icon={<EditOutlined />}
@@ -407,7 +405,7 @@ export const UserDetails: React.FC = () => {
               }
               loading={loadingRecord}
             >
-              {!!record?.data.data ? (
+              {record?.data.data ? (
                 <>
                   <Row gutter={24}>
                     <Col span={12}>
@@ -432,7 +430,7 @@ export const UserDetails: React.FC = () => {
                         column={1}
                       >
                         <Descriptions.Item label="Discapacidad">
-                          {!!disabilities.filter((a) => !!a).length ? (
+                          {disabilities.filter((a) => !!a).length ? (
                             disabilities.map((d) => (
                               <Tag key={d} color="purple">
                                 {d}
@@ -459,15 +457,15 @@ export const UserDetails: React.FC = () => {
                         column={1}
                       >
                         <Descriptions.Item label="Cirugías">
-                          {!!record?.data.data?.cirugias ? "Sí" : "No"}
+                          {record?.data.data?.cirugias ? "Sí" : "No"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Alergias a medicamentos">
-                          {!!record?.data.data?.medicamentos_alergia
+                          {record?.data.data?.medicamentos_alergia
                             ? "Sí"
                             : "No"}
                         </Descriptions.Item>
                         <Descriptions.Item label="Otras Alergias">
-                          {!!record?.data.data?.otras_alergias ? "Sí" : "No"}
+                          {record?.data.data?.otras_alergias ? "Sí" : "No"}
                         </Descriptions.Item>
                       </Descriptions>
                     </Col>
@@ -503,7 +501,7 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Reportes Clínicos"
               extra={
-                <Button type="primary" icon={<PlusOutlined />}>
+                <Button icon={<EditOutlined />} type="primary" onClick={() => navigate('/MedicalReport')}>
                   Agregar
                 </Button>
               }

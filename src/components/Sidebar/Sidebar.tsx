@@ -22,6 +22,7 @@ const menuItems = [
         key: "2.2",
         label: <Link to="usuarios/crear">Registrar nuevo usuarios</Link>,
       },
+      { key: "2.3", label: "Nuevo Reporte Clínico" },
     ],
   },
   {
