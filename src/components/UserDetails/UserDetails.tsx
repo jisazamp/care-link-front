@@ -20,6 +20,7 @@ import {
   DeleteOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
 import patientImage from '../assets/Patients/patient1.jpg';
@@ -194,6 +195,7 @@ const contractsColumns = [
 ];
 
 export const UserDetails: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header />
@@ -263,7 +265,7 @@ export const UserDetails: React.FC = () => {
               title="Historia Clínica"
               extra={
                 <Space>
-                  <Button icon={<EditOutlined />} type="primary">
+                  <Button icon={<EditOutlined />} type="primary" onClick={() => navigate('/MedicalRecord')}>
                     Editar
                   </Button>
                   <Button icon={<DeleteOutlined />} danger>
