@@ -18,6 +18,8 @@ import { MainLayout } from "./components/MainLayout/MainLayout";
 import { UsersList } from "./components/UsersList/UsersList";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
 import { MedicalReport } from "./components/MedicalReport/MedicalReport";
+import { UserList } from "./components/UserList/UserList";
+import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
 
 export const colors = {
   primary: {
@@ -169,6 +171,22 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <MedicalReport />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/ShowMedicalReport"
+              element={
+                <PrivateRoute>
+                  <ShowMedicalReport />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/UserList"
+              element={
+                <PrivateRoute>
+                  <UserList />
                 </PrivateRoute>
               }
             />
