@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ConfigProvider } from "antd";
 import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
+import { NewUser } from "./components/NewUser/NewUser";
+import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 
 export const App = () => {
   return (
@@ -40,6 +42,8 @@ export const App = () => {
         <Routes>
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/new-user" element={<NewUser />} />
+          <Route path="/MedicalRecord" element={<MedicalRecord />} />
         </Routes>
       </Router>
     </ConfigProvider>
