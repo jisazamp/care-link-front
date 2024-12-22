@@ -7,21 +7,137 @@ import {
   Space,
   Button,
   Divider,
-  Descriptions,
+  Table,
+  Checkbox,
   Avatar,
   Row,
   Col,
+  Tag,
+  Descriptions,
 } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
 import patientImage from '../assets/Patients/patient1.jpg';
 
 const { Content, Sider } = Layout;
-const { Title, Text } = Typography;
+const { Title } = Typography;
+
+const clinicalReportsData = [
+  {
+    key: '1',
+    professional: 'Sara Manuela Gomez',
+    reportType: 'Enfermería',
+    date: '10/20/2024',
+    actions: [
+      <a key="view" href="#">Ver</a>,
+      <a key="edit" href="#" style={{ marginLeft: 8 }}>Editar</a>,
+    ],
+  },
+  {
+    key: '2',
+    professional: 'Juan Pablo Ruiz',
+    reportType: 'Ortopedia',
+    date: '10/24/2024',
+    actions: [
+      <a key="view" href="#">Ver</a>,
+      <a key="edit" href="#" style={{ marginLeft: 8 }}>Editar</a>,
+    ],
+  },
+];
+
+const columns = [
+  {
+    title: <Checkbox />,
+    dataIndex: 'checkbox',
+    render: () => <Checkbox />,
+    width: '5%',
+  },
+  {
+    title: 'Profesional',
+    dataIndex: 'professional',
+    key: 'professional',
+  },
+  {
+    title: 'Tipo Reporte',
+    dataIndex: 'reportType',
+    key: 'reportType',
+  },
+  {
+    title: 'Fecha',
+    dataIndex: 'date',
+    key: 'date',
+  },
+  {
+    title: 'Acciones',
+    dataIndex: 'actions',
+    key: 'actions',
+  },
+];
+
+const acudientesData = [
+  {
+    key: '1',
+    nombres: 'Maria Patricia',
+    apellidos: 'Lopez Gomez',
+    parentesco: 'Hija',
+    telefono: '304567890',
+    direccion: 'CLL 45 - 60-20 INT 101',
+    email: 'maria@gmail.com',
+    acciones: [
+      <a key="edit" href="#">Editar</a>,
+      <a key="delete" href="#" style={{ marginLeft: 8 }}>Eliminar</a>,
+    ],
+  },
+];
+
+const acudientesColumns = [
+  {
+    title: <Checkbox />,
+    dataIndex: 'checkbox',
+    render: () => <Checkbox />,
+    width: '5%',
+  },
+  {
+    title: 'Nombres',
+    dataIndex: 'nombres',
+    key: 'nombres',
+  },
+  {
+    title: 'Apellidos',
+    dataIndex: 'apellidos',
+    key: 'apellidos',
+  },
+  {
+    title: 'Parentesco',
+    dataIndex: 'parentesco',
+    key: 'parentesco',
+  },
+  {
+    title: 'Teléfono',
+    dataIndex: 'telefono',
+    key: 'telefono',
+  },
+  {
+    title: 'Dirección',
+    dataIndex: 'direccion',
+    key: 'direccion',
+  },
+  {
+    title: 'E-Mail',
+    dataIndex: 'email',
+    key: 'email',
+  },
+  {
+    title: 'Acciones',
+    dataIndex: 'acciones',
+    key: 'acciones',
+  },
+];
 
 export const UserDetails: React.FC = () => {
   return (
@@ -103,59 +219,94 @@ export const UserDetails: React.FC = () => {
               }
               className="detail-card"
             >
-              <Descriptions column={1}>
-                <Descriptions.Item label="Empresa de Salud Domiciliaria">
-                  604 607 8990
-                </Descriptions.Item>
-                <Descriptions.Item label="Tipo de Sangre">O+</Descriptions.Item>
-                <Descriptions.Item label="Estatura">165 cm</Descriptions.Item>
-                <Descriptions.Item label="Motivo de Ingreso">
-                  Usuario de centro de día
-                </Descriptions.Item>
-                <Descriptions.Item label="Discapacidades">
-                  Visual, Auditiva
-                </Descriptions.Item>
-                <Descriptions.Item label="Limitaciones">
-                  Ayuda para ir al baño
-                </Descriptions.Item>
-                <Descriptions.Item label="Dieta Especial">Sí</Descriptions.Item>
-              </Descriptions>
+              <Row gutter={24}>
+                <Col span={12}>
+                  <Descriptions title="Datos Esenciales" column={1}>
+                    <Descriptions.Item label="Empresa de Salud Domiciliaria">
+                      604 607 8990
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Tipo de Sangre">O+</Descriptions.Item>
+                    <Descriptions.Item label="Estatura">165 cm</Descriptions.Item>
+                    <Descriptions.Item label="Motivo de Ingreso">
+                      Usuario de centro de día
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Col>
+                <Col span={12}>
+                  <Descriptions title="Discapacidades, Apoyos y Limitaciones" column={1}>
+                    <Descriptions.Item label="Discapacidad">
+                      <Tag color="purple">Visual</Tag>
+                      <Tag color="purple">Auditiva</Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Limitaciones">
+                      Ayuda para ir al baño
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Dieta Especial">Sí</Descriptions.Item>
+                  </Descriptions>
+                </Col>
+              </Row>
+              <Divider />
+              <Row gutter={24}>
+                <Col span={12}>
+                  <Descriptions title="Preexistencias y Alergias" column={1}>
+                    <Descriptions.Item label="Cirugías">
+                      Sí <a href="#">Ver</a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Alergias a medicamentos">
+                      Sí <a href="#">Ver</a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Otras Alergias">
+                      Sí <a href="#">Ver</a>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Condiciones Especiales">
+                      <a href="#">Ver</a>
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Col>
+                <Col span={12}>
+                  <Descriptions title="Hábitos y otros datos" column={1}>
+                    <Descriptions.Item label="Cafeína">Sí</Descriptions.Item>
+                    <Descriptions.Item label="Tabaquismo">No</Descriptions.Item>
+                    <Descriptions.Item label="Alcoholismo">No</Descriptions.Item>
+                    <Descriptions.Item label="Sustancias Psicoactivas">No</Descriptions.Item>
+                    <Descriptions.Item label="Maltratado">No</Descriptions.Item>
+                  </Descriptions>
+                </Col>
+              </Row>
             </Card>
 
             {/* Card: Reportes Clínicos */}
             <Card
               title="Reportes Clínicos"
               extra={
-                <Space>
-                  <Button icon={<EditOutlined />} type="primary">
-                    Editar
-                  </Button>
-                  <Button icon={<DeleteOutlined />} danger>
-                    Eliminar
-                  </Button>
-                </Space>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Agregar
+                </Button>
               }
               className="detail-card"
             >
-              <Text>Historial completo de reportes médicos.</Text>
+              <Table
+                columns={columns}
+                dataSource={clinicalReportsData}
+                pagination={false}
+              />
             </Card>
 
             {/* Card: Acudientes */}
             <Card
               title="Acudientes"
               extra={
-                <Space>
-                  <Button icon={<EditOutlined />} type="primary">
-                    Editar
-                  </Button>
-                  <Button icon={<DeleteOutlined />} danger>
-                    Eliminar
-                  </Button>
-                </Space>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Agregar
+                </Button>
               }
               className="detail-card"
             >
-              <Text>Información sobre acudientes asignados.</Text>
+              <Table
+                columns={acudientesColumns}
+                dataSource={acudientesData}
+                pagination={false}
+              />
             </Card>
 
             {/* Card: Contratos */}
@@ -173,7 +324,7 @@ export const UserDetails: React.FC = () => {
               }
               className="detail-card"
             >
-              <Text>Historial de contratos asociados al usuario.</Text>
+              <Typography.Text>Historial de contratos asociados al usuario.</Typography.Text>
             </Card>
           </Space>
 
