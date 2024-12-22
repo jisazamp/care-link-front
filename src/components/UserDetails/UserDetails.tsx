@@ -139,6 +139,60 @@ const acudientesColumns = [
   },
 ];
 
+const contractsData = [
+  {
+    key: '1',
+    fechaInicio: '12/12/2024',
+    estado: 'Activo',
+    servicios: 'Centro día, transporte',
+    firmado: 'Sí',
+    estadoFacturacion: 'Al día',
+    acciones: [
+      <a key="view" href="#">Ver</a>,
+      <a key="edit" href="#" style={{ marginLeft: 8 }}>Editar</a>,
+    ],
+  },
+];
+
+const contractsColumns = [
+  {
+    title: <Checkbox />,
+    dataIndex: 'checkbox',
+    render: () => <Checkbox />,
+    width: '5%',
+  },
+  {
+    title: 'Fecha de inicio',
+    dataIndex: 'fechaInicio',
+    key: 'fechaInicio',
+  },
+  {
+    title: 'Estado',
+    dataIndex: 'estado',
+    key: 'estado',
+  },
+  {
+    title: 'Servicios',
+    dataIndex: 'servicios',
+    key: 'servicios',
+  },
+  {
+    title: 'Firmado',
+    dataIndex: 'firmado',
+    key: 'firmado',
+  },
+  {
+    title: 'Estado Facturación',
+    dataIndex: 'estadoFacturacion',
+    key: 'estadoFacturacion',
+  },
+  {
+    title: 'Acciones',
+    dataIndex: 'acciones',
+    key: 'acciones',
+  },
+];
+
 export const UserDetails: React.FC = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -313,18 +367,17 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Contratos"
               extra={
-                <Space>
-                  <Button icon={<EditOutlined />} type="primary">
-                    Editar
-                  </Button>
-                  <Button icon={<DeleteOutlined />} danger>
-                    Eliminar
-                  </Button>
-                </Space>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Agregar
+                </Button>
               }
               className="detail-card"
             >
-              <Typography.Text>Historial de contratos asociados al usuario.</Typography.Text>
+              <Table
+                columns={contractsColumns}
+                dataSource={contractsData}
+                pagination={false}
+              />
             </Card>
           </Space>
 
