@@ -217,11 +217,32 @@ export const MedicalReport: React.FC = () => {
             </Card>
 
             <Card
+              title="Tratamientos y recomendaciones Adjuntar documentos"
+              extra={<Button type="primary" icon={<PlusOutlined />}>Agregar</Button>}
+              className="detail-card"
+            >
+              <p>Adjunte documentos relacionados con el tratamiento y las recomendaciones aquí.</p>
+            </Card>
+
+            <Card
               title="Reportes clínicos previos"
               extra={<Button type="primary" icon={<PlusOutlined />}>Agregar</Button>}
               className="detail-card"
             >
               <Table columns={reportColumns} dataSource={reportData} pagination={false} />
+            </Card>
+
+            <Card
+              className="detail-card"
+            >
+              <Row gutter={16} justify="end">
+                <Col>
+                  <Button>Restablecer</Button>
+                </Col>
+                <Col>
+                  <Button type="primary">Guardar y continuar</Button>
+                </Col>
+              </Row>
             </Card>
           </Space>
         </Content>
