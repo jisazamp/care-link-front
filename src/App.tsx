@@ -7,6 +7,7 @@ import { NewUser } from "./components/NewUser/NewUser";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { MedicalReport } from "./components/MedicalReport/MedicalReport";
+import { UserList } from "./components/UserList/UserList";
 
 export const App = () => {
   return (
@@ -48,6 +49,7 @@ export const App = () => {
           <Route path="/MedicalRecord" element={<MedicalRecord />} />
           <Route path="/UserDetails" element={<UserDetails />} />
           <Route path="/MedicalReport" element={<MedicalReport />} />
+          <Route path="/UserList" element={<UserList />} />
         </Routes>
       </Router>
     </ConfigProvider>
