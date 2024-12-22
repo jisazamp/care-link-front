@@ -190,6 +190,33 @@ export const MedicalReport: React.FC = () => {
             </Card>
 
             <Card
+              title="Tratamientos y recomendaciones"
+              className="detail-card"
+            >
+              <Form layout="vertical">
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item label="Tratamiento">
+                      <Input placeholder="Ingrese el tratamiento" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="Duración">
+                      <Input placeholder="Ingrese la duración" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={24}>
+                  <Col span={24}>
+                    <Form.Item label="Recomendaciones adicionales">
+                      <Input.TextArea rows={3} placeholder="Ingrese recomendaciones adicionales" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form>
+            </Card>
+
+            <Card
               title="Reportes clínicos previos"
               extra={<Button type="primary" icon={<PlusOutlined />}>Agregar</Button>}
               className="detail-card"
