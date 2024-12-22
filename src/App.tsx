@@ -17,6 +17,7 @@ import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { UsersList } from "./components/UsersList/UsersList";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
+import { MedicalReport } from "./components/MedicalReport/MedicalReport";
 
 export const colors = {
   primary: {
@@ -160,6 +161,14 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <MedicalRecord />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/usuarios/:id/reporte"
+              element={
+                <PrivateRoute>
+                  <MedicalReport />
                 </PrivateRoute>
               }
             />
