@@ -6,6 +6,7 @@ import { Login } from "./components/Login/Login";
 import { NewUser } from "./components/NewUser/NewUser";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { UserDetails } from "./components/UserDetails/UserDetails";
+import { MedicalReport } from "./components/MedicalReport/MedicalReport";
 
 export const App = () => {
   return (
@@ -46,6 +47,7 @@ export const App = () => {
           <Route path="/new-user" element={<NewUser />} />
           <Route path="/MedicalRecord" element={<MedicalRecord />} />
           <Route path="/UserDetails" element={<UserDetails />} />
+          <Route path="/MedicalReport" element={<MedicalReport />} />
         </Routes>
       </Router>
     </ConfigProvider>
