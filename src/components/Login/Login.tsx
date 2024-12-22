@@ -68,9 +68,9 @@ export const Login = () => {
         ]}
       />
       <Form
-        onFinish={handleSubmit(onSubmit)}
         layout="vertical"
         style={{ marginTop: "1rem" }}
+        onFinish={handleSubmit(onSubmit)}
       >
         {activeTab === "register" && (
           <>
