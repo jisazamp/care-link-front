@@ -5,10 +5,12 @@ import {
   Typography,
   Row,
   Col,
-  Divider
+  Divider,
+  Button
 } from 'antd';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import avatar from '../assets/Patients/patient1.jpg';
 
 const { Content, Sider } = Layout;
@@ -85,7 +87,15 @@ export const ShowMedicalReport: React.FC = () => {
                       backgroundColor: '#FFFFFF',
                     }}
                   >
-                    <Title level={5} style={{ fontWeight: 'bold', color: '#333333' }}>Reporte clínico - 001 10-20-2024 - Realizado por: SARA MANUELA GONZALEZ</Title>
+                    <Row justify="space-between" align="middle">
+                      <Col>
+                        <Title level={5} style={{ fontWeight: 'bold', color: '#333333' }}>Reporte clínico - 001 10-20-2024 - Realizado por: SARA MANUELA GONZALEZ</Title>
+                      </Col>
+                      <Col>
+                        <Button type="text" icon={<EditOutlined />} />
+                        <Button type="text" icon={<DeleteOutlined />} />
+                      </Col>
+                    </Row>
                     <Divider style={{ margin: '12px 0' }} />
                     <Row>
                       <Col span={12}>
