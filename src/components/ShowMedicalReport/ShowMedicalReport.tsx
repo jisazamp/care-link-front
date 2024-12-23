@@ -143,6 +143,38 @@ export const ShowMedicalReport: React.FC = () => {
                   </Card>
                 </Col>
 
+                                {/* Tercera tarjeta: Tratamiento y recomendaciones */}
+                                <Col span={24}>
+                  <Card
+                    className="card-legacy"
+                    style={{
+                      marginBottom: '16px',
+                      padding: '16px 24px',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                      backgroundColor: '#FFFFFF',
+                    }}
+                  >
+                    <Title level={5} style={{ fontWeight: 'bold', color: '#333333' }}>Tratamiento y recomendaciones</Title>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Row>
+                    <Col span={6} style={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <Title level={4} style={{ fontWeight: 'bold', fontSize: '16px', color: '#495057' }}>Recomendaciones</Title>
+                      </Col>
+                      <Col span={18}>
+                        <ul style={{ paddingLeft: '20px', color: '#333333', fontSize: '14px', lineHeight: '1.6' }}>
+                          <li>Limpiar la herida con suero fisiológico estéril y secar con gasas sin frotar.</li>
+                          <li>Aplicar un antiséptico tópico, según la indicación médica.</li>
+                          <li>Cubrir la herida con apósito estéril y asegurarlo, evitando la presión excesiva.</li>
+                          <li>Cambiar el apósito cada 24 horas o antes si está húmedo o sucio.</li>
+                          <li>Observar y documentar signos de infección: enrojecimiento, calor, hinchazón o exudado purulento.</li>
+                          <li>Administrar analgésicos según prescripción médica.</li>
+                        </ul>
+                      </Col>
+                    </Row>
+                  </Card>
+                </Col>
+
               </Row>
             </Card>
           </Card>
