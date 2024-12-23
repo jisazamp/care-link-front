@@ -13,7 +13,7 @@ import {
   Avatar,
   Tag,
 } from 'antd';
-import { SearchOutlined, DownOutlined, ReloadOutlined, SettingOutlined, FullscreenOutlined, } from '@ant-design/icons';
+import { SearchOutlined, DownOutlined, ReloadOutlined, SettingOutlined, FullscreenOutlined } from '@ant-design/icons';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
 
@@ -23,8 +23,8 @@ const { Title } = Typography;
 export const UserList: React.FC = () => {
   const menu = (
     <Menu>
-      <Menu.Item key="1">Opción 1</Menu.Item>
-      <Menu.Item key="2">Opción 2</Menu.Item>
+      <Menu.Item key="1">Ordenar por nombre</Menu.Item>
+      <Menu.Item key="2">Ordenar por estado</Menu.Item>
     </Menu>
   );
 
@@ -39,10 +39,10 @@ export const UserList: React.FC = () => {
           <Breadcrumb className="breadcrumb" style={{ marginBottom: '16px' }}>
             <Breadcrumb.Item>Home</Breadcrumb.Item>
             <Breadcrumb.Item>Usuarios</Breadcrumb.Item>
-            <Breadcrumb.Item>Lista de usuarios</Breadcrumb.Item>
+            <Breadcrumb.Item>Buscar usuarios</Breadcrumb.Item>
           </Breadcrumb>
 
-          <Title level={3} className="page-title">Lista de Usuarios</Title>
+          <Title level={3} className="page-title">Buscar usuarios</Title>
 
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <Card className="detail-card">
@@ -67,12 +67,12 @@ export const UserList: React.FC = () => {
               </Space>
             </Card>
 
-            <Card title="Lista de usuarios" className="detail-card">
+            <Card>
               <Table
                 dataSource={Array.from({ length: 20 }, (_, i) => ({
                   key: i,
                   avatar: <Avatar>{`P${i + 1}`}</Avatar>,
-                  name: `Paciente ${i + 1}`,
+                  name: `Mariela de Jesus Villa Escobar ${i + 1}`,
                   description: 'Lorem ipsum dolor sit amet.',
                   status: <Tag color="green">Activo</Tag>,
                   actions: [
@@ -111,10 +111,18 @@ export const UserList: React.FC = () => {
                   total: 50,
                   showSizeChanger: true,
                   pageSizeOptions: ['10', '20', '30'],
+                  locale: { items_per_page: '/página' },
+                  defaultPageSize: 10,
+                  showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} usuarios`,
+                  
                 }}
                 title={() => (
-                  <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                    <Typography.Text strong>Lista de usuarios</Typography.Text>
+                  <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>                    
+                    <Dropdown overlay={menu} trigger={['click']}>
+                      <Typography.Text strong style={{ cursor: 'pointer' }}>
+                        Ordenar por nombre <DownOutlined />
+                      </Typography.Text>
+                    </Dropdown>
                     <Space>
                       <Button icon={<ReloadOutlined />} />
                       <Button icon={<SettingOutlined />} />
