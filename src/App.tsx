@@ -8,6 +8,7 @@ import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { MedicalReport } from "./components/MedicalReport/MedicalReport";
 import { UserList } from "./components/UserList/UserList";
+import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
 
 export const App = () => {
   return (
@@ -50,6 +51,7 @@ export const App = () => {
           <Route path="/UserDetails" element={<UserDetails />} />
           <Route path="/MedicalReport" element={<MedicalReport />} />
           <Route path="/UserList" element={<UserList />} />
+          <Route path="/ShowMedicalReport" element={<ShowMedicalReport />} />
         </Routes>
       </Router>
     </ConfigProvider>
