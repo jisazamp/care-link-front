@@ -6,15 +6,77 @@ import {
   Row,
   Col,
   Divider,
-  Button
+  Button,
+  Table,
+  Checkbox
 } from 'antd';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import avatar from '../assets/Patients/patient1.jpg';
 
 const { Content, Sider } = Layout;
 const { Title, Text } = Typography;
+
+const dataSource = [
+  {
+    key: '1',
+    professional: 'Sara Manuela Gomez',
+    reportType: 'Enfermería',
+    date: '10/11/2024',
+    treatments: 'Sí',
+    actions: ''
+  },
+  {
+    key: '2',
+    professional: 'Juan Pablo Ruiz',
+    reportType: 'Ortopedia',
+    date: '10/11/2024',
+    treatments: 'No',
+    actions: ''
+  }
+];
+
+const columns = [
+  {
+    title: '',
+    dataIndex: 'checkbox',
+    key: 'checkbox',
+    render: () => <Checkbox />
+  },
+  {
+    title: 'Profesional',
+    dataIndex: 'professional',
+    key: 'professional',
+  },
+  {
+    title: 'Tipo Reporte',
+    dataIndex: 'reportType',
+    key: 'reportType',
+  },
+  {
+    title: 'Fecha',
+    dataIndex: 'date',
+    key: 'date',
+  },
+  {
+    title: 'Registro de tratamientos',
+    dataIndex: 'treatments',
+    key: 'treatments',
+    render: (text: string) => (<span>{text} <a>Ver</a></span>)
+  },
+  {
+    title: 'Acciones',
+    dataIndex: 'actions',
+    key: 'actions',
+    render: () => (
+      <span>
+        <a style={{ marginRight: 8 }}>Ver</a>
+        <a>Editar</a>
+      </span>
+    )
+  }
+];
 
 export const ShowMedicalReport: React.FC = () => {
   return (
@@ -42,17 +104,16 @@ export const ShowMedicalReport: React.FC = () => {
                   >
                     <Row align="middle">
                       <Col flex="96px">
-                      <img
-                        src={avatar}
-                        alt="Avatar del paciente"
-                        style={{
-                          width: '96px',
-                          height: '96px',
-                          borderRadius: '50%',
-                          objectFit: 'cover',
-                        }}
-                      />
-
+                        <img
+                          src={avatar}
+                          alt="Avatar del paciente"
+                          style={{
+                            width: '96px',
+                            height: '96px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                          }}
+                        />
                       </Col>
                       <Col flex="auto">
                         <Row>
@@ -143,8 +204,8 @@ export const ShowMedicalReport: React.FC = () => {
                   </Card>
                 </Col>
 
-                                {/* Tercera tarjeta: Tratamiento y recomendaciones */}
-                                <Col span={24}>
+                {/* Tercera tarjeta: Tratamiento y recomendaciones */}
+                <Col span={24}>
                   <Card
                     className="card-legacy"
                     style={{
@@ -158,7 +219,7 @@ export const ShowMedicalReport: React.FC = () => {
                     <Title level={5} style={{ fontWeight: 'bold', color: '#333333' }}>Tratamiento y recomendaciones</Title>
                     <Divider style={{ margin: '12px 0' }} />
                     <Row>
-                    <Col span={6} style={{ display: 'flex', alignItems: 'flex-start' }}>
+                      <Col span={6} style={{ display: 'flex', alignItems: 'flex-start' }}>
                         <Title level={4} style={{ fontWeight: 'bold', fontSize: '16px', color: '#495057' }}>Recomendaciones</Title>
                       </Col>
                       <Col span={18}>
@@ -172,6 +233,31 @@ export const ShowMedicalReport: React.FC = () => {
                         </ul>
                       </Col>
                     </Row>
+                  </Card>
+                </Col>
+
+                {/* Cuarta tarjeta: Reportes de Evolución Clínica */}
+                <Col span={24}>
+                  <Card
+                    className="card-legacy"
+                    style={{
+                      marginBottom: '16px',
+                      padding: '16px 24px',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                      backgroundColor: '#FFFFFF',
+                    }}
+                  >
+                    <Row justify="space-between" align="middle">
+                      <Col>
+                        <Title level={5} style={{ fontWeight: 'bold', color: '#333333' }}>Reportes de Evolución Clínica</Title>
+                      </Col>
+                      <Col>
+                        <Button type="primary" icon={<PlusCircleOutlined />}>Agregar</Button>
+                      </Col>
+                    </Row>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Table dataSource={dataSource} columns={columns} pagination={false} />
                   </Card>
                 </Col>
 
