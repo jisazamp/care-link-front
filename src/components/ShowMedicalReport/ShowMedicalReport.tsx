@@ -3,14 +3,13 @@ import {
   Layout,
   Card,
   Typography,
-  Space,
-  Avatar,
   Row,
-  Col
+  Col,
+  Divider
 } from 'antd';
-import patientImage from '../assets/Patients/patient1.jpg';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
+import avatar from '../assets/Patients/patient1.jpg';
 
 const { Content, Sider } = Layout;
 const { Title, Text } = Typography;
@@ -27,7 +26,8 @@ export const ShowMedicalReport: React.FC = () => {
           <Card className="main-frame" style={{ border: 'none', backgroundColor: 'transparent' }}>
             <Card className="inner-frame" style={{ margin: '16px', padding: '32px', borderRadius: '8px', boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)', backgroundColor: '#fff' }}>
               <Row gutter={[16, 16]}>
-                {/* Primera tarjeta con información del paciente */}
+
+                {/* Primera tarjeta: Información del paciente */}
                 <Col span={24}>
                   <Card
                     className="card-legacy"
@@ -40,15 +40,17 @@ export const ShowMedicalReport: React.FC = () => {
                   >
                     <Row align="middle">
                       <Col flex="96px">
-                        <Avatar
-                          src={patientImage}
-                          size={96}
-                          alt="Avatar del paciente"
-                          style={{
-                            borderRadius: '50%',
-                            border: '1px solid #ddd',
-                          }}
-                        />
+                      <img
+                        src={avatar}
+                        alt="Avatar del paciente"
+                        style={{
+                          width: '96px',
+                          height: '96px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                        }}
+                      />
+
                       </Col>
                       <Col flex="auto">
                         <Row>
@@ -73,33 +75,64 @@ export const ShowMedicalReport: React.FC = () => {
 
                 {/* Segunda tarjeta: Tipo de reporte */}
                 <Col span={24}>
-                  <Card className="card-legacy" style={{ marginBottom: '16px' }}>
-                    <Title level={5}>Tipo de reporte</Title>
-                    <Text>Enfermería</Text>
+                  <Card
+                    className="card-legacy"
+                    style={{
+                      marginBottom: '16px',
+                      padding: '16px 24px',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                      backgroundColor: '#FFFFFF',
+                    }}
+                  >
+                    <Title level={5} style={{ fontWeight: 'bold', color: '#333333' }}>Reporte clínico - 001 10-20-2024 - Realizado por: SARA MANUELA GONZALEZ</Title>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Row>
+                      <Col span={12}>
+                        <div style={{ paddingBottom: '8px' }}>
+                          <Title level={5} style={{ fontWeight: 'bold', fontSize: '14px', color: '#495057' }}>Tipo de reporte</Title>
+                          <Text style={{ fontSize: '14px', color: '#333333' }}>Enfermería</Text>
+                        </div>
+                        <div style={{ paddingBottom: '8px' }}>
+                          <Title level={5} style={{ fontWeight: 'bold', fontSize: '14px', color: '#495057' }}>Motivo de consulta</Title>
+                          <Text style={{ fontSize: '14px', color: '#333333' }}>Usuario se cayó en la mañana mientras se bañaba</Text>
+                        </div>
+                      </Col>
+                      <Col span={12}>
+                        <div style={{ paddingBottom: '8px' }}>
+                          <Title level={5} style={{ fontWeight: 'bold', fontSize: '14px', color: '#495057' }}>Exploración física</Title>
+                          <Text style={{ fontSize: '14px', color: '#333333' }}>Peso: 65 kg</Text><br />
+                          <Text style={{ fontSize: '14px', color: '#333333' }}>Presión arterial: 110 mm</Text><br />
+                          <Text style={{ fontSize: '14px', color: '#333333' }}>Frecuencia cardíaca: 80 lpm</Text><br />
+                          <Text style={{ fontSize: '14px', color: '#333333' }}>Temperatura corporal: 38° - Fiebre leve</Text><br />
+                          <Text style={{ fontSize: '14px', color: '#333333' }}>Pulsioximetría: 95%</Text>
+                        </div>
+                      </Col>
+                    </Row>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Row>
+                      <Col span={24}>
+                        <Title level={5} style={{ fontWeight: 'bold', fontSize: '14px', color: '#495057' }}>Diagnóstico</Title>
+                        <Text style={{ fontSize: '14px', color: '#333333' }}>Integridad de la piel alterada relacionada con herida en la rodilla izquierda debido a traumatismo leve</Text>
+                      </Col>
+                    </Row>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Row>
+                      <Col span={24}>
+                        <Title level={5} style={{ fontWeight: 'bold', fontSize: '14px', color: '#495057' }}>Observaciones</Title>
+                        <Text style={{ fontSize: '14px', color: '#666666' }}>Visible solo para el propietario del reporte.</Text>
+                      </Col>
+                    </Row>
+                    <Divider style={{ margin: '12px 0' }} />
+                    <Row>
+                      <Col span={24}>
+                        <Title level={5} style={{ fontWeight: 'bold', fontSize: '14px', color: '#495057' }}>Remisión</Title>
+                        <Text style={{ fontSize: '14px', color: '#666666' }}>Ortopedia</Text>
+                      </Col>
+                    </Row>
                   </Card>
                 </Col>
 
-                {/* Tercera tarjeta: Exploración física */}
-                <Col span={24}>
-                  <Card className="card-legacy" style={{ marginBottom: '16px' }}>
-                    <Title level={5}>Exploración física</Title>
-                    <Space direction="vertical">
-                      <Text>Peso: 65 kg</Text>
-                      <Text>Presión arterial: 110 mm</Text>
-                      <Text>Frecuencia cardíaca: 80 lpm</Text>
-                      <Text>Temperatura corporal: 38° - Fiebre leve</Text>
-                      <Text>Pulsioximetría: 95%</Text>
-                    </Space>
-                  </Card>
-                </Col>
-
-                {/* Cuarta tarjeta: Diagnóstico */}
-                <Col span={24}>
-                  <Card className="card-legacy" style={{ marginBottom: '16px' }}>
-                    <Title level={5}>Diagnóstico</Title>
-                    <Text>Integridad de la piel alterada relacionada con herida en la rodilla izquierda debido a traumatismo leve</Text>
-                  </Card>
-                </Col>
               </Row>
             </Card>
           </Card>
