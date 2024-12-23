@@ -14,7 +14,7 @@ const menuItems = [
     children: [
       { key: "2.1", label: <a href="/new-user">Nuevo Usuario</a> },
       { key: "2.2", label: "Nuevo Reporte Clínico" },
-      { key: "2.3", label: "Lista de Usuarios" },
+      { key: "2.3", label: <a href="/userlist">Lista de Usiarios</a> },
     ],
   },
   {
