@@ -13,7 +13,7 @@ import {
   Avatar,
   Tag,
 } from 'antd';
-import { SearchOutlined, DownOutlined, ReloadOutlined, SettingOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { SearchOutlined, DownOutlined, ReloadOutlined, SettingOutlined, FullscreenOutlined, ColumnHeightOutlined } from '@ant-design/icons';
 import { Header } from '../Header/Header';
 import { Sidebar } from '../Sidebar/Sidebar';
 
@@ -118,13 +118,10 @@ export const UserList: React.FC = () => {
                 }}
                 title={() => (
                   <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>                    
-                    <Dropdown overlay={menu} trigger={['click']}>
-                      <Typography.Text strong style={{ cursor: 'pointer' }}>
-                        Ordenar por nombre <DownOutlined />
-                      </Typography.Text>
-                    </Dropdown>
+                    <Typography.Text strong>Lista de usuarios</Typography.Text>
                     <Space>
                       <Button icon={<ReloadOutlined />} />
+                      <Button icon={<ColumnHeightOutlined />} />
                       <Button icon={<SettingOutlined />} />
                       <Button icon={<FullscreenOutlined />} />
                     </Space>
