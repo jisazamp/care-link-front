@@ -63,7 +63,7 @@ const columns = [
     title: 'Registro de tratamientos',
     dataIndex: 'treatments',
     key: 'treatments',
-    render: (text: string) => (<span>{text} <a>Ver</a></span>)
+    render: (text: string) => (<span>{text} | <a>Ver</a></span>)
   },
   {
     title: 'Acciones',
