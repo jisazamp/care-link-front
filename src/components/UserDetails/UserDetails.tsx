@@ -306,13 +306,13 @@ export const UserDetails: React.FC = () => {
                 <Col span={12}>
                   <Descriptions title="Preexistencias y Alergias" column={1}>
                     <Descriptions.Item label="Cirugías">
-                      Sí <a href="#">Ver</a>
+                      Sí | <a href="#"> Ver </a>
                     </Descriptions.Item>
                     <Descriptions.Item label="Alergias a medicamentos">
-                      Sí <a href="#">Ver</a>
+                      Sí | <a href="#">Ver</a>
                     </Descriptions.Item>
                     <Descriptions.Item label="Otras Alergias">
-                      Sí <a href="#">Ver</a>
+                      Sí | <a href="#">Ver</a>
                     </Descriptions.Item>
                     <Descriptions.Item label="Condiciones Especiales">
                       <a href="#">Ver</a>
