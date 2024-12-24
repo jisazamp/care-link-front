@@ -4,6 +4,7 @@ import {
   Card,
   Typography,
   Row,
+  Breadcrumb,
   Col,
   Divider,
   Button
@@ -25,6 +26,12 @@ export const ContractDetail: React.FC = () => {
           <Sidebar />
         </Sider>
         <Content style={{ padding: '24px' }}>
+        <Breadcrumb style={{ margin: "16px 0" }}>
+            <Breadcrumb.Item>Inicio</Breadcrumb.Item>
+            <Breadcrumb.Item>Usuarios</Breadcrumb.Item>
+            <Breadcrumb.Item>Juan Antonio Lopez Orrego</Breadcrumb.Item>
+            <Breadcrumb.Item>Vista Detalle Reporte Clínico</Breadcrumb.Item>
+          </Breadcrumb>
           <Card className="main-frame" style={{ border: 'none', backgroundColor: 'transparent' }}>
             <Card className="inner-frame" style={{ margin: '16px', padding: '32px', borderRadius: '8px', boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)', backgroundColor: '#fff' }}>
               <Row gutter={[16, 16]}>
