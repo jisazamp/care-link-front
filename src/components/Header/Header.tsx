@@ -1,4 +1,6 @@
 import { Avatar, Badge, Layout, Typography, Flex, Tooltip, Button } from "antd";
+import { useAuthStore } from "../../store/auth";
+import { queryClient } from "../../main";
 import {
   BellOutlined,
   LogoutOutlined,
@@ -6,15 +8,19 @@ import {
   SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useAuthStore } from "../../store/auth";
+import { useGetUserInfo } from "../../hooks/useGetUserInfo/useGetUserInfo";
 
 const { Header: AntHeader } = Layout;
 
 export const Header = () => {
   const setJwtToken = useAuthStore((state) => state.setJwtToken);
+  const { data } = useGetUserInfo();
 
   const onLogout = () => {
     setJwtToken(null);
+    queryClient.invalidateQueries({
+      queryKey: ["get-user-info"],
+    });
   };
 
   return (
@@ -64,7 +70,7 @@ export const Header = () => {
         <Flex gap="small" style={{ alignItems: "center" }}>
           <Avatar icon={<UserOutlined />} />
           <Typography.Paragraph style={{ color: "#fff", margin: 0 }}>
-            Andrea Salazar
+            {`${data?.data.data.first_name ?? ""} ${data?.data.data.last_name ?? ""}`}
           </Typography.Paragraph>
         </Flex>
         <Tooltip title="Cerrar sesión">
