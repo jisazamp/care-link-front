@@ -3,6 +3,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { useForm, Controller } from "react-hook-form";
 import {
   Breadcrumb,
+  Spin,
   Button,
   Card,
   Col,
@@ -13,9 +14,19 @@ import {
   Select,
   Typography,
   Upload,
+  Flex,
 } from "antd";
+import request from "axios";
 import { UploadOutlined } from "@ant-design/icons";
+import { useCreateUserMutation } from "../../hooks/useCreateUserMutation/useCreateUserMutation";
+import { useEffect } from "react";
+import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import { useParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { User } from "../../types";
+import { CivilStatus, Gender, UserFamilyType, UserStatus } from "../../enums";
+import { useNavigate } from "react-router-dom";
+import { useEditUserMutation } from "../../hooks/useEditUserMutation/useEditUserMutation";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -34,7 +45,7 @@ const formSchema = z.object({
   lastName: z
     .string({ message: "Los apellidos son requeridos" })
     .nonempty("Los apellidos son requeridos"),
-  gender: z.enum(["Hombre", "Mujer", "Otro"], {
+  gender: z.enum(["Masculino", "Femenino", "Neutro"], {
     errorMap: () => ({ message: "El género es requerido" }),
   }),
   dateOfBirth: z
@@ -42,9 +53,10 @@ const formSchema = z.object({
     .refine((date) => date.isBefore(dayjs()), {
       message: "La fecha debe ser anterior al día actual",
     }),
-  maritalStatus: z.enum(["Casado", "Soltero", "Divorciado", "Viudo"], {
+  maritalStatus: z.nativeEnum(CivilStatus, {
     errorMap: () => ({ message: "El estado civil es requerido" }),
   }),
+  email: z.string().email(),
   occupation: z.string().optional(),
   photo: z
     .any()
@@ -63,6 +75,9 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export const NewUser: React.FC = () => {
+  const params = useParams();
+  const userId = params.id;
+
   const {
     control,
     formState: { errors },
@@ -71,15 +86,84 @@ export const NewUser: React.FC = () => {
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      gender: "Hombre",
-      userId: "0001",
+      gender: "Masculino",
+      userId: "0000",
     },
   });
 
+  const navigate = useNavigate();
+  const { data, isError, isLoading, error } = useGetUserById(userId);
+  const {
+    mutate: createUser,
+    isSuccess: isSuccessCreateUser,
+    isPending: isPendingCreateUser,
+  } = useCreateUserMutation();
+  const { mutate: editUser, isSuccess: isSuccessEditUser } =
+    useEditUserMutation();
+
   const onSubmit = (data: FormValues) => {
-    console.log("Datos:", data);
-    reset();
+    const user: Partial<User> = {
+      apellidos: data.lastName,
+      email: data.email,
+      escribe: false,
+      estado: "ACTIVO" as UserStatus,
+      estado_civil: data.maritalStatus as CivilStatus,
+      fecha_nacimiento: data.dateOfBirth.format("YYYY-MM-DD"),
+      fecha_registro: dayjs().toISOString(),
+      genero: data.gender as Gender,
+      ha_estado_en_otro_centro: false,
+      lee: false,
+      n_documento: data.documentNumber,
+      nombres: data.firstName,
+      nucleo_familiar: "Nuclear" as UserFamilyType,
+      proteccion_exequial: false,
+    };
+    if (!userId) {
+      createUser(user);
+      return;
+    }
+    editUser({ user: user, id: userId });
   };
+
+  useEffect(() => {
+    if (data?.data.data) {
+      reset({
+        dateOfBirth: dayjs(data.data.data.fecha_nacimiento),
+        documentNumber: data.data.data.n_documento + "",
+        firstName: data.data.data.nombres + "",
+        lastName: data.data.data.apellidos + "",
+        userId: data.data.data.id_usuario + "",
+        maritalStatus: data.data.data.estado_civil as CivilStatus,
+        gender: data.data.data.genero as Gender,
+        email: data.data.data.email ?? "",
+      });
+    }
+  }, [data?.data.data, reset]);
+
+  useEffect(() => {
+    if (isSuccessCreateUser || isSuccessEditUser) {
+      navigate("/usuarios");
+    }
+  }, [isSuccessCreateUser, isSuccessEditUser, navigate]);
+
+  if (isLoading) {
+    return (
+      <Flex align="center" justify="center" style={{ minHeight: "300px" }}>
+        <Spin />
+      </Flex>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Flex align="center">
+        <Typography.Text style={{ fontSize: "30px" }}>
+          {request.isAxiosError(error) &&
+            (error.response?.data as { error: string[] }).error?.[0]}
+        </Typography.Text>
+      </Flex>
+    );
+  }
 
   return (
     <>
@@ -210,9 +294,9 @@ export const NewUser: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select {...field}>
-                          <Option value="Hombre">Hombre</Option>
-                          <Option value="Mujer">Mujer</Option>
-                          <Option value="Otro">Otro</Option>
+                          <Option value="Masculino">Masculino</Option>
+                          <Option value="Femenino">Femenino</Option>
+                          <Option value="Neutro">Neutro</Option>
                         </Select>
                       )}
                     />
@@ -288,6 +372,25 @@ export const NewUser: React.FC = () => {
               <Row gutter={24}>
                 <Col span={8}>
                   <Form.Item
+                    label="Email"
+                    validateStatus={errors.email ? "error" : ""}
+                    help={
+                      errors.email?.message && (
+                        <Text type="danger">{errors.email.message}</Text>
+                      )
+                    }
+                  >
+                    <Controller
+                      name="email"
+                      control={control}
+                      render={({ field }) => (
+                        <Input {...field} placeholder="Correo electrónico" />
+                      )}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
                     label="Fotografía"
                     validateStatus={errors.photo ? "error" : ""}
                     help={
@@ -341,7 +444,11 @@ export const NewUser: React.FC = () => {
                 >
                   Restablecer
                 </Button>
-                <Button type="default" htmlType="submit">
+                <Button
+                  type="default"
+                  htmlType="submit"
+                  loading={isPendingCreateUser}
+                >
                   Guardar y continuar
                 </Button>
               </Row>

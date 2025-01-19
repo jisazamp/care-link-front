@@ -21,7 +21,7 @@ export type User = {
   nucleo_familiar: UserFamilyType | null;
   ocupacion_quedesempeño: string | null;
   origen_otrocentro: string | null;
-  proteccion_exequial: string | null;
+  proteccion_exequial: boolean | null;
   regimen_seguridad_social: string | null;
   telefono: number | null;
   tipo_afiliacion: string | null;

@@ -4,21 +4,24 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
+import { Link } from "react-router-dom";
 
 const menuItems = [
   {
     key: "1",
     icon: <HomeOutlined />,
-    label: <a href="/home">Tablero de inicio</a>,
+    label: <Link to="home">Inicio</Link>,
   },
   {
     key: "2",
     icon: <UserOutlined />,
-    label: "Usuarios",
+    label: "Pacientes",
     children: [
-      { key: "2.1", label: <a href="/new-user">Nuevo Usuario</a> },
-      { key: "2.2", label: "Nuevo Reporte Clínico" },
-      { key: "2.3", label: "Lista de Usuarios" },
+      { key: "2.1", label: <Link to="usuarios">Listado de pacientes</Link> },
+      {
+        key: "2.2",
+        label: <Link to="usuarios/crear">Registrar nuevo paciente</Link>,
+      },
     ],
   },
   {

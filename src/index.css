@@ -7,3 +7,11 @@ body {
   padding: 6.4px 15px;
   height: 40px;
 }
+
+.main-button-danger {
+  background-color: red;
+}
+
+.main-button-danger::hover {
+  background-color: blue;
+}
