@@ -4,15 +4,11 @@ import {
   Card,
   Checkbox,
   Flex,
-  Layout,
   Row,
   Table,
   Typography,
 } from "antd";
-import { Sidebar } from "../Sidebar/Sidebar";
-import { Header } from "../Header/Header";
 
-const { Content, Sider } = Layout;
 const { Title } = Typography;
 
 const columnsUserFlow = [
@@ -134,37 +130,31 @@ const columnsAttendance = [
 
 export const Home = () => {
   return (
-    <Layout>
-      <Header />
-      <Layout>
-        <Sider collapsible style={{ backgroundColor: "#FFF" }}>
-          <Sidebar />
-        </Sider>
-        <Content style={{ padding: "0 16px 30px 16px" }}>
-          <Breadcrumb style={{ margin: "16px 0" }}>
-            <Breadcrumb.Item>Inicio</Breadcrumb.Item>
-            <Breadcrumb.Item>Tablero de Inicio</Breadcrumb.Item>
-          </Breadcrumb>
-          <Flex vertical gap="middle">
-            <Card
-              title={<Title level={5}>Control de asistencia del día</Title>}
-              extra={<Button type="primary">Agregar</Button>}
-            >
-              <Table
-                dataSource={attendanceData}
-                columns={columnsAttendance}
-                pagination={false}
-              />
-            </Card>
-            <Flex gap="middle">
-              <Card
-                title={<Title level={5}>Flujo de usuarios</Title>}
-                style={{
-                  flex: 1,
-                }}
-              >
-                <Row gutter={[16, 16]}>
-                  {/* <Col span={12}>
+    <>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>Inicio</Breadcrumb.Item>
+        <Breadcrumb.Item>Tablero de Inicio</Breadcrumb.Item>
+      </Breadcrumb>
+      <Flex vertical gap="middle">
+        <Card
+          title={<Title level={5}>Control de asistencia del día</Title>}
+          extra={<Button type="primary">Agregar</Button>}
+        >
+          <Table
+            dataSource={attendanceData}
+            columns={columnsAttendance}
+            pagination={false}
+          />
+        </Card>
+        <Flex gap="middle">
+          <Card
+            title={<Title level={5}>Flujo de usuarios</Title>}
+            style={{
+              flex: 1,
+            }}
+          >
+            <Row gutter={[16, 16]}>
+              {/* <Col span={12}>
                     <img
                       src={Grafica1}
                       alt="Gráfico Usuarios del Mes"
@@ -175,7 +165,7 @@ export const Home = () => {
                     />
                   </Col>
                   */}
-                  {/* <Col span={12}>
+              {/* <Col span={12}>
                     <img
                       src={Grafica2}
                       alt="Gráfico Tasa de Asistencia"
@@ -186,33 +176,31 @@ export const Home = () => {
                     />
                   </Col>
                   */}
-                </Row>
-                <Table
-                  dataSource={userFlowData}
-                  columns={columnsUserFlow}
-                  pagination={{
-                    pageSize: 5,
-                  }}
-                />
-              </Card>
-              <Card
-                title={<Title level={5}>Actividades programadas</Title>}
-                style={{
-                  flex: 1,
-                }}
-              >
-                <Table
-                  dataSource={activitiesData}
-                  columns={columnsActivities}
-                  pagination={{
-                    pageSize: 5,
-                  }}
-                />
-              </Card>
-            </Flex>
-          </Flex>
-        </Content>
-      </Layout>
-    </Layout>
+            </Row>
+            <Table
+              dataSource={userFlowData}
+              columns={columnsUserFlow}
+              pagination={{
+                pageSize: 5,
+              }}
+            />
+          </Card>
+          <Card
+            title={<Title level={5}>Actividades programadas</Title>}
+            style={{
+              flex: 1,
+            }}
+          >
+            <Table
+              dataSource={activitiesData}
+              columns={columnsActivities}
+              pagination={{
+                pageSize: 5,
+              }}
+            />
+          </Card>
+        </Flex>
+      </Flex>
+    </>
   );
 };
