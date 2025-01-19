@@ -60,7 +60,7 @@ const formSchema = z.object({
         (value.file instanceof File && value.file.size <= 5 * 1024 * 1024),
       {
         message: "La foto debe ser un archivo válido y pesar menos de 5MB",
-      }
+      },
     ),
 });
 

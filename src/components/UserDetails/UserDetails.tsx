@@ -1,4 +1,4 @@
-import React  from 'react';
+import React from "react";
 import {
   Layout,
   Card,
@@ -14,39 +14,43 @@ import {
   Col,
   Tag,
   Descriptions,
-} from 'antd';
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { Header } from '../Header/Header';
-import { Sidebar } from '../Sidebar/Sidebar';
-import patientImage from '../assets/Patients/patient1.jpg';
+} from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { Header } from "../Header/Header";
+import { Sidebar } from "../Sidebar/Sidebar";
+import patientImage from "../assets/Patients/patient1.jpg";
 
 const { Content, Sider } = Layout;
 const { Title } = Typography;
 
 const clinicalReportsData = [
   {
-    key: '1',
-    professional: 'Sara Manuela Gomez',
-    reportType: 'Enfermería',
-    date: '10/20/2024',
+    key: "1",
+    professional: "Sara Manuela Gomez",
+    reportType: "Enfermería",
+    date: "10/20/2024",
     actions: [
-      <a key="view" href="#">Ver</a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>Editar</a>,
+      <a key="view" href="#">
+        Ver
+      </a>,
+      <a key="edit" href="#" style={{ marginLeft: 8 }}>
+        Editar
+      </a>,
     ],
   },
   {
-    key: '2',
-    professional: 'Juan Pablo Ruiz',
-    reportType: 'Ortopedia',
-    date: '10/24/2024',
+    key: "2",
+    professional: "Juan Pablo Ruiz",
+    reportType: "Ortopedia",
+    date: "10/24/2024",
     actions: [
-      <a key="view" href="#">Ver</a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>Editar</a>,
+      <a key="view" href="#">
+        Ver
+      </a>,
+      <a key="edit" href="#" style={{ marginLeft: 8 }}>
+        Editar
+      </a>,
     ],
   },
 ];
@@ -54,44 +58,48 @@ const clinicalReportsData = [
 const columns = [
   {
     title: <Checkbox />,
-    dataIndex: 'checkbox',
+    dataIndex: "checkbox",
     render: () => <Checkbox />,
-    width: '5%',
+    width: "5%",
   },
   {
-    title: 'Profesional',
-    dataIndex: 'professional',
-    key: 'professional',
+    title: "Profesional",
+    dataIndex: "professional",
+    key: "professional",
   },
   {
-    title: 'Tipo Reporte',
-    dataIndex: 'reportType',
-    key: 'reportType',
+    title: "Tipo Reporte",
+    dataIndex: "reportType",
+    key: "reportType",
   },
   {
-    title: 'Fecha',
-    dataIndex: 'date',
-    key: 'date',
+    title: "Fecha",
+    dataIndex: "date",
+    key: "date",
   },
   {
-    title: 'Acciones',
-    dataIndex: 'actions',
-    key: 'actions',
+    title: "Acciones",
+    dataIndex: "actions",
+    key: "actions",
   },
 ];
 
 const acudientesData = [
   {
-    key: '1',
-    nombres: 'Maria Patricia',
-    apellidos: 'Lopez Gomez',
-    parentesco: 'Hija',
-    telefono: '304567890',
-    direccion: 'CLL 45 - 60-20 INT 101',
-    email: 'maria@gmail.com',
+    key: "1",
+    nombres: "Maria Patricia",
+    apellidos: "Lopez Gomez",
+    parentesco: "Hija",
+    telefono: "304567890",
+    direccion: "CLL 45 - 60-20 INT 101",
+    email: "maria@gmail.com",
     acciones: [
-      <a key="edit" href="#">Editar</a>,
-      <a key="delete" href="#" style={{ marginLeft: 8 }}>Eliminar</a>,
+      <a key="edit" href="#">
+        Editar
+      </a>,
+      <a key="delete" href="#" style={{ marginLeft: 8 }}>
+        Eliminar
+      </a>,
     ],
   },
 ];
@@ -99,58 +107,62 @@ const acudientesData = [
 const acudientesColumns = [
   {
     title: <Checkbox />,
-    dataIndex: 'checkbox',
+    dataIndex: "checkbox",
     render: () => <Checkbox />,
-    width: '5%',
+    width: "5%",
   },
   {
-    title: 'Nombres',
-    dataIndex: 'nombres',
-    key: 'nombres',
+    title: "Nombres",
+    dataIndex: "nombres",
+    key: "nombres",
   },
   {
-    title: 'Apellidos',
-    dataIndex: 'apellidos',
-    key: 'apellidos',
+    title: "Apellidos",
+    dataIndex: "apellidos",
+    key: "apellidos",
   },
   {
-    title: 'Parentesco',
-    dataIndex: 'parentesco',
-    key: 'parentesco',
+    title: "Parentesco",
+    dataIndex: "parentesco",
+    key: "parentesco",
   },
   {
-    title: 'Teléfono',
-    dataIndex: 'telefono',
-    key: 'telefono',
+    title: "Teléfono",
+    dataIndex: "telefono",
+    key: "telefono",
   },
   {
-    title: 'Dirección',
-    dataIndex: 'direccion',
-    key: 'direccion',
+    title: "Dirección",
+    dataIndex: "direccion",
+    key: "direccion",
   },
   {
-    title: 'E-Mail',
-    dataIndex: 'email',
-    key: 'email',
+    title: "E-Mail",
+    dataIndex: "email",
+    key: "email",
   },
   {
-    title: 'Acciones',
-    dataIndex: 'acciones',
-    key: 'acciones',
+    title: "Acciones",
+    dataIndex: "acciones",
+    key: "acciones",
   },
 ];
 
 const contractsData = [
   {
-    key: '1',
-    fechaInicio: '12/12/2024',
-    estado: 'Activo',
-    servicios: 'Centro día, transporte',
-    firmado: 'Sí',
-    estadoFacturacion: 'Al día',
+    key: "1",
+    fechaInicio: "12/12/2024",
+    estado: "Activo",
+    servicios: "Centro día, transporte",
+    firmado: "Sí",
+    estadoFacturacion: "Al día",
     acciones: [
-      <a key="view" href="#">Ver</a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>Editar</a>,
+      <a key="view" href="#">
+        Ver
+      </a>,
+      <a key="edit" href="#" style={{ marginLeft: 8 }}>
+        Editar
+      </a>,
     ],
   },
 ];
@@ -158,39 +170,39 @@ const contractsData = [
 const contractsColumns = [
   {
     title: <Checkbox />,
-    dataIndex: 'checkbox',
+    dataIndex: "checkbox",
     render: () => <Checkbox />,
-    width: '5%',
+    width: "5%",
   },
   {
-    title: 'Fecha de inicio',
-    dataIndex: 'fechaInicio',
-    key: 'fechaInicio',
+    title: "Fecha de inicio",
+    dataIndex: "fechaInicio",
+    key: "fechaInicio",
   },
   {
-    title: 'Estado',
-    dataIndex: 'estado',
-    key: 'estado',
+    title: "Estado",
+    dataIndex: "estado",
+    key: "estado",
   },
   {
-    title: 'Servicios',
-    dataIndex: 'servicios',
-    key: 'servicios',
+    title: "Servicios",
+    dataIndex: "servicios",
+    key: "servicios",
   },
   {
-    title: 'Firmado',
-    dataIndex: 'firmado',
-    key: 'firmado',
+    title: "Firmado",
+    dataIndex: "firmado",
+    key: "firmado",
   },
   {
-    title: 'Estado Facturación',
-    dataIndex: 'estadoFacturacion',
-    key: 'estadoFacturacion',
+    title: "Estado Facturación",
+    dataIndex: "estadoFacturacion",
+    key: "estadoFacturacion",
   },
   {
-    title: 'Acciones',
-    dataIndex: 'acciones',
-    key: 'acciones',
+    title: "Acciones",
+    dataIndex: "acciones",
+    key: "acciones",
   },
 ];
 
@@ -210,9 +222,11 @@ export const UserDetails: React.FC = () => {
             <Breadcrumb.Item>Vista Detalle</Breadcrumb.Item>
           </Breadcrumb>
 
-          <Title level={3} className="page-title">Juan Antonio Lopez Orrego</Title>
+          <Title level={3} className="page-title">
+            Juan Antonio Lopez Orrego
+          </Title>
 
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Space direction="vertical" size="large" style={{ width: "100%" }}>
             {/* Card: Datos básicos y de localización */}
             <Card
               title="Datos básicos y de localización"
@@ -245,13 +259,19 @@ export const UserDetails: React.FC = () => {
                     <Descriptions.Item label="Documento">
                       44567890
                     </Descriptions.Item>
-                    <Descriptions.Item label="Género">Masculino</Descriptions.Item>
+                    <Descriptions.Item label="Género">
+                      Masculino
+                    </Descriptions.Item>
                     <Descriptions.Item label="Fecha de Nacimiento">
                       1956/11/08
                     </Descriptions.Item>
                     <Descriptions.Item label="Edad">68 años</Descriptions.Item>
-                    <Descriptions.Item label="Estado Civil">Casado</Descriptions.Item>
-                    <Descriptions.Item label="Teléfono">315 6789 6789</Descriptions.Item>
+                    <Descriptions.Item label="Estado Civil">
+                      Casado
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Teléfono">
+                      315 6789 6789
+                    </Descriptions.Item>
                     <Descriptions.Item label="Email">
                       juanantonio@gmail.com
                     </Descriptions.Item>
@@ -265,7 +285,11 @@ export const UserDetails: React.FC = () => {
               title="Historia Clínica"
               extra={
                 <Space>
-                  <Button icon={<EditOutlined />} type="primary" onClick={() => navigate('/MedicalRecord')}>
+                  <Button
+                    icon={<EditOutlined />}
+                    type="primary"
+                    onClick={() => navigate("/MedicalRecord")}
+                  >
                     Editar
                   </Button>
                   <Button icon={<DeleteOutlined />} danger>
@@ -281,15 +305,22 @@ export const UserDetails: React.FC = () => {
                     <Descriptions.Item label="Empresa de Salud Domiciliaria">
                       604 607 8990
                     </Descriptions.Item>
-                    <Descriptions.Item label="Tipo de Sangre">O+</Descriptions.Item>
-                    <Descriptions.Item label="Estatura">165 cm</Descriptions.Item>
+                    <Descriptions.Item label="Tipo de Sangre">
+                      O+
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Estatura">
+                      165 cm
+                    </Descriptions.Item>
                     <Descriptions.Item label="Motivo de Ingreso">
                       Usuario de centro de día
                     </Descriptions.Item>
                   </Descriptions>
                 </Col>
                 <Col span={12}>
-                  <Descriptions title="Discapacidades, Apoyos y Limitaciones" column={1}>
+                  <Descriptions
+                    title="Discapacidades, Apoyos y Limitaciones"
+                    column={1}
+                  >
                     <Descriptions.Item label="Discapacidad">
                       <Tag color="purple">Visual</Tag>
                       <Tag color="purple">Auditiva</Tag>
@@ -297,7 +328,9 @@ export const UserDetails: React.FC = () => {
                     <Descriptions.Item label="Limitaciones">
                       Ayuda para ir al baño
                     </Descriptions.Item>
-                    <Descriptions.Item label="Dieta Especial">Sí</Descriptions.Item>
+                    <Descriptions.Item label="Dieta Especial">
+                      Sí
+                    </Descriptions.Item>
                   </Descriptions>
                 </Col>
               </Row>
@@ -323,8 +356,12 @@ export const UserDetails: React.FC = () => {
                   <Descriptions title="Hábitos y otros datos" column={1}>
                     <Descriptions.Item label="Cafeína">Sí</Descriptions.Item>
                     <Descriptions.Item label="Tabaquismo">No</Descriptions.Item>
-                    <Descriptions.Item label="Alcoholismo">No</Descriptions.Item>
-                    <Descriptions.Item label="Sustancias Psicoactivas">No</Descriptions.Item>
+                    <Descriptions.Item label="Alcoholismo">
+                      No
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Sustancias Psicoactivas">
+                      No
+                    </Descriptions.Item>
                     <Descriptions.Item label="Maltratado">No</Descriptions.Item>
                   </Descriptions>
                 </Col>

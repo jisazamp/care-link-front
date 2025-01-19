@@ -1,13 +1,13 @@
 import "./index.css";
+import es from "antd/es/date-picker/locale/es_ES";
+import esES from "antd/es/locale/es_ES";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ConfigProvider } from "antd";
 import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
-import { NewUser } from "./components/NewUser/NewUser";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
+import { NewUser } from "./components/NewUser/NewUser";
 import { UserDetails } from "./components/UserDetails/UserDetails";
-import es from "antd/es/date-picker/locale/es_ES";
-import esES from "antd/es/locale/es_ES";
 
 export const colors = {
   primary: {
