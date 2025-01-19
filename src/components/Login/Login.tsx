@@ -1,4 +1,4 @@
-import { Form, Input, Button, Typography, Flex } from "antd";
+import { Form, Input, Button, Typography, Flex, notification } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useAuthStore } from "../../store/auth";
 import { useEffect } from "react";
@@ -7,6 +7,7 @@ import { useLoginMutation } from "../../hooks/useLoginMutation/useLoginMutation"
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import request from "axios";
 
 const { Text } = Typography;
 
@@ -30,7 +31,9 @@ export const Login = () => {
     },
   });
 
-  const { mutate: login, isPending } = useLoginMutation();
+  const [api, contextHolder] = notification.useNotification();
+
+  const { error, mutate: login, isPending, isError } = useLoginMutation();
   const jwtToken = useAuthStore((state) => state.jwtToken);
   const navigate = useNavigate();
 
@@ -44,6 +47,15 @@ export const Login = () => {
     }
   }, [jwtToken, navigate]);
 
+  useEffect(() => {
+    if (isError && request.isAxiosError(error)) {
+      api.error({
+        message: error.message,
+        description: (error.response?.data as { error: string[] }).error?.[0],
+      });
+    }
+  }, [isError, error, api]);
+
   return (
     <Flex
       vertical
@@ -54,6 +66,7 @@ export const Login = () => {
         maxWidth: 400,
       }}
     >
+      {contextHolder}
       <Form
         layout="vertical"
         style={{ marginTop: "1rem" }}

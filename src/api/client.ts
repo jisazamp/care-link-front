@@ -27,7 +27,6 @@ client.interceptors.response.use(
       useAuthStore.setState({
         jwtToken: null,
       });
-      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

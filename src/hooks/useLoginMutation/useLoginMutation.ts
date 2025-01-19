@@ -16,7 +16,9 @@ export const useLoginMutation = () => {
     mutationKey: ["login"],
     mutationFn: login,
     onSuccess: (data) => {
-      setJwtToken(data.data.data.access_token);
+      if (data.data.data.access_token) {
+        setJwtToken(data.data.data.access_token);
+      }
     },
   });
 };
