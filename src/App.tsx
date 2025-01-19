@@ -9,6 +9,7 @@ import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { NewUser } from "./components/NewUser/NewUser";
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
+import { MainLayout } from "./components/MainLayout/MainLayout";
 
 export const colors = {
   primary: {
@@ -82,46 +83,40 @@ export const App = () => {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/home"
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/new-user"
-            element={
-              <PrivateRoute>
-                <NewUser />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/MedicalRecord"
-            element={
-              <PrivateRoute>
-                <MedicalRecord />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/UserDetails"
-            element={
-              <PrivateRoute>
-                <UserDetails />
-              </PrivateRoute>
-            }
-          />
+          <Route element={<MainLayout />}>
+            <Route
+              path="/home"
+              element={
+                <PrivateRoute>
+                  <Home />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/new-user"
+              element={
+                <PrivateRoute>
+                  <NewUser />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/MedicalRecord"
+              element={
+                <PrivateRoute>
+                  <MedicalRecord />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/UserDetails"
+              element={
+                <PrivateRoute>
+                  <UserDetails />
+                </PrivateRoute>
+              }
+            />
+          </Route>
         </Routes>
       </Router>
     </ConfigProvider>
