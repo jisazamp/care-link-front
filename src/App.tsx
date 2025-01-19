@@ -10,6 +10,7 @@ import { NewUser } from "./components/NewUser/NewUser";
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { MainLayout } from "./components/MainLayout/MainLayout";
+import { UsersList } from "./components/UsersList/UsersList";
 
 export const colors = {
   primary: {
@@ -93,7 +94,15 @@ export const App = () => {
               }
             />
             <Route
-              path="/new-user"
+              path="/usuarios/crear"
+              element={
+                <PrivateRoute>
+                  <NewUser />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/usuarios/:id/editar"
               element={
                 <PrivateRoute>
                   <NewUser />
@@ -113,6 +122,14 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <UserDetails />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/usuarios"
+              element={
+                <PrivateRoute>
+                  <UsersList />
                 </PrivateRoute>
               }
             />
