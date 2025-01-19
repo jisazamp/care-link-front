@@ -33,4 +33,9 @@ export type AuthorizedUser = {
   id: number;
   last_name: string;
   password: string;
-}
+};
+
+export type Login = {
+  access_token: string;
+  token_type: "bearer";
+};

@@ -6,10 +6,17 @@ import {
   SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { useAuthStore } from "../../store/auth";
 
 const { Header: AntHeader } = Layout;
 
 export const Header = () => {
+  const setJwtToken = useAuthStore((state) => state.setJwtToken);
+
+  const onLogout = () => {
+    setJwtToken(null);
+  };
+
   return (
     <AntHeader
       style={{
@@ -65,6 +72,7 @@ export const Header = () => {
             type="text"
             shape="circle"
             icon={<LogoutOutlined style={{ color: "#fff" }} />}
+            onClick={onLogout}
           />
         </Tooltip>
       </Flex>

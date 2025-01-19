@@ -1,9 +1,12 @@
 import { Form, Input, Button, Typography, Flex } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { useAuthStore } from "../../store/auth";
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useLoginMutation } from "../../hooks/useLoginMutation/useLoginMutation";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMutation } from "../../hooks/useLoginMutation/useLoginMutation";
 
 const { Text } = Typography;
 
@@ -28,10 +31,18 @@ export const Login = () => {
   });
 
   const { mutate: login, isPending } = useLoginMutation();
+  const jwtToken = useAuthStore((state) => state.jwtToken);
+  const navigate = useNavigate();
 
   const onSubmit = (data: LoginValues) => {
     login(data);
   };
+
+  useEffect(() => {
+    if (jwtToken) {
+      navigate("/home");
+    }
+  }, [jwtToken, navigate]);
 
   return (
     <Flex
