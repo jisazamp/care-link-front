@@ -1,9 +1,9 @@
+import { Form, Input, Button, Typography, Flex } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Tabs, Form, Input, Button, Typography, Flex } from "antd";
-import { useForm, Controller, FieldErrors } from "react-hook-form";
-import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLoginMutation } from "../../hooks/useLoginMutation/useLoginMutation";
 
 const { Text } = Typography;
 
@@ -12,41 +12,25 @@ const loginSchema = z.object({
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
 });
 
-const registerSchema = loginSchema.extend({
-  firstName: z.string().nonempty("El primer nombre es obligatorio"),
-  middleName: z.string().optional(),
-  lastName: z.string().nonempty("El apellido es obligatorio"),
-});
-
 type LoginValues = z.infer<typeof loginSchema>;
-type RegisterValues = z.infer<typeof registerSchema>;
 
 export const Login = () => {
-  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-
   const {
     control,
     handleSubmit,
     formState: { errors },
-    reset,
-  } = useForm<LoginValues | RegisterValues>({
-    resolver: zodResolver(activeTab === "login" ? loginSchema : registerSchema),
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      firstName: "",
-      lastName: "",
-      middleName: "",
     },
   });
 
-  const handleTabSwitch = (key: string) => {
-    setActiveTab(key as "login" | "register");
-    reset();
-  };
+  const { mutate: login, isPending } = useLoginMutation();
 
-  const onSubmit = (data: any) => {
-    console.log("Submitted data:", data);
+  const onSubmit = (data: LoginValues) => {
+    login(data);
   };
 
   return (
@@ -59,89 +43,11 @@ export const Login = () => {
         maxWidth: 400,
       }}
     >
-      <Tabs
-        activeKey={activeTab}
-        onChange={handleTabSwitch}
-        items={[
-          { key: "login", label: "Iniciar sesión" },
-          { key: "register", label: "Registrar" },
-        ]}
-      />
       <Form
         layout="vertical"
         style={{ marginTop: "1rem" }}
         onFinish={handleSubmit(onSubmit)}
       >
-        {activeTab === "register" && (
-          <>
-            <Form.Item
-              label="Primer Nombre"
-              validateStatus={
-                (errors as FieldErrors<RegisterValues>).firstName ? "error" : ""
-              }
-              help={
-                (errors as FieldErrors<RegisterValues>).firstName?.message && (
-                  <Text type="danger">
-                    {(errors as FieldErrors<RegisterValues>).firstName?.message}
-                  </Text>
-                )
-              }
-            >
-              <Controller
-                name="firstName"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    className="input"
-                    prefix={<UserOutlined />}
-                    placeholder="Primer Nombre"
-                  />
-                )}
-              />
-            </Form.Item>
-            <Form.Item label="Segundo Nombre (opcional)">
-              <Controller
-                name="middleName"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    className="input"
-                    prefix={<UserOutlined />}
-                    placeholder="Segundo Nombre"
-                  />
-                )}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Apellidos"
-              validateStatus={
-                (errors as FieldErrors<RegisterValues>).lastName ? "error" : ""
-              }
-              help={
-                (errors as FieldErrors<RegisterValues>).lastName?.message && (
-                  <Text type="danger">
-                    {(errors as FieldErrors<RegisterValues>).lastName?.message}
-                  </Text>
-                )
-              }
-            >
-              <Controller
-                name="lastName"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    className="input"
-                    prefix={<UserOutlined />}
-                    placeholder="Apellidos"
-                  />
-                )}
-              />
-            </Form.Item>
-          </>
-        )}
         <Form.Item
           label="Correo Electrónico"
           validateStatus={errors.email ? "error" : ""}
@@ -188,11 +94,13 @@ export const Login = () => {
         </Form.Item>
         <Form.Item>
           <Button
-            htmlType="submit"
             className="main-button"
+            disabled={isPending}
+            htmlType="submit"
+            loading={isPending}
             style={{ marginTop: "1rem" }}
           >
-            {activeTab === "login" ? "Iniciar sesión" : "Registrar"}
+            Iniciar sesión
           </Button>
         </Form.Item>
       </Form>

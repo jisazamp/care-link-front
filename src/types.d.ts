@@ -26,3 +26,11 @@ export type User = {
   telefono: number | null;
   tipo_afiliacion: string | null;
 };
+
+export type AuthorizedUser = {
+  email: string;
+  first_name: string;
+  id: number;
+  last_name: string;
+  password: string;
+}
