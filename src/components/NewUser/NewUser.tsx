@@ -33,9 +33,11 @@ const { Text } = Typography;
 
 const formSchema = z.object({
   userId: z.string(),
-  userType: z.enum(["Recurrente", "Nuevo"], {
-    errorMap: () => ({ message: "El tipo de usuario es requerido" }),
-  }),
+  userType: z
+    .enum(["Recurrente", "Nuevo"], {
+      errorMap: () => ({ message: "El tipo de usuario es requerido" }),
+    })
+    .optional(),
   documentNumber: z
     .string({ message: "El número de documento es requerido" })
     .nonempty("El número de documento es requerido"),
@@ -56,8 +58,12 @@ const formSchema = z.object({
   maritalStatus: z.nativeEnum(CivilStatus, {
     errorMap: () => ({ message: "El estado civil es requerido" }),
   }),
-  email: z.string().email(),
+  email: z
+    .string({ message: "El correo electrónico es requerido" })
+    .email({ message: "Ingrese un correo electrónico válido" }),
   occupation: z.string().optional(),
+  address: z.string().optional(),
+  phone: z.string().optional(),
   photo: z
     .any()
     .optional()
@@ -104,6 +110,7 @@ export const NewUser: React.FC = () => {
   const onSubmit = (data: FormValues) => {
     const user: Partial<User> = {
       apellidos: data.lastName,
+      direccion: data.address,
       email: data.email,
       escribe: false,
       estado: "ACTIVO" as UserStatus,
@@ -117,6 +124,7 @@ export const NewUser: React.FC = () => {
       nombres: data.firstName,
       nucleo_familiar: "Nuclear" as UserFamilyType,
       proteccion_exequial: false,
+      telefono: data.phone,
     };
     if (!userId) {
       createUser(user);
@@ -136,6 +144,8 @@ export const NewUser: React.FC = () => {
         maritalStatus: data.data.data.estado_civil as CivilStatus,
         gender: data.data.data.genero as Gender,
         email: data.data.data.email ?? "",
+        phone: data.data.data.telefono ?? "",
+        address: data.data.data.direccion ?? "",
       });
     }
   }, [data?.data.data, reset]);
@@ -372,25 +382,6 @@ export const NewUser: React.FC = () => {
               <Row gutter={24}>
                 <Col span={8}>
                   <Form.Item
-                    label="Email"
-                    validateStatus={errors.email ? "error" : ""}
-                    help={
-                      errors.email?.message && (
-                        <Text type="danger">{errors.email.message}</Text>
-                      )
-                    }
-                  >
-                    <Controller
-                      name="email"
-                      control={control}
-                      render={({ field }) => (
-                        <Input {...field} placeholder="Correo electrónico" />
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
                     label="Fotografía"
                     validateStatus={errors.photo ? "error" : ""}
                     help={
@@ -430,6 +421,77 @@ export const NewUser: React.FC = () => {
               </Row>
             </Card>
           </Col>
+
+          <Col span={24}>
+            <Card
+              title="Datos de localización"
+              bordered={false}
+              style={{ marginTop: "16px" }}
+            >
+              <Row gutter={24}>
+                <Col span={24}>
+                  <Form.Item
+                    label="Dirección"
+                    validateStatus={errors.address ? "error" : ""}
+                    help={
+                      errors.address?.message && (
+                        <Text type="danger">{errors.address.message}</Text>
+                      )
+                    }
+                  >
+                    <Controller
+                      name="address"
+                      control={control}
+                      render={({ field }) => (
+                        <Input {...field} placeholder="Dirección" />
+                      )}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={24}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Teléfono"
+                    validateStatus={errors.phone ? "error" : ""}
+                    help={
+                      errors.phone?.message && (
+                        <Text type="danger">{errors.phone.message}</Text>
+                      )
+                    }
+                  >
+                    <Controller
+                      name="phone"
+                      control={control}
+                      render={({ field }) => (
+                        <Input {...field} placeholder="Teléfono" />
+                      )}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Email"
+                    validateStatus={errors.email ? "error" : ""}
+                    help={
+                      errors.email?.message && (
+                        <Text type="danger">{errors.email.message}</Text>
+                      )
+                    }
+                  >
+                    <Controller
+                      name="email"
+                      control={control}
+                      render={({ field }) => (
+                        <Input {...field} placeholder="Correo electrónico" />
+                      )}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+
           <Col span={24}>
             <Card bordered={false} style={{ marginTop: "16px" }}>
               <Row justify="end">
