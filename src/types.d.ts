@@ -23,7 +23,7 @@ export type User = {
   origen_otrocentro: string | null;
   proteccion_exequial: boolean | null;
   regimen_seguridad_social: string | null;
-  telefono: number | null;
+  telefono: string | null;
   tipo_afiliacion: string | null;
 };
 
