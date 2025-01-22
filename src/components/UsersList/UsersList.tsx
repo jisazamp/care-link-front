@@ -8,10 +8,10 @@ import {
   Button,
 } from "antd";
 import type { User } from "../../types";
-import { Link } from "react-router-dom";
 import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
 import { useGetUsers } from "../../hooks/useGetUsers/useGetUsers";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -60,7 +60,9 @@ export const UsersList = () => {
           renderItem={(item) => (
             <List.Item
               actions={[
-                <Link to={`/usuarios/${item.id_usuario}/editar`}>Editar</Link>,
+                <Link to={`/usuarios/${item.id_usuario}/editar`}>
+                  <Button type="link">Editar</Button>
+                </Link>,
                 <Button type="link" onClick={() => showModal(item)}>
                   Eliminar
                 </Button>,

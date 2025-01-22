@@ -17,10 +17,10 @@ const menuItems = [
     icon: <UserOutlined />,
     label: "Pacientes",
     children: [
-      { key: "2.1", label: <Link to="usuarios">Listado de pacientes</Link> },
+      { key: "2.1", label: <Link to="usuarios">Listado de usuarios</Link> },
       {
         key: "2.2",
-        label: <Link to="usuarios/crear">Registrar nuevo paciente</Link>,
+        label: <Link to="usuarios/crear">Registrar nuevo usuarios</Link>,
       },
     ],
   },

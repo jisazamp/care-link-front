@@ -1,7 +1,12 @@
 import "./index.css";
 import es from "antd/es/date-picker/locale/es_ES";
 import esES from "antd/es/locale/es_ES";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { ConfigProvider } from "antd";
 import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
@@ -11,11 +16,13 @@ import { UserDetails } from "./components/UserDetails/UserDetails";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { UsersList } from "./components/UsersList/UsersList";
+import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
 
 export const colors = {
   primary: {
     main: "#9957C2",
     secondary: "#22075E",
+    link: "#7F34B4",
   },
 };
 
@@ -78,6 +85,10 @@ export const App = () => {
             hoverBorderColor: colors.primary.main,
             activeBorderColor: colors.primary.main,
           },
+          Checkbox: {
+            colorPrimary: colors.primary.main,
+            colorPrimaryHover: colors.primary.main,
+          },
         },
       }}
     >
@@ -86,10 +97,18 @@ export const App = () => {
           <Route path="/login" element={<Login />} />
           <Route element={<MainLayout />}>
             <Route
-              path="/home"
+              path="/inicio"
               element={
                 <PrivateRoute>
                   <Home />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/usuarios"
+              element={
+                <PrivateRoute>
+                  <UsersList />
                 </PrivateRoute>
               }
             />
@@ -110,15 +129,7 @@ export const App = () => {
               }
             />
             <Route
-              path="/MedicalRecord"
-              element={
-                <PrivateRoute>
-                  <MedicalRecord />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/UserDetails"
+              path="/usuarios/:id/detalles"
               element={
                 <PrivateRoute>
                   <UserDetails />
@@ -126,14 +137,31 @@ export const App = () => {
               }
             />
             <Route
-              path="/usuarios"
+              path="/usuarios/:id/familiar"
               element={
                 <PrivateRoute>
-                  <UsersList />
+                  <CreateFamilyMember />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/usuarios/:id/familiar/:familyMemberId"
+              element={
+                <PrivateRoute>
+                  <CreateFamilyMember />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/MedicalRecord"
+              element={
+                <PrivateRoute>
+                  <MedicalRecord />
                 </PrivateRoute>
               }
             />
           </Route>
+          <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
       </Router>
     </ConfigProvider>

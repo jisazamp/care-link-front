@@ -125,6 +125,7 @@ export const NewUser: React.FC = () => {
       nucleo_familiar: "Nuclear" as UserFamilyType,
       proteccion_exequial: false,
       telefono: data.phone,
+      is_deleted: false,
     };
     if (!userId) {
       createUser(user);
@@ -178,7 +179,10 @@ export const NewUser: React.FC = () => {
   return (
     <>
       <Breadcrumb
-        items={[{ title: "Inicio" }, { title: "Nuevo usuario" }]}
+        items={[
+          { title: "Inicio" },
+          { title: userId ? "Editar usuario" : "Nuevo usuario" },
+        ]}
         style={{ margin: "16px 0" }}
       />
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
@@ -421,7 +425,6 @@ export const NewUser: React.FC = () => {
               </Row>
             </Card>
           </Col>
-
           <Col span={24}>
             <Card
               title="Datos de localización"
@@ -491,18 +494,13 @@ export const NewUser: React.FC = () => {
               </Row>
             </Card>
           </Col>
-
           <Col span={24}>
             <Card bordered={false} style={{ marginTop: "16px" }}>
               <Row justify="end">
                 <Button
                   variant="outlined"
                   onClick={() => reset()}
-                  style={{
-                    backgroundColor: "#fff",
-                    color: "#000",
-                    marginRight: "8px",
-                  }}
+                  className="main-button-white"
                 >
                   Restablecer
                 </Button>
