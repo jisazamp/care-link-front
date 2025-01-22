@@ -1,22 +1,29 @@
-import React from "react";
 import {
-  Card,
-  Typography,
-  Breadcrumb,
-  Space,
-  Button,
-  Divider,
-  Table,
-  Checkbox,
   Avatar,
-  Row,
+  Breadcrumb,
+  Button,
+  Card,
+  Checkbox,
   Col,
-  Tag,
   Descriptions,
+  Divider,
+  Row,
+  Space,
+  Table,
+  TableProps,
+  Tag,
+  Typography,
+  Modal,
 } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import patientImage from "../assets/Patients/patient1.jpg";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import dayjs from "dayjs";
+import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
+import { FamilyMember } from "../../types";
+import { useEffect, useState } from "react";
+import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 
 const { Title } = Typography;
 
@@ -80,70 +87,6 @@ const columns = [
   },
 ];
 
-const acudientesData = [
-  {
-    key: "1",
-    nombres: "Maria Patricia",
-    apellidos: "Lopez Gomez",
-    parentesco: "Hija",
-    telefono: "304567890",
-    direccion: "CLL 45 - 60-20 INT 101",
-    email: "maria@gmail.com",
-    acciones: [
-      <a key="edit" href="#">
-        Editar
-      </a>,
-      <a key="delete" href="#" style={{ marginLeft: 8 }}>
-        Eliminar
-      </a>,
-    ],
-  },
-];
-
-const acudientesColumns = [
-  {
-    title: <Checkbox />,
-    dataIndex: "checkbox",
-    render: () => <Checkbox />,
-    width: "5%",
-  },
-  {
-    title: "Nombres",
-    dataIndex: "nombres",
-    key: "nombres",
-  },
-  {
-    title: "Apellidos",
-    dataIndex: "apellidos",
-    key: "apellidos",
-  },
-  {
-    title: "Parentesco",
-    dataIndex: "parentesco",
-    key: "parentesco",
-  },
-  {
-    title: "Teléfono",
-    dataIndex: "telefono",
-    key: "telefono",
-  },
-  {
-    title: "Dirección",
-    dataIndex: "direccion",
-    key: "direccion",
-  },
-  {
-    title: "E-Mail",
-    dataIndex: "email",
-    key: "email",
-  },
-  {
-    title: "Acciones",
-    dataIndex: "acciones",
-    key: "acciones",
-  },
-];
-
 const contractsData = [
   {
     key: "1",
@@ -203,26 +146,122 @@ const contractsColumns = [
 ];
 
 export const UserDetails: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<FamilyMember | null>(null);
+
   const navigate = useNavigate();
+  const params = useParams();
+  const userId = params.id;
+
+  const { data: user } = useGetUserById(userId);
+  const { data: familyMembers, isLoading: loadingFamilyMembers } =
+    useGetUserFamilyMembers(userId);
+  const { mutate: deleteFamilyMember, isSuccess: isSuccessDeleteFamilyMember } =
+    useDeleteFamilyMemberMutation(userId);
+
+  const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
+    [
+      {
+        title: <Checkbox />,
+        dataIndex: "checkbox",
+        render: () => <Checkbox />,
+        width: "5%",
+      },
+      {
+        title: "Nombres",
+        dataIndex: ["acudiente", "nombres"],
+        key: "nombres",
+      },
+      {
+        title: "Apellidos",
+        dataIndex: ["acudiente", "apellidos"],
+        key: "nombres",
+      },
+      {
+        title: "Parentesco",
+        dataIndex: "parentesco",
+        key: "parentesco",
+      },
+      {
+        title: "Teléfono",
+        dataIndex: ["acudiente", "telefono"],
+        key: "telefono",
+      },
+      {
+        title: "Dirección",
+        dataIndex: ["acudiente", "direccion"],
+        key: "direccion",
+      },
+      {
+        title: "E-Mail",
+        dataIndex: ["acudiente", "email"],
+        key: "email",
+      },
+      {
+        title: "Acciones",
+        dataIndex: "acciones",
+        key: "acciones",
+        render: (_, record: { acudiente: FamilyMember }) => (
+          <Space>
+            <Link
+              to={`/usuarios/${userId}/familiar/${record.acudiente.id_acudiente}`}
+            >
+              <Button type="link" className="main-button-link" size="small">
+                Editar
+              </Button>
+            </Link>
+            <Divider type="vertical" />
+            <Button
+              className="main-button-link"
+              size="small"
+              type="link"
+              onClick={() => {
+                setUserToDelete(record.acudiente);
+                setIsModalOpen(true);
+              }}
+            >
+              Eliminar
+            </Button>
+          </Space>
+        ),
+      },
+    ];
+
+  useEffect(() => {
+    if (isSuccessDeleteFamilyMember) {
+      setIsModalOpen(false);
+      setUserToDelete(null);
+    }
+  }, [isSuccessDeleteFamilyMember]);
+
   return (
     <>
-      <Breadcrumb className="breadcrumb" style={{ marginBottom: "16px" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Usuarios</Breadcrumb.Item>
-        <Breadcrumb.Item>Vista Detalle</Breadcrumb.Item>
-      </Breadcrumb>
-
+      <Breadcrumb
+        className="breadcrumb"
+        style={{ marginBottom: "16px" }}
+        items={[
+          {
+            title: "Inicio",
+          },
+          {
+            title: "Usuarios",
+          },
+          { title: "Vista detalle" },
+        ]}
+      />
       <Title level={3} className="page-title">
-        Juan Antonio Lopez Orrego
+        {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
       </Title>
-
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        {/* Card: Datos básicos y de localización */}
         <Card
           title="Datos básicos y de localización"
           extra={
             <Space>
-              <Button icon={<EditOutlined />} type="primary">
+              <Button
+                className="main-button-white"
+                variant="outlined"
+                icon={<EditOutlined />}
+              >
                 Editar
               </Button>
               <Button icon={<DeleteOutlined />} danger>
@@ -230,10 +269,10 @@ export const UserDetails: React.FC = () => {
               </Button>
             </Space>
           }
-          className="detail-card"
+          style={{ marginTop: 3 }}
         >
           <Row gutter={24} align="middle">
-            <Col flex="120px">
+            <Col>
               <Avatar
                 src={patientImage}
                 size={120}
@@ -244,31 +283,37 @@ export const UserDetails: React.FC = () => {
             <Col flex="auto">
               <Descriptions column={2} labelStyle={{ fontWeight: "bold" }}>
                 <Descriptions.Item label="Nombre Completo">
-                  Juan Antonio Lopez Orrego
+                  {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
                 </Descriptions.Item>
                 <Descriptions.Item label="Documento">
-                  44567890
+                  {`${user?.data.data.n_documento}`}
                 </Descriptions.Item>
-                <Descriptions.Item label="Género">Masculino</Descriptions.Item>
+                <Descriptions.Item label="Género">
+                  {user?.data.data.genero}
+                </Descriptions.Item>
                 <Descriptions.Item label="Fecha de Nacimiento">
-                  1956/11/08
+                  {user?.data.data.fecha_nacimiento}
                 </Descriptions.Item>
-                <Descriptions.Item label="Edad">68 años</Descriptions.Item>
+                <Descriptions.Item label="Edad">
+                  {dayjs().diff(
+                    dayjs(user?.data.data.fecha_nacimiento),
+                    "years"
+                  )}{" "}
+                  años
+                </Descriptions.Item>
                 <Descriptions.Item label="Estado Civil">
-                  Casado
+                  {user?.data.data.estado_civil}
                 </Descriptions.Item>
                 <Descriptions.Item label="Teléfono">
-                  315 6789 6789
+                  {user?.data.data.telefono}
                 </Descriptions.Item>
                 <Descriptions.Item label="Email">
-                  juanantonio@gmail.com
+                  {user?.data.data.email}
                 </Descriptions.Item>
               </Descriptions>
             </Col>
           </Row>
         </Card>
-
-        {/* Card: Historia Clínica */}
         <Card
           title="Historia Clínica"
           extra={
@@ -285,7 +330,6 @@ export const UserDetails: React.FC = () => {
               </Button>
             </Space>
           }
-          className="detail-card"
         >
           <Row gutter={24}>
             <Col span={12}>
@@ -347,8 +391,6 @@ export const UserDetails: React.FC = () => {
             </Col>
           </Row>
         </Card>
-
-        {/* Card: Reportes Clínicos */}
         <Card
           title="Reportes Clínicos"
           extra={
@@ -364,25 +406,27 @@ export const UserDetails: React.FC = () => {
             pagination={false}
           />
         </Card>
-
-        {/* Card: Acudientes */}
         <Card
           title="Acudientes"
           extra={
-            <Button type="primary" icon={<PlusOutlined />}>
-              Agregar
-            </Button>
+            <Link to={`/usuarios/${userId}/familiar`}>
+              <Button
+                className="main-button-white"
+                variant="outlined"
+                icon={<PlusOutlined />}
+              >
+                Agregar
+              </Button>
+            </Link>
           }
-          className="detail-card"
         >
           <Table
             columns={acudientesColumns}
-            dataSource={acudientesData}
+            loading={loadingFamilyMembers}
+            dataSource={familyMembers?.data.data}
             pagination={false}
           />
         </Card>
-
-        {/* Card: Contratos */}
         <Card
           title="Contratos"
           extra={
@@ -399,8 +443,29 @@ export const UserDetails: React.FC = () => {
           />
         </Card>
       </Space>
-
       <Divider />
+      <Modal
+        cancelText="No eliminar"
+        okText="Sí, eliminar"
+        onOk={() => {
+          if (userToDelete) {
+            deleteFamilyMember(userToDelete.id_acudiente);
+          }
+        }}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+        title="Confirmar acción"
+        okButtonProps={{
+          type: "default",
+          style: { backgroundColor: "#F32013" },
+        }}
+        cancelButtonProps={{
+          type: "text",
+        }}
+      >
+        <Typography.Text>{`¿Estás seguro que deseas eliminar al acudiente ${userToDelete?.nombres} ${userToDelete?.apellidos}?`}</Typography.Text>
+      </Modal>
     </>
   );
 };
