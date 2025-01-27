@@ -338,7 +338,9 @@ export const CreateFamilyMember = () => {
                       name="isFamilyMember"
                       control={control}
                       render={({ field }) => (
-                        <Checkbox {...field}>Marcar como acudiente</Checkbox>
+                        <Checkbox checked={!!field.value} {...field}>
+                          Marcar como acudiente
+                        </Checkbox>
                       )}
                     />
                   </Col>
@@ -351,7 +353,11 @@ export const CreateFamilyMember = () => {
             <Col span={24}>
               <Card bordered={false} style={{ marginTop: "16px" }}>
                 <Row justify="end">
-                  <Button variant="outlined" className="main-button-white">
+                  <Button
+                    variant="outlined"
+                    className="main-button-white"
+                    onClick={() => reset()}
+                  >
                     Restablecer
                   </Button>
                   <Button type="default" htmlType="submit">
