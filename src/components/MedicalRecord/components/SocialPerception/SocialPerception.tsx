@@ -10,6 +10,7 @@ export const SocialPerception = () => {
     <Card
       bordered
       title={<Title level={4}>Habilidades de percepción social</Title>}
+      style={{ marginBottom: 8 }}
     >
       <Row gutter={16}>
         <Col span={12}>

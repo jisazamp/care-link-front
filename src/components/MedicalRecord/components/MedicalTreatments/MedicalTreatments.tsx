@@ -33,7 +33,7 @@ export const MedicalTreatments = () => {
       bordered
     >
       <Form.Item>
-        <Title level={5} className="checkbox-title">
+        <Title level={5} style={{ margin: 0 }}>
           Tratamientos o medicamentos
         </Title>
         <Controller
@@ -52,7 +52,7 @@ export const MedicalTreatments = () => {
                 display: "flex",
                 flexWrap: "wrap",
                 gap: "16px",
-                marginBottom: "16px",
+                marginTop: 15,
               }}
             >
               <Checkbox value="pharmacotherapeuticRegimen">
@@ -69,20 +69,23 @@ export const MedicalTreatments = () => {
         />
       </Form.Item>
       {selectedValues.includes("pharmacotherapeuticRegimen") && (
-        <Flex vertical gap={10}>
-          <Divider />
-          <Flex vertical>
-            <Title level={5}>Régimen farmacoterapéutico</Title>
-            <Flex
-              style={{
-                justifyContent: "flex-end",
-              }}
+        <Card
+          bordered
+          extra={
+            <Button
+              className="main-button-white"
+              icon={<PlusOutlined />}
+              style={{ marginBottom: 8 }}
             >
-              <Button type="primary" icon={<PlusOutlined />}>
-                Agregar
-              </Button>
-            </Flex>
-          </Flex>
+              Agregar
+            </Button>
+          }
+          title={
+            <Title level={5} style={{ margin: 0 }}>
+              Régimen farmacoterapéutico
+            </Title>
+          }
+        >
           <Table
             columns={[
               {
@@ -140,38 +143,26 @@ export const MedicalTreatments = () => {
                 ),
               },
             ]}
-            dataSource={[
-              {
-                key: "1",
-                startDate: "10/09/2024",
-                medicine: "Enalapril",
-                dose: "5 mg",
-                administration: "Oral",
-                frequency: "Cada 12 horas",
-                duration: "Indefinida",
-                instructions:
-                  "Administrar con alimentos. Controlar presión arterial antes de cada dosis.",
-              },
-            ]}
+            dataSource={[]}
             pagination={false}
           />
-        </Flex>
+        </Card>
       )}
       {selectedValues.includes("nursingCarePlan") && (
-        <Flex vertical>
-          <Flex vertical>
-            <Title level={5}>Plan de cuidados de enfermería</Title>
-            <Flex
-              style={{
-                justifyContent: "flex-end",
-                marginBottom: 8,
-              }}
-            >
-              <Button type="primary" icon={<PlusOutlined />}>
-                Agregar
-              </Button>
-            </Flex>
-          </Flex>
+        <Card
+          bordered
+          title={
+            <Title level={5} style={{ margin: 0 }}>
+              Plan de cuidados de enfermería
+            </Title>
+          }
+          extra={
+            <Button className="main-button-white" icon={<PlusOutlined />}>
+              Agregar
+            </Button>
+          }
+          style={{ marginTop: 10 }}
+        >
           <Table
             columns={[
               {
@@ -209,17 +200,67 @@ export const MedicalTreatments = () => {
                 ),
               },
             ]}
-            dataSource={[
-              {
-                key: "1",
-                diagnosis: "Piel alterada relacionada con herida en la pierna.",
-                intervention: "Limpiar herida, secar con gasas sin frotar.",
-                frequency: "Diaria",
-              },
-            ]}
+            dataSource={[]}
             pagination={false}
           />
-        </Flex>
+        </Card>
+      )}
+      {selectedValues.includes("physiotherapeuticIntervention") && (
+        <Card
+          bordered
+          extra={
+            <Button className="main-button-white" icon={<PlusOutlined />}>
+              Agregar
+            </Button>
+          }
+          title={
+            <Title level={5} style={{ margin: 0 }}>
+              Intervención fisioterapéutica
+            </Title>
+          }
+          style={{ marginTop: 10 }}
+        >
+          <Table
+            columns={[
+              {
+                title: "Diagnóstico",
+                dataIndex: "diagnosis",
+                key: "diagnosis",
+              },
+              {
+                title: "Intervención",
+                dataIndex: "intervention",
+                key: "intervention",
+              },
+              {
+                title: "Frecuencia",
+                dataIndex: "frequency",
+                key: "frequency",
+              },
+              {
+                title: "Acciones",
+                key: "actions",
+                render: () => (
+                  <Space>
+                    <Button
+                      type="link"
+                      style={{
+                        color: "#1890ff",
+                      }}
+                    >
+                      Finalizar
+                    </Button>
+                    <Button type="link" danger>
+                      Eliminar
+                    </Button>
+                  </Space>
+                ),
+              },
+            ]}
+            dataSource={[]}
+            pagination={false}
+          />
+        </Card>
       )}
     </Card>
   );

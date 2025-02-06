@@ -99,6 +99,7 @@ export const MedicalRecord: React.FC = () => {
                 className="diagnostico-inicial-card"
                 bordered
                 title={<Title level={4}>Diagnóstico inicial</Title>}
+                style={{ marginBottom: 8 }}
               >
                 <Form.Item
                   label="Observaciones"
@@ -121,23 +122,20 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                className="pruebas-test-card"
                 bordered
-                title={
-                  <div className="table-header">
-                    <Title level={4}>Pruebas y Test</Title>
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      className="add-button"
-                    >
-                      Nuevo
-                    </Button>
-                  </div>
+                extra={
+                  <Button icon={<PlusOutlined />} className="main-button-white">
+                    Nuevo
+                  </Button>
                 }
+                title={
+                  <Title level={4} style={{ margin: 0 }}>
+                    Pruebas y Test
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
                 <Table
-                  className="pruebas-test-table"
                   columns={[
                     {
                       title: "Profesional",
@@ -173,14 +171,7 @@ export const MedicalRecord: React.FC = () => {
                       ),
                     },
                   ]}
-                  dataSource={[
-                    {
-                      key: "1",
-                      profesional: "Sara Manuela Gomez",
-                      tipoPrueba: "Escala de Yesavage",
-                      fecha: "10/11/2024",
-                    },
-                  ]}
+                  dataSource={[]}
                   pagination={false}
                 />
               </Card>
@@ -189,19 +180,16 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                className="adjuntar-documentos-card"
                 bordered
+                extra={
+                  <Button icon={<PlusOutlined />} className="main-button-white">
+                    Agregar
+                  </Button>
+                }
                 title={
-                  <div className="table-header">
-                    <Title level={4}>Adjuntar documentos</Title>
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      className="add-button"
-                    >
-                      Agregar
-                    </Button>
-                  </div>
+                  <Title level={4} style={{ margin: 0 }}>
+                    Adjuntar documentos
+                  </Title>
                 }
               >
                 <div style={{ textAlign: "center", padding: "16px" }}>
@@ -210,9 +198,9 @@ export const MedicalRecord: React.FC = () => {
               </Card>
             </Col>
           </Row>
-          <Row gutter={[16, 16]} justify="end">
+          <Row gutter={[16, 16]} justify="end" style={{ marginTop: 20 }}>
             <Col>
-              <Button type="default" style={{ marginRight: 8 }}>
+              <Button className="main-button-white" style={{ marginRight: 8 }}>
                 Restablecer
               </Button>
               <Button

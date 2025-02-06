@@ -1,6 +1,6 @@
-import { useFormContext, Controller } from "react-hook-form";
-import { Card, Flex, Typography, Checkbox, Divider, Button, Table } from "antd";
+import { Card, Flex, Typography, Checkbox, Button, Table } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { useFormContext, Controller } from "react-hook-form";
 
 const { Title } = Typography;
 
@@ -24,7 +24,11 @@ export const SpecialConditions = () => {
       bordered
     >
       <Flex vertical>
-        <Title level={5} className="checkbox-title">
+        <Title
+          level={5}
+          className="checkbox-title"
+          style={{ marginTop: 0, marginBottom: 15 }}
+        >
           Condición especial
         </Title>
         <Controller
@@ -54,140 +58,24 @@ export const SpecialConditions = () => {
           )}
         />
       </Flex>
-      <Flex vertical>
-        {selectedValues.includes("disability") && (
-          <>
-            <Divider />
-            <Card
-              bordered
-              title={
-                <Flex vertical>
-                  <Title level={5}>Tipos de discapacidad del paciente</Title>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    className="add-button"
-                  >
-                    Agregar
-                  </Button>
-                </Flex>
-              }
-            >
-              <Table
-                className="discapacidad-table"
-                columns={[
-                  {
-                    title: "Discapacidades",
-                    dataIndex: "discapacidad",
-                    key: "discapacidad",
-                    align: "center",
-                  },
-                  {
-                    title: "Observación",
-                    dataIndex: "observacion",
-                    key: "observacion",
-                    align: "center",
-                  },
-                  {
-                    title: "Acciones",
-                    key: "acciones",
-                    align: "center",
-                    render: () => (
-                      <Button type="link" danger>
-                        Eliminar
-                      </Button>
-                    ),
-                  },
-                ]}
-                dataSource={[
-                  {
-                    key: "1",
-                    discapacidad: "Física",
-                    observacion: "N/A",
-                  },
-                ]}
-                pagination={false}
-              />
-            </Card>
-          </>
-        )}
-        {selectedValues.includes("limitations") && (
-          <Card
-            bordered
-            title={
-              <Flex vertical>
-                <Divider />
-                <Title level={5}>
-                  Limitaciones permanentes que requieren apoyos o cuidados
-                </Title>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  className="add-button"
-                >
-                  Agregar
-                </Button>
-              </Flex>
-            }
-          >
-            <Table
-              className="limitaciones-table"
-              columns={[
-                {
-                  title: "Limitaciones",
-                  dataIndex: "limitacion",
-                  key: "limitacion",
-                  align: "center",
-                },
-                {
-                  title: "Observación",
-                  dataIndex: "observacion",
-                  key: "observacion",
-                  align: "center",
-                },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  align: "center",
-                  render: () => (
-                    <Button type="link" danger>
-                      Eliminar
-                    </Button>
-                  ),
-                },
-              ]}
-              dataSource={[
-                {
-                  key: "1",
-                  limitacion: "Incontinencia urinaria",
-                  observacion: "Requiere uso de pañal",
-                },
-                {
-                  key: "2",
-                  limitacion: "Debilidad muscular",
-                  observacion: "Requiere ayuda para comer",
-                },
-              ]}
-              pagination={false}
-            />
-          </Card>
-        )}
+      <Flex vertical style={{ marginTop: 8 }}>
         {selectedValues.includes("alergies") && (
           <Card
-            bordered
-            title={
-              <Flex vertical>
-                <Divider />
-                <Title level={5}>Alergias a medicamentos</Title>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  className="add-button"
-                >
-                  Agregar
-                </Button>
-              </Flex>
+            extra={
+              <Button
+                icon={<PlusOutlined />}
+                className="main-button-white"
+                style={{ alignSelf: "flex-end" }}
+              >
+                Agregar
+              </Button>
             }
+            title={
+              <Title level={5} style={{ margin: 0 }}>
+                Alergias a medicamentos
+              </Title>
+            }
+            style={{ marginBottom: 8 }}
           >
             <Table
               className="alergias-table"
@@ -215,35 +103,208 @@ export const SpecialConditions = () => {
                   ),
                 },
               ]}
-              dataSource={[
+              dataSource={[]}
+              pagination={false}
+            />
+          </Card>
+        )}
+        {selectedValues.includes("diet") && (
+          <Card
+            extra={
+              <Button
+                icon={<PlusOutlined />}
+                className="main-button-white"
+                style={{ alignSelf: "flex-end", marginBottom: 8 }}
+              >
+                Agregar
+              </Button>
+            }
+            title={
+              <Title level={5} style={{ margin: 0 }}>
+                Dieta
+              </Title>
+            }
+            style={{ marginBottom: 8 }}
+          >
+            <Table
+              columns={[
                 {
-                  key: "1",
-                  medicamento: "Penicilina",
-                  observacion: "Reemplazar con azitromicina",
+                  title: "Medicamentos a los que presenta alergia",
+                  dataIndex: "medicamento",
+                  key: "medicamento",
+                  align: "center",
+                },
+                {
+                  title: "Observación",
+                  dataIndex: "observacion",
+                  key: "observacion",
+                  align: "center",
+                },
+                {
+                  title: "Acciones",
+                  key: "acciones",
+                  align: "center",
+                  render: () => (
+                    <Button type="link" danger>
+                      Eliminar
+                    </Button>
+                  ),
                 },
               ]}
+              dataSource={[]}
+              pagination={false}
+            />
+          </Card>
+        )}
+        {selectedValues.includes("disability") && (
+          <>
+            <Card
+              extra={
+                <Button icon={<PlusOutlined />} className="main-button-white">
+                  Agregar
+                </Button>
+              }
+              title={
+                <Title level={5} style={{ margin: 0 }}>
+                  Tipos de discapacidad del paciente
+                </Title>
+              }
+              style={{ marginBottom: 8 }}
+            >
+              <Table
+                className="discapacidad-table"
+                columns={[
+                  {
+                    title: "Discapacidades",
+                    dataIndex: "discapacidad",
+                    key: "discapacidad",
+                    align: "center",
+                  },
+                  {
+                    title: "Observación",
+                    dataIndex: "observacion",
+                    key: "observacion",
+                    align: "center",
+                  },
+                  {
+                    title: "Acciones",
+                    key: "acciones",
+                    align: "center",
+                    render: () => (
+                      <Button type="link" danger>
+                        Eliminar
+                      </Button>
+                    ),
+                  },
+                ]}
+                dataSource={[]}
+                pagination={false}
+              />
+            </Card>
+          </>
+        )}
+        {selectedValues.includes("limitations") && (
+          <Card
+            extra={
+              <Button icon={<PlusOutlined />} className="main-button-white">
+                Agregar
+              </Button>
+            }
+            title={
+              <Title level={5} style={{ margin: 0 }}>
+                Limitaciones permanentes que requieren apoyos o cuidados
+              </Title>
+            }
+            style={{ marginBottom: 8 }}
+          >
+            <Table
+              className="limitaciones-table"
+              columns={[
+                {
+                  title: "Limitaciones",
+                  dataIndex: "limitacion",
+                  key: "limitacion",
+                  align: "center",
+                },
+                {
+                  title: "Observación",
+                  dataIndex: "observacion",
+                  key: "observacion",
+                  align: "center",
+                },
+                {
+                  title: "Acciones",
+                  key: "acciones",
+                  align: "center",
+                  render: () => (
+                    <Button type="link" danger>
+                      Eliminar
+                    </Button>
+                  ),
+                },
+              ]}
+              dataSource={[]}
+              pagination={false}
+            />
+          </Card>
+        )}
+        {selectedValues.includes("otherAlergies") && (
+          <Card
+            extra={
+              <Button icon={<PlusOutlined />} className="main-button-white">
+                Agregar
+              </Button>
+            }
+            title={
+              <Title level={5} style={{ margin: 0 }}>
+                Otras alergias
+              </Title>
+            }
+            style={{ marginBottom: 8 }}
+          >
+            <Table
+              columns={[
+                {
+                  title: "Fecha de ocurrencia",
+                  dataIndex: "fecha",
+                  key: "fecha",
+                  align: "center",
+                },
+                {
+                  title: "Observación",
+                  dataIndex: "observacion",
+                  key: "observacion",
+                  align: "center",
+                },
+                {
+                  title: "Acciones",
+                  key: "acciones",
+                  align: "center",
+                  render: () => (
+                    <Button type="link" danger>
+                      Eliminar
+                    </Button>
+                  ),
+                },
+              ]}
+              dataSource={[]}
               pagination={false}
             />
           </Card>
         )}
         {selectedValues.includes("surgeries") && (
           <Card
-            bordered
-            title={
-              <Flex vertical>
-                <Divider />
-                <Title level={5}>
-                  Historial de cirugías, traumatismos o accidentes
-                </Title>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  className="add-button"
-                >
-                  Agregar
-                </Button>
-              </Flex>
+            extra={
+              <Button icon={<PlusOutlined />} className="main-button-white">
+                Agregar
+              </Button>
             }
+            title={
+              <Title level={5} style={{ margin: 0 }}>
+                Historial de cirugías, traumatismos o accidentes
+              </Title>
+            }
+            style={{ marginBottom: 8 }}
           >
             <Table
               className="historial-table"
@@ -271,13 +332,7 @@ export const SpecialConditions = () => {
                   ),
                 },
               ]}
-              dataSource={[
-                {
-                  key: "1",
-                  fecha: "10/11/1998",
-                  observacion: "Apendicectomía",
-                },
-              ]}
+              dataSource={[]}
               pagination={false}
             />
           </Card>
