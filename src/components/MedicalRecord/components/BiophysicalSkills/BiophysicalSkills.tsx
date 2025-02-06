@@ -1,11 +1,12 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { Card, Row, Typography, Col, Select, Form } from "antd";
+import { FormValues } from "../../MedicalRecord";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export const BiophysicalSkills = () => {
-  const { control } = useFormContext();
+  const { control } = useFormContext<FormValues>();
 
   return (
     <Card bordered title={<Title level={4}>Habilidades biofísicas</Title>}>

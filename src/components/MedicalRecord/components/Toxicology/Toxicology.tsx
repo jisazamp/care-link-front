@@ -1,11 +1,12 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { Card, Row, Col, Form, Select, Typography } from "antd";
+import { FormValues } from "../../MedicalRecord";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export const Toxicology = () => {
-  const { control } = useFormContext();
+  const { control } = useFormContext<FormValues>();
 
   return (
     <Card
@@ -20,8 +21,8 @@ export const Toxicology = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="si">Sí</Option>
-                  <Option value="no">No</Option>
+                  <Option value={true}>Sí</Option>
+                  <Option value={false}>No</Option>
                 </Select>
               )}
             />
@@ -33,12 +34,12 @@ export const Toxicology = () => {
             name="sustanciasPsicoactivas"
           >
             <Controller
-              name="psychoactive"
+              name="psycoactive"
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="si">Sí</Option>
-                  <Option value="no">No</Option>
+                  <Option value={true}>Sí</Option>
+                  <Option value={false}>No</Option>
                 </Select>
               )}
             />
@@ -51,8 +52,8 @@ export const Toxicology = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="si">Sí</Option>
-                  <Option value="no">No</Option>
+                  <Option value={true}>Sí</Option>
+                  <Option value={false}>No</Option>
                 </Select>
               )}
             />
@@ -65,8 +66,8 @@ export const Toxicology = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="si">Sí</Option>
-                  <Option value="no">No</Option>
+                  <Option value={true}>Sí</Option>
+                  <Option value={false}>No</Option>
                 </Select>
               )}
             />

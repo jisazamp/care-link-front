@@ -1,12 +1,91 @@
-import { Card, Flex, Typography, Checkbox, Button, Table } from "antd";
+import { AlergiesModal } from "./components/AlergiesModal/AlergiesModal";
+import { Card, Flex, Typography, Checkbox, Button, Table, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useFormContext, Controller } from "react-hook-form";
+import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { useState } from "react";
+import { FormValues } from "../../MedicalRecord";
+import { DietModal } from "./components/DietModal/DietModal";
+import { DisabilityModal } from "./components/DisabilityModal/DisabilityModal";
+import { LimitationsModal } from "./components/LimitationsModal/LimitationsModal";
+import { OtherAlergiesModal } from "./components/OtherAlergies/OtherAlergies";
+import { SurgeriesModal } from "./components/SurgeriesModal/SurgeriesModal";
 
 const { Title } = Typography;
 
 export const SpecialConditions = () => {
-  const { control, setValue, watch } = useFormContext();
+  const { control, watch, setValue } = useFormContext<FormValues>();
+  const [showModal, setShowModal] = useState<
+    | "alergies"
+    | "diet"
+    | "disability"
+    | "limitations"
+    | "otherAlergies"
+    | "surgeries"
+    | null
+  >(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  const {
+    append: appendAlergies,
+    update: updateAlergies,
+    remove: removeAlergies,
+  } = useFieldArray({
+    control,
+    name: "alergies",
+  });
+
+  const {
+    append: appendDiet,
+    update: updateDiet,
+    remove: removeDiet,
+  } = useFieldArray({
+    control,
+    name: "diet",
+  });
+
+  const {
+    append: appendDisability,
+    update: updateDisability,
+    remove: removeDisability,
+  } = useFieldArray({
+    control,
+    name: "disabilities",
+  });
+
+  const {
+    append: appendLimitations,
+    update: updateLimitations,
+    remove: removeLimitations,
+  } = useFieldArray({
+    control,
+    name: "limitations",
+  });
+
+  const {
+    append: appendOtherAlergies,
+    update: updateOtherAlergies,
+    remove: removeOtherAlergies,
+  } = useFieldArray({
+    control,
+    name: "otherAlergies",
+  });
+
+  const {
+    append: appendSurgeries,
+    update: updateSurgeries,
+    remove: removeSurgeries,
+  } = useFieldArray({
+    control,
+    name: "surgeries",
+  });
+
   const selectedValues = watch("specialConditions", []);
+  const alergies = watch("alergies") ?? [];
+  const diet = watch("diet") ?? [];
+  const disability = watch("disabilities") ?? [];
+  const limitations = watch("limitations") ?? [];
+  const otherAlergies = watch("otherAlergies") ?? [];
+  const surgeries = watch("surgeries") ?? [];
 
   const handleCheckboxGroupChange = (values: any) => {
     setValue("specialConditions", values);
@@ -64,8 +143,11 @@ export const SpecialConditions = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
-                className="main-button-white"
                 style={{ alignSelf: "flex-end" }}
+                onClick={() => {
+                  setEditingIndex(null);
+                  setShowModal("alergies");
+                }}
               >
                 Agregar
               </Button>
@@ -79,31 +161,43 @@ export const SpecialConditions = () => {
           >
             <Table
               className="alergias-table"
+              rowKey="id"
               columns={[
                 {
                   title: "Medicamentos a los que presenta alergia",
-                  dataIndex: "medicamento",
-                  key: "medicamento",
-                  align: "center",
+                  dataIndex: "medicine",
                 },
                 {
                   title: "Observación",
-                  dataIndex: "observacion",
-                  key: "observacion",
-                  align: "center",
+                  dataIndex: "observation",
                 },
                 {
                   title: "Acciones",
                   key: "acciones",
-                  align: "center",
-                  render: () => (
-                    <Button type="link" danger>
-                      Eliminar
-                    </Button>
+
+                  render: (_, __, index) => (
+                    <Space>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setShowModal("alergies");
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => removeAlergies(index)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Space>
                   ),
                 },
               ]}
-              dataSource={[]}
+              dataSource={alergies}
               pagination={false}
             />
           </Card>
@@ -113,8 +207,11 @@ export const SpecialConditions = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
-                className="main-button-white"
                 style={{ alignSelf: "flex-end", marginBottom: 8 }}
+                onClick={() => {
+                  setEditingIndex(null);
+                  setShowModal("diet");
+                }}
               >
                 Agregar
               </Button>
@@ -127,31 +224,42 @@ export const SpecialConditions = () => {
             style={{ marginBottom: 8 }}
           >
             <Table
+              rowKey="id"
               columns={[
                 {
-                  title: "Medicamentos a los que presenta alergia",
-                  dataIndex: "medicamento",
-                  key: "medicamento",
-                  align: "center",
+                  title: "Tipo de dieta",
+                  dataIndex: "diet",
                 },
                 {
                   title: "Observación",
-                  dataIndex: "observacion",
-                  key: "observacion",
-                  align: "center",
+                  dataIndex: "observation",
                 },
                 {
                   title: "Acciones",
                   key: "acciones",
-                  align: "center",
-                  render: () => (
-                    <Button type="link" danger>
-                      Eliminar
-                    </Button>
+                  render: (_, __, index) => (
+                    <Space>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setShowModal("diet");
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => removeDiet(index)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Space>
                   ),
                 },
               ]}
-              dataSource={[]}
+              dataSource={diet}
               pagination={false}
             />
           </Card>
@@ -160,7 +268,13 @@ export const SpecialConditions = () => {
           <>
             <Card
               extra={
-                <Button icon={<PlusOutlined />} className="main-button-white">
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={() => {
+                    setEditingIndex(null);
+                    setShowModal("disability");
+                  }}
+                >
                   Agregar
                 </Button>
               }
@@ -172,32 +286,43 @@ export const SpecialConditions = () => {
               style={{ marginBottom: 8 }}
             >
               <Table
-                className="discapacidad-table"
+                rowKey="id"
                 columns={[
                   {
                     title: "Discapacidades",
-                    dataIndex: "discapacidad",
-                    key: "discapacidad",
-                    align: "center",
+                    dataIndex: "disability",
                   },
                   {
                     title: "Observación",
-                    dataIndex: "observacion",
-                    key: "observacion",
-                    align: "center",
+                    dataIndex: "observation",
                   },
                   {
                     title: "Acciones",
                     key: "acciones",
                     align: "center",
-                    render: () => (
-                      <Button type="link" danger>
-                        Eliminar
-                      </Button>
+                    render: (_, __, index) => (
+                      <Space>
+                        <Button
+                          type="link"
+                          onClick={() => {
+                            setEditingIndex(index);
+                            setShowModal("disability");
+                          }}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          type="link"
+                          danger
+                          onClick={() => removeDisability(index)}
+                        >
+                          Eliminar
+                        </Button>
+                      </Space>
                     ),
                   },
                 ]}
-                dataSource={[]}
+                dataSource={disability}
                 pagination={false}
               />
             </Card>
@@ -206,7 +331,13 @@ export const SpecialConditions = () => {
         {selectedValues.includes("limitations") && (
           <Card
             extra={
-              <Button icon={<PlusOutlined />} className="main-button-white">
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setEditingIndex(null);
+                  setShowModal("limitations");
+                }}
+              >
                 Agregar
               </Button>
             }
@@ -218,32 +349,43 @@ export const SpecialConditions = () => {
             style={{ marginBottom: 8 }}
           >
             <Table
-              className="limitaciones-table"
+              rowKey="id"
               columns={[
                 {
                   title: "Limitaciones",
-                  dataIndex: "limitacion",
-                  key: "limitacion",
-                  align: "center",
+                  dataIndex: "limitation",
                 },
                 {
                   title: "Observación",
-                  dataIndex: "observacion",
-                  key: "observacion",
-                  align: "center",
+                  dataIndex: "observation",
                 },
                 {
                   title: "Acciones",
                   key: "acciones",
                   align: "center",
-                  render: () => (
-                    <Button type="link" danger>
-                      Eliminar
-                    </Button>
+                  render: (_, __, index) => (
+                    <Space>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setShowModal("limitations");
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => removeLimitations(index)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Space>
                   ),
                 },
               ]}
-              dataSource={[]}
+              dataSource={limitations}
               pagination={false}
             />
           </Card>
@@ -251,7 +393,13 @@ export const SpecialConditions = () => {
         {selectedValues.includes("otherAlergies") && (
           <Card
             extra={
-              <Button icon={<PlusOutlined />} className="main-button-white">
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setEditingIndex(null);
+                  setShowModal("otherAlergies");
+                }}
+              >
                 Agregar
               </Button>
             }
@@ -263,31 +411,43 @@ export const SpecialConditions = () => {
             style={{ marginBottom: 8 }}
           >
             <Table
+              rowKey="id"
               columns={[
                 {
-                  title: "Fecha de ocurrencia",
-                  dataIndex: "fecha",
-                  key: "fecha",
-                  align: "center",
+                  title: "Alergia",
+                  dataIndex: "alergie",
                 },
                 {
                   title: "Observación",
-                  dataIndex: "observacion",
-                  key: "observacion",
-                  align: "center",
+                  dataIndex: "observation",
                 },
                 {
                   title: "Acciones",
                   key: "acciones",
                   align: "center",
-                  render: () => (
-                    <Button type="link" danger>
-                      Eliminar
-                    </Button>
+                  render: (_, __, index) => (
+                    <Space>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setShowModal("otherAlergies");
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => removeOtherAlergies(index)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Space>
                   ),
                 },
               ]}
-              dataSource={[]}
+              dataSource={otherAlergies}
               pagination={false}
             />
           </Card>
@@ -295,7 +455,13 @@ export const SpecialConditions = () => {
         {selectedValues.includes("surgeries") && (
           <Card
             extra={
-              <Button icon={<PlusOutlined />} className="main-button-white">
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setEditingIndex(null);
+                  setShowModal("surgeries");
+                }}
+              >
                 Agregar
               </Button>
             }
@@ -307,37 +473,115 @@ export const SpecialConditions = () => {
             style={{ marginBottom: 8 }}
           >
             <Table
-              className="historial-table"
+              rowKey="id"
               columns={[
                 {
                   title: "Fecha de ocurrencia",
-                  dataIndex: "fecha",
-                  key: "fecha",
-                  align: "center",
+                  dataIndex: "date",
+                  render: (_, record) => record.date?.format("YYYY-MM-DD"),
                 },
                 {
                   title: "Observación",
-                  dataIndex: "observacion",
-                  key: "observacion",
-                  align: "center",
+                  dataIndex: "observation",
                 },
                 {
                   title: "Acciones",
                   key: "acciones",
                   align: "center",
-                  render: () => (
-                    <Button type="link" danger>
-                      Eliminar
-                    </Button>
+                  render: (_, __, index) => (
+                    <Space>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setShowModal("surgeries");
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => removeSurgeries(index)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Space>
                   ),
                 },
               ]}
-              dataSource={[]}
+              dataSource={surgeries}
               pagination={false}
             />
           </Card>
         )}
       </Flex>
+      <AlergiesModal
+        open={showModal === "alergies"}
+        editingIndex={editingIndex}
+        initialData={editingIndex !== null ? alergies[editingIndex] : null}
+        append={appendAlergies}
+        update={updateAlergies}
+        onCancel={() => {
+          setShowModal(null);
+          setEditingIndex(null);
+        }}
+      />
+      <DietModal
+        open={showModal === "diet"}
+        editingIndex={editingIndex}
+        initialData={editingIndex !== null ? diet[editingIndex] : null}
+        append={appendDiet}
+        update={updateDiet}
+        onCancel={() => {
+          setShowModal(null);
+          setEditingIndex(null);
+        }}
+      />
+      <DisabilityModal
+        open={showModal === "disability"}
+        editingIndex={editingIndex}
+        initialData={editingIndex !== null ? disability[editingIndex] : null}
+        append={appendDisability}
+        update={updateDisability}
+        onCancel={() => {
+          setShowModal(null);
+          setEditingIndex(null);
+        }}
+      />
+      <LimitationsModal
+        open={showModal === "limitations"}
+        editingIndex={editingIndex}
+        initialData={editingIndex !== null ? limitations[editingIndex] : null}
+        append={appendLimitations}
+        update={updateLimitations}
+        onCancel={() => {
+          setShowModal(null);
+          setEditingIndex(null);
+        }}
+      />
+      <OtherAlergiesModal
+        open={showModal === "otherAlergies"}
+        editingIndex={editingIndex}
+        initialData={editingIndex !== null ? otherAlergies[editingIndex] : null}
+        append={appendOtherAlergies}
+        update={updateOtherAlergies}
+        onCancel={() => {
+          setShowModal(null);
+          setEditingIndex(null);
+        }}
+      />
+      <SurgeriesModal
+        open={showModal === "surgeries"}
+        editingIndex={editingIndex}
+        initialData={editingIndex !== null ? surgeries[editingIndex] : null}
+        append={appendSurgeries}
+        update={updateSurgeries}
+        onCancel={() => {
+          setShowModal(null);
+          setEditingIndex(null);
+        }}
+      />
     </Card>
   );
 };

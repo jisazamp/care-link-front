@@ -1,11 +1,12 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { Card, Typography, Row, Col, Form, Select } from "antd";
+import { FormValues } from "../../MedicalRecord";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 export const SocialPerception = () => {
-  const { control } = useFormContext();
+  const { control } = useFormContext<FormValues>();
   return (
     <Card
       bordered
@@ -63,8 +64,8 @@ export const SocialPerception = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="si">Sí</Option>
-                  <Option value="no">No</Option>
+                  <Option value={true}>Sí</Option>
+                  <Option value={false}>No</Option>
                 </Select>
               )}
             />
