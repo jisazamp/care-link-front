@@ -6,7 +6,6 @@ const { Title } = Typography;
 
 export const BasicHealthData = () => {
   const { control } = useFormContext();
-
   return (
     <Card title={<Title level={4}>Datos básicos de salud</Title>} bordered>
       <Row gutter={16}>
