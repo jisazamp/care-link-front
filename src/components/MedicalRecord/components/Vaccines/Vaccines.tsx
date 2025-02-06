@@ -7,15 +7,15 @@ export const Vaccines = () => {
   return (
     <Card
       bordered
+      extra={
+        <Button icon={<PlusOutlined />} className="main-button-white">
+          Agregar vacuna
+        </Button>
+      }
       title={
-        <Flex vertical>
-          <Title level={4}>Esquema de vacunación</Title>
-          <Flex justify="flex-end" style={{ marginBottom: "8px" }}>
-            <Button icon={<PlusOutlined />} type="primary">
-              Agregar Vacuna
-            </Button>
-          </Flex>
-        </Flex>
+        <Title level={4} style={{ margin: 0 }}>
+          Esquema de vacunación
+        </Title>
       }
     >
       <Flex vertical>
@@ -56,22 +56,7 @@ export const Vaccines = () => {
               ),
             },
           ]}
-          dataSource={[
-            {
-              key: "1",
-              vacuna: "Influenza",
-              fechaAdministracion: "05/07/2024",
-              proximaAplicacion: "Anual",
-              efectosSecundarios: "Ninguno",
-            },
-            {
-              key: "2",
-              vacuna: "Hepatitis B",
-              fechaAdministracion: "NO REGISTRA",
-              proximaAplicacion: "No requiere",
-              efectosSecundarios: "Ninguno",
-            },
-          ]}
+          dataSource={[]}
           pagination={false}
           style={{
             marginTop: 16,
