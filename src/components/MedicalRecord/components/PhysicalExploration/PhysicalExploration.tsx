@@ -5,7 +5,6 @@ const { Title } = Typography;
 
 export const PhysicalExploration = () => {
   const { control } = useFormContext();
-
   return (
     <Card title={<Title level={4}>Exploración física inicial</Title>} bordered>
       <Row gutter={16}>

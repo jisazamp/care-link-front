@@ -12,24 +12,66 @@ import {
   Table,
   Typography,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
 import { BasicHealthData } from "./components/BasicHealthData/BasicHealthData";
-import { UserInfo } from "./components/UserInfo/UserInfo";
-import { MedicalServices } from "./components/MedicalServices/MedicalServices";
-import { EntryData } from "./components/EntryData/EntryData";
-import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
-import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
-import { SpecialConditions } from "./components/SpecialConditions/SpecialConditions";
-import { Vaccines } from "./components/Vaccines/Vaccines";
 import { BiophysicalSkills } from "./components/BiophysicalSkills/BiophysicalSkills";
-import { Toxicology } from "./components/Toxicology/Toxicology";
+import { EntryData } from "./components/EntryData/EntryData";
+import { MedicalServices } from "./components/MedicalServices/MedicalServices";
+import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
+import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
+import { PlusOutlined } from "@ant-design/icons";
 import { SocialPerception } from "./components/SocialPerception/SocialPerception";
+import { SpecialConditions } from "./components/SpecialConditions/SpecialConditions";
+import { Toxicology } from "./components/Toxicology/Toxicology";
+import { UserInfo } from "./components/UserInfo/UserInfo";
+import { Vaccines } from "./components/Vaccines/Vaccines";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import dayjs, { Dayjs } from "dayjs";
 
 const { Title, Text } = Typography;
 
+export const pharmacotherapeuticRegimenSchema = z.object({
+  id: z.union([z.number(), z.string()]).nullable().optional(),
+  startDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
+  medicine: z.string().min(1, "El medicamento es requerido"),
+  dose: z.string().min(1, "La dosis es requerida"),
+  administration: z.string().min(1, "La vía de administración es requerida"),
+  frequency: z.string().min(1, "La frecuencia es requerida"),
+  duration: z.string().min(1, "La duración es requerida"),
+  instructions: z.string().min(1, "Las indicaciones son requeridas"),
+});
+
+const formSchema = z.object({
+  bloodPressure: z.number({ coerce: true }).nullable().default(null),
+  bloodType: z.string().nullable().default(null),
+  bpm: z.number({ coerce: true }).nullable().default(null),
+  entryDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
+  entryReason: z.string().default(""),
+  eps: z.string().nullable().default(null),
+  externalService: z.string().nullable().default(null),
+  externalServicePhone: z.string().nullable().default(null),
+  hasExternalService: z.boolean().default(false),
+  height: z.number({ coerce: true }).nullable().default(null),
+  medicalTreatments: z.array(z.string()).default([]),
+  pharmacotherapeuticRegimen: z
+    .array(pharmacotherapeuticRegimenSchema)
+    .default([]),
+  temperature: z.number({ coerce: true }).nullable().default(null),
+  weight: z.number({ coerce: true }).nullable().default(null),
+});
+
+export type FormValues = z.infer<typeof formSchema>;
+
 export const MedicalRecord: React.FC = () => {
-  const methods = useForm();
+  const methods = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+  });
+
+  const onSubmit = (data: FormValues) => {
+    console.log(data);
+  };
+
   return (
     <FormProvider {...methods}>
       <Layout style={{ minHeight: "100vh" }}>
@@ -104,12 +146,6 @@ export const MedicalRecord: React.FC = () => {
                 <Form.Item
                   label="Observaciones"
                   name="observacionesDiagnostico"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor ingrese las observaciones",
-                    },
-                  ]}
                 >
                   <Input.TextArea
                     rows={4}
@@ -209,6 +245,7 @@ export const MedicalRecord: React.FC = () => {
                   backgroundColor: "#722ed1",
                   borderColor: "#722ed1",
                 }}
+                onClick={methods.handleSubmit(onSubmit)}
               >
                 Guardar y continuar
               </Button>
