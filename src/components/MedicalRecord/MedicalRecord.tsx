@@ -8,8 +8,6 @@ import {
   Layout,
   Row,
   Form,
-  Space,
-  Table,
   Typography,
 } from "antd";
 import { BasicHealthData } from "./components/BasicHealthData/BasicHealthData";
