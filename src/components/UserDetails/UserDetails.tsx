@@ -455,6 +455,7 @@ export const UserDetails: React.FC = () => {
               }
             >
               <Table
+                // @ts-ignore-next
                 columns={acudientesColumns}
                 loading={loadingFamilyMembers}
                 dataSource={familyMembers?.data.data}
