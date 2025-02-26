@@ -60,6 +60,36 @@ export type AuthorizedUser = {
   is_deleted: boolean;
 };
 
+export type MedicalRecord = {
+  alcoholismo: boolean;
+  alergico_medicamento: boolean;
+  altura: number;
+  cafeina: boolean;
+  cirugias: boolean;
+  discapacidad: boolean;
+  emer_medica: string;
+  eps: string;
+  fecha_ingreso: string;
+  frecuencia_cardiaca: number;
+  historial_cirugias: string;
+  id_usuario: number;
+  maltratado: boolean;
+  medicamentos_alergia: string;
+  motivo_ingreso: string;
+  observ_dietaEspecial: string;
+  observ_otrasalergias: string;
+  observaciones_iniciales: string;
+  peso: number;
+  presion_arterial: number;
+  sustanciaspsico: boolean;
+  tabaquismo: boolean;
+  telefono_emermedica: string;
+  temperatura_corporal: number;
+  Tiene_OtrasAlergias: boolean;
+  Tienedieta_especial: boolean;
+  tipo_sangre: string;
+}
+
 export type Login = {
   access_token: string;
   token_type: "bearer";

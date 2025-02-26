@@ -1,4 +1,3 @@
-import { Controller, FormProvider } from "react-hook-form";
 import {
   Breadcrumb,
   Button,
@@ -10,8 +9,11 @@ import {
   Form,
   Typography,
 } from "antd";
+import dayjs, { Dayjs } from "dayjs";
+import type { MedicalRecord as MedicalRecordType } from "../../types";
 import { BasicHealthData } from "./components/BasicHealthData/BasicHealthData";
 import { BiophysicalSkills } from "./components/BiophysicalSkills/BiophysicalSkills";
+import { Controller, FormProvider } from "react-hook-form";
 import { EntryData } from "./components/EntryData/EntryData";
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
 import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
@@ -25,7 +27,8 @@ import { Vaccines } from "./components/Vaccines/Vaccines";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import dayjs, { Dayjs } from "dayjs";
+import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
+import { useParams } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -100,7 +103,7 @@ const formSchema = z.object({
   externalService: z.string().nullable().default(null),
   externalServicePhone: z.string().nullable().default(null),
   hasExternalService: z.boolean().default(false),
-  height: z.number({ coerce: true }).nullable().default(null),
+  height: z.number({ coerce: true }).default(0),
   medicalTreatments: z.array(z.string()).default([]),
   specialConditions: z.array(z.string()).default([]),
   pharmacotherapeuticRegimen: z
@@ -130,18 +133,53 @@ const formSchema = z.object({
   nonVerbalCommunication: z.string(),
   mood: z.string(),
   abused: z.boolean(),
-  initialDiagnosis: z.string(),
+  initialDiagnosis: z.string().optional(),
 });
 
 export type FormValues = z.infer<typeof formSchema>;
 
 export const MedicalRecord: React.FC = () => {
+  const params = useParams();
+  const userId = params.id;
+
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
 
+  const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
+    useCreateUserMedicalRecord(userId);
+
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    const record: MedicalRecordType = {
+      Tiene_OtrasAlergias: !!data.otherAlergies.length,
+      Tienedieta_especial: !!data.diet.length,
+      alcoholismo: data.alcholism,
+      alergico_medicamento: !!data.alergies.length,
+      altura: data.height,
+      cafeina: data.caffeine,
+      cirugias: !!data.surgeries.length,
+      discapacidad: !!data.disabilities.length,
+      emer_medica: data.externalService + "",
+      eps: data.eps + "",
+      fecha_ingreso: data.entryDate.format('YYYY-MM-DD'),
+      frecuencia_cardiaca: Number(data.bpm),
+      historial_cirugias: "",
+      id_usuario: Number(userId),
+      maltratado: data.abused,
+      medicamentos_alergia: data.alergies.join(", "),
+      motivo_ingreso: data.entryReason,
+      observ_dietaEspecial: "",
+      observ_otrasalergias: "",
+      observaciones_iniciales: data.initialDiagnosis + '',
+      peso: Number(data.weight),
+      presion_arterial: Number(data.bloodPressure),
+      sustanciaspsico: data.psycoactive,
+      tabaquismo: data.tabaquism,
+      telefono_emermedica: data.externalServicePhone + "",
+      temperatura_corporal: Number(data.temperature),
+      tipo_sangre: data.bloodType ?? "O+",
+    };
+    createUserMedicalRecord(record);
   };
 
   return (
@@ -210,7 +248,7 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                bordered
+                variant="outlined"
                 title={<Title level={4}>Diagnóstico inicial</Title>}
                 style={{ marginBottom: 8 }}
               >
@@ -294,7 +332,7 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                bordered
+                variant="outlined"
                 extra={
                   <Button icon={<PlusOutlined />} className="main-button-white">
                     Agregar
@@ -323,6 +361,7 @@ export const MedicalRecord: React.FC = () => {
                   backgroundColor: "#722ed1",
                   borderColor: "#722ed1",
                 }}
+                loading={isLoadingCreation}
                 onClick={methods.handleSubmit(onSubmit)}
               >
                 Guardar y continuar

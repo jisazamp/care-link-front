@@ -9,7 +9,7 @@ export const BiophysicalSkills = () => {
   const { control } = useFormContext<FormValues>();
 
   return (
-    <Card bordered title={<Title level={4}>Habilidades biofísicas</Title>}>
+    <Card variant="outlined" title={<Title level={4}>Habilidades biofísicas</Title>}>
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item label="Tipo de alimentación" name="tipoAlimentacion">

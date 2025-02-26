@@ -10,7 +10,7 @@ export const Toxicology = () => {
 
   return (
     <Card
-      bordered
+      variant="outlined"
       title={<Title level={4}>Hábitos o antecedentes toxicológicos</Title>}
     >
       <Row gutter={16}>

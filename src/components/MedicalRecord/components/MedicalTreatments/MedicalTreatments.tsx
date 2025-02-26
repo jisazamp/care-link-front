@@ -54,7 +54,7 @@ export const MedicalTreatments = () => {
     <>
       <Card
         title={<Title level={4}>Tratamientos o medicamentos</Title>}
-        bordered
+        variant="outlined"
       >
         <Form.Item>
           <Controller

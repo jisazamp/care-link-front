@@ -10,7 +10,7 @@ export const MedicalServices = () => {
   return (
     <Card
       title={<Title level={4}>Servicio externo para emergencias médicas</Title>}
-      bordered
+      variant="outlined"
     >
       <Row gutter={16}>
         <Col span={8}>
