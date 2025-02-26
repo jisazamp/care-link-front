@@ -1,6 +1,5 @@
 import { Button, Col, Form, Input, Modal, Row } from "antd";
-import { FormValues } from "../../../../MedicalRecord";
-import { alergiesSchema } from "../../../../MedicalRecord";
+import { FormValues, alergiesSchema } from "../../../../schema/schema";
 import { useEffect } from "react";
 import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
@@ -36,7 +35,6 @@ export const AlergiesModal = ({
     else
       reset({
         medicine: undefined,
-        observation: undefined,
       });
   }, [initialData, reset]);
 
@@ -73,17 +71,6 @@ export const AlergiesModal = ({
             <Form.Item label="Medicamento">
               <Controller
                 name="medicine"
-                control={control}
-                render={({ field }) => <Input {...field} />}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Observación">
-              <Controller
-                name="observation"
                 control={control}
                 render={({ field }) => <Input {...field} />}
               />

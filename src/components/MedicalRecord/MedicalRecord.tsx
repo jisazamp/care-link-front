@@ -1,18 +1,34 @@
-import { Controller, FormProvider } from "react-hook-form";
 import {
   Breadcrumb,
   Button,
   Card,
   Col,
+  Flex,
+  Form,
   Input,
   Layout,
   Row,
-  Form,
+  Spin,
   Typography,
 } from "antd";
+import dayjs from "dayjs";
+import type {
+  MedicalRecord as MedicalRecordType,
+  UserCare,
+  UserIntervention,
+} from "../../types";
+import type { UserMedicine } from "../../types";
 import { BasicHealthData } from "./components/BasicHealthData/BasicHealthData";
 import { BiophysicalSkills } from "./components/BiophysicalSkills/BiophysicalSkills";
+import { Controller, FormProvider } from "react-hook-form";
 import { EntryData } from "./components/EntryData/EntryData";
+import {
+  FormValues,
+  NursingCarePlan,
+  PharmacoRegimen,
+  PhysioRegimen,
+  formSchema,
+} from "./schema/schema";
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
 import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
 import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
@@ -22,127 +38,235 @@ import { SpecialConditions } from "./components/SpecialConditions/SpecialConditi
 import { Toxicology } from "./components/Toxicology/Toxicology";
 import { UserInfo } from "./components/UserInfo/UserInfo";
 import { Vaccines } from "./components/Vaccines/Vaccines";
+import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useGetRecordCares } from "../../hooks/useGetUserCares/useGetUserCares";
+import { useGetRecordMedicines } from "../../hooks/useGetRecordMedicines/useGetRecordMedicines";
+import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import { zodResolver } from "@hookform/resolvers/zod";
-import dayjs, { Dayjs } from "dayjs";
+import { useGetRecordInterventions } from "../../hooks/useGetUserInterventions/useGetUserInterventions";
 
 const { Title, Text } = Typography;
 
-export const pharmacotherapeuticRegimenSchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  startDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
-  medicine: z.string().min(1, "El medicamento es requerido"),
-  dose: z.string().min(1, "La dosis es requerida"),
-  administration: z.string().min(1, "La vía de administración es requerida"),
-  frequency: z.string().min(1, "La frecuencia es requerida"),
-  duration: z.string().min(1, "La duración es requerida"),
-  instructions: z.string().min(1, "Las indicaciones son requeridas"),
-});
-
-export const surgeriesSchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  date: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
-  observation: z.string(),
-});
-
-export const nursingCarePlanSchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  diagnosis: z.string().min(1, "El diagnóstico es requerido"),
-  intervention: z.string().min(1, "La intervención es requerida"),
-  frequency: z.string().min(1, "La frecuencia es requerida"),
-});
-
-export const physioterapeuticRegimenSchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  diagnosis: z.string().min(1, "El diagnóstico es requerido"),
-  intervention: z.string().min(1, "La intervención es requerida"),
-  frequency: z.string().min(1, "La frecuencia es requerida"),
-});
-
-export const alergiesSchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  medicine: z.string(),
-  observation: z.string(),
-});
-
-export const dietSchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  diet: z.string(),
-  observation: z.string(),
-});
-
-export const disabilitySchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  disability: z.string(),
-  observation: z.string(),
-});
-
-export const limitationsSchema = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  limitation: z.string(),
-  observation: z.string(),
-});
-
-export const otherAlergies = z.object({
-  id: z.union([z.number(), z.string()]).nullable().optional(),
-  alergy: z.string(),
-  observation: z.string(),
-});
-
-const formSchema = z.object({
-  bloodPressure: z.number({ coerce: true }).nullable().default(null),
-  bloodType: z.string().nullable().default(null),
-  bpm: z.number({ coerce: true }).nullable().default(null),
-  entryDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
-  entryReason: z.string().default(""),
-  eps: z.string().nullable().default(null),
-  externalService: z.string().nullable().default(null),
-  externalServicePhone: z.string().nullable().default(null),
-  hasExternalService: z.boolean().default(false),
-  height: z.number({ coerce: true }).nullable().default(null),
-  medicalTreatments: z.array(z.string()).default([]),
-  specialConditions: z.array(z.string()).default([]),
-  pharmacotherapeuticRegimen: z
-    .array(pharmacotherapeuticRegimenSchema)
-    .default([]),
-  nursingCarePlan: z.array(nursingCarePlanSchema).default([]),
-  physioterapeuticRegimen: z.array(physioterapeuticRegimenSchema).default([]),
-  diet: z.array(dietSchema).default([]),
-  alergies: z.array(alergiesSchema).default([]),
-  disabilities: z.array(disabilitySchema).default([]),
-  limitations: z.array(limitationsSchema).default([]),
-  otherAlergies: z.array(otherAlergies).default([]),
-  surgeries: z.array(surgeriesSchema).default([]),
-  temperature: z.number({ coerce: true }).nullable().default(null),
-  weight: z.number({ coerce: true }).nullable().default(null),
-  feeding: z.string(),
-  sleepType: z.string(),
-  continence: z.string(),
-  mobility: z.string(),
-  personalCare: z.string(),
-  personalAppearance: z.string(),
-  tabaquism: z.boolean(),
-  psycoactive: z.boolean(),
-  alcholism: z.boolean(),
-  caffeine: z.boolean(),
-  verbalCommunication: z.string(),
-  nonVerbalCommunication: z.string(),
-  mood: z.string(),
-  abused: z.boolean(),
-  initialDiagnosis: z.string(),
-});
-
-export type FormValues = z.infer<typeof formSchema>;
-
 export const MedicalRecord: React.FC = () => {
+  const params = useParams();
+  const userId = params.id;
+
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
+  const { reset, getValues } = methods;
+
+  const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
+    useCreateUserMedicalRecord(userId);
+
+  const { data: userMedicalRecord, isLoading: loadingUserMedicalRecord } =
+    useGetUserMedicalRecord(userId);
+
+  const { data: userMedicines, isLoading: loadingUserMedicines } =
+    useGetRecordMedicines(userMedicalRecord?.data.data?.id_historiaclinica);
+
+  const { data: userCares, isLoading: loadingUserCares } = useGetRecordCares(
+    userMedicalRecord?.data.data?.id_historiaclinica
+  );
+
+  const { data: userInterventions, isLoading: loadingUserInterventions } =
+    useGetRecordInterventions(userMedicalRecord?.data.data?.id_historiaclinica);
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    const record: MedicalRecordType = {
+      Tiene_OtrasAlergias: !!data.otherAlergies.length,
+      Tienedieta_especial: !!data.diet.length,
+      alcoholismo: data.alcholism,
+      alergico_medicamento: !!data.alergies.length,
+      altura: data.height,
+      apariencia_personal: data.personalAppearance + "",
+      cafeina: data.caffeine,
+      cirugias: !!data.surgeries.length,
+      comunicacion_no_verbal: data.nonVerbalCommunication,
+      comunicacion_verbal: data.verbalCommunication,
+      continencia: data.continence,
+      cuidado_personal: data.personalCare + "",
+      discapacidad: !!data.disabilities.length,
+      emer_medica: data.externalService + "",
+      eps: data.eps + "",
+      estado_de_animo: data.mood,
+      fecha_ingreso: data.entryDate.format("YYYY-MM-DD"),
+      frecuencia_cardiaca: Number(data.bpm),
+      historial_cirugias: "",
+      id_usuario: Number(userId),
+      maltratado: data.abused,
+      maltrato: data.abused,
+      medicamentos_alergia: data.alergies.map((a) => a.medicine).join(", "),
+      motivo_ingreso: data.entryReason,
+      observ_dietaEspecial: "",
+      observ_otrasalergias: "",
+      observaciones_iniciales: data.initialDiagnosis + "",
+      peso: Number(data.weight),
+      presion_arterial: Number(data.bloodPressure),
+      sustanciaspsico: data.psycoactive,
+      tabaquismo: data.tabaquism,
+      telefono_emermedica: data.externalServicePhone + "",
+      temperatura_corporal: Number(data.temperature),
+      tipo_alimentacion: data.feeding + "",
+      tipo_de_movilidad: data.mobility + "",
+      tipo_de_sueno: data.sleepType + "",
+      tipo_sangre: data.bloodType ?? "O+",
+    };
+
+    const medicines: UserMedicine[] = [];
+    data.pharmacotherapeuticRegimen.forEach((p) => {
+      const medicine: UserMedicine = {
+        Fecha_inicio: p.startDate.format("YYYY-MM-DD"),
+        fecha_fin: p.endDate.format("YYYY-MM-DD"),
+        medicamento: p.medicine,
+        periodicidad: p.frequency,
+      };
+      medicines.push(medicine);
+    });
+
+    const cares: UserCare[] = [];
+    data.nursingCarePlan.forEach((n) => {
+      const care: UserCare = {
+        diagnostico: n.diagnosis,
+        frecuencia: n.frequency,
+        intervencion: n.intervention,
+      };
+      cares.push(care);
+    });
+
+    const interventions: UserIntervention[] = [];
+    data.physioterapeuticRegimen.forEach((n) => {
+      const intervention: UserIntervention = {
+        diagnostico: n.diagnosis,
+        frecuencia: n.frequency,
+        intervencion: n.intervention,
+      };
+      interventions.push(intervention);
+    });
+
+    createUserMedicalRecord({ record, medicines, cares, interventions });
   };
+
+  useEffect(() => {
+    if (userMedicalRecord?.data.data) {
+      const data = userMedicalRecord.data.data;
+      const alergies = data.medicamentos_alergia
+        .split(", ")
+        .filter((a) => !!a)
+        .map((e) => ({ id: uuidv4(), medicine: e }));
+      const specialConditions: string[] = [];
+      if (alergies.length) specialConditions.push("alergies");
+
+      reset((values) => ({
+        ...values,
+        abused: data.maltratado,
+        alcholism: data.alcoholismo,
+        alergies,
+        specialConditions,
+        bloodPressure: data.presion_arterial,
+        bloodType: data.tipo_sangre,
+        bpm: data.frecuencia_cardiaca,
+        caffeine: data.cafeina,
+        continence: data.continencia,
+        entryDate: dayjs(data.fecha_ingreso),
+        entryReason: data.motivo_ingreso,
+        eps: data.eps + "",
+        externalService: data.emer_medica + "",
+        externalServicePhone: data.telefono_emermedica + "",
+        feeding: data.tipo_alimentacion,
+        hasExternalService: !!data.emer_medica,
+        height: data.altura,
+        initialDiagnosis: data.observaciones_iniciales + "",
+        mobility: data.tipo_de_movilidad,
+        mood: data.estado_de_animo,
+        nonVerbalCommunication: data.comunicacion_no_verbal,
+        personalAppearance: data.apariencia_personal,
+        personalCare: data.cuidado_personal,
+        psycoactive: data.sustanciaspsico,
+        sleepType: data.tipo_de_sueno,
+        tabaquism: data.tabaquismo,
+        temperature: data.temperatura_corporal,
+        verbalCommunication: data.comunicacion_verbal,
+        weight: data.peso,
+      }));
+    }
+  }, [userMedicalRecord?.data.data, reset]);
+
+  useEffect(() => {
+    if (userMedicines?.data.data) {
+      const medicines: PharmacoRegimen[] = userMedicines.data.data.map((e) => ({
+        id: uuidv4(),
+        endDate: dayjs(e.fecha_fin),
+        frequency: e.periodicidad,
+        medicine: e.medicamento,
+        startDate: dayjs(e.Fecha_inicio),
+      }));
+      const medicalTreatments: string[] = getValues("medicalTreatments") ?? [];
+      if (userMedicines.data.data.length)
+        medicalTreatments.push("pharmacotherapeuticRegimen");
+      reset((values) => ({
+        ...values,
+        medicalTreatments,
+        pharmacotherapeuticRegimen: medicines,
+      }));
+    }
+  }, [userMedicines?.data.data, reset, getValues]);
+
+  useEffect(() => {
+    if (userCares?.data.data) {
+      const cares: NursingCarePlan[] = userCares.data.data.map((e) => ({
+        id: uuidv4(),
+        frequency: e.frecuencia,
+        diagnosis: e.diagnostico,
+        intervention: e.intervencion,
+      }));
+      const medicalTreatments: string[] = getValues("medicalTreatments") ?? [];
+      if (userCares.data.data.length) medicalTreatments.push("nursingCarePlan");
+      reset((values) => ({
+        ...values,
+        medicalTreatments,
+        nursingCarePlan: cares,
+      }));
+    }
+  }, [userCares?.data.data, reset, getValues]);
+
+  useEffect(() => {
+    if (userInterventions?.data.data) {
+      const interventions: PhysioRegimen[] = userInterventions.data.data.map(
+        (e) => ({
+          id: uuidv4(),
+          frequency: e.frecuencia,
+          diagnosis: e.diagnostico,
+          intervention: e.intervencion,
+        })
+      );
+      const medicalTreatments: string[] = getValues("medicalTreatments") ?? [];
+      if (userInterventions.data.data.length)
+        medicalTreatments.push("physiotherapeuticIntervention");
+      reset((values) => ({
+        ...values,
+        medicalTreatments,
+        physioterapeuticRegimen: interventions,
+      }));
+    }
+  }, [userInterventions?.data.data, reset, getValues]);
+
+  if (
+    loadingUserMedicalRecord ||
+    loadingUserCares ||
+    loadingUserMedicines ||
+    loadingUserInterventions
+  ) {
+    return (
+      <Flex align="center" justify="center" style={{ minHeight: 300 }}>
+        <Spin />
+      </Flex>
+    );
+  }
 
   return (
     <FormProvider {...methods}>
@@ -210,7 +334,7 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                bordered
+                variant="outlined"
                 title={<Title level={4}>Diagnóstico inicial</Title>}
                 style={{ marginBottom: 8 }}
               >
@@ -294,7 +418,7 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                bordered
+                variant="outlined"
                 extra={
                   <Button icon={<PlusOutlined />} className="main-button-white">
                     Agregar
@@ -323,6 +447,7 @@ export const MedicalRecord: React.FC = () => {
                   backgroundColor: "#722ed1",
                   borderColor: "#722ed1",
                 }}
+                loading={isLoadingCreation}
                 onClick={methods.handleSubmit(onSubmit)}
               >
                 Guardar y continuar

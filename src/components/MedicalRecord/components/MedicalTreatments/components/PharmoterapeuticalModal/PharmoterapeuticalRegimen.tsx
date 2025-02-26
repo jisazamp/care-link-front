@@ -1,6 +1,8 @@
 import { Button, Col, DatePicker, Form, Input, Modal, Row } from "antd";
-import { FormValues } from "../../../../MedicalRecord";
-import { pharmacotherapeuticRegimenSchema } from "../../../../MedicalRecord";
+import {
+  FormValues,
+  pharmacotherapeuticRegimenSchema,
+} from "../../../../schema/schema";
 import { useEffect } from "react";
 import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
@@ -35,12 +37,9 @@ export const PharmoterapeuticModal = ({
     if (initialData) reset(initialData);
     else
       reset({
-        administration: undefined,
-        dose: undefined,
-        duration: undefined,
+        endDate: undefined,
         frequency: undefined,
         id: undefined,
-        instructions: undefined,
         medicine: undefined,
         startDate: undefined,
       });
@@ -94,6 +93,23 @@ export const PharmoterapeuticModal = ({
               />
             </Form.Item>
           </Col>
+          <Col span={24}>
+            <Form.Item label="Fecha fin">
+              <Controller
+                name="endDate"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    {...field}
+                    style={{
+                      width: "100%",
+                    }}
+                    placeholder="DD-MM-YYYY"
+                  />
+                )}
+              />
+            </Form.Item>
+          </Col>
         </Row>
         <Row gutter={16}>
           <Col span={24}>
@@ -108,55 +124,11 @@ export const PharmoterapeuticModal = ({
         </Row>
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Dosis">
-              <Controller
-                name="dose"
-                control={control}
-                render={({ field }) => <Input {...field} />}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Vía de administración">
-              <Controller
-                name="administration"
-                control={control}
-                render={({ field }) => <Input {...field} />}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
             <Form.Item label="Frecuencia">
               <Controller
                 name="frequency"
                 control={control}
                 render={({ field }) => <Input {...field} />}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Duración">
-              <Controller
-                name="duration"
-                control={control}
-                render={({ field }) => <Input {...field} />}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Indicaciones">
-              <Controller
-                name="instructions"
-                control={control}
-                render={({ field }) => <Input.TextArea {...field} />}
               />
             </Form.Item>
           </Col>

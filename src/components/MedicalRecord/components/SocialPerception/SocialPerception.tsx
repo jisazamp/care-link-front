@@ -1,6 +1,6 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { Card, Typography, Row, Col, Form, Select } from "antd";
-import { FormValues } from "../../MedicalRecord";
+import { FormValues } from "../../schema/schema";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -9,7 +9,7 @@ export const SocialPerception = () => {
   const { control } = useFormContext<FormValues>();
   return (
     <Card
-      bordered
+      variant="outlined"
       title={<Title level={4}>Habilidades de percepción social</Title>}
       style={{ marginBottom: 8 }}
     >

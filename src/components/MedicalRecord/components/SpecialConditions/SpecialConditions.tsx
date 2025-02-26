@@ -100,7 +100,7 @@ export const SpecialConditions = () => {
           </Title>
         </Flex>
       }
-      bordered
+      variant="outlined"
     >
       <Flex vertical>
         <Title
@@ -160,16 +160,11 @@ export const SpecialConditions = () => {
             style={{ marginBottom: 8 }}
           >
             <Table
-              className="alergias-table"
               rowKey="id"
               columns={[
                 {
                   title: "Medicamentos a los que presenta alergia",
                   dataIndex: "medicine",
-                },
-                {
-                  title: "Observación",
-                  dataIndex: "observation",
                 },
                 {
                   title: "Acciones",

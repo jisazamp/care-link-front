@@ -6,7 +6,7 @@ const { Title } = Typography;
 export const Vaccines = () => {
   return (
     <Card
-      bordered
+      variant="outlined"
       extra={
         <Button icon={<PlusOutlined />} className="main-button-white">
           Agregar vacuna

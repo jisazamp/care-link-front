@@ -1,6 +1,5 @@
 import { Button, Col, Form, Input, Modal, Row } from "antd";
-import { FormValues } from "../../../../MedicalRecord";
-import { dietSchema } from "../../../../MedicalRecord";
+import { FormValues, dietSchema } from "../../../../schema/schema";
 import { useEffect } from "react";
 import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";

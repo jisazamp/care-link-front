@@ -1,6 +1,6 @@
-import { useFormContext, Controller } from "react-hook-form";
 import { Card, Row, Typography, Col, Select, Form } from "antd";
-import { FormValues } from "../../MedicalRecord";
+import { FormValues } from "../../schema/schema";
+import { useFormContext, Controller } from "react-hook-form";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -9,7 +9,7 @@ export const BiophysicalSkills = () => {
   const { control } = useFormContext<FormValues>();
 
   return (
-    <Card bordered title={<Title level={4}>Habilidades biofísicas</Title>}>
+    <Card variant="outlined" title={<Title level={4}>Habilidades biofísicas</Title>}>
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item label="Tipo de alimentación" name="tipoAlimentacion">
@@ -46,8 +46,8 @@ export const BiophysicalSkills = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="si">Sí</Option>
-                  <Option value="no">No</Option>
+                  <Option value={true}>Sí</Option>
+                  <Option value={false}>No</Option>
                 </Select>
               )}
             />
