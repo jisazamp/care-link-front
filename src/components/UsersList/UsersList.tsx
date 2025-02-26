@@ -76,7 +76,11 @@ export const UsersList = () => {
                     src="https://via.placeholder.com/72"
                   />
                 }
-                title={`${item.nombres} ${item.apellidos}`}
+                title={
+                  <Link to={`/usuarios/${item.id_usuario}/detalles`} style={{ color: "#6A0DAD" }}>
+                    {`${item.nombres} ${item.apellidos}`}
+                  </Link>
+                }
                 description={item.email}
               />
               <Typography style={{ color: "rgba(0, 0, 0, 0.45)" }}>
