@@ -189,7 +189,7 @@ export const CreateFamilyMember = () => {
                   </Col>
                   <Col span={8}>
                     <Form.Item
-                      label="¿Vive?"
+                      label="¿Convive con el usuario?"
                       validateStatus={errors.isAlive ? "error" : ""}
                       help={
                         errors.isAlive?.message && (
