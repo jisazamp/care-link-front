@@ -17,6 +17,10 @@ import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { UsersList } from "./components/UsersList/UsersList";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
+import { FormContracts } from "./components/Contracts/components/FormContracts";
+import MedicalReport from "./components/MedicalReport/MedicalReport";
+import { ContractDetails } from "./components/Contracts/components/ContractDetails/ContractDetails";
+
 
 export const colors = {
   primary: {
@@ -96,70 +100,17 @@ export const App = () => {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route element={<MainLayout />}>
-            <Route
-              path="/inicio"
-              element={
-                <PrivateRoute>
-                  <Home />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios"
-              element={
-                <PrivateRoute>
-                  <UsersList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/crear"
-              element={
-                <PrivateRoute>
-                  <NewUser />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/editar"
-              element={
-                <PrivateRoute>
-                  <NewUser />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/detalles"
-              element={
-                <PrivateRoute>
-                  <UserDetails />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/familiar"
-              element={
-                <PrivateRoute>
-                  <CreateFamilyMember />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/familiar/:familyMemberId"
-              element={
-                <PrivateRoute>
-                  <CreateFamilyMember />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/MedicalRecord"
-              element={
-                <PrivateRoute>
-                  <MedicalRecord />
-                </PrivateRoute>
-              }
-            />
+            <Route path="/inicio" element={<PrivateRoute><Home /></PrivateRoute>} />
+            <Route path="/usuarios" element={<PrivateRoute><UsersList /></PrivateRoute>} />
+            <Route path="/usuarios/crear" element={<PrivateRoute><NewUser /></PrivateRoute>} />
+            <Route path="/usuarios/:id/editar" element={<PrivateRoute><NewUser /></PrivateRoute>} />
+            <Route path="/usuarios/:id/detalles" element={<PrivateRoute><UserDetails /></PrivateRoute>} />
+            <Route path="/usuarios/:id/familiar" element={<PrivateRoute><CreateFamilyMember /></PrivateRoute>} />
+            <Route path="/MedicalRecord" element={<PrivateRoute><MedicalRecord /></PrivateRoute>} />
+            <Route path="/usuarios/:id/contract" element={<PrivateRoute><FormContracts /></PrivateRoute>} />
+            <Route path="/usuarios/:id/detalles/*" element={<MedicalReport />} />
+            <Route path="/usuarios/:id/contract" element={<PrivateRoute><FormContracts /></PrivateRoute>} />
+            <Route path="/usuarios/:id/contract-details" element={<PrivateRoute><ContractDetails /></PrivateRoute>} /> {/* ✅ Ruta independiente */}
           </Route>
           <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
