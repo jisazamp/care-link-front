@@ -1,7 +1,8 @@
 import {
   HomeOutlined,
   UserOutlined,
-  CheckCircleOutlined,
+  CarOutlined,
+  HddOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link } from "react-router-dom";
@@ -10,24 +11,29 @@ const menuItems = [
   {
     key: "1",
     icon: <HomeOutlined />,
-    label: <Link to="home">Inicio</Link>,
+    label: <Link to="home">Tablero de inicio</Link>,
   },
   {
     key: "2",
     icon: <UserOutlined />,
-    label: "Pacientes",
+    label: "Usuarios",
     children: [
-      { key: "2.1", label: <Link to="usuarios">Listado de usuarios</Link> },
-      {
-        key: "2.2",
-        label: <Link to="usuarios/crear">Registrar nuevo usuarios</Link>,
-      },
+      { key: "2.1", label: <Link to="usuarios/crear">Nuevo Usuario</Link> },
+      { key: "2.2", label: <Link to ="home"> Nuevo reporte Clinico</Link>},
+      { key: "2.3", label: <Link to="usuarios">Listado de usuarios</Link> },
+      
     ],
   },
   {
     key: "3",
-    icon: <CheckCircleOutlined />,
-    label: "Gestión de Actividades",
+    icon: <CarOutlined />,
+    label: "Visitas domiciliarias",
+  },
+
+  {
+    key: "4",
+    icon: <HddOutlined />,
+    label: "Administración",
   },
 ];
 
