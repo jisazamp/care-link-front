@@ -29,65 +29,7 @@ import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMember
 
 const { Title } = Typography;
 
-const clinicalReportsData = [
-  {
-    key: "1",
-    professional: "Sara Manuela Gomez",
-    reportType: "Enfermería",
-    date: "10/20/2024",
-    actions: [
-      <a key="view" href="#">
-        Ver
-      </a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>
-        Editar
-      </a>,
-    ],
-  },
-  {
-    key: "2",
-    professional: "Juan Pablo Ruiz",
-    reportType: "Ortopedia",
-    date: "10/24/2024",
-    actions: [
-      <a key="view" href="#">
-        Ver
-      </a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>
-        Editar
-      </a>,
-    ],
-  },
-];
 
-const columns = [
-  {
-    title: <Checkbox />,
-    dataIndex: "checkbox",
-    render: () => <Checkbox />,
-    width: "5%",
-  },
-  {
-    title: "Profesional",
-    dataIndex: "professional",
-    key: "professional",
-  },
-  {
-    title: "Tipo Reporte",
-    dataIndex: "reportType",
-    key: "reportType",
-  },
-  {
-    title: "Fecha",
-    dataIndex: "date",
-    key: "date",
-  },
-  {
-    title: "Acciones",
-    dataIndex: "actions",
-    key: "actions",
-  },
-];
 
 const contractsData = [
   {
@@ -97,55 +39,15 @@ const contractsData = [
     servicios: "Centro día, transporte",
     firmado: "Sí",
     estadoFacturacion: "Al día",
-    acciones: [
-      <a key="view" href="#">
-        Ver
-      </a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>
-        Editar
-      </a>,
-    ],
-  },
+    acciones: (
+      <Space>
+        <a key="view" href="#">Ver</a>
+        <a key="edit" href="#" style={{ marginLeft: 8 }}>Editar</a>
+      </Space>
+    ),
+  }
 ];
 
-const contractsColumns = [
-  {
-    title: <Checkbox />,
-    dataIndex: "checkbox",
-    render: () => <Checkbox />,
-    width: "5%",
-  },
-  {
-    title: "Fecha de inicio",
-    dataIndex: "fechaInicio",
-    key: "fechaInicio",
-  },
-  {
-    title: "Estado",
-    dataIndex: "estado",
-    key: "estado",
-  },
-  {
-    title: "Servicios",
-    dataIndex: "servicios",
-    key: "servicios",
-  },
-  {
-    title: "Firmado",
-    dataIndex: "firmado",
-    key: "firmado",
-  },
-  {
-    title: "Estado Facturación",
-    dataIndex: "estadoFacturacion",
-    key: "estadoFacturacion",
-  },
-  {
-    title: "Acciones",
-    dataIndex: "acciones",
-    key: "acciones",
-  },
-];
 
 export const UserDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -164,8 +66,67 @@ export const UserDetails: React.FC = () => {
     isPending: loadingUserDeletion,
   } = useDeleteFamilyMemberMutation(userId);
 
-  const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
-    [
+  const clinicalReportsData = [
+    {
+      key: "1",
+      professional: "Sara Manuela Gomez",
+      reportType: "Enfermería",
+      date: "10/20/2024",
+      actions: [
+        <Link key="view" to={`/usuarios/${userId}/detalles/viewReport`}>
+          Ver
+        </Link>,
+        <Link key="edit" to={`/usuarios/${userId}/detalles/EditReport`} style={{ marginLeft: 8 }}>
+          Agregar reporte
+        </Link>,
+      ],
+    },
+    {
+      key: "2",
+      professional: "Juan Pablo Ruiz",
+      reportType: "Ortopedia",
+      date: "10/24/2024",
+      actions: [
+        <Link key="view" to="#">
+          Ver
+        </Link>,
+        <Link key="edit" to={`/usuarios/${userId}/detalles/EditReport`} style={{ marginLeft: 8 }}>
+          Agregar reporte
+        </Link>,
+      ],
+    },
+  ];
+  
+  const columns = [
+    {
+      title: <Checkbox />,
+      dataIndex: "checkbox",
+      render: () => <Checkbox />,
+      width: "5%",
+    },
+    {
+      title: "Profesional",
+      dataIndex: "professional",
+      key: "professional",
+    },
+    {
+      title: "Tipo Reporte",
+      dataIndex: "reportType",
+      key: "reportType",
+    },
+    {
+      title: "Fecha",
+      dataIndex: "date",
+      key: "date",
+    },
+    {
+      title: "Acciones",
+      dataIndex: "actions",
+      key: "actions",
+    },
+  ];
+
+const acudientesColumns: TableProps<FamilyMember>["columns"] = [
       {
         title: <Checkbox />,
         dataIndex: "checkbox",
@@ -176,7 +137,7 @@ export const UserDetails: React.FC = () => {
         title: "Nombres",
         dataIndex: ["acudiente", "nombres"],
         key: "nombres",
-      },
+      }, 
       {
         title: "Apellidos",
         dataIndex: ["acudiente", "apellidos"],
@@ -206,11 +167,9 @@ export const UserDetails: React.FC = () => {
         title: "Acciones",
         dataIndex: "acciones",
         key: "acciones",
-        render: (_, record: { acudiente: FamilyMember }) => (
+        render: (_, record: FamilyMember) => (
           <Space>
-            <Link
-              to={`/usuarios/${userId}/familiar/${record.acudiente.id_acudiente}`}
-            >
+            <Link to={`/usuarios/${userId}/familiar/${record.id_acudiente}`}>
               <Button type="link" className="main-button-link" size="small">
                 Editar
               </Button>
@@ -221,7 +180,7 @@ export const UserDetails: React.FC = () => {
               size="small"
               type="link"
               onClick={() => {
-                setUserToDelete(record.acudiente);
+                setUserToDelete(record);
                 setIsModalOpen(true);
               }}
             >
@@ -229,6 +188,45 @@ export const UserDetails: React.FC = () => {
             </Button>
           </Space>
         ),
+      },
+    ];
+
+    const contractsColumns: TableProps<typeof contractsData[number]>["columns"] = [
+      {
+        title: <Checkbox />,
+        dataIndex: "checkbox",
+        render: () => <Checkbox />,
+        width: "5%",
+      },
+      {
+        title: "Fecha de inicio",
+        dataIndex: "fechaInicio",
+        key: "fechaInicio",
+      },
+      {
+        title: "Estado",
+        dataIndex: "estado",
+        key: "estado",
+      },
+      {
+        title: "Servicios",
+        dataIndex: "servicios",
+        key: "servicios",
+      },
+      {
+        title: "Firmado",
+        dataIndex: "firmado",
+        key: "firmado",
+      },
+      {
+        title: "Estado Facturación",
+        dataIndex: "estadoFacturacion",
+        key: "estadoFacturacion",
+      },
+      {
+        title: "Acciones",
+        dataIndex: "acciones",
+        key: "acciones",
       },
     ];
 
@@ -272,6 +270,7 @@ export const UserDetails: React.FC = () => {
                     className="main-button-white"
                     variant="outlined"
                     icon={<EditOutlined />}
+                    onClick={()=> navigate(`/usuarios/${userId}/editar`)}
                   >
                     Editar
                   </Button>
@@ -397,7 +396,7 @@ export const UserDetails: React.FC = () => {
                 <Col span={12}>
                   <Descriptions title="Preexistencias y Alergias" column={1}>
                     <Descriptions.Item label="Cirugías">
-                      Sí <a href="#">Ver</a>
+                      Sí<a href="#">Ver</a>
                     </Descriptions.Item>
                     <Descriptions.Item label="Alergias a medicamentos">
                       Sí <a href="#">Ver</a>
@@ -428,9 +427,15 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Reportes Clínicos"
               extra={
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Agregar
-                </Button>
+                <Link to={`/usuarios/${userId}/detalles/newReport#`}>
+                  <Button
+                    type="primary"
+                    variant="outlined"                    
+                    icon={<PlusOutlined />}
+                  >
+                    Agregar
+                  </Button>
+                </Link>
               }
               className="detail-card"
             >
@@ -445,8 +450,8 @@ export const UserDetails: React.FC = () => {
               extra={
                 <Link to={`/usuarios/${userId}/familiar`}>
                   <Button
-                    className="main-button-white"
-                    variant="outlined"
+                    type="primary"
+                    variant="outlined"                    
                     icon={<PlusOutlined />}
                   >
                     Agregar
@@ -464,7 +469,12 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Contratos"
               extra={
-                <Button type="primary" icon={<PlusOutlined />}>
+                <Button 
+                  type="primary"
+                  className="main-button"
+                  icon={<PlusOutlined />} 
+                  onClick={() => navigate(`/usuarios/${userId}/contract`)}
+                >
                   Agregar
                 </Button>
               }
