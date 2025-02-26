@@ -153,7 +153,7 @@ export const App = () => {
               }
             />
             <Route
-              path="/MedicalRecord"
+              path="/usuarios/:id/historia"
               element={
                 <PrivateRoute>
                   <MedicalRecord />

@@ -60,6 +60,9 @@ export const UsersList = () => {
           renderItem={(item) => (
             <List.Item
               actions={[
+                <Link to={`/usuarios/${item.id_usuario}/detalles`}>
+                  <Button type="link">Detalles</Button>
+                </Link>,
                 <Link to={`/usuarios/${item.id_usuario}/editar`}>
                   <Button type="link">Editar</Button>
                 </Link>,
@@ -86,27 +89,53 @@ export const UsersList = () => {
           )}
         />
       </Card>
-      <Modal
-        cancelText="No eliminar"
-        okText="Sí, eliminar"
-        open={isModalOpen}
-        title="Confirmar acción"
+      <DeleteUserModal
         confirmLoading={isDeletingUser}
-        okButtonProps={{
-          type: "default",
-          style: { backgroundColor: "#F32013" },
-        }}
-        cancelButtonProps={{
-          type: "text",
-        }}
+        open={isModalOpen}
+        userToDelete={userToDelete}
         onCancel={handleCancel}
-        onClose={handleCancel}
         onOk={handleOk}
-      >
-        <Typography.Paragraph
-          style={{ marginBottom: "30px" }}
-        >{`¿Está seguro que desea eliminar al usuario ${userToDelete?.nombres} ${userToDelete?.apellidos}? Esto es una acción destructiva y no se puede deshacer`}</Typography.Paragraph>
-      </Modal>
+      />
     </>
+  );
+};
+
+interface DeleteUserModalProps {
+  confirmLoading: boolean;
+  open: boolean;
+  userToDelete: User | null;
+  onCancel: () => void;
+  onOk: () => void;
+}
+
+export const DeleteUserModal = ({
+  confirmLoading,
+  open,
+  userToDelete,
+  onCancel,
+  onOk,
+}: DeleteUserModalProps) => {
+  return (
+    <Modal
+      cancelText="No eliminar"
+      okText="Sí, eliminar"
+      open={open}
+      title="Confirmar acción"
+      confirmLoading={confirmLoading}
+      okButtonProps={{
+        type: "default",
+        style: { backgroundColor: "#F32013" },
+      }}
+      cancelButtonProps={{
+        type: "text",
+      }}
+      onCancel={onCancel}
+      onClose={onCancel}
+      onOk={onOk}
+    >
+      <Typography.Paragraph
+        style={{ marginBottom: "30px" }}
+      >{`¿Está seguro que desea eliminar al usuario ${userToDelete?.nombres} ${userToDelete?.apellidos}? Esto es una acción destructiva y no se puede deshacer`}</Typography.Paragraph>
+    </Modal>
   );
 };

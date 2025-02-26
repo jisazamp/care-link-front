@@ -17,15 +17,18 @@ import {
   Flex,
   Spin,
 } from "antd";
+import dayjs from "dayjs";
 import patientImage from "../assets/Patients/patient1.jpg";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
-import dayjs from "dayjs";
-import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { FamilyMember } from "../../types";
-import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
+import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
+import { useEffect, useState } from "react";
+import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
+import { DeleteUserModal } from "../UsersList/UsersList";
+import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 
 const { Title } = Typography;
 
@@ -150,6 +153,7 @@ const contractsColumns = [
 export const UserDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<FamilyMember | null>(null);
+  const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const params = useParams();
@@ -163,6 +167,10 @@ export const UserDetails: React.FC = () => {
     isSuccess: isSuccessDeleteFamilyMember,
     isPending: loadingUserDeletion,
   } = useDeleteFamilyMemberMutation(userId);
+  const { mutate: deleteUser, isPending: loadingDeletion } =
+    useDeleteUserMutation();
+  const { data: record, isLoading: loadingRecord } =
+    useGetUserMedicalRecord(userId);
 
   const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
     [
@@ -268,14 +276,20 @@ export const UserDetails: React.FC = () => {
               title="Datos básicos y de localización"
               extra={
                 <Space>
+                  <Link to={`/usuarios/${userId}/editar`}>
+                    <Button
+                      className="main-button-white"
+                      variant="outlined"
+                      icon={<EditOutlined />}
+                    >
+                      Editar
+                    </Button>
+                  </Link>
                   <Button
-                    className="main-button-white"
-                    variant="outlined"
-                    icon={<EditOutlined />}
+                    icon={<DeleteOutlined />}
+                    danger
+                    className="main-button-danger"
                   >
-                    Editar
-                  </Button>
-                  <Button icon={<DeleteOutlined />} danger>
                     Eliminar
                   </Button>
                 </Space>
@@ -346,31 +360,36 @@ export const UserDetails: React.FC = () => {
                 <Space>
                   <Button
                     icon={<EditOutlined />}
-                    type="primary"
-                    onClick={() => navigate("/MedicalRecord")}
+                    className="main-button-white"
+                    onClick={() => navigate(`/usuarios/${userId}/historia`)}
                   >
                     Editar
                   </Button>
-                  <Button icon={<DeleteOutlined />} danger>
+                  <Button
+                    icon={<DeleteOutlined />}
+                    danger
+                    className="main-button-danger"
+                  >
                     Eliminar
                   </Button>
                 </Space>
               }
+              loading={loadingRecord}
             >
               <Row gutter={24}>
                 <Col span={12}>
                   <Descriptions title="Datos Esenciales" column={1}>
                     <Descriptions.Item label="Empresa de Salud Domiciliaria">
-                      604 607 8990
+                      {record?.data.data?.eps}
                     </Descriptions.Item>
                     <Descriptions.Item label="Tipo de Sangre">
-                      O+
+                      {record?.data.data?.tipo_sangre}
                     </Descriptions.Item>
                     <Descriptions.Item label="Estatura">
-                      165 cm
+                      {record?.data.data?.altura} cm
                     </Descriptions.Item>
                     <Descriptions.Item label="Motivo de Ingreso">
-                      Usuario de centro de día
+                      {record?.data.data?.motivo_ingreso}
                     </Descriptions.Item>
                   </Descriptions>
                 </Col>
@@ -396,31 +415,35 @@ export const UserDetails: React.FC = () => {
               <Row gutter={24}>
                 <Col span={12}>
                   <Descriptions title="Preexistencias y Alergias" column={1}>
-                    <Descriptions.Item label="Cirugías">
-                      Sí <a href="#">Ver</a>
-                    </Descriptions.Item>
+                    <Descriptions.Item label="Cirugías">Sí</Descriptions.Item>
                     <Descriptions.Item label="Alergias a medicamentos">
-                      Sí <a href="#">Ver</a>
+                      Sí
                     </Descriptions.Item>
                     <Descriptions.Item label="Otras Alergias">
-                      Sí <a href="#">Ver</a>
+                      Sí
                     </Descriptions.Item>
                     <Descriptions.Item label="Condiciones Especiales">
-                      <a href="#">Ver</a>
+                      No
                     </Descriptions.Item>
                   </Descriptions>
                 </Col>
                 <Col span={12}>
                   <Descriptions title="Hábitos y otros datos" column={1}>
-                    <Descriptions.Item label="Cafeína">Sí</Descriptions.Item>
-                    <Descriptions.Item label="Tabaquismo">No</Descriptions.Item>
+                    <Descriptions.Item label="Cafeína">
+                      {record?.data.data?.cafeina ? "Sí" : "No"}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Tabaquismo">
+                      {record?.data.data?.tabaquismo ? "Sí" : "No"}
+                    </Descriptions.Item>
                     <Descriptions.Item label="Alcoholismo">
-                      No
+                      {record?.data.data?.alcoholismo ? "Sí" : "No"}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Sustancias Psicoactivas">
-                      No
+                    <Descriptions.Item label="Sustancias psicoactivas">
+                      {record?.data.data?.sustanciaspsico ? "Sí" : "No"}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Maltratado">No</Descriptions.Item>
+                    <Descriptions.Item label="Maltratado">
+                      {record?.data.data?.maltrato ? "Sí" : "No"}
+                    </Descriptions.Item>
                   </Descriptions>
                 </Col>
               </Row>
@@ -504,6 +527,7 @@ export const UserDetails: React.FC = () => {
       >
         <Typography.Text>{`¿Estás seguro que deseas eliminar al acudiente ${userToDelete?.nombres} ${userToDelete?.apellidos}?`}</Typography.Text>
       </Modal>
+      <DeleteUserModal />
     </>
   );
 };

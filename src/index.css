@@ -22,6 +22,15 @@ body {
   margin-right: 8px;
 }
 
+.main-button-white:hover,
+.main-button-danger:hover {
+  background-color: #fff !important;
+}
+
+.main-button-white:hover {
+  color: #000 !important;
+}
+
 .main-button-link {
   color: #7f34b4;
 }

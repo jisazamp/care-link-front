@@ -1,6 +1,6 @@
 import { Button, Card, Checkbox, Form, Space, Table, Typography } from "antd";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
-import { FormValues } from "../../MedicalRecord";
+import { FormValues } from "../../schema/schema";
 import { PharmoterapeuticModal } from "./components/PharmoterapeuticalModal/PharmoterapeuticalRegimen";
 import { NursingCarePlanModal } from "./components/NursingCarePlanModal/NursingCarePlanModal";
 import { PlusOutlined } from "@ant-design/icons";
@@ -54,7 +54,7 @@ export const MedicalTreatments = () => {
     <>
       <Card
         title={<Title level={4}>Tratamientos o medicamentos</Title>}
-        bordered
+        variant="outlined"
       >
         <Form.Item>
           <Controller
@@ -86,7 +86,7 @@ export const MedicalTreatments = () => {
         </Form.Item>
         {selectedValues.includes("pharmacotherapeuticRegimen") && (
           <Card
-            bordered
+            variant="outlined"
             extra={
               <Button
                 icon={<PlusOutlined />}
@@ -99,21 +99,23 @@ export const MedicalTreatments = () => {
               </Button>
             }
             title={<Title level={5}>Régimen farmacoterapéutico</Title>}
+            style={{ marginTop: 8 }}
           >
             <Table
               rowKey="id"
               columns={[
+                { title: "Medicamento", dataIndex: "medicine" },
                 {
                   title: "Fecha de inicio",
                   dataIndex: "startDate",
                   render: (_, record) => record.startDate?.format("YYYY-MM-DD"),
                 },
-                { title: "Medicamento", dataIndex: "medicine" },
-                { title: "Dosis", dataIndex: "dose" },
-                { title: "Vía de administración", dataIndex: "administration" },
+                {
+                  title: "Fecha de fin",
+                  dataIndex: "endDate",
+                  render: (_, record) => record.endDate?.format("YYYY-MM-DD"),
+                },
                 { title: "Frecuencia", dataIndex: "frequency" },
-                { title: "Duración", dataIndex: "duration" },
-                { title: "Indicaciones", dataIndex: "instructions" },
                 {
                   title: "Acciones",
                   render: (_, __, index) => (
@@ -141,7 +143,7 @@ export const MedicalTreatments = () => {
         )}
         {selectedValues.includes("nursingCarePlan") && (
           <Card
-            bordered
+            variant="outlined"
             extra={
               <Button
                 icon={<PlusOutlined />}
@@ -154,6 +156,7 @@ export const MedicalTreatments = () => {
               </Button>
             }
             title={<Title level={5}>Plan de cuidados de enfemería</Title>}
+            style={{ marginTop: 16 }}
           >
             <Table
               rowKey="id"
@@ -204,7 +207,7 @@ export const MedicalTreatments = () => {
         )}
         {selectedValues.includes("physiotherapeuticIntervention") && (
           <Card
-            bordered
+            variant="outlined"
             extra={
               <Button
                 icon={<PlusOutlined />}
@@ -217,6 +220,7 @@ export const MedicalTreatments = () => {
               </Button>
             }
             title={<Title level={5}>Intervención fisioterapéutica</Title>}
+            style={{ marginTop: 16 }}
           >
             <Table
               rowKey="id"
