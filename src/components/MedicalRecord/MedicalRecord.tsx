@@ -521,9 +521,14 @@ export const MedicalRecord: React.FC = () => {
           </Row>
           <Row gutter={[16, 16]} justify="end" style={{ marginTop: 20 }}>
             <Col>
-              <Button className="main-button-white" style={{ marginRight: 8 }}>
-                Restablecer
-              </Button>
+              {!userMedicalRecord?.data.data?.id_historiaclinica && (
+                <Button
+                  className="main-button-white"
+                  style={{ marginRight: 8 }}
+                >
+                  Restablecer
+                </Button>
+              )}
               <Button
                 type="primary"
                 style={{

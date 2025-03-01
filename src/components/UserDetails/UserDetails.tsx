@@ -172,6 +172,9 @@ export const UserDetails: React.FC = () => {
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
 
+  const disabilities = record?.data.data?.discapacidades?.split(",") ?? [];
+  const limitations = record?.data.data?.limitaciones;
+
   const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
     [
       {
@@ -357,96 +360,129 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Historia Clínica"
               extra={
-                <Space>
-                  <Button
-                    icon={<EditOutlined />}
-                    className="main-button-white"
-                    onClick={() => navigate(`/usuarios/${userId}/historia`)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    icon={<DeleteOutlined />}
-                    danger
-                    className="main-button-danger"
-                  >
-                    Eliminar
-                  </Button>
-                </Space>
+                !!record?.data.data ? (
+                  <Space>
+                    <Button
+                      icon={<EditOutlined />}
+                      className="main-button-white"
+                      onClick={() => navigate(`/usuarios/${userId}/historia`)}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      icon={<DeleteOutlined />}
+                      danger
+                      className="main-button-danger"
+                    >
+                      Eliminar
+                    </Button>
+                  </Space>
+                ) : (
+                  <Space>
+                    <Button
+                      className="main-button-white"
+                      icon={<PlusOutlined />}
+                      onClick={() => navigate(`/usuarios/${userId}/historia`)}
+                    >
+                      Agregar
+                    </Button>
+                  </Space>
+                )
               }
               loading={loadingRecord}
             >
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Descriptions title="Datos Esenciales" column={1}>
-                    <Descriptions.Item label="Empresa de Salud Domiciliaria">
-                      {record?.data.data?.eps}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Tipo de Sangre">
-                      {record?.data.data?.tipo_sangre}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Estatura">
-                      {record?.data.data?.altura} cm
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Motivo de Ingreso">
-                      {record?.data.data?.motivo_ingreso}
-                    </Descriptions.Item>
-                  </Descriptions>
-                </Col>
-                <Col span={12}>
-                  <Descriptions
-                    title="Discapacidades, Apoyos y Limitaciones"
-                    column={1}
-                  >
-                    <Descriptions.Item label="Discapacidad">
-                      <Tag color="purple">Visual</Tag>
-                      <Tag color="purple">Auditiva</Tag>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Limitaciones">
-                      Ayuda para ir al baño
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Dieta Especial">
-                      Sí
-                    </Descriptions.Item>
-                  </Descriptions>
-                </Col>
-              </Row>
-              <Divider />
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Descriptions title="Preexistencias y Alergias" column={1}>
-                    <Descriptions.Item label="Cirugías">Sí</Descriptions.Item>
-                    <Descriptions.Item label="Alergias a medicamentos">
-                      Sí
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Otras Alergias">
-                      Sí
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Condiciones Especiales">
-                      No
-                    </Descriptions.Item>
-                  </Descriptions>
-                </Col>
-                <Col span={12}>
-                  <Descriptions title="Hábitos y otros datos" column={1}>
-                    <Descriptions.Item label="Cafeína">
-                      {record?.data.data?.cafeina ? "Sí" : "No"}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Tabaquismo">
-                      {record?.data.data?.tabaquismo ? "Sí" : "No"}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Alcoholismo">
-                      {record?.data.data?.alcoholismo ? "Sí" : "No"}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Sustancias psicoactivas">
-                      {record?.data.data?.sustanciaspsico ? "Sí" : "No"}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Maltratado">
-                      {record?.data.data?.maltrato ? "Sí" : "No"}
-                    </Descriptions.Item>
-                  </Descriptions>
-                </Col>
-              </Row>
+              {!!record?.data.data ? (
+                <>
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Descriptions title="Datos Esenciales" column={1}>
+                        <Descriptions.Item label="Empresa de Salud Domiciliaria">
+                          {record?.data.data?.eps}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Tipo de Sangre">
+                          {record?.data.data?.tipo_sangre}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Estatura">
+                          {record?.data.data?.altura} cm
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Motivo de Ingreso">
+                          {record?.data.data?.motivo_ingreso}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </Col>
+                    <Col span={12}>
+                      <Descriptions
+                        title="Discapacidades, Apoyos y Limitaciones"
+                        column={1}
+                      >
+                        <Descriptions.Item label="Discapacidad">
+                          {!!disabilities.filter((a) => !!a).length ? (
+                            disabilities.map((d) => (
+                              <Tag key={d} color="purple">
+                                {d}
+                              </Tag>
+                            ))
+                          ) : (
+                            <Tag color="purple">Ninguna</Tag>
+                          )}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Limitaciones">
+                          {limitations ? limitations : "Ninguna"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Dieta Especial">
+                          {record?.data.data?.dieta_especial ? "Sí" : "No"}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </Col>
+                  </Row>
+                  <Divider />
+                  <Row gutter={24}>
+                    <Col span={12}>
+                      <Descriptions
+                        title="Preexistencias y Alergias"
+                        column={1}
+                      >
+                        <Descriptions.Item label="Cirugías">
+                          {!!record?.data.data?.cirugias ? "Sí" : "No"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Alergias a medicamentos">
+                          {!!record?.data.data?.medicamentos_alergia
+                            ? "Sí"
+                            : "No"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Otras Alergias">
+                          {!!record?.data.data?.otras_alergias ? "Sí" : "No"}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </Col>
+                    <Col span={12}>
+                      <Descriptions title="Hábitos y otros datos" column={1}>
+                        <Descriptions.Item label="Cafeína">
+                          {record?.data.data?.cafeina ? "Sí" : "No"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Tabaquismo">
+                          {record?.data.data?.tabaquismo ? "Sí" : "No"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Alcoholismo">
+                          {record?.data.data?.alcoholismo ? "Sí" : "No"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Sustancias psicoactivas">
+                          {record?.data.data?.sustanciaspsico ? "Sí" : "No"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Maltratado">
+                          {record?.data.data?.maltrato ? "Sí" : "No"}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </Col>
+                  </Row>
+                </>
+              ) : (
+                <Flex style={{ height: 50, alignItems: "center" }}>
+                  <Typography.Text>
+                    El usuario no tiene historia clínica registrada
+                  </Typography.Text>
+                </Flex>
+              )}
             </Card>
             <Card
               title="Reportes Clínicos"
