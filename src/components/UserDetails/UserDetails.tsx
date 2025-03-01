@@ -23,11 +23,11 @@ import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { FamilyMember } from "../../types";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
-import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
+// import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
 import { useEffect, useState } from "react";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
-import { DeleteUserModal } from "../UsersList/UsersList";
+// import { DeleteUserModal } from "../UsersList/UsersList";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 
 const { Title } = Typography;
@@ -153,7 +153,7 @@ const contractsColumns = [
 export const UserDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<FamilyMember | null>(null);
-  const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
+  // const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const params = useParams();
@@ -167,8 +167,8 @@ export const UserDetails: React.FC = () => {
     isSuccess: isSuccessDeleteFamilyMember,
     isPending: loadingUserDeletion,
   } = useDeleteFamilyMemberMutation(userId);
-  const { mutate: deleteUser, isPending: loadingDeletion } =
-    useDeleteUserMutation();
+  /* const { mutate: deleteUser, isPending: loadingDeletion } =
+    useDeleteUserMutation(); */
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
 
@@ -478,7 +478,7 @@ export const UserDetails: React.FC = () => {
               }
             >
               <Table
-                // @ts-ignore-next
+                // @ts-expect-error no idea
                 columns={acudientesColumns}
                 loading={loadingFamilyMembers}
                 dataSource={familyMembers?.data.data}
@@ -527,7 +527,6 @@ export const UserDetails: React.FC = () => {
       >
         <Typography.Text>{`¿Estás seguro que deseas eliminar al acudiente ${userToDelete?.nombres} ${userToDelete?.apellidos}?`}</Typography.Text>
       </Modal>
-      <DeleteUserModal />
     </>
   );
 };
