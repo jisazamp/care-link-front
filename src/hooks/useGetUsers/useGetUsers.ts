@@ -7,5 +7,6 @@ export const useGetUsers = () => {
   return useQuery({
     queryFn: getUsers,
     queryKey: ["get-users"],
+    staleTime: Infinity
   });
 };

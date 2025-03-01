@@ -10,5 +10,6 @@ export const useGetRecordVaccines = (recordId?: number) => {
     queryKey: [`record-${recordId}-vaccines`],
     queryFn: () => getRecordVaccines(recordId),
     enabled: !!recordId,
+    staleTime: Infinity
   });
 };
