@@ -123,6 +123,13 @@ export type UserIntervention = {
   intervencion: string;
 }
 
+export type UserVaccine = {
+  efectos_secundarios?: string;
+  fecha_administracion?: string;
+  fecha_proxima?: string;
+  vacuna: string;
+}
+
 export type Login = {
   access_token: string;
   token_type: "bearer";
