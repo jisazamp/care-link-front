@@ -10,5 +10,6 @@ export const useGetUserById = (id: string | undefined) => {
     queryKey: [`get-user-${id}`, id],
     queryFn: () => getUser(id),
     enabled: !!id,
+    staleTime: Infinity
   });
 };

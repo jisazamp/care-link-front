@@ -12,5 +12,6 @@ export const useGetRecordInterventions = (recordId?: number) => {
     queryKey: [`record-${recordId}-interventions`],
     queryFn: () => getRecordInterventions(recordId),
     enabled: !!recordId,
+    staleTime: Infinity
   });
 };

@@ -10,5 +10,6 @@ export const useGetRecordMedicines = (recordId: number | undefined | null) => {
     queryKey: [`record-${recordId}-medicines`],
     queryFn: () => getRecordMedicines(recordId),
     enabled: !!recordId,
+    staleTime: Infinity
   });
 };

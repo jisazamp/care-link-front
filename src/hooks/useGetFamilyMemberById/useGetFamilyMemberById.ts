@@ -9,5 +9,6 @@ export const useGetFamilyMemberById = (id?: string | number) => {
     enabled: !!id,
     queryFn: () => getFamilyMemberById(id),
     queryKey: [`get-family-member-${id}`],
+    staleTime: Infinity
   });
 };

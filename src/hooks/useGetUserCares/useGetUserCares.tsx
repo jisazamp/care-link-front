@@ -10,5 +10,6 @@ export const useGetRecordCares = (recordId?: number) => {
     queryKey: [`record-${recordId}-cares`],
     queryFn: () => getRecordCares(recordId),
     enabled: !!recordId,
+    staleTime: Infinity
   });
 };

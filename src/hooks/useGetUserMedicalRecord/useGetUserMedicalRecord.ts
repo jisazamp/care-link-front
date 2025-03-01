@@ -8,7 +8,8 @@ const getUserMedicalRecord = (id: number | string | undefined) =>
 export const useGetUserMedicalRecord = (id: number | string | undefined) => {
   return useQuery({
     enabled: !!id,
-    queryFn: () => getUserMedicalRecord(id),
     queryKey: [`user-medical-record-${id}`],
+    queryFn: () => getUserMedicalRecord(id),
+    staleTime: Infinity
   });
 };
