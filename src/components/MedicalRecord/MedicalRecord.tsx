@@ -16,6 +16,7 @@ import type {
   MedicalRecord as MedicalRecordType,
   UserCare,
   UserIntervention,
+  UserVaccine,
 } from "../../types";
 import type { UserMedicine } from "../../types";
 import { BasicHealthData } from "./components/BasicHealthData/BasicHealthData";
@@ -27,6 +28,7 @@ import {
   NursingCarePlan,
   PharmacoRegimen,
   PhysioRegimen,
+  Vaccine,
   formSchema,
 } from "./schema/schema";
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
@@ -48,6 +50,7 @@ import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetRecordInterventions } from "../../hooks/useGetUserInterventions/useGetUserInterventions";
+import { useGetRecordVaccines } from "../../hooks/useGetUserVaccines/useGetUserVaccines";
 
 const { Title, Text } = Typography;
 
@@ -75,6 +78,9 @@ export const MedicalRecord: React.FC = () => {
 
   const { data: userInterventions, isLoading: loadingUserInterventions } =
     useGetRecordInterventions(userMedicalRecord?.data.data?.id_historiaclinica);
+
+  const { data: userVaccines, isLoading: loadingVaccines } =
+    useGetRecordVaccines(userMedicalRecord?.data.data?.id_historiaclinica);
 
   const onSubmit = (data: FormValues) => {
     const record: MedicalRecordType = {
@@ -153,8 +159,25 @@ export const MedicalRecord: React.FC = () => {
       interventions.push(intervention);
     });
 
+    const vaccines: UserVaccine[] = [];
+    data.vaccines.forEach((v) => {
+      const vaccine: UserVaccine = {
+        efectos_secundarios: v.secondaryEffects,
+        fecha_administracion: v.date?.format("YYYY-MM-DD"),
+        fecha_proxima: v.nextDate?.format("YYYY-MM-DD"),
+        vacuna: v.name,
+      };
+      vaccines.push(vaccine);
+    });
+
     if (!userMedicalRecord?.data.data?.id_historiaclinica) {
-      createUserMedicalRecord({ record, medicines, cares, interventions });
+      createUserMedicalRecord({
+        record,
+        medicines,
+        cares,
+        interventions,
+        vaccines,
+      });
     }
   };
 
@@ -296,11 +319,30 @@ export const MedicalRecord: React.FC = () => {
     }
   }, [userInterventions?.data.data, reset, getValues]);
 
+  useEffect(() => {
+    if (userVaccines?.data.data) {
+      const vaccines: Vaccine[] = userVaccines.data.data.map((e) => ({
+        id: uuidv4(),
+        date: e.fecha_administracion
+          ? dayjs(e.fecha_administracion)
+          : undefined,
+        nextDate: e.fecha_proxima ? dayjs(e.fecha_proxima) : undefined,
+        name: e.vacuna,
+        secondaryEffects: e.efectos_secundarios,
+      }));
+      reset((values) => ({
+        ...values,
+        vaccines,
+      }));
+    }
+  }, [userVaccines?.data.data, reset]);
+
   if (
     loadingUserMedicalRecord ||
     loadingUserCares ||
     loadingUserMedicines ||
-    loadingUserInterventions
+    loadingUserInterventions ||
+    loadingVaccines
   ) {
     return (
       <Flex align="center" justify="center" style={{ minHeight: 300 }}>

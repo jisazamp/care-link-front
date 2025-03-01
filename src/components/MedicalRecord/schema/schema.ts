@@ -33,7 +33,17 @@ export const physioterapeuticRegimenSchema = z.object({
   frequency: z.string().min(1, "La frecuencia es requerida"),
 });
 
-export type PhysioRegimen = z.infer<typeof physioterapeuticRegimenSchema>
+export type PhysioRegimen = z.infer<typeof physioterapeuticRegimenSchema>;
+
+export const vaccineSchema = z.object({
+  id: z.union([z.number(), z.string()]).nullable().optional(),
+  date: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta").optional(),
+  name: z.string(),
+  nextDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta").optional(),
+  secondaryEffects: z.string().optional(),
+});
+
+export type Vaccine = z.infer<typeof vaccineSchema>;
 
 export const alergiesSchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
@@ -101,6 +111,7 @@ export const formSchema = z.object({
   mood: z.string(),
   abused: z.boolean(),
   initialDiagnosis: z.string().optional().default(""),
+  vaccines: z.array(vaccineSchema).default([]),
 });
 
 export type FormValues = z.infer<typeof formSchema>;

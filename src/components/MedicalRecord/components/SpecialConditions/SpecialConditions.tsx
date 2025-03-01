@@ -169,7 +169,6 @@ export const SpecialConditions = () => {
                 {
                   title: "Acciones",
                   key: "acciones",
-
                   render: (_, __, index) => (
                     <Space>
                       <Button
