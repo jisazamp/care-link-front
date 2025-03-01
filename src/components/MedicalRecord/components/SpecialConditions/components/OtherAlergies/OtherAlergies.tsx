@@ -35,7 +35,6 @@ export const OtherAlergiesModal = ({
     else
       reset({
         alergy: undefined,
-        observation: undefined,
       });
   }, [initialData, reset]);
 
@@ -72,17 +71,6 @@ export const OtherAlergiesModal = ({
             <Form.Item label="Alergias">
               <Controller
                 name="alergy"
-                control={control}
-                render={({ field }) => <Input {...field} />}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Observación">
-              <Controller
-                name="observation"
                 control={control}
                 render={({ field }) => <Input {...field} />}
               />
