@@ -1,15 +1,42 @@
-import { Button, Card, Checkbox, Form, Space, Table, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Form,
+  Space,
+  Table,
+  Typography,
+  Modal,
+} from "antd";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { FormValues } from "../../schema/schema";
-import { PharmoterapeuticModal } from "./components/PharmoterapeuticalModal/PharmoterapeuticalRegimen";
 import { NursingCarePlanModal } from "./components/NursingCarePlanModal/NursingCarePlanModal";
-import { PlusOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { PharmoterapeuticModal } from "./components/PharmoterapeuticalModal/PharmoterapeuticalRegimen";
 import { PhysioterapeuticModal } from "./components/PhysioterapeuticModal/PhysioterapeuticModal";
+import { PlusOutlined } from "@ant-design/icons";
+import { useDeleteCareMutation } from "../../../../hooks/useDeleteCareMutation/useDeleteCareMutation";
+import { useDeleteInterventionMutation } from "../../../../hooks/useDeleteInterventionMutation/useDeleteUserIntervention";
+import { useDeleteMedicineMutation } from "../../../../hooks/useDeleteMedicineMutation/useDeleteMedicineMutation";
+import { useEffect, useState } from "react";
+import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useParams } from "react-router-dom";
 
 const { Title } = Typography;
 
 export const MedicalTreatments = () => {
+  const params = useParams();
+  const userId = params.id;
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [pharmaToDelete, setPharmaToDelete] = useState<number | null>(null);
+  const [isDeleteNursingModalOpen, setIsDeleteNursingModalOpen] =
+    useState(false);
+  const [interventionToDelete, setInterventionToDelete] = useState<
+    number | null
+  >(null);
+  const [isDeleteInterventionModalOpen, setIsDeleteInterventionModalOpen] =
+    useState(false);
+  const [nursingToDelete, setNursingToDelete] = useState<number | null>(null);
   const [showModal, setShowModal] = useState<
     "pharma" | "nursing" | "physioterapeutic" | null
   >(null);
@@ -21,6 +48,11 @@ export const MedicalTreatments = () => {
     useState<number | null>(null);
 
   const { control, watch } = useFormContext<FormValues>();
+
+  const deletePharmaMutation = useDeleteMedicineMutation();
+  const deleteCareMutation = useDeleteCareMutation();
+  const deleteInterventionMutatino = useDeleteInterventionMutation();
+  const recordQuery = useGetUserMedicalRecord(userId);
 
   const { append, update, remove } = useFieldArray({
     control,
@@ -49,6 +81,26 @@ export const MedicalTreatments = () => {
   const pharmaRegimen = watch("pharmacotherapeuticRegimen") ?? [];
   const nursingCare = watch("nursingCarePlan") ?? [];
   const physioRegimen = watch("physioterapeuticRegimen") ?? [];
+
+  useEffect(() => {
+    if (deletePharmaMutation.isSuccess) {
+      remove(pharmaRegimen.findIndex((p) => p.id === pharmaToDelete));
+    }
+  }, [deletePharmaMutation.isSuccess]);
+
+  useEffect(() => {
+    if (deleteCareMutation.isSuccess) {
+      removeNursing(nursingCare.findIndex((n) => n.id === nursingToDelete));
+    }
+  }, [deleteCareMutation.isSuccess]);
+
+  useEffect(() => {
+    if (deleteInterventionMutatino.isSuccess) {
+      removePhysio(
+        physioRegimen.findIndex((n) => n.id === interventionToDelete)
+      );
+    }
+  }, [deleteInterventionMutatino.isSuccess]);
 
   return (
     <>
@@ -129,7 +181,14 @@ export const MedicalTreatments = () => {
                       >
                         Editar
                       </Button>
-                      <Button type="link" danger onClick={() => remove(index)}>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => {
+                          setPharmaToDelete(Number(pharmaRegimen[index].id));
+                          setIsDeleteModalOpen(true);
+                        }}
+                      >
                         Eliminar
                       </Button>
                     </Space>
@@ -192,7 +251,10 @@ export const MedicalTreatments = () => {
                       <Button
                         type="link"
                         danger
-                        onClick={() => removeNursing(index)}
+                        onClick={() => {
+                          setNursingToDelete(Number(nursingCare[index].id));
+                          setIsDeleteNursingModalOpen(true);
+                        }}
                       >
                         Eliminar
                       </Button>
@@ -256,7 +318,12 @@ export const MedicalTreatments = () => {
                       <Button
                         type="link"
                         danger
-                        onClick={() => removePhysio(index)}
+                        onClick={() => {
+                          setInterventionToDelete(
+                            Number(physioRegimen[index].id)
+                          );
+                          setIsDeleteInterventionModalOpen(true);
+                        }}
                       >
                         Eliminar
                       </Button>
@@ -309,6 +376,97 @@ export const MedicalTreatments = () => {
           setEditingIndexPhysioterapeutic(null);
         }}
       />
+      <Modal
+        title="Confirmar eliminación"
+        open={isDeleteModalOpen}
+        onOk={() => {
+          if (pharmaToDelete !== null) {
+            if (!isNaN(pharmaToDelete)) {
+              deletePharmaMutation.mutate({
+                id: Number(recordQuery.data?.data.data?.id_historiaclinica),
+                medicineId: Number(pharmaToDelete),
+              });
+            } else {
+              remove(pharmaRegimen.findIndex((p) => p.id === pharmaToDelete));
+            }
+            setIsDeleteModalOpen(false);
+            setPharmaToDelete(null);
+          }
+        }}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setPharmaToDelete(null);
+        }}
+        okText="Eliminar"
+        cancelText="Cancelar"
+        confirmLoading={deletePharmaMutation.isPending}
+      >
+        <Typography.Text>
+          ¿Estás seguro que deseas eliminar este medicamento?
+        </Typography.Text>
+      </Modal>
+      <Modal
+        title="Confirmar eliminación"
+        open={isDeleteNursingModalOpen}
+        onOk={() => {
+          if (nursingToDelete !== null) {
+            if (!isNaN(nursingToDelete)) {
+              deleteCareMutation.mutate({
+                id: Number(recordQuery.data?.data.data?.id_historiaclinica),
+                careId: Number(nursingToDelete),
+              });
+            } else {
+              removeNursing(
+                nursingCare.findIndex((n) => n.id === nursingToDelete)
+              );
+            }
+            setIsDeleteNursingModalOpen(false);
+            setNursingToDelete(null);
+          }
+        }}
+        onCancel={() => {
+          setIsDeleteNursingModalOpen(false);
+          setNursingToDelete(null);
+        }}
+        okText="Eliminar"
+        cancelText="Cancelar"
+        confirmLoading={deleteCareMutation.isPending}
+      >
+        <Typography.Text>
+          ¿Estás seguro que deseas eliminar este plan de cuidados?
+        </Typography.Text>
+      </Modal>
+      <Modal
+        title="Confirmar eliminación"
+        open={isDeleteInterventionModalOpen}
+        onOk={() => {
+          if (interventionToDelete !== null) {
+            if (!isNaN(interventionToDelete)) {
+              deleteInterventionMutatino.mutate({
+                id: Number(recordQuery.data?.data.data?.id_historiaclinica),
+                interventionId: Number(interventionToDelete),
+              });
+            } else {
+              removePhysio(
+                physioRegimen.findIndex((n) => n.id === interventionToDelete)
+              );
+            }
+            setIsDeleteInterventionModalOpen(false);
+            setInterventionToDelete(null);
+          }
+        }}
+        onCancel={() => {
+          setIsDeleteInterventionModalOpen(false);
+          setInterventionToDelete(null);
+        }}
+        okText="Eliminar"
+        cancelText="Cancelar"
+        confirmLoading={deleteInterventionMutatino.isPending}
+      >
+        <Typography.Text>
+          ¿Estás seguro que deseas eliminar esta intervención?
+        </Typography.Text>
+      </Modal>
     </>
   );
 };

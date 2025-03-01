@@ -51,6 +51,7 @@ import { v4 as uuidv4 } from "uuid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetRecordInterventions } from "../../hooks/useGetUserInterventions/useGetUserInterventions";
 import { useGetRecordVaccines } from "../../hooks/useGetUserVaccines/useGetUserVaccines";
+import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
 
 const { Title, Text } = Typography;
 
@@ -81,6 +82,8 @@ export const MedicalRecord: React.FC = () => {
 
   const { data: userVaccines, isLoading: loadingVaccines } =
     useGetRecordVaccines(userMedicalRecord?.data.data?.id_historiaclinica);
+
+  const { mutate: editRecord } = useEditRecordMutation(userId);
 
   const onSubmit = (data: FormValues) => {
     const record: MedicalRecordType = {
@@ -178,7 +181,14 @@ export const MedicalRecord: React.FC = () => {
         interventions,
         vaccines,
       });
+      return;
     }
+
+    editRecord({
+      id: Number(userId),
+      recordId: Number(userMedicalRecord?.data.data.id_historiaclinica),
+      record,
+    });
   };
 
   useEffect(() => {
@@ -263,7 +273,7 @@ export const MedicalRecord: React.FC = () => {
   useEffect(() => {
     if (userMedicines?.data.data) {
       const medicines: PharmacoRegimen[] = userMedicines.data.data.map((e) => ({
-        id: uuidv4(),
+        id: e.id,
         endDate: dayjs(e.fecha_fin),
         frequency: e.periodicidad,
         medicine: e.medicamento,
@@ -283,7 +293,7 @@ export const MedicalRecord: React.FC = () => {
   useEffect(() => {
     if (userCares?.data.data) {
       const cares: NursingCarePlan[] = userCares.data.data.map((e) => ({
-        id: uuidv4(),
+        id: e.id,
         frequency: e.frecuencia,
         diagnosis: e.diagnostico,
         intervention: e.intervencion,
@@ -302,7 +312,7 @@ export const MedicalRecord: React.FC = () => {
     if (userInterventions?.data.data) {
       const interventions: PhysioRegimen[] = userInterventions.data.data.map(
         (e) => ({
-          id: uuidv4(),
+          id: e.id,
           frequency: e.frecuencia,
           diagnosis: e.diagnostico,
           intervention: e.intervencion,
@@ -322,7 +332,7 @@ export const MedicalRecord: React.FC = () => {
   useEffect(() => {
     if (userVaccines?.data.data) {
       const vaccines: Vaccine[] = userVaccines.data.data.map((e) => ({
-        id: uuidv4(),
+        id: e.id,
         date: e.fecha_administracion
           ? dayjs(e.fecha_administracion)
           : undefined,

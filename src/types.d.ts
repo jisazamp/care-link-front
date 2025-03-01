@@ -102,33 +102,37 @@ export type MedicalRecord = {
   tipo_de_movilidad: string;
   tipo_de_sueno: string;
   tipo_sangre: string;
-}
+};
 
 export type UserMedicine = {
+  id?: string | number;
   medicamento: string;
   periodicidad: string;
   Fecha_inicio: string;
   fecha_fin: string;
-}
+};
 
 export type UserCare = {
+  id?: string | number;
   diagnostico: string;
   frecuencia: string;
   intervencion: string;
-}
+};
 
 export type UserIntervention = {
+  id?: string | number;
   diagnostico: string;
   frecuencia: string;
   intervencion: string;
-}
+};
 
 export type UserVaccine = {
+  id?: string | number;
   efectos_secundarios?: string;
   fecha_administracion?: string;
   fecha_proxima?: string;
   vacuna: string;
-}
+};
 
 export type Login = {
   access_token: string;

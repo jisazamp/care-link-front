@@ -1,23 +1,45 @@
-import { Card, Flex, Typography, Button, Table, Space } from "antd";
+import { Card, Flex, Typography, Button, Table, Space, Modal } from "antd";
 import { FormValues } from "../../schema/schema";
 import { PlusOutlined } from "@ant-design/icons";
 import { VaccinesModal } from "./components/VaccinesModal/VaccinesModal";
+import { useDeleteVaccineMutation } from "../../../../hooks/useDeleteVaccineMutation/useDeleteVaccineMutation";
+import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { useState } from "react";
+import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useParams } from "react-router-dom";
 
 const { Title } = Typography;
 
 export const Vaccines = () => {
+  const params = useParams();
+  const userId = params.id;
+
   const [showModal, setShowModal] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [vaccineToDelete, setVaccineToDelete] = useState<number | null>(null);
 
   const { append, update, remove } = useFieldArray<FormValues>({
     name: "vaccines",
   });
 
+  const {
+    mutate: deleteVaccine,
+    isPending,
+    isSuccess,
+  } = useDeleteVaccineMutation();
+
+  const { data: record } = useGetUserMedicalRecord(userId);
+
   const { watch } = useFormContext<FormValues>();
 
   const vaccines = watch("vaccines");
+
+  useEffect(() => {
+    if (isSuccess) {
+      remove(vaccines.findIndex((v) => v.id === vaccineToDelete));
+    }
+  }, [isSuccess]);
 
   return (
     <>
@@ -82,7 +104,14 @@ export const Vaccines = () => {
                     >
                       Editar
                     </Button>
-                    <Button type="link" danger onClick={() => remove(index)}>
+                    <Button
+                      type="link"
+                      danger
+                      onClick={() => {
+                        setVaccineToDelete(Number(vaccines[index].id));
+                        setIsDeleteModalOpen(true);
+                      }}
+                    >
                       Eliminar
                     </Button>
                   </Space>
@@ -108,6 +137,35 @@ export const Vaccines = () => {
           setEditingIndex(null);
         }}
       />
+      <Modal
+        title="Confirmar eliminación"
+        open={isDeleteModalOpen}
+        onOk={() => {
+          if (vaccineToDelete !== null) {
+            if (!isNaN(vaccineToDelete)) {
+              deleteVaccine({
+                id: Number(record?.data.data?.id_historiaclinica),
+                vaccineId: Number(vaccineToDelete),
+              });
+            } else {
+              remove(vaccines.findIndex((v) => v.id === vaccineToDelete));
+            }
+            setIsDeleteModalOpen(false);
+            setVaccineToDelete(null);
+          }
+        }}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setVaccineToDelete(null);
+        }}
+        okText="Eliminar"
+        cancelText="Cancelar"
+        confirmLoading={isPending}
+      >
+        <Typography.Text>
+          ¿Estás seguro que deseas eliminar esta vacuna?
+        </Typography.Text>
+      </Modal>
     </>
   );
 };
