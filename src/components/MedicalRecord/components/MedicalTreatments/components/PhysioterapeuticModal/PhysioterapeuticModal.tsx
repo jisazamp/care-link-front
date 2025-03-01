@@ -1,10 +1,15 @@
 import { Button, Col, Form, Input, Modal, Row } from "antd";
-import { FormValues, physioterapeuticRegimenSchema } from "../../../../schema/schema";
+import {
+  FormValues,
+  physioterapeuticRegimenSchema,
+} from "../../../../schema/schema";
 import { useEffect } from "react";
 import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEditIntervention } from "../../../../../../hooks/useEditIntervention/useEditIntervention";
+import { UserIntervention } from "../../../../../../types";
 
 type PhysioterapeuticForm = z.infer<typeof physioterapeuticRegimenSchema>;
 
@@ -30,6 +35,8 @@ export const PhysioterapeuticModal = ({
     defaultValues: initialData || {},
   });
 
+  const editMutation = useEditIntervention();
+
   useEffect(() => {
     if (initialData) reset(initialData);
     else
@@ -40,12 +47,23 @@ export const PhysioterapeuticModal = ({
       });
   }, [initialData, reset]);
 
-  const onSubmit = (data: PhysioterapeuticForm) => {
+  const onSubmit = async (data: PhysioterapeuticForm) => {
     if (editingIndex !== null) {
       update(editingIndex, {
         ...data,
         id: initialData?.id || uuidv4(),
       });
+      if (initialData?.id && typeof initialData.id === "number") {
+        const intervention: UserIntervention = {
+          diagnostico: data.diagnosis,
+          frecuencia: data.frequency,
+          intervencion: data.intervention,
+        };
+        await editMutation.mutateAsync({
+          intervention: intervention,
+          id: Number(initialData.id),
+        });
+      }
     } else {
       append({ ...data, id: uuidv4() });
     }

@@ -5,6 +5,8 @@ import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEditCare } from "../../../../../../hooks/useEditNursing/useEditNursing";
+import type { UserCare } from "../../../../../../types";
 
 type NursingCarePlanForm = z.infer<typeof nursingCarePlanSchema>;
 
@@ -30,6 +32,8 @@ export const NursingCarePlanModal = ({
     defaultValues: initialData || {},
   });
 
+  const editMutation = useEditCare();
+
   useEffect(() => {
     if (initialData) reset(initialData);
     else
@@ -40,12 +44,20 @@ export const NursingCarePlanModal = ({
       });
   }, [initialData, reset]);
 
-  const onSubmit = (data: NursingCarePlanForm) => {
+  const onSubmit = async (data: NursingCarePlanForm) => {
     if (editingIndex !== null) {
       update(editingIndex, {
         ...data,
         id: initialData?.id || uuidv4(),
       });
+      if (initialData?.id && typeof initialData.id === "number") {
+        const care: UserCare = {
+          diagnostico: data.diagnosis,
+          frecuencia: data.frequency,
+          intervencion: data.intervention,
+        };
+        await editMutation.mutateAsync({ care, id: Number(initialData?.id) });
+      }
     } else {
       append({ ...data, id: uuidv4() });
     }
@@ -64,7 +76,7 @@ export const NursingCarePlanModal = ({
         <Button key="cancel" className="main-button-white" onClick={onCancel}>
           Cancelar
         </Button>,
-        <Button key="confirm" onClick={handleSubmit(onSubmit)}>
+        <Button key="confirm" onClick={handleSubmit(onSubmit)} loading={editMutation.isPending}>
           Guardar
         </Button>,
       ]}

@@ -83,7 +83,10 @@ export const MedicalRecord: React.FC = () => {
   const { data: userVaccines, isLoading: loadingVaccines } =
     useGetRecordVaccines(userMedicalRecord?.data.data?.id_historiaclinica);
 
-  const { mutate: editRecord } = useEditRecordMutation(userId);
+  const { mutate: editRecord } = useEditRecordMutation({
+    id: userId,
+    recordId: userMedicalRecord?.data.data?.id_historiaclinica,
+  });
 
   const onSubmit = (data: FormValues) => {
     const record: MedicalRecordType = {
@@ -134,6 +137,7 @@ export const MedicalRecord: React.FC = () => {
     const medicines: UserMedicine[] = [];
     data.pharmacotherapeuticRegimen.forEach((p) => {
       const medicine: UserMedicine = {
+        id: p.id ?? "",
         Fecha_inicio: p.startDate.format("YYYY-MM-DD"),
         fecha_fin: p.endDate.format("YYYY-MM-DD"),
         medicamento: p.medicine,
@@ -145,6 +149,7 @@ export const MedicalRecord: React.FC = () => {
     const cares: UserCare[] = [];
     data.nursingCarePlan.forEach((n) => {
       const care: UserCare = {
+        id: n.id ?? "",
         diagnostico: n.diagnosis,
         frecuencia: n.frequency,
         intervencion: n.intervention,
@@ -155,6 +160,7 @@ export const MedicalRecord: React.FC = () => {
     const interventions: UserIntervention[] = [];
     data.physioterapeuticRegimen.forEach((n) => {
       const intervention: UserIntervention = {
+        id: n.id ?? "",
         diagnostico: n.diagnosis,
         frecuencia: n.frequency,
         intervencion: n.intervention,
@@ -165,6 +171,7 @@ export const MedicalRecord: React.FC = () => {
     const vaccines: UserVaccine[] = [];
     data.vaccines.forEach((v) => {
       const vaccine: UserVaccine = {
+        id: v.id ?? "",
         efectos_secundarios: v.secondaryEffects,
         fecha_administracion: v.date?.format("YYYY-MM-DD"),
         fecha_proxima: v.nextDate?.format("YYYY-MM-DD"),
@@ -187,7 +194,13 @@ export const MedicalRecord: React.FC = () => {
     editRecord({
       id: Number(userId),
       recordId: Number(userMedicalRecord?.data.data.id_historiaclinica),
-      record,
+      record: {
+        record,
+        medicines: medicines.filter((m) => typeof m.id === "string"),
+        cares: cares.filter((m) => typeof m.id === "string"),
+        interventions: interventions.filter((i) => typeof i.id === "string"),
+        vaccines: vaccines.filter((v) => typeof v.id === "string"),
+      },
     });
   };
 

@@ -8,6 +8,8 @@ import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEditMedicine } from "../../../../../../hooks/useEditMedicine/useEditMedicine";
+import { UserMedicine } from "../../../../../../types";
 
 type PharmoterapeuticForm = z.infer<typeof pharmacotherapeuticRegimenSchema>;
 
@@ -33,6 +35,8 @@ export const PharmoterapeuticModal = ({
     defaultValues: initialData || {},
   });
 
+  const editMutation = useEditMedicine();
+
   useEffect(() => {
     if (initialData) reset(initialData);
     else
@@ -45,12 +49,25 @@ export const PharmoterapeuticModal = ({
       });
   }, [initialData, reset]);
 
-  const onSubmit = (data: PharmoterapeuticForm) => {
+  const onSubmit = async (data: PharmoterapeuticForm) => {
     if (editingIndex !== null) {
+      const medicine: UserMedicine = {
+        id: initialData?.id ?? uuidv4(),
+        medicamento: data.medicine,
+        periodicidad: data.frequency,
+        Fecha_inicio: data.startDate.format("YYYY-MM-DD"),
+        fecha_fin: data.endDate.format("YYYY-MM-DD"),
+      };
       update(editingIndex, {
         ...data,
         id: initialData?.id || uuidv4(),
       });
+      if (initialData?.id && typeof initialData.id === "number") {
+        await editMutation.mutateAsync({
+          user: medicine,
+          id: initialData?.id ?? 0,
+        });
+      }
     } else {
       append({ ...data, id: uuidv4() });
     }
@@ -69,7 +86,11 @@ export const PharmoterapeuticModal = ({
         <Button key="cancel" className="main-button-white" onClick={onCancel}>
           Cancelar
         </Button>,
-        <Button key="confirm" onClick={handleSubmit(onSubmit)}>
+        <Button
+          key="confirm"
+          onClick={handleSubmit(onSubmit)}
+          loading={editMutation.isPending}
+        >
           Guardar
         </Button>,
       ]}

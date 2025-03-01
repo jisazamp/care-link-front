@@ -5,6 +5,8 @@ import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEditVaccine } from "../../../../../../hooks/useEditVaccine/useEditVaccine";
+import { UserVaccine } from "../../../../../../types";
 
 type VaccinesForm = z.infer<typeof vaccineSchema>;
 
@@ -30,6 +32,8 @@ export const VaccinesModal = ({
     defaultValues: initialData || {},
   });
 
+  const editMutation = useEditVaccine();
+
   useEffect(() => {
     if (initialData) reset(initialData);
     else
@@ -41,12 +45,21 @@ export const VaccinesModal = ({
       });
   }, [initialData, reset]);
 
-  const onSubmit = (data: VaccinesForm) => {
+  const onSubmit = async (data: VaccinesForm) => {
     if (editingIndex !== null) {
       update(editingIndex, {
         ...data,
         id: initialData?.id || uuidv4(),
       });
+      if (initialData?.id && typeof initialData.id === "number") {
+        const vaccine: UserVaccine = {
+          efectos_secundarios: data.secondaryEffects,
+          fecha_administracion: data.date?.format("YYYY-MM-DD"),
+          fecha_proxima: data.nextDate?.format("YYYY-MM-DD"),
+          vacuna: data.name,
+        };
+        await editMutation.mutateAsync({ vaccine, id: Number(initialData.id) });
+      }
     } else {
       append({ ...data, id: uuidv4() });
     }
