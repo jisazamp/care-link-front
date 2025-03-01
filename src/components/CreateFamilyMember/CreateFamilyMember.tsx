@@ -62,7 +62,7 @@ export const CreateFamilyMember = () => {
     useCreateFamilyMember(userId);
 
   const { mutate: editFamilyMember, isSuccess: isSuccessEditFamilyMember } =
-    useEditFamilyMemberMutation();
+    useEditFamilyMemberMutation(userId);
 
   const navigate = useNavigate();
 

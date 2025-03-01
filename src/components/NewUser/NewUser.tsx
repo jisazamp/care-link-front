@@ -105,7 +105,7 @@ export const NewUser: React.FC = () => {
     isPending: isPendingCreateUser,
   } = useCreateUserMutation();
   const { mutate: editUser, isSuccess: isSuccessEditUser } =
-    useEditUserMutation();
+    useEditUserMutation(userId);
 
   const onSubmit = (data: FormValues) => {
     const user: Partial<User> = {
