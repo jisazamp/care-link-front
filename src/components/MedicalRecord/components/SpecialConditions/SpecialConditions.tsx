@@ -226,10 +226,6 @@ export const SpecialConditions = () => {
                   dataIndex: "diet",
                 },
                 {
-                  title: "Observación",
-                  dataIndex: "observation",
-                },
-                {
                   title: "Acciones",
                   key: "acciones",
                   render: (_, __, index) => (
@@ -286,10 +282,6 @@ export const SpecialConditions = () => {
                   {
                     title: "Discapacidades",
                     dataIndex: "disability",
-                  },
-                  {
-                    title: "Observación",
-                    dataIndex: "observation",
                   },
                   {
                     title: "Acciones",
@@ -351,10 +343,6 @@ export const SpecialConditions = () => {
                   dataIndex: "limitation",
                 },
                 {
-                  title: "Observación",
-                  dataIndex: "observation",
-                },
-                {
                   title: "Acciones",
                   key: "acciones",
                   align: "center",
@@ -410,11 +398,7 @@ export const SpecialConditions = () => {
               columns={[
                 {
                   title: "Alergia",
-                  dataIndex: "alergie",
-                },
-                {
-                  title: "Observación",
-                  dataIndex: "observation",
+                  dataIndex: "alergy",
                 },
                 {
                   title: "Acciones",
@@ -470,14 +454,11 @@ export const SpecialConditions = () => {
             <Table
               rowKey="id"
               columns={[
+                { title: "Observaciones", dataIndex: "observation" },
                 {
                   title: "Fecha de ocurrencia",
                   dataIndex: "date",
                   render: (_, record) => record.date?.format("YYYY-MM-DD"),
-                },
-                {
-                  title: "Observación",
-                  dataIndex: "observation",
                 },
                 {
                   title: "Acciones",

@@ -85,12 +85,15 @@ export const MedicalRecord: React.FC = () => {
       altura: data.height,
       apariencia_personal: data.personalAppearance + "",
       cafeina: data.caffeine,
-      cirugias: !!data.surgeries.length,
+      cirugias: data.surgeries
+        .map((a) => `${a.observation}:${a.date.format("YYYY-MM-DD")}`)
+        .join(","),
       comunicacion_no_verbal: data.nonVerbalCommunication,
       comunicacion_verbal: data.verbalCommunication,
       continencia: data.continence,
       cuidado_personal: data.personalCare + "",
-      discapacidad: !!data.disabilities.length,
+      dieta_especial: data.diet.map((a) => a.diet).join(","),
+      discapacidades: data.disabilities.map((a) => a.disability).join(","),
       emer_medica: data.externalService + "",
       eps: data.eps + "",
       estado_de_animo: data.mood,
@@ -98,13 +101,15 @@ export const MedicalRecord: React.FC = () => {
       frecuencia_cardiaca: Number(data.bpm),
       historial_cirugias: "",
       id_usuario: Number(userId),
+      limitaciones: data.limitations.map((a) => a.limitation).join(","),
       maltratado: data.abused,
       maltrato: data.abused,
-      medicamentos_alergia: data.alergies.map((a) => a.medicine).join(", "),
+      medicamentos_alergia: data.alergies.map((a) => a.medicine).join(","),
       motivo_ingreso: data.entryReason,
       observ_dietaEspecial: "",
       observ_otrasalergias: "",
       observaciones_iniciales: data.initialDiagnosis + "",
+      otras_alergias: data.otherAlergies.map((a) => a.alergy).join(","),
       peso: Number(data.weight),
       presion_arterial: Number(data.bloodPressure),
       sustanciaspsico: data.psycoactive,
@@ -148,30 +153,62 @@ export const MedicalRecord: React.FC = () => {
       interventions.push(intervention);
     });
 
-    createUserMedicalRecord({ record, medicines, cares, interventions });
+    if (!userMedicalRecord?.data.data?.id_historiaclinica) {
+      createUserMedicalRecord({ record, medicines, cares, interventions });
+    }
   };
 
   useEffect(() => {
     if (userMedicalRecord?.data.data) {
       const data = userMedicalRecord.data.data;
       const alergies = data.medicamentos_alergia
-        .split(", ")
+        ?.split(",")
         .filter((a) => !!a)
         .map((e) => ({ id: uuidv4(), medicine: e }));
+      const diet = data.dieta_especial
+        ?.split(",")
+        .filter((a) => !!a)
+        .map((e) => ({ id: uuidv4(), diet: e }));
+      const disabilities = data.discapacidades
+        ?.split(",")
+        .filter((a) => !!a)
+        .map((e) => ({ id: uuidv4(), disability: e }));
+      const limitations = data.limitaciones
+        ?.split(",")
+        .filter((a) => !!a)
+        .map((e) => ({ id: uuidv4(), limitation: e }));
+      const otherAlergies = data.otras_alergias
+        ?.split(",")
+        .filter((a) => !!a)
+        .map((e) => ({ id: uuidv4(), alergy: e }));
+      const surgeries = data.cirugias
+        ?.split(",")
+        .filter((a) => !!a)
+        .map((e) => {
+          const info = e.split(":");
+          return { id: uuidv4(), date: dayjs(info[1]), observation: info[0] };
+        });
+
       const specialConditions: string[] = [];
-      if (alergies.length) specialConditions.push("alergies");
+      if (alergies?.length) specialConditions.push("alergies");
+      if (diet?.length) specialConditions.push("diet");
+      if (disabilities?.length) specialConditions.push("disability");
+      if (limitations?.length) specialConditions.push("limitations");
+      if (otherAlergies?.length) specialConditions.push("otherAlergies");
+      if (surgeries?.length) specialConditions.push("surgeries");
 
       reset((values) => ({
         ...values,
         abused: data.maltratado,
         alcholism: data.alcoholismo,
-        alergies,
-        specialConditions,
+        alergies: alergies ?? [],
         bloodPressure: data.presion_arterial,
         bloodType: data.tipo_sangre,
         bpm: data.frecuencia_cardiaca,
         caffeine: data.cafeina,
         continence: data.continencia,
+        diet: diet ?? [],
+        disabilities: disabilities ?? [],
         entryDate: dayjs(data.fecha_ingreso),
         entryReason: data.motivo_ingreso,
         eps: data.eps + "",
@@ -181,13 +218,17 @@ export const MedicalRecord: React.FC = () => {
         hasExternalService: !!data.emer_medica,
         height: data.altura,
         initialDiagnosis: data.observaciones_iniciales + "",
+        limitations: limitations ?? [],
         mobility: data.tipo_de_movilidad,
         mood: data.estado_de_animo,
         nonVerbalCommunication: data.comunicacion_no_verbal,
+        otherAlergies: otherAlergies ?? [],
         personalAppearance: data.apariencia_personal,
         personalCare: data.cuidado_personal,
         psycoactive: data.sustanciaspsico,
         sleepType: data.tipo_de_sueno,
+        specialConditions,
+        surgeries: surgeries ?? [],
         tabaquism: data.tabaquismo,
         temperature: data.temperatura_corporal,
         verbalCommunication: data.comunicacion_verbal,
@@ -450,7 +491,9 @@ export const MedicalRecord: React.FC = () => {
                 loading={isLoadingCreation}
                 onClick={methods.handleSubmit(onSubmit)}
               >
-                Guardar y continuar
+                {userMedicalRecord?.data.data?.id_historiaclinica
+                  ? "Editar"
+                  : "Guardar y continuar"}
               </Button>
             </Col>
           </Row>

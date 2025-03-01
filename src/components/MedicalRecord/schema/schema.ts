@@ -33,7 +33,7 @@ export const physioterapeuticRegimenSchema = z.object({
   frequency: z.string().min(1, "La frecuencia es requerida"),
 });
 
-export type PhysioRegimen = z.infer<typeof physioterapeuticRegimenSchema>;
+export type PhysioRegimen = z.infer<typeof physioterapeuticRegimenSchema>
 
 export const alergiesSchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
@@ -43,25 +43,21 @@ export const alergiesSchema = z.object({
 export const dietSchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
   diet: z.string(),
-  observation: z.string(),
 });
 
 export const disabilitySchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
   disability: z.string(),
-  observation: z.string(),
 });
 
 export const limitationsSchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
   limitation: z.string(),
-  observation: z.string(),
 });
 
 export const otherAlergies = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
   alergy: z.string(),
-  observation: z.string(),
 });
 
 export const formSchema = z.object({
@@ -104,7 +100,7 @@ export const formSchema = z.object({
   nonVerbalCommunication: z.string(),
   mood: z.string(),
   abused: z.boolean(),
-  initialDiagnosis: z.string().optional(),
+  initialDiagnosis: z.string().optional().default(""),
 });
 
 export type FormValues = z.infer<typeof formSchema>;
