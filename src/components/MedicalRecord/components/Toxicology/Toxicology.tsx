@@ -1,6 +1,6 @@
 import { useFormContext, Controller } from "react-hook-form";
 import { Card, Row, Col, Form, Select, Typography } from "antd";
-import { FormValues } from "../../MedicalRecord";
+import { FormValues } from "../../schema/schema";
 
 const { Title } = Typography;
 const { Option } = Select;

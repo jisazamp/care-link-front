@@ -1,5 +1,5 @@
 import { Card, Row, Col, Typography, Form, DatePicker, Input } from "antd";
-import { FormValues } from "../../MedicalRecord";
+import { FormValues } from "../../schema/schema";
 import { useFormContext, Controller } from "react-hook-form";
 
 const { Title, Text } = Typography;

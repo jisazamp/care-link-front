@@ -3,7 +3,7 @@ import { Card, Flex, Typography, Checkbox, Button, Table, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { useState } from "react";
-import { FormValues } from "../../MedicalRecord";
+import { FormValues } from "../../schema/schema";
 import { DietModal } from "./components/DietModal/DietModal";
 import { DisabilityModal } from "./components/DisabilityModal/DisabilityModal";
 import { LimitationsModal } from "./components/LimitationsModal/LimitationsModal";
@@ -87,7 +87,7 @@ export const SpecialConditions = () => {
   const otherAlergies = watch("otherAlergies") ?? [];
   const surgeries = watch("surgeries") ?? [];
 
-  const handleCheckboxGroupChange = (values: any) => {
+  const handleCheckboxGroupChange = (values: string[]) => {
     setValue("specialConditions", values);
   };
 
