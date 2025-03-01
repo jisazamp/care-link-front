@@ -49,6 +49,7 @@ export const App = () => {
       theme={{
         token: {
           borderRadius: 2,
+          colorPrimary: colors.primary.main,
         },
         components: {
           Layout: {
@@ -81,9 +82,11 @@ export const App = () => {
             optionSelectedBg: "#9957C255",
           },
           DatePicker: {
-            ...esES.DatePicker,
             hoverBorderColor: colors.primary.main,
             activeBorderColor: colors.primary.main,
+            cellActiveWithRangeBg: "#9957C255",
+            cellHoverBg: "#9957C255",
+            cellRangeBorderColor: colors.primary.main,
           },
           Checkbox: {
             colorPrimary: colors.primary.main,
