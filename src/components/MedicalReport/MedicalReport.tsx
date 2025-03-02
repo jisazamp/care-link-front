@@ -1,256 +1,58 @@
-import {
-  Breadcrumb,
-  Button,
-  Card,
-  Checkbox,
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  Layout,
-  Row,
-  Select,
-  Space,
-  Table,
-  Typography,
-} from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-
-const { Content } = Layout;
-const { Title } = Typography;
-const { Option } = Select;
-
-const reportData = [
-  {
-    key: "1",
-    profesional: "Andrea Salazar",
-    tipoReporte: "Enfermería",
-    fecha: "2024-11-08",
-    motivo: "Consulta general",
-    acciones: [
-      <a key="view" href="#">
-        Ver
-      </a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>
-        Editar
-      </a>,
-    ],
-  },
-];
-
-const reportColumns = [
-  {
-    title: <Checkbox />,
-    dataIndex: "checkbox",
-    render: () => <Checkbox />,
-    width: "5%",
-  },
-  {
-    title: "Profesional",
-    dataIndex: "profesional",
-    key: "profesional",
-  },
-  {
-    title: "Tipo de Reporte",
-    dataIndex: "tipoReporte",
-    key: "tipoReporte",
-  },
-  {
-    title: "Fecha",
-    dataIndex: "fecha",
-    key: "fecha",
-  },
-  {
-    title: "Motivo",
-    dataIndex: "motivo",
-    key: "motivo",
-  },
-  {
-    title: "Acciones",
-    dataIndex: "acciones",
-    key: "acciones",
-  },
-];
+import { Breadcrumb } from "antd";
+import { EditReport } from "./components/EditReport/EditReport";
+import { NewReport } from "./components/NewReport/NewReport";
+import { Routes, Route, useLocation, useParams } from "react-router-dom";
+import { ViewReport } from "./components/ViewReport/ViewReport";
 
 export const MedicalReport: React.FC = () => {
+  const location = useLocation();
+  const { id } = useParams(); // Obtener ID del usuario desde la URL
+
+  // Definir los breadcrumbs según la ruta actual
+  const breadcrumbItems = [
+    { path: "/", label: "Home" },
+    { path: "/usuarios", label: "Usuarios" },
+  ];
+
+  if (id) {
+    breadcrumbItems.push({
+      path: `/usuarios/${id}/detalles`,
+      label: `Nombre_Usuario`,
+    });
+  }
+
+  if (location.pathname.includes("viewReport")) {
+    breadcrumbItems.push({
+      path: location.pathname,
+      label: "Vista detalle Reporte clínico",
+    });
+  } else if (location.pathname.includes("newReport")) {
+    breadcrumbItems.push({
+      path: location.pathname,
+      label: "Nuevo reporte de evolución clínica",
+    });
+  } else if (location.pathname.includes("EditReport")) {
+    breadcrumbItems.push({
+      path: location.pathname,
+      label: "Nuevo reporte clínico",
+    });
+  }
+
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Content className="content-wrapper" style={{ padding: "16px" }}>
-        <Breadcrumb className="breadcrumb" style={{ marginBottom: "16px" }}>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>Usuarios</Breadcrumb.Item>
-          <Breadcrumb.Item>Nuevo reporte clínico</Breadcrumb.Item>
-        </Breadcrumb>
-        <Title level={3} className="page-title">
-          Nuevo Reporte Clínico
-        </Title>
-        <Space direction="vertical" size="large" style={{ width: "100%" }}>
-          <Card title="Datos básicos del reporte" className="detail-card">
-            <Form layout="vertical">
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Form.Item label="Profesional" name="profesional">
-                    <Select placeholder="Seleccione un profesional">
-                      <Option value="andrea-salazar">Andrea Salazar</Option>
-                      <Option value="juan-perez">Juan Pérez</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Tipo de Reporte" name="tipoReporte">
-                    <Select placeholder="Seleccione el tipo de reporte">
-                      <Option value="enfermeria">Enfermería</Option>
-                      <Option value="medico">Médico</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Form.Item label="Paciente" name="paciente">
-                    <Input defaultValue="Juan Antonio Lopez Orrego" disabled />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Fecha de registro" name="fechaRegistro">
-                    <DatePicker style={{ width: "100%" }} />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={24}>
-                <Col span={24}>
-                  <Form.Item label="Motivo de Consulta" name="motivoConsulta">
-                    <Input placeholder="Ingrese el motivo de consulta" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>
-          </Card>
-          <Card title="Exploración física" className="detail-card">
-            <Form layout="vertical">
-              <Row gutter={24}>
-                <Col span={5}>
-                  <Form.Item label="Peso">
-                    <Input placeholder="Ingrese el peso" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item label="Presión Arterial">
-                    <Input placeholder="Ingrese la presión arterial" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item label="Frecuencia Cardiaca">
-                    <Input placeholder="Ingrese la frecuencia cardiaca" />
-                  </Form.Item>
-                </Col>
-                <Col span={5}>
-                  <Form.Item label="Temperatura Corporal">
-                    <Input placeholder="Ingrese la temperatura corporal" />
-                  </Form.Item>
-                </Col>
-                <Col span={4}>
-                  <Form.Item label="Pulsoximetría">
-                    <Input placeholder="Ingrese la pulsoximetría" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>
-          </Card>
+    <div style={{ padding: "16px" }}>
+      {/* Breadcrumbs */}
+      <Breadcrumb style={{ marginBottom: "16px" }}>
+        {breadcrumbItems.map((item, index) => (
+          <Breadcrumb.Item key={index}>{item.label}</Breadcrumb.Item>
+        ))}
+      </Breadcrumb>
 
-          <Card title="Datos de diagnóstico" className="detail-card">
-            <Form layout="vertical">
-              <Row gutter={24}>
-                <Col span={24}>
-                  <Form.Item label="Diagnóstico">
-                    <Input.TextArea
-                      rows={3}
-                      placeholder="Ingrese el diagnóstico"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item label="Observaciones internas">
-                    <Input.TextArea
-                      rows={3}
-                      placeholder="Ingrese las observaciones internas"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>
-          </Card>
-
-          <Card title="Tratamientos y recomendaciones" className="detail-card">
-            <Form layout="vertical">
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Form.Item label="Tratamiento">
-                    <Input placeholder="Ingrese el tratamiento" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Duración">
-                    <Input placeholder="Ingrese la duración" />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={24}>
-                <Col span={24}>
-                  <Form.Item label="Recomendaciones adicionales">
-                    <Input.TextArea
-                      rows={3}
-                      placeholder="Ingrese recomendaciones adicionales"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>
-          </Card>
-
-          <Card
-            title="Tratamientos y recomendaciones Adjuntar documentos"
-            extra={
-              <Button type="primary" icon={<PlusOutlined />}>
-                Agregar
-              </Button>
-            }
-            className="detail-card"
-          >
-            <p>
-              Adjunte documentos relacionados con el tratamiento y las
-              recomendaciones aquí.
-            </p>
-          </Card>
-
-          <Card
-            title="Reportes clínicos previos"
-            extra={
-              <Button type="primary" icon={<PlusOutlined />}>
-                Agregar
-              </Button>
-            }
-            className="detail-card"
-          >
-            <Table
-              columns={reportColumns}
-              dataSource={reportData}
-              pagination={false}
-            />
-          </Card>
-
-          <Card className="detail-card">
-            <Row gutter={16} justify="end">
-              <Col>
-                <Button>Restablecer</Button>
-              </Col>
-              <Col>
-                <Button type="primary">Guardar y continuar</Button>
-              </Col>
-            </Row>
-          </Card>
-        </Space>
-      </Content>
-    </Layout>
+      {/* Rutas */}
+      <Routes>
+        <Route path="newReport" element={<NewReport />} />
+        <Route path="viewReport" element={<ViewReport />} />
+        <Route path="editReport" element={<EditReport />} />
+      </Routes>
+    </div>
   );
 };
