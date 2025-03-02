@@ -17,7 +17,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useDeleteCareMutation } from "../../../../hooks/useDeleteCareMutation/useDeleteCareMutation";
 import { useDeleteInterventionMutation } from "../../../../hooks/useDeleteInterventionMutation/useDeleteUserIntervention";
 import { useDeleteMedicineMutation } from "../../../../hooks/useDeleteMedicineMutation/useDeleteMedicineMutation";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useParams } from "react-router-dom";
 
@@ -78,16 +78,9 @@ export const MedicalTreatments = () => {
   });
 
   const selectedValues = watch("medicalTreatments", []);
-  const pharmaRegimen = useMemo(
-    () => watch("pharmacotherapeuticRegimen") ?? [],
-    [watch]
-  );
-  const nursingCare = useMemo(() => watch("nursingCarePlan") ?? [], [watch]);
-  const physioRegimen = useMemo(
-    () => watch("physioterapeuticRegimen") ?? [],
-    [watch]
-  );
-
+  const pharmaRegimen = watch("pharmacotherapeuticRegimen") ?? [];
+  const nursingCare = watch("nursingCarePlan") ?? [];
+  const physioRegimen = watch("physioterapeuticRegimen") ?? [];
   useEffect(() => {
     if (deletePharmaMutation.isSuccess) {
       remove(pharmaRegimen.findIndex((p) => p.id === pharmaToDelete));
