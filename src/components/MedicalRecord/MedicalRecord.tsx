@@ -441,7 +441,7 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                variant="outlined"
+                bordered
                 title={<Title level={4}>Diagnóstico inicial</Title>}
                 style={{ marginBottom: 8 }}
               >
@@ -525,7 +525,7 @@ export const MedicalRecord: React.FC = () => {
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
-                variant="outlined"
+                bordered
                 extra={
                   <Button icon={<PlusOutlined />} className="main-button-white">
                     Agregar

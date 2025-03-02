@@ -8,7 +8,7 @@ export const EntryData = () => {
   const { control, formState } = useFormContext<FormValues>();
   const { errors } = formState;
   return (
-    <Card title={<Title level={4}>Datos básicos de ingreso</Title>} variant="outlined">
+    <Card title={<Title level={4}>Datos básicos de ingreso</Title>} bordered>
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item

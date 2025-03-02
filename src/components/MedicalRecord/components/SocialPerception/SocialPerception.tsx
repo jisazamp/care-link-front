@@ -9,7 +9,7 @@ export const SocialPerception = () => {
   const { control } = useFormContext<FormValues>();
   return (
     <Card
-      variant="outlined"
+      bordered
       title={<Title level={4}>Habilidades de percepción social</Title>}
       style={{ marginBottom: 8 }}
     >

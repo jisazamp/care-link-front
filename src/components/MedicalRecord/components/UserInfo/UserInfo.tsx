@@ -12,7 +12,7 @@ export const UserInfo = () => {
   const { data: user, isLoading: loadingUser } = useGetUserById(userId);
 
   return (
-    <Card variant="outlined" loading={loadingUser}>
+    <Card bordered loading={loadingUser}>
       <Row align="middle" gutter={16}>
         <Col span={4}>
           <Avatar alt="Avatar" size={72} src="https://via.placeholder.com/72" />

@@ -39,12 +39,12 @@ export const Vaccines = () => {
     if (isSuccess) {
       remove(vaccines.findIndex((v) => v.id === vaccineToDelete));
     }
-  }, [isSuccess]);
+  }, [isSuccess, remove, vaccineToDelete, vaccines]);
 
   return (
     <>
       <Card
-        variant="outlined"
+        bordered
         extra={
           <Button
             icon={<PlusOutlined />}
