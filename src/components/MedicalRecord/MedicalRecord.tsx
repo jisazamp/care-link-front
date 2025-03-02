@@ -83,7 +83,7 @@ export const MedicalRecord: React.FC = () => {
   const { data: userVaccines, isLoading: loadingVaccines } =
     useGetRecordVaccines(userMedicalRecord?.data.data?.id_historiaclinica);
 
-  const { mutate: editRecord, isLoading: loadingEditing } = useEditRecordMutation({
+  const { mutate: editRecord, isPending: loadingEditing } = useEditRecordMutation({
     id: userId,
     recordId: userMedicalRecord?.data.data?.id_historiaclinica,
   });
