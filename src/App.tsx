@@ -20,6 +20,8 @@ import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamily
 import { MedicalReport } from "./components/MedicalReport/MedicalReport";
 import { UserList } from "./components/UserList/UserList";
 import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
+import { FormContracts } from "./components/Contracts/components/FormContracts";
+import { ContractDetails } from "./components/Contracts/components/ContractDetails/ContractDetails";
 
 export const colors = {
   primary: {
@@ -167,14 +169,6 @@ export const App = () => {
               }
             />
             <Route
-              path="/usuarios/:id/reporte"
-              element={
-                <PrivateRoute>
-                  <MedicalReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
               path="/ShowMedicalReport"
               element={
                 <PrivateRoute>
@@ -191,6 +185,23 @@ export const App = () => {
               }
             />
           </Route>
+          <Route path="/MedicalReport" element={<MedicalReport />} />
+          <Route
+            path="/usuarios/:id/contrato"
+            element={
+              <PrivateRoute>
+                <FormContracts />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/usuarios/:id/detalles-contrato"
+            element={
+              <PrivateRoute>
+                <ContractDetails />
+              </PrivateRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
       </Router>
