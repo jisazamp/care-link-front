@@ -83,7 +83,7 @@ export const MedicalRecord: React.FC = () => {
   const { data: userVaccines, isLoading: loadingVaccines } =
     useGetRecordVaccines(userMedicalRecord?.data.data?.id_historiaclinica);
 
-  const { mutate: editRecord } = useEditRecordMutation({
+  const { mutate: editRecord, isLoading: loadingEditing } = useEditRecordMutation({
     id: userId,
     recordId: userMedicalRecord?.data.data?.id_historiaclinica,
   });
@@ -558,7 +558,7 @@ export const MedicalRecord: React.FC = () => {
                   backgroundColor: "#722ed1",
                   borderColor: "#722ed1",
                 }}
-                loading={isLoadingCreation}
+                loading={isLoadingCreation || loadingEditing}
                 onClick={methods.handleSubmit(onSubmit)}
               >
                 {userMedicalRecord?.data.data?.id_historiaclinica
