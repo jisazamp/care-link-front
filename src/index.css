@@ -38,3 +38,126 @@ body {
 .main-button-link:hover {
   color: #7f34b4 !important;
 }
+
+/* 🔹 CONTENEDORES PRINCIPALES */
+.contract-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+}
+
+/* 🔹 TARJETAS */
+.full-width-card {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔹 HEADER DE LAS TARJETAS */
+.contract-header,
+.services-header,
+.billing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+/* 🔹 TÍTULOS */
+.contract-title,
+.services-title,
+.billing-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* 🔹 ACCIONES DE LAS TARJETAS */
+.contract-actions,
+.services-actions,
+.billing-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 🔹 BODY DE LAS TARJETAS */
+.contract-body,
+.services-body,
+.billing-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 10px;
+}
+
+/* 🔹 FILAS DENTRO DEL BODY */
+.contract-row {
+  display: flex;
+  gap: 20px;
+}
+
+.contract-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* 🔹 TITULOS Y VALORES */
+.field-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.field-value {
+  font-size: 14px;
+  color: #595959;
+}
+
+/* 🔹 ESTADO DEL CONTRATO */
+.contract-status {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.status-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 🔹 TARJETA SERVICIOS */
+.services-card {
+  padding: 20px;
+}
+
+/* 🔹 BOTÓN AGREGAR Y NUEVA FACTURA */
+.add-button,
+.billing-add-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* 🔹 SUBTÍTULO DE LA TABLA */
+.table-subtitle {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* 🔹 LINK DE ACCIONES */
+.delete-link,
+.edit-link {
+  color: #7f34b4 !important;
+}
+
+.delete-link:hover,
+.edit-link:hover {
+  color: #9957c2 !important;
+}
