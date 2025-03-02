@@ -86,13 +86,18 @@ export const MedicalTreatments = () => {
     if (deletePharmaMutation.isSuccess) {
       remove(pharmaRegimen.findIndex((p) => p.id === pharmaToDelete));
     }
-  }, [deletePharmaMutation.isSuccess]);
+  }, [deletePharmaMutation.isSuccess, pharmaRegimen, pharmaToDelete, remove]);
 
   useEffect(() => {
     if (deleteCareMutation.isSuccess) {
       removeNursing(nursingCare.findIndex((n) => n.id === nursingToDelete));
     }
-  }, [deleteCareMutation.isSuccess]);
+  }, [
+    deleteCareMutation.isSuccess,
+    nursingCare,
+    nursingToDelete,
+    removeNursing,
+  ]);
 
   useEffect(() => {
     if (deleteInterventionMutatino.isSuccess) {
@@ -100,13 +105,18 @@ export const MedicalTreatments = () => {
         physioRegimen.findIndex((n) => n.id === interventionToDelete)
       );
     }
-  }, [deleteInterventionMutatino.isSuccess]);
+  }, [
+    deleteInterventionMutatino.isSuccess,
+    interventionToDelete,
+    physioRegimen,
+    removePhysio,
+  ]);
 
   return (
     <>
       <Card
         title={<Title level={4}>Tratamientos o medicamentos</Title>}
-        variant="outlined"
+        bordered
       >
         <Form.Item>
           <Controller
@@ -138,7 +148,7 @@ export const MedicalTreatments = () => {
         </Form.Item>
         {selectedValues.includes("pharmacotherapeuticRegimen") && (
           <Card
-            variant="outlined"
+            bordered
             extra={
               <Button
                 icon={<PlusOutlined />}
@@ -202,7 +212,7 @@ export const MedicalTreatments = () => {
         )}
         {selectedValues.includes("nursingCarePlan") && (
           <Card
-            variant="outlined"
+            bordered
             extra={
               <Button
                 icon={<PlusOutlined />}
@@ -269,7 +279,7 @@ export const MedicalTreatments = () => {
         )}
         {selectedValues.includes("physiotherapeuticIntervention") && (
           <Card
-            variant="outlined"
+            bordered
             extra={
               <Button
                 icon={<PlusOutlined />}

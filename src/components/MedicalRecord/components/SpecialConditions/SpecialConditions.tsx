@@ -100,7 +100,7 @@ export const SpecialConditions = () => {
           </Title>
         </Flex>
       }
-      variant="outlined"
+      bordered
     >
       <Flex vertical>
         <Title
