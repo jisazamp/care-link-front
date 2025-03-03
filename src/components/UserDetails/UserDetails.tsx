@@ -16,6 +16,7 @@ import {
   Modal,
   Flex,
   Spin,
+  Tooltip,
 } from "antd";
 import dayjs from "dayjs";
 import patientImage from "../assets/Patients/patient1.jpg";
@@ -29,41 +30,11 @@ import { useEffect, useState } from "react";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 
 const { Title } = Typography;
 
-const clinicalReportsData = [
-  {
-    key: "1",
-    professional: "Sara Manuela Gomez",
-    reportType: "Enfermería",
-    date: "10/20/2024",
-    actions: [
-      <a key="view" href="#">
-        Ver
-      </a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>
-        Editar
-      </a>,
-    ],
-  },
-  {
-    key: "2",
-    professional: "Juan Pablo Ruiz",
-    reportType: "Ortopedia",
-    date: "10/24/2024",
-    actions: [
-      <a key="view" href="#">
-        Ver
-      </a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>
-        Editar
-      </a>,
-    ],
-  },
-];
-
-const columns = [
+/* const columns = [
   {
     title: <Checkbox />,
     dataIndex: "checkbox",
@@ -72,8 +43,7 @@ const columns = [
   },
   {
     title: "Profesional",
-    dataIndex: "professional",
-    key: "professional",
+    dataIndex: "profesional",
   },
   {
     title: "Tipo Reporte",
@@ -90,7 +60,7 @@ const columns = [
     dataIndex: "actions",
     key: "actions",
   },
-];
+]; */
 
 const contractsData = [
   {
@@ -171,18 +141,13 @@ export const UserDetails: React.FC = () => {
     useDeleteRecordMutation();
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
+  const { data: medicalReports } = useGetMedicalReports(userId);
 
   const disabilities = record?.data.data?.discapacidades?.split(",") ?? [];
   const limitations = record?.data.data?.limitaciones;
 
   const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
     [
-      {
-        title: <Checkbox />,
-        dataIndex: "checkbox",
-        render: () => <Checkbox />,
-        width: "5%",
-      },
       {
         title: "Nombres",
         dataIndex: ["acudiente", "nombres"],
@@ -501,19 +466,78 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Reportes Clínicos"
               extra={
-                <Button
-                  icon={<EditOutlined />}
-                  type="primary"
-                  onClick={() => navigate(`/usuarios/${userId}/reporte`)}
+                <Tooltip
+                  title={
+                    !record?.data.data?.id_historiaclinica
+                      ? "No se pueden registrar reportes clínicos si no hay una historia clínica"
+                      : null
+                  }
                 >
-                  Agregar
-                </Button>
+                  <Button
+                    icon={<PlusOutlined />}
+                    onClick={() =>
+                      navigate(`/usuarios/${userId}/nuevo-reporte`)
+                    }
+                    className="main-button-white"
+                    disabled={!record?.data.data?.id_historiaclinica}
+                  >
+                    Agregar
+                  </Button>
+                </Tooltip>
               }
               className="detail-card"
             >
               <Table
-                columns={columns}
-                dataSource={clinicalReportsData}
+                columns={[
+                  {
+                    title: "Profesional",
+                    dataIndex: "profesional",
+                    render: (_, record) => {
+                      return `${record.profesional?.nombres} ${record.profesional?.apellidos}`;
+                    },
+                  },
+                  {
+                    title: "Fecha registro",
+                    dataIndex: "fecha_registro",
+                    render: (_, record) =>
+                      record.fecha_registro
+                        ? dayjs(record.fecha_registro).format("DD-MM-YYYY")
+                        : "",
+                  },
+                  {
+                    title: "Tipo reporte",
+                    dataIndex: "tipo_reporte",
+                  },
+                  {
+                    title: "Acciones",
+                    dataIndex: "acciones",
+                    key: "acciones",
+                    render: (_, record) => (
+                      <Space>
+                        <Link
+                          to={`/usuarios/${userId}/reportes/${record.id_reporteclinico}`}
+                        >
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            size="small"
+                          >
+                            Editar
+                          </Button>
+                        </Link>
+                        <Divider type="vertical" />
+                        <Button
+                          className="main-button-link"
+                          size="small"
+                          type="link"
+                        >
+                          Eliminar
+                        </Button>
+                      </Space>
+                    ),
+                  },
+                ]}
+                dataSource={medicalReports?.data.data}
                 pagination={false}
               />
             </Card>

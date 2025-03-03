@@ -1,42 +1,90 @@
-import React from "react";
+import { useState } from "react";
 import {
+  Avatar,
+  Button,
   Card,
+  Col,
+  DatePicker,
+  Flex,
   Form,
   Input,
-  Button,
-  Select,
-  DatePicker,
   Row,
-  Col,
+  Select,
   Typography,
-  Avatar,
 } from "antd";
-import { useParams, useNavigate } from "react-router-dom";
+import dayjs, { Dayjs } from "dayjs";
+import { ClinicalEvolution } from "../../../../types";
 import { UserOutlined } from "@ant-design/icons";
+import { useCreateClinicalEvolution } from "../../../../hooks/useCreateClinicalEvolution/useCreateClinicalEvolution";
+import { useGetClinicalEvolutions } from "../../../../hooks/useGetClinicalEvolutions/useGetClinicalEvolutions";
+import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
+import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
+import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
+import { useParams } from "react-router-dom";
+import { useEditClinicalEvolution } from "../../../../hooks/useEditClinicalEvolution/useEditClinicalEvolution";
 
 const { Text } = Typography;
 
 export const EditReport: React.FC = () => {
-  const { reportId, userId } = useParams();
-  const navigate = useNavigate();
+  const { reportId, id } = useParams();
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form] = Form.useForm();
 
-  // Datos del usuario para mostrar en la tarjeta
-  const user = {
-    nombre: "Juan Antonio Lopez Orrego",
-    documento: "44567890",
-    genero: "Masculino",
-    fechaNacimiento: "1956/11/08",
-    edad: 68,
-    estadoCivil: "Casado - Pensionado",
-    direccion: "CLL 45 - 60-20 INT 101",
-    telefono: "315 6789 6789",
-    email: "juanantonio@gmail.com",
-    foto: "", // Puedes agregar una URL de imagen si hay una disponible
+  const clinicalEvolutionMutation = useCreateClinicalEvolution(reportId);
+  const editEvolutionMutation = useEditClinicalEvolution();
+  const userQuery = useGetUserById(id);
+  const reportQuery = useGetMedicalReport(reportId);
+  const evolutionsQuery = useGetClinicalEvolutions(reportId);
+  const professionalsQuery = useGetProfessionals();
+  const user = userQuery.data?.data.data;
+  const report = reportQuery.data?.data.data;
+  const evolutions = evolutionsQuery.data?.data.data;
+  const professionals = professionalsQuery.data?.data.data;
+
+  const handleFinish = (values: {
+    date: Dayjs;
+    observation: string;
+    professional: number;
+    reportType: string;
+  }) => {
+    const clinicalEvolution: Omit<
+      ClinicalEvolution,
+      "id_TipoReporte" | "profesional"
+    > = {
+      fecha_evolucion: values.date.format("YYYY-MM-DD"),
+      id_profesional: values.professional,
+      id_reporteclinico: Number(reportId),
+      observacion_evolucion: values.observation,
+      tipo_report: values.reportType,
+    };
+    if (!editingId) {
+      clinicalEvolutionMutation.mutate(clinicalEvolution, {
+        onSuccess: () => {
+          form.resetFields();
+        },
+      });
+      return;
+    }
+    editEvolutionMutation.mutate(
+      {
+        data: clinicalEvolution,
+        evolutionId: editingId,
+      },
+      {
+        onSuccess: () => {
+          setEditingId(null);
+          form.resetFields();
+        },
+      }
+    );
   };
 
-  const handleFinish = (values: unknown) => {
-    console.log("Reporte actualizado:", values);
-    navigate(`/usuarios/${userId}/detalles`);
+  const handleEdit = (id: number) => {
+    setEditingId(id);
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
   };
 
   return (
@@ -51,85 +99,100 @@ export const EditReport: React.FC = () => {
         gap: "16px",
       }}
     >
-      {/* Tarjeta de Información del Paciente */}
-      <Card style={{ width: "100%", marginBottom: 16 }}>
+      <Card
+        style={{ width: "100%", marginBottom: 16 }}
+        loading={userQuery.isLoading}
+      >
         <Row align="middle" gutter={16}>
           <Col>
-            {user.foto ? (
-              <Avatar size={80} src={user.foto} />
-            ) : (
-              <Avatar size={80} icon={<UserOutlined />} />
-            )}
+            <Avatar size={80} icon={<UserOutlined />} />
           </Col>
           <Col flex="auto">
-            <Typography.Title level={4}>{user.nombre}</Typography.Title>
-            <Text strong>{user.documento}</Text> - {user.genero} -{" "}
-            {user.fechaNacimiento} - <Text strong>{user.edad} años</Text>
+            <Typography.Title
+              level={4}
+            >{`${user?.nombres} ${user?.apellidos}`}</Typography.Title>
+            <Text strong>{user?.n_documento}</Text> - {user?.genero} -{" "}
+            {dayjs(user?.fecha_nacimiento).format("DD-MM-YYYY")} -{" "}
+            <Text strong>
+              {dayjs().diff(dayjs(user?.fecha_nacimiento), "years")} años
+            </Text>
             <br />
-            {user.estadoCivil}
+            {user?.estado_civil}
             <br />
-            <Text>{user.direccion}</Text>
+            <Text>{user?.direccion}</Text>
             <br />
-            {user.telefono} - {user.email}
+            {user?.telefono} - {user?.email}
           </Col>
         </Row>
       </Card>
-
-      {/* Segunda Tarjeta: Información del Reporte */}
-      <Card style={{ marginBottom: 16, width: "100%" }}>
-        <Text strong>Asociado a:</Text> Reporte clínico - {reportId} -{" "}
-        <Text strong>Realizado por:</Text> SARA MANUELA GONZALEZ
+      <Card
+        style={{ marginBottom: 16, width: "100%" }}
+        loading={reportQuery.isLoading}
+      >
+        <Text strong>Asociado a:</Text> Reporte clínico #{reportId} -{" "}
+        <Text strong>Realizado por:</Text>{" "}
+        {`${report?.profesional?.nombres} ${report?.profesional?.apellidos}`}
         <Row gutter={16} style={{ marginTop: 16 }}>
           <Col span={24}>
             <Card style={{ backgroundColor: "#f5f5f5", borderRadius: 8 }}>
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Motivo de consulta:</Text>
-                  <p>Usuario se cayó en la mañana mientras se bañaba</p>
+                  <p>{report?.motivo_consulta}</p>
                 </Col>
               </Row>
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Diagnóstico:</Text>
-                  <p>
-                    Integridad de la piel alterada relacionada con herida en la
-                    rodilla izquierda debido a traumatismo leve
-                  </p>
+                  <p>{report?.diagnostico}</p>
                 </Col>
               </Row>
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Remisión:</Text>
-                  <p>Ortopedia</p>
+                  <p>{report?.remision.toUpperCase()}</p>
                 </Col>
               </Row>
             </Card>
           </Col>
         </Row>
       </Card>
-
-      {/* Tercera Tarjeta: Datos del Reporte de Evolución */}
       <Card
         title="Datos del Reporte de Evolución"
         style={{ marginBottom: 16, width: "100%" }}
       >
-        <Form layout="vertical" onFinish={handleFinish}>
+        <Form layout="vertical" form={form} onFinish={handleFinish}>
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="Profesional" name="professional">
-                <Select disabled defaultValue="Andrea Salazar" />
+              <Form.Item
+                label="Profesional"
+                name="professional"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  loading={professionalsQuery.isLoading}
+                  showSearch
+                  filterOption={(input, option) =>
+                    !!option?.label.toLowerCase().includes(input)
+                  }
+                  options={
+                    professionals?.map((p) => ({
+                      label: `${p.nombres} ${p.apellidos}`,
+                      value: p.id_profesional,
+                    })) ?? []
+                  }
+                />
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="Tipo de reporte" name="reportType">
-                <Select
-                  mode="multiple"
-                  placeholder="Seleccione el tipo de reporte"
-                  defaultValue={["Enfermería"]}
-                >
+              <Form.Item
+                label="Tipo de reporte"
+                name="reportType"
+                rules={[{ required: true }]}
+              >
+                <Select placeholder="Seleccione el tipo de reporte">
                   <Select.Option value="enfermeria">Enfermería</Select.Option>
                   <Select.Option value="psicologia">Psicología</Select.Option>
                   <Select.Option value="nutricion">Nutrición</Select.Option>
@@ -140,32 +203,157 @@ export const EditReport: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="Fecha de registro" name="date">
+              <Form.Item
+                label="Fecha de registro"
+                name="date"
+                rules={[{ required: true }]}
+              >
                 <DatePicker style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="Observación" name="observation">
+              <Form.Item
+                label="Observación"
+                name="observation"
+                rules={[{ required: true }]}
+              >
                 <Input.TextArea rows={4} />
               </Form.Item>
             </Col>
           </Row>
+          <Row gutter={16} style={{ marginTop: 16 }}>
+            <Flex style={{ width: "100%" }} justify="flex-end" gap={8}>
+              <Button className="main-button-white">Restablecer</Button>
+              <Button
+                disabled={clinicalEvolutionMutation.isPending}
+                htmlType="submit"
+                loading={clinicalEvolutionMutation.isPending}
+                type="primary"
+              >
+                Guardar
+              </Button>
+            </Flex>
+          </Row>
         </Form>
       </Card>
-
-      {/* Cuarta Tarjeta: Botones */}
-      <Card style={{ width: "100%", textAlign: "right" }}>
-        <Button style={{ marginRight: 8 }}>Restablecer</Button>
-        <Button type="primary" htmlType="submit" onClick={handleFinish}>
-          Guardar
-        </Button>
-      </Card>
+      {evolutions?.map((e, idx) => (
+        <Card
+          key={e.id_TipoReporte}
+          title={`Evolución clínica #${idx + 1}`}
+          style={{ marginBottom: 16, width: "100%" }}
+        >
+          <Form layout="vertical" onFinish={handleFinish}>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item
+                  label="Profesional"
+                  name="professional"
+                  initialValue={e.id_profesional}
+                  rules={[{ required: true }]}
+                >
+                  <Select
+                    disabled={editingId !== e.id_TipoReporte}
+                    loading={professionalsQuery.isLoading}
+                    showSearch
+                    filterOption={(input, option) =>
+                      !!option?.label.toLowerCase().includes(input)
+                    }
+                    options={
+                      professionals?.map((p) => ({
+                        label: `${p.nombres} ${p.apellidos}`,
+                        value: p.id_profesional,
+                      })) ?? []
+                    }
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item
+                  label="Tipo de reporte"
+                  name="reportType"
+                  initialValue={e.tipo_report.toUpperCase()}
+                  rules={[{ required: true }]}
+                >
+                  <Select
+                    placeholder="Seleccione el tipo de reporte"
+                    disabled={editingId !== e.id_TipoReporte}
+                  >
+                    <Select.Option value="enfermeria">Enfermería</Select.Option>
+                    <Select.Option value="psicologia">Psicología</Select.Option>
+                    <Select.Option value="nutricion">Nutrición</Select.Option>
+                    <Select.Option value="fisioterapia">
+                      Fisioterapia
+                    </Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item
+                  label="Fecha de registro"
+                  name="date"
+                  initialValue={dayjs(e.fecha_evolucion)}
+                  rules={[{ required: true }]}
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    disabled={editingId !== e.id_TipoReporte}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item
+                  label="Observación"
+                  name="observation"
+                  initialValue={e.observacion_evolucion}
+                  rules={[{ required: true }]}
+                >
+                  <Input.TextArea
+                    rows={4}
+                    disabled={editingId !== e.id_TipoReporte}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16} style={{ marginTop: 16 }}>
+              <Flex style={{ width: "100%" }} justify="flex-end">
+                {editingId === e.id_TipoReporte ? (
+                  <Flex gap={8}>
+                    <Button
+                      onClick={handleCancel}
+                      className="main-button-white"
+                      disabled={editEvolutionMutation.isPending}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      disabled={editEvolutionMutation.isPending}
+                      htmlType="submit"
+                      loading={editEvolutionMutation.isPending}
+                      type="primary"
+                    >
+                      Guardar
+                    </Button>
+                  </Flex>
+                ) : (
+                  <Button onClick={() => handleEdit(e.id_TipoReporte)}>
+                    Editar
+                  </Button>
+                )}
+              </Flex>
+            </Row>
+          </Form>
+        </Card>
+      ))}
     </div>
   );
 };

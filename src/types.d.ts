@@ -104,6 +104,58 @@ export type MedicalRecord = {
   tipo_sangre: string;
 };
 
+export type MedicalReport = {
+  id_reporteclinico: number;
+  id_historiaclinica: number;
+  id_profesional: number;
+  Circunferencia_cadera: number;
+  Frecuencia_cardiaca: number;
+  IMC: number;
+  Obs_habitosalimenticios: string;
+  Porc_grasacorporal: number;
+  Porc_masamuscular: number;
+  area_afectiva: string;
+  area_comportamental: string;
+  areacognitiva: string;
+  areainterpersonal: string;
+  areasomatica: string;
+  circunferencia_cintura: number;
+  consumo_aguadiaria: number;
+  diagnostico: string;
+  fecha_registro: string;
+  frecuencia_actividadfisica: string;
+  frecuencia_respiratoria: number;
+  motivo_consulta: string;
+  nivel_dolor: number;
+  observaciones: string;
+  peso: number;
+  presion_arterial: number;
+  profesional: Professional | null;
+  pruebas_examenes: string;
+  recomendaciones: string;
+  remision: string;
+  saturacionOxigeno: number;
+  temperatura_corporal: number;
+  tipo_reporte: string;
+};
+
+export type Professional = {
+  id_profesional: number;
+  apellidos: string;
+  cargo: string;
+  direccion: string;
+  e_mail: string;
+  especialidad: string;
+  estado: string;
+  fecha_ingreso: string;
+  fecha_nacimiento: string;
+  n_documento: string;
+  nombres: string;
+  profesion: string;
+  t_profesional: string;
+  telefono: number;
+};
+
 export type UserMedicine = {
   id?: string | number;
   medicamento: string;
@@ -132,6 +184,16 @@ export type UserVaccine = {
   fecha_administracion?: string;
   fecha_proxima?: string;
   vacuna: string;
+};
+
+export type ClinicalEvolution = {
+  id_TipoReporte: number;
+  id_profesional: number;
+  id_reporteclinico: number;
+  fecha_evolucion: string;
+  observacion_evolucion: string;
+  profesional: Professional;
+  tipo_report: string;
 };
 
 export type Login = {
