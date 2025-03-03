@@ -1,42 +1,33 @@
-import React from "react";
 import {
+  Avatar,
+  Button,
   Card,
+  Col,
+  DatePicker,
   Form,
   Input,
-  Button,
-  Select,
-  DatePicker,
   Row,
-  Col,
+  Select,
   Typography,
-  Avatar,
 } from "antd";
-import { useParams, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 import { UserOutlined } from "@ant-design/icons";
+import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
+import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
+import { useParams } from "react-router-dom";
 
 const { Text } = Typography;
 
 export const EditReport: React.FC = () => {
-  const { reportId, userId } = useParams();
-  const navigate = useNavigate();
+  const { reportId, id } = useParams();
 
-  // Datos del usuario para mostrar en la tarjeta
-  const user = {
-    nombre: "Juan Antonio Lopez Orrego",
-    documento: "44567890",
-    genero: "Masculino",
-    fechaNacimiento: "1956/11/08",
-    edad: 68,
-    estadoCivil: "Casado - Pensionado",
-    direccion: "CLL 45 - 60-20 INT 101",
-    telefono: "315 6789 6789",
-    email: "juanantonio@gmail.com",
-    foto: "", // Puedes agregar una URL de imagen si hay una disponible
-  };
+  const userQuery = useGetUserById(id);
+  const reportQuery = useGetMedicalReport(reportId);
+  const user = userQuery.data?.data.data;
+  const report = reportQuery.data?.data.data;
 
   const handleFinish = (values: unknown) => {
     console.log("Reporte actualizado:", values);
-    navigate(`/usuarios/${userId}/detalles`);
   };
 
   return (
@@ -51,64 +42,64 @@ export const EditReport: React.FC = () => {
         gap: "16px",
       }}
     >
-      {/* Tarjeta de Información del Paciente */}
-      <Card style={{ width: "100%", marginBottom: 16 }}>
+      <Card
+        style={{ width: "100%", marginBottom: 16 }}
+        loading={userQuery.isLoading}
+      >
         <Row align="middle" gutter={16}>
           <Col>
-            {user.foto ? (
-              <Avatar size={80} src={user.foto} />
-            ) : (
-              <Avatar size={80} icon={<UserOutlined />} />
-            )}
+            <Avatar size={80} icon={<UserOutlined />} />
           </Col>
           <Col flex="auto">
-            <Typography.Title level={4}>{user.nombre}</Typography.Title>
-            <Text strong>{user.documento}</Text> - {user.genero} -{" "}
-            {user.fechaNacimiento} - <Text strong>{user.edad} años</Text>
+            <Typography.Title
+              level={4}
+            >{`${user?.nombres} ${user?.apellidos}`}</Typography.Title>
+            <Text strong>{user?.n_documento}</Text> - {user?.genero} -{" "}
+            {dayjs(user?.fecha_nacimiento).format("DD-MM-YYYY")} -{" "}
+            <Text strong>
+              {dayjs().diff(dayjs(user?.fecha_nacimiento), "years")} años
+            </Text>
             <br />
-            {user.estadoCivil}
+            {user?.estado_civil}
             <br />
-            <Text>{user.direccion}</Text>
+            <Text>{user?.direccion}</Text>
             <br />
-            {user.telefono} - {user.email}
+            {user?.telefono} - {user?.email}
           </Col>
         </Row>
       </Card>
-
-      {/* Segunda Tarjeta: Información del Reporte */}
-      <Card style={{ marginBottom: 16, width: "100%" }}>
+      <Card
+        style={{ marginBottom: 16, width: "100%" }}
+        loading={reportQuery.isLoading}
+      >
         <Text strong>Asociado a:</Text> Reporte clínico - {reportId} -{" "}
-        <Text strong>Realizado por:</Text> SARA MANUELA GONZALEZ
+        <Text strong>Realizado por:</Text>{" "}
+        {`${report?.profesional?.nombres} ${report?.profesional?.apellidos}`}
         <Row gutter={16} style={{ marginTop: 16 }}>
           <Col span={24}>
             <Card style={{ backgroundColor: "#f5f5f5", borderRadius: 8 }}>
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Motivo de consulta:</Text>
-                  <p>Usuario se cayó en la mañana mientras se bañaba</p>
+                  <p>{report?.motivo_consulta}</p>
                 </Col>
               </Row>
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Diagnóstico:</Text>
-                  <p>
-                    Integridad de la piel alterada relacionada con herida en la
-                    rodilla izquierda debido a traumatismo leve
-                  </p>
+                  <p>{report?.diagnostico}</p>
                 </Col>
               </Row>
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Remisión:</Text>
-                  <p>Ortopedia</p>
+                  <p>{report?.remision.toUpperCase()}</p>
                 </Col>
               </Row>
             </Card>
           </Col>
         </Row>
       </Card>
-
-      {/* Tercera Tarjeta: Datos del Reporte de Evolución */}
       <Card
         title="Datos del Reporte de Evolución"
         style={{ marginBottom: 16, width: "100%" }}
@@ -121,7 +112,6 @@ export const EditReport: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item label="Tipo de reporte" name="reportType">
@@ -140,7 +130,6 @@ export const EditReport: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item label="Fecha de registro" name="date">
@@ -148,7 +137,6 @@ export const EditReport: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item label="Observación" name="observation">
@@ -158,8 +146,6 @@ export const EditReport: React.FC = () => {
           </Row>
         </Form>
       </Card>
-
-      {/* Cuarta Tarjeta: Botones */}
       <Card style={{ width: "100%", textAlign: "right" }}>
         <Button style={{ marginRight: 8 }}>Restablecer</Button>
         <Button type="primary" htmlType="submit" onClick={handleFinish}>

@@ -61,12 +61,20 @@ export const UsersList = () => {
             <List.Item
               actions={[
                 <Link to={`/usuarios/${item.id_usuario}/detalles`}>
-                  <Button type="link">Detalles</Button>
+                  <Button type="link" className="main-button-link">
+                    Detalles
+                  </Button>
                 </Link>,
                 <Link to={`/usuarios/${item.id_usuario}/editar`}>
-                  <Button type="link">Editar</Button>
+                  <Button type="link" className="main-button-link">
+                    Editar
+                  </Button>
                 </Link>,
-                <Button type="link" onClick={() => showModal(item)}>
+                <Button
+                  type="link"
+                  onClick={() => showModal(item)}
+                  className="main-button-link"
+                >
                   Eliminar
                 </Button>,
               ]}
