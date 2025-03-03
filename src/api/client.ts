@@ -1,4 +1,5 @@
 import axios from "axios";
+import { message } from "antd";
 import { useAuthStore } from "../store/auth";
 
 export const client = axios.create({
@@ -20,6 +21,9 @@ client.interceptors.request.use(
 
 client.interceptors.response.use(
   (response) => {
+    if (response.config.method !== "get") {
+      message.success(response.data.message || "Solicitud exitosa");
+    }
     return response;
   },
   (error) => {
@@ -28,6 +32,11 @@ client.interceptors.response.use(
         jwtToken: null,
       });
     }
+
+    message.error(
+      error.response?.data?.message ||
+      "Algo salió mal al intentar procesar la solicitud"
+    );
     return Promise.reject(error);
   }
 );

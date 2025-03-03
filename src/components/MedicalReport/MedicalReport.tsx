@@ -6,9 +6,8 @@ import { ViewReport } from "./components/ViewReport/ViewReport";
 
 export const MedicalReport: React.FC = () => {
   const location = useLocation();
-  const { id } = useParams(); // Obtener ID del usuario desde la URL
+  const { id } = useParams();
 
-  // Definir los breadcrumbs según la ruta actual
   const breadcrumbItems = [
     { path: "/", label: "Home" },
     { path: "/usuarios", label: "Usuarios" },
@@ -40,14 +39,11 @@ export const MedicalReport: React.FC = () => {
 
   return (
     <div style={{ padding: "16px" }}>
-      {/* Breadcrumbs */}
       <Breadcrumb style={{ marginBottom: "16px" }}>
         {breadcrumbItems.map((item, index) => (
           <Breadcrumb.Item key={index}>{item.label}</Breadcrumb.Item>
         ))}
       </Breadcrumb>
-
-      {/* Rutas */}
       <Routes>
         <Route path="newReport" element={<NewReport />} />
         <Route path="viewReport" element={<ViewReport />} />

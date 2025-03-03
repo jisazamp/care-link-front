@@ -1,63 +1,81 @@
-import React from "react";
 import {
+  Button,
   Card,
+  Col,
+  DatePicker,
   Form,
   Input,
-  Button,
-  Select,
-  DatePicker,
   Row,
-  Col,
+  Select,
   Upload,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport/useCreateMedicalReport";
+import { MedicalReport } from "../../../../types";
+import { Dayjs } from "dayjs";
+import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 
 export const NewReport: React.FC = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const handleFinish = (values: {
-    professional: string;
+  const createMutation = useCreateMedicalReport(id);
+  const medicalRecordQuery = useGetUserMedicalRecord(id);
+  const professionalsQuery = useGetProfessionals();
+
+  const handleFinish = async (values: {
+    professional: number;
     reportType: string;
-    registrationDate: string;
+    registrationDate: Dayjs;
     consultationReason: string;
-    weight: string;
-    bloodPressure: string;
-    heartRate: string;
-    bodyTemperature: string;
-    oxygenSaturation: string;
+    weight: number;
+    bloodPressure: number;
+    heartRate: number;
+    bodyTemperature: number;
+    oxygenSaturation: number;
     diagnosis: string;
     internalObservations: string;
     referral: string;
     treatmentObservation: string;
   }) => {
-    console.log("Reporte creado:", values);
-    navigate(-1);
+    const medicalReport: Partial<MedicalReport> = {
+      id_historiaclinica: Number(
+        medicalRecordQuery.data?.data.data?.id_historiaclinica
+      ),
+      Frecuencia_cardiaca: values.heartRate,
+      Obs_habitosalimenticios: values.treatmentObservation,
+      diagnostico: values.diagnosis,
+      fecha_registro: values.registrationDate.format("YYYY-MM-DD"),
+      id_profesional: values.professional,
+      motivo_consulta: values.consultationReason,
+      observaciones: values.internalObservations,
+      peso: values.weight,
+      presion_arterial: values.bloodPressure,
+      remision: values.referral,
+      saturacionOxigeno: values.oxygenSaturation,
+      temperatura_corporal: values.bodyTemperature,
+      tipo_reporte: values.reportType,
+    };
+    await createMutation.mutateAsync({ data: medicalReport });
   };
 
+  useEffect(() => {
+    if (createMutation.isSuccess) {
+      navigate(`/usuarios/${id}/detalles`);
+    }
+  }, [createMutation.isSuccess, id, navigate]);
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "24px",
-        backgroundColor: "#f5f5f5",
-      }}
-    >
+    <>
       <Card
         title="Nuevo Reporte Clínico"
-        style={{
-          width: "95%",
-          margin: "auto",
-          background: "#fff",
-          padding: "24px",
-        }}
+        loading={medicalRecordQuery.isLoading}
       >
         <Form layout="vertical" onFinish={handleFinish}>
-          {/* Datos Básicos del Reporte */}
-          <Card
-            title="Datos básicos del reporte"
-            style={{ marginBottom: 16, width: "100%" }}
-          >
+          <Card title="Datos básicos del reporte" style={{ marginBottom: 16 }}>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -65,20 +83,20 @@ export const NewReport: React.FC = () => {
                   name="professional"
                   rules={[{ required: true, message: "Campo requerido" }]}
                 >
-                  <Select placeholder="Seleccione un profesional">
-                    <Select.Option value="profesional1">
-                      Profesional 1
-                    </Select.Option>
-                    <Select.Option value="profesional2">
-                      Profesional 2
-                    </Select.Option>
-                    <Select.Option value="profesional3">
-                      Profesional 3
-                    </Select.Option>
-                    <Select.Option value="profesional4">
-                      Profesional 4
-                    </Select.Option>
-                  </Select>
+                  <Select
+                    placeholder="Seleccione un profesional"
+                    loading={professionalsQuery.isLoading}
+                    showSearch
+                    filterOption={(input, option) =>
+                      !!option?.label.toLowerCase().includes(input)
+                    }
+                    options={
+                      professionalsQuery.data?.data.data.map((p) => ({
+                        label: `${p.nombres} ${p.apellidos}`,
+                        value: p.id_profesional,
+                      })) ?? []
+                    }
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -119,12 +137,7 @@ export const NewReport: React.FC = () => {
               </Col>
             </Row>
           </Card>
-
-          {/* Exploración Física */}
-          <Card
-            title="Exploración Física"
-            style={{ marginBottom: 16, width: "100%" }}
-          >
+          <Card title="Exploración Física" style={{ marginBottom: 16 }}>
             <Row gutter={16}>
               <Col span={4}>
                 <Form.Item label="Peso (kg)" name="weight">
@@ -156,12 +169,7 @@ export const NewReport: React.FC = () => {
               </Col>
             </Row>
           </Card>
-
-          {/* Datos de Diagnóstico */}
-          <Card
-            title="Datos del diagnóstico"
-            style={{ marginBottom: 16, width: "100%" }}
-          >
+          <Card title="Datos del diagnóstico" style={{ marginBottom: 16 }}>
             <Form.Item label="Diagnóstico" name="diagnosis">
               <Input />
             </Form.Item>
@@ -181,40 +189,33 @@ export const NewReport: React.FC = () => {
               </Select>
             </Form.Item>
           </Card>
-
-          {/* Tratamientos y Recomendaciones */}
           <Card
             title="Tratamientos y recomendaciones"
-            style={{ marginBottom: 16, width: "100%" }}
+            style={{ marginBottom: 16 }}
           >
             <Form.Item label="Observación" name="treatmentObservation">
               <Input.TextArea rows={3} />
             </Form.Item>
           </Card>
-
-          {/* Adjuntar Documentos */}
-          <Card
-            title="Adjuntar documentos"
-            style={{ marginBottom: 16, width: "100%" }}
-          >
+          <Card title="Adjuntar documentos" style={{ marginBottom: 16 }}>
             <Upload>
               <Button icon={<UploadOutlined />}>Agregar</Button>
             </Upload>
           </Card>
-
-          {/* Botones */}
           <Card style={{ width: "100%", textAlign: "right" }}>
-            <Button style={{ marginRight: 8 }}>Restablecer</Button>
+            <Button style={{ marginRight: 8 }} className="main-button-white">
+              Restablecer
+            </Button>
             <Button
-              type="primary"
               htmlType="submit"
-              style={{ backgroundColor: "#722ed1" }}
+              loading={createMutation.isPending}
+              disabled={createMutation.isPending}
             >
               Guardar y continuar
             </Button>
           </Card>
         </Form>
       </Card>
-    </div>
+    </>
   );
 };
