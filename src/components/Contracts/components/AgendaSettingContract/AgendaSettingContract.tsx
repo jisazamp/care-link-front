@@ -1,5 +1,5 @@
 import type { Dayjs } from "dayjs";
-import { Layout, Card, Typography, Button, Calendar } from "antd";
+import { Card, Typography, Button, Calendar } from "antd";
 import { ScheduleOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 
@@ -91,7 +91,7 @@ export const AgendaSettingsContract = ({
   };
 
   return (
-    <Layout style={{ padding: "24px", minHeight: "100vh" }}>
+    <>
       <Card bordered>
         <Title level={4}>Configuración y Agenda</Title>
 
@@ -151,6 +151,6 @@ export const AgendaSettingsContract = ({
           </Button>
         </Card>
       </Card>
-    </Layout>
+    </>
   );
 };

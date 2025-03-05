@@ -22,7 +22,6 @@ export const CreateContract = ({
   const [contractType, setContractType] = useState<string | null>(null);
   const [billed, setBilled] = useState<string | null>(null);
 
-  // Manejar cambio de fecha de inicio y calcular la fecha de finalización automáticamente
   const handleStartDateChange = (date: Dayjs | null) => {
     if (date) {
       setStartDate(date);

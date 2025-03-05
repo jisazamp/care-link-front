@@ -5,13 +5,11 @@ import {
   Card,
   Checkbox,
   Col,
-  Descriptions,
   Divider,
   Row,
   Space,
   Table,
   TableProps,
-  Tag,
   Typography,
   Modal,
   Flex,
@@ -116,8 +114,7 @@ export const UserDetails: React.FC = () => {
   const { data: medicalReports } = useGetMedicalReports(userId);
   const deleteReportMutation = useDeleteMedicalReport();
 
-  const disabilities = record?.data.data?.discapacidades?.split(",") ?? [];
-  const limitations = record?.data.data?.limitaciones;
+  const records = record?.data.data;
 
   const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
     [
@@ -271,11 +268,9 @@ export const UserDetails: React.FC = () => {
                   </Link>
                   <Button
                     icon={<DeleteOutlined />}
-                    danger
-                    className="main-button-danger"
-                  >
-                    Eliminar
-                  </Button>
+                    className="main-button-white"
+                    shape="circle"
+                  ></Button>
                 </Space>
               }
               style={{ marginTop: 3 }}
@@ -352,12 +347,10 @@ export const UserDetails: React.FC = () => {
                     </Button>
                     <Button
                       icon={<DeleteOutlined />}
-                      danger
-                      className="main-button-danger"
+                      className="main-button-white"
+                      shape="circle"
                       onClick={handleDeleteRecord}
-                    >
-                      Eliminar
-                    </Button>
+                    ></Button>
                   </Space>
                 ) : (
                   <Space>
@@ -373,91 +366,235 @@ export const UserDetails: React.FC = () => {
               }
               loading={loadingRecord}
             >
-              {record?.data.data ? (
-                <>
-                  <Row gutter={24}>
-                    <Col span={12}>
-                      <Descriptions title="Datos Esenciales" column={1}>
-                        <Descriptions.Item label="Empresa de Salud Domiciliaria">
-                          {record?.data.data?.eps}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Tipo de Sangre">
-                          {record?.data.data?.tipo_sangre}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Estatura">
-                          {record?.data.data?.altura} cm
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Motivo de Ingreso">
-                          {record?.data.data?.motivo_ingreso}
-                        </Descriptions.Item>
-                      </Descriptions>
-                    </Col>
-                    <Col span={12}>
-                      <Descriptions
-                        title="Discapacidades, Apoyos y Limitaciones"
-                        column={1}
+              {records ? (
+                <Flex vertical gap={60}>
+                  <Flex gap={60} align="center">
+                    <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                      <Divider
+                        type="vertical"
+                        style={{ height: 70, borderWidth: 2 }}
+                      />
+                      <Typography.Title level={5}>
+                        Datos Esenciales
+                      </Typography.Title>
+                    </Flex>
+                    <Flex vertical gap={10} style={{ flex: 2 }}>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
                       >
-                        <Descriptions.Item label="Discapacidad">
-                          {disabilities.filter((a) => !!a).length ? (
-                            disabilities.map((d) => (
-                              <Tag key={d} color="purple">
-                                {d}
-                              </Tag>
-                            ))
-                          ) : (
-                            <Tag color="purple">Ninguna</Tag>
-                          )}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Limitaciones">
-                          {limitations ? limitations : "Ninguna"}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Dieta Especial">
-                          {record?.data.data?.dieta_especial ? "Sí" : "No"}
-                        </Descriptions.Item>
-                      </Descriptions>
-                    </Col>
-                  </Row>
-                  <Divider />
-                  <Row gutter={24}>
-                    <Col span={12}>
-                      <Descriptions
-                        title="Preexistencias y Alergias"
-                        column={1}
+                        Empresa de salud domiciliaria:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.emer_medica ? "Sí" : "No"}
+                        </Typography.Text>{" "}
+                        {records.telefono_emermedica && (
+                          <Typography.Text
+                            style={{
+                              backgroundColor: "#F1E6F5",
+                              borderRadius: 20,
+                              fontWeight: 500,
+                              marginLeft: 5,
+                              paddingBottom: 4,
+                              paddingLeft: 8,
+                              paddingRight: 8,
+                              paddingTop: 4,
+                            }}
+                          >
+                            {records.telefono_emermedica}
+                          </Typography.Text>
+                        )}
+                      </Typography.Text>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
                       >
-                        <Descriptions.Item label="Cirugías">
-                          {record?.data.data?.cirugias ? "Sí" : "No"}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Alergias a medicamentos">
-                          {record?.data.data?.medicamentos_alergia
-                            ? "Sí"
-                            : "No"}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Otras Alergias">
-                          {record?.data.data?.otras_alergias ? "Sí" : "No"}
-                        </Descriptions.Item>
-                      </Descriptions>
-                    </Col>
-                    <Col span={12}>
-                      <Descriptions title="Hábitos y otros datos" column={1}>
-                        <Descriptions.Item label="Cafeína">
-                          {record?.data.data?.cafeina ? "Sí" : "No"}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Tabaquismo">
-                          {record?.data.data?.tabaquismo ? "Sí" : "No"}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Alcoholismo">
-                          {record?.data.data?.alcoholismo ? "Sí" : "No"}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Sustancias psicoactivas">
-                          {record?.data.data?.sustanciaspsico ? "Sí" : "No"}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Maltratado">
-                          {record?.data.data?.maltrato ? "Sí" : "No"}
-                        </Descriptions.Item>
-                      </Descriptions>
-                    </Col>
-                  </Row>
-                </>
+                        Tipo de sangre:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records?.tipo_sangre}
+                        </Typography.Text>{" "}
+                        Estatura:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records?.altura}
+                        </Typography.Text>
+                      </Typography.Text>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Motivo ingreso:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records?.motivo_ingreso}
+                        </Typography.Text>{" "}
+                      </Typography.Text>
+                    </Flex>
+                  </Flex>
+                  <Flex gap={60} align="center">
+                    <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                      <Divider
+                        type="vertical"
+                        style={{ height: 70, borderWidth: 2 }}
+                      />
+                      <Typography.Title level={5}>
+                        Discapacidades, Apoyos y Limitaciones
+                      </Typography.Title>
+                    </Flex>
+                    <Flex vertical gap={10} style={{ flex: 2 }}>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Discapacidad:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.discapacidades ? "Sí" : "No"}
+                        </Typography.Text>{" "}
+                        {records.discapacidades
+                          ?.split(",")
+                          .filter((a) => !!a)
+                          .map((e) => (
+                            <Typography.Text
+                              key={e}
+                              style={{
+                                backgroundColor: "#F1E6F5",
+                                borderRadius: 20,
+                                fontWeight: 500,
+                                marginLeft: 5,
+                                paddingBottom: 4,
+                                paddingLeft: 8,
+                                paddingRight: 8,
+                                paddingTop: 4,
+                              }}
+                            >
+                              {e}
+                            </Typography.Text>
+                          ))}
+                      </Typography.Text>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Limitaciones:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.limitaciones ? "Sí" : "No"}
+                        </Typography.Text>{" "}
+                        {records.limitaciones
+                          ?.split(",")
+                          .filter((a) => !!a)
+                          .map((e) => (
+                            <Typography.Text
+                              key={e}
+                              style={{
+                                backgroundColor: "#F1E6F5",
+                                borderRadius: 20,
+                                fontWeight: 500,
+                                marginLeft: 5,
+                                paddingBottom: 4,
+                                paddingLeft: 8,
+                                paddingRight: 8,
+                                paddingTop: 4,
+                              }}
+                            >
+                              {e}
+                            </Typography.Text>
+                          ))}
+                      </Typography.Text>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Dieta Especial:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.dieta_especial ? "Sí" : "No"}
+                        </Typography.Text>{" "}
+                      </Typography.Text>
+                    </Flex>
+                  </Flex>
+                  <Flex gap={60} align="center">
+                    <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                      <Divider
+                        type="vertical"
+                        style={{ height: 70, borderWidth: 2 }}
+                      />
+                      <Typography.Title level={5}>
+                        Preexistencias y Alergias
+                      </Typography.Title>
+                    </Flex>
+                    <Flex vertical gap={10} style={{ flex: 2 }}>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Cirugias:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.cirugias ? "Sí" : "No"}
+                        </Typography.Text>
+                      </Typography.Text>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Alergias a medicamentos:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.alergico_medicamento ? "Sí" : "No"}
+                        </Typography.Text>
+                      </Typography.Text>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Otras alergias:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.otras_alergias ? "Sí" : "No"}
+                        </Typography.Text>{" "}
+                      </Typography.Text>
+                      <Typography.Text
+                        style={{ fontWeight: 500, marginRight: 5 }}
+                      >
+                        Condiciones especiales:{" "}
+                        <Typography.Text style={{ fontWeight: 400 }}>
+                          {records.otras_alergias ? "Sí" : "No"}
+                        </Typography.Text>{" "}
+                      </Typography.Text>
+                    </Flex>
+                  </Flex>
+                  <Flex gap={60} align="center">
+                    <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                      <Divider
+                        type="vertical"
+                        style={{ height: 70, borderWidth: 2 }}
+                      />
+                      <Typography.Title level={5}>
+                        Hábitos y otros datos
+                      </Typography.Title>
+                    </Flex>
+                    <Flex vertical gap={10} style={{ flex: 2 }}>
+                      <Flex gap={10}>
+                        <Typography.Text style={{ fontWeight: 500 }}>
+                          Cafeina{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.cafeina ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text style={{ fontWeight: 500 }}>
+                          Tabaquismo{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.tabaquismo ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text style={{ fontWeight: 500 }}>
+                          Alcoholismo{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.alcoholismo ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text style={{ fontWeight: 500 }}>
+                          Sustancias Psicoactivas{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.sustanciaspsico ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                      </Flex>
+                      <Flex gap={10} style={{ flex: 2 }}>
+                        <Typography.Text style={{ fontWeight: 500 }}>
+                          Maltratado{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.maltratado ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                </Flex>
               ) : (
                 <Flex style={{ height: 50, alignItems: "center" }}>
                   <Typography.Text>
@@ -491,6 +628,7 @@ export const UserDetails: React.FC = () => {
               className="detail-card"
             >
               <Table
+                rowKey="id_profesional"
                 columns={[
                   {
                     title: "Profesional",

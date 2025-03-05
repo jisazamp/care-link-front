@@ -27,7 +27,6 @@ export const ViewReport: React.FC = () => {
   const record = recordQuery.data?.data.data;
   const report = reportQuery.data?.data.data;
   const evolutions = evolutionsQuery.data?.data.data;
-  console.log(evolutions);
 
   return (
     <Flex
