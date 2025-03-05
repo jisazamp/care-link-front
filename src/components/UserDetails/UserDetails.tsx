@@ -25,42 +25,16 @@ import { FamilyMember } from "../../types";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { queryClient } from "../../main";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
+import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
 import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
 import { useEffect, useState } from "react";
+import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 
 const { Title } = Typography;
-
-/* const columns = [
-  {
-    title: <Checkbox />,
-    dataIndex: "checkbox",
-    render: () => <Checkbox />,
-    width: "5%",
-  },
-  {
-    title: "Profesional",
-    dataIndex: "profesional",
-  },
-  {
-    title: "Tipo Reporte",
-    dataIndex: "reportType",
-    key: "reportType",
-  },
-  {
-    title: "Fecha",
-    dataIndex: "date",
-    key: "date",
-  },
-  {
-    title: "Acciones",
-    dataIndex: "actions",
-    key: "actions",
-  },
-]; */
+const { confirm } = Modal;
 
 const contractsData = [
   {
@@ -122,7 +96,6 @@ const contractsColumns = [
 
 export const UserDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteRecordModalOpen, setIsDeleteRecordModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<FamilyMember | null>(null);
 
   const navigate = useNavigate();
@@ -137,11 +110,11 @@ export const UserDetails: React.FC = () => {
     isSuccess: isSuccessDeleteFamilyMember,
     isPending: loadingUserDeletion,
   } = useDeleteFamilyMemberMutation(userId);
-  const { mutate: deleteRecord, isPending: loadingDeletion } =
-    useDeleteRecordMutation();
+  const { mutate: deleteRecord } = useDeleteRecordMutation();
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
+  const deleteReportMutation = useDeleteMedicalReport();
 
   const disabilities = record?.data.data?.discapacidades?.split(",") ?? [];
   const limitations = record?.data.data?.limitaciones;
@@ -216,16 +189,46 @@ export const UserDetails: React.FC = () => {
   }, [isSuccessDeleteFamilyMember]);
 
   const handleDeleteRecord = () => {
-    if (userId) {
-      deleteRecord(Number(record?.data.data?.id_historiaclinica), {
-        onSuccess: () => {
-          setIsDeleteRecordModalOpen(false);
-          queryClient.invalidateQueries({
-            queryKey: [`user-medical-record-${userId}`],
+    confirm({
+      title: "¿Estás seguro de que deseas eliminar la historia clínica?",
+      content: "Esta acción no se puede deshacer.",
+      okText: "Sí, eliminar",
+      okType: "danger",
+      cancelText: "Cancelar",
+      onOk() {
+        if (userId) {
+          deleteRecord(Number(record?.data.data?.id_historiaclinica), {
+            onSuccess: () => {
+              queryClient.invalidateQueries({
+                queryKey: [`user-medical-record-${userId}`],
+              });
+              queryClient.invalidateQueries({
+                queryKey: [`user-${userId}-medical-reports`],
+              });
+            },
           });
-        },
-      });
-    }
+        }
+      },
+    });
+  };
+
+  const handleDeleteReport = (reportId: number) => {
+    confirm({
+      title: "¿Estás seguro de que deseas eliminar este reporte clínico?",
+      content: "Esta acción no se puede deshacer.",
+      okText: "Sí, eliminar",
+      okType: "danger",
+      cancelText: "Cancelar",
+      onOk() {
+        deleteReportMutation.mutate(reportId, {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: [`user-${userId}-medical-reports`],
+            });
+          },
+        });
+      },
+    });
   };
 
   return (
@@ -351,7 +354,7 @@ export const UserDetails: React.FC = () => {
                       icon={<DeleteOutlined />}
                       danger
                       className="main-button-danger"
-                      onClick={() => setIsDeleteRecordModalOpen(true)}
+                      onClick={handleDeleteRecord}
                     >
                       Eliminar
                     </Button>
@@ -515,6 +518,18 @@ export const UserDetails: React.FC = () => {
                     render: (_, record) => (
                       <Space>
                         <Link
+                          to={`/usuarios/${userId}/reportes/${record.id_reporteclinico}/detalles`}
+                        >
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            size="small"
+                          >
+                            Detalles
+                          </Button>
+                        </Link>
+                        <Divider type="vertical" />
+                        <Link
                           to={`/usuarios/${userId}/reportes/${record.id_reporteclinico}`}
                         >
                           <Button
@@ -530,6 +545,9 @@ export const UserDetails: React.FC = () => {
                           className="main-button-link"
                           size="small"
                           type="link"
+                          onClick={() =>
+                            handleDeleteReport(record.id_reporteclinico)
+                          }
                         >
                           Eliminar
                         </Button>
@@ -556,6 +574,7 @@ export const UserDetails: React.FC = () => {
               }
             >
               <Table
+                rowKey="id_acudiente"
                 // @ts-expect-error no idea
                 columns={acudientesColumns}
                 loading={loadingFamilyMembers}
@@ -604,26 +623,6 @@ export const UserDetails: React.FC = () => {
         }}
       >
         <Typography.Text>{`¿Estás seguro que deseas eliminar al acudiente ${userToDelete?.nombres} ${userToDelete?.apellidos}?`}</Typography.Text>
-      </Modal>
-      <Modal
-        cancelText="Cancelar"
-        okText="Sí, eliminar"
-        onOk={handleDeleteRecord}
-        onCancel={() => setIsDeleteRecordModalOpen(false)}
-        open={isDeleteRecordModalOpen}
-        confirmLoading={loadingDeletion}
-        title="Confirmar eliminación"
-        okButtonProps={{
-          type: "default",
-          style: { backgroundColor: "#F32013" },
-        }}
-        cancelButtonProps={{
-          type: "text",
-        }}
-      >
-        <Typography.Text>
-          ¿Estás seguro que deseas eliminar la historia clínica de este usuario?
-        </Typography.Text>
       </Modal>
     </>
   );

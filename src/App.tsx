@@ -187,7 +187,7 @@ export const App = () => {
               }
             />
             <Route
-              path="/usuarios/:id/reportes/:reportId/detalle"
+              path="/usuarios/:id/reportes/:reportId/detalles"
               element={
                 <PrivateRoute>
                   <ViewReport />
