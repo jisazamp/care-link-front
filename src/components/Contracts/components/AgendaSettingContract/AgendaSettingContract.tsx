@@ -91,7 +91,7 @@ export const AgendaSettingsContract = ({
   };
 
   return (
-    <Layout style={{ padding: "24px", minHeight: "100vh" }}>
+    <>
       <Card bordered>
         <Title level={4}>Configuración y Agenda</Title>
 
@@ -151,6 +151,6 @@ export const AgendaSettingsContract = ({
           </Button>
         </Card>
       </Card>
-    </Layout>
+    </>
   );
 };

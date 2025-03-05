@@ -1,20 +1,19 @@
 import {
-  Layout,
-  Card,
   Button,
-  Table,
-  Input,
-  DatePicker,
-  Select,
+  Card,
   Checkbox,
-  Row,
   Col,
+  DatePicker,
+  Input,
+  Layout,
+  Row,
+  Select,
+  Table,
 } from "antd";
+import dayjs from "dayjs";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import dayjs from "dayjs";
 
-// Definición de la interfaz para los servicios
 interface Service {
   key: string;
   startDate: string;
@@ -28,7 +27,7 @@ interface Service {
 interface ServicesContractProps {
   startDate: string;
   endDate: string;
-  onNext?: (selectedServices: Service[]) => void; // ✅ Acepta un array de servicios seleccionados
+  onNext?: (selectedServices: Service[]) => void;
   onBack?: () => void;
 }
 
@@ -151,7 +150,7 @@ export const ServicesContract = ({
       dataIndex: "serviceType",
       render: (_: unknown, record: Service) => (
         <Select
-          style={{ width: "100%" }}
+          style={{ width: "100%", minWidth: 200 }}
           value={record.serviceType || undefined}
           onChange={(value) => handleServiceChange(record.key, value)}
         >

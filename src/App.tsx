@@ -195,6 +195,14 @@ export const App = () => {
               }
             />
             <Route
+              path="/usuarios/:id/reportes/:reportId/detalle"
+              element={
+                <PrivateRoute>
+                  <ViewReport />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="/ShowMedicalReport"
               element={
                 <PrivateRoute>
@@ -210,23 +218,23 @@ export const App = () => {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/usuarios/:id/contrato"
+              element={
+                <PrivateRoute>
+                  <FormContracts />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/usuarios/:id/detalles-contrato"
+              element={
+                <PrivateRoute>
+                  <ContractDetails />
+                </PrivateRoute>
+              }
+            />
           </Route>
-          <Route
-            path="/usuarios/:id/contrato"
-            element={
-              <PrivateRoute>
-                <FormContracts />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/usuarios/:id/detalles-contrato"
-            element={
-              <PrivateRoute>
-                <ContractDetails />
-              </PrivateRoute>
-            }
-          />
           <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
       </Router>

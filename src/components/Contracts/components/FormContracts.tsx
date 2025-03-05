@@ -1,5 +1,9 @@
+import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
+import { BillingContract } from "./BillingContract/BillingContract";
+import { CreateContract } from "./CreateContract/CreateContract";
+import { ServicesContract } from "./ServicesContract/ServicesContract";
+import { Steps, Button, Card, Typography, Breadcrumb } from "antd";
 import { useState } from "react";
-import { Steps, Layout, Button, Card, Typography, Breadcrumb } from "antd";
 import {
   HomeOutlined,
   UserOutlined,
@@ -8,14 +12,9 @@ import {
   DollarOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-import { CreateContract } from "./CreateContract/CreateContract";
-import { ServicesContract } from "./ServicesContract/ServicesContract";
-import { BillingContract } from "./BillingContract/BillingContract";
-import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 
 const { Title } = Typography;
 
-// Definir la estructura de los servicios
 interface Service {
   key: string;
   startDate: string;
@@ -30,7 +29,7 @@ export const FormContracts = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [services, setServices] = useState<Service[]>([]); // ✅ Se especifica correctamente el tipo
+  const [services, setServices] = useState<Service[]>([]);
 
   const steps = [
     {
@@ -54,8 +53,7 @@ export const FormContracts = () => {
           startDate={startDate}
           endDate={endDate}
           onNext={(selectedServices: Service[]) => {
-            // ✅ Se define correctamente el tipo de datos esperado
-            setServices(selectedServices); // ✅ Se guarda el array de servicios correctamente
+            setServices(selectedServices);
             setCurrentStep(2);
           }}
           onBack={() => setCurrentStep(0)}
@@ -77,7 +75,7 @@ export const FormContracts = () => {
       icon: <CalendarOutlined />,
       content: (
         <AgendaSettingsContract
-          services={services} // ✅ Se pasa correctamente la lista de servicios
+          services={services}
           onBack={() => setCurrentStep(2)}
         />
       ),
@@ -85,8 +83,7 @@ export const FormContracts = () => {
   ];
 
   return (
-    <Layout style={{ padding: "24px", minHeight: "100vh" }}>
-      {/* ✅ Breadcrumb agregado globalmente */}
+    <>
       <Breadcrumb
         style={{ marginBottom: 16 }}
         items={[
@@ -96,7 +93,6 @@ export const FormContracts = () => {
           { title: "Contrato" },
         ]}
       />
-
       <Card bordered>
         <Title level={4}>Gestión de Contratos</Title>
         <Steps
@@ -113,10 +109,7 @@ export const FormContracts = () => {
           }))}
         />
       </Card>
-
       <div style={{ marginTop: "24px" }}>{steps[currentStep].content}</div>
-
-      {/* ✅ Tarjeta con botones de Restablecer y Guardar y Continuar */}
       <Card bordered style={{ marginTop: 24, textAlign: "right" }}>
         <Button
           className="main-button"
@@ -134,6 +127,6 @@ export const FormContracts = () => {
           Guardar y Continuar
         </Button>
       </Card>
-    </Layout>
+    </>
   );
 };

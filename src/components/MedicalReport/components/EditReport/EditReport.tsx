@@ -15,7 +15,7 @@ import {
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { ClinicalEvolution } from "../../../../types";
-import { UserOutlined } from "@ant-design/icons";
+import { DeleteOutlined, UserOutlined } from "@ant-design/icons";
 import { queryClient } from "../../../../main";
 import { useCreateClinicalEvolution } from "../../../../hooks/useCreateClinicalEvolution/useCreateClinicalEvolution";
 import { useDeleteClinicalEvolution } from "../../../../hooks/useDeleteClinicalEvolution/useDeleteClinicalEvolution";
@@ -377,12 +377,11 @@ export const EditReport: React.FC = () => {
                       Editar
                     </Button>
                     <Button
-                      danger
+                      className="main-button-white"
+                      icon={<DeleteOutlined />}
+                      shape="circle"
                       onClick={() => handleDelete(e.id_TipoReporte)}
-                      className="main-button-danger"
-                    >
-                      Eliminar
-                    </Button>
+                    ></Button>
                   </Flex>
                 )}
               </Flex>
