@@ -10,7 +10,7 @@ const menuItems = [
   {
     key: "1",
     icon: <HomeOutlined />,
-    label: <Link to="home">Inicio</Link>,
+    label: <Link to="inicio">Inicio</Link>,
   },
   {
     key: "2",
@@ -35,7 +35,6 @@ const menuItems = [
 export const Sidebar = () => (
   <Menu
     theme="light"
-    defaultSelectedKeys={["1"]}
     mode="inline"
     items={menuItems}
     style={{ backgroundColor: "#FFFFFF", fontWeight: "500" }}
