@@ -11,19 +11,23 @@ import {
   Row,
   Select,
   Typography,
+  Modal,
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { ClinicalEvolution } from "../../../../types";
 import { UserOutlined } from "@ant-design/icons";
+import { queryClient } from "../../../../main";
 import { useCreateClinicalEvolution } from "../../../../hooks/useCreateClinicalEvolution/useCreateClinicalEvolution";
+import { useDeleteClinicalEvolution } from "../../../../hooks/useDeleteClinicalEvolution/useDeleteClinicalEvolution";
+import { useEditClinicalEvolution } from "../../../../hooks/useEditClinicalEvolution/useEditClinicalEvolution";
 import { useGetClinicalEvolutions } from "../../../../hooks/useGetClinicalEvolutions/useGetClinicalEvolutions";
 import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 import { useParams } from "react-router-dom";
-import { useEditClinicalEvolution } from "../../../../hooks/useEditClinicalEvolution/useEditClinicalEvolution";
 
 const { Text } = Typography;
+const { confirm } = Modal;
 
 export const EditReport: React.FC = () => {
   const { reportId, id } = useParams();
@@ -32,6 +36,7 @@ export const EditReport: React.FC = () => {
 
   const clinicalEvolutionMutation = useCreateClinicalEvolution(reportId);
   const editEvolutionMutation = useEditClinicalEvolution();
+  const deleteEvolutionMutation = useDeleteClinicalEvolution();
   const userQuery = useGetUserById(id);
   const reportQuery = useGetMedicalReport(reportId);
   const evolutionsQuery = useGetClinicalEvolutions(reportId);
@@ -74,6 +79,9 @@ export const EditReport: React.FC = () => {
         onSuccess: () => {
           setEditingId(null);
           form.resetFields();
+          queryClient.invalidateQueries({
+            queryKey: [`report-${reportId}-clinical-evolutions`],
+          });
         },
       }
     );
@@ -87,16 +95,34 @@ export const EditReport: React.FC = () => {
     setEditingId(null);
   };
 
+  const handleDelete = (evolutionId: number) => {
+    confirm({
+      title: "¿Estás seguro de que deseas eliminar esta evolución clínica?",
+      content: "Esta acción no se puede deshacer.",
+      okText: "Sí, eliminar",
+      okType: "danger",
+      cancelText: "Cancelar",
+      onOk() {
+        deleteEvolutionMutation.mutate(evolutionId, {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: [`report-${reportId}-clinical-evolutions`],
+            });
+          },
+        });
+      },
+    });
+  };
+
   return (
-    <div
+    <Flex
+      vertical
+      gap={16}
       style={{
-        padding: "24px",
+        margin: "auto",
         maxWidth: "100%",
         minHeight: "100vh",
-        margin: "auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
+        padding: "24px",
       }}
     >
       <Card
@@ -245,6 +271,7 @@ export const EditReport: React.FC = () => {
           key={e.id_TipoReporte}
           title={`Evolución clínica #${idx + 1}`}
           style={{ marginBottom: 16, width: "100%" }}
+          loading={evolutionsQuery.isLoading}
         >
           <Form layout="vertical" onFinish={handleFinish}>
             <Row gutter={16}>
@@ -345,15 +372,24 @@ export const EditReport: React.FC = () => {
                     </Button>
                   </Flex>
                 ) : (
-                  <Button onClick={() => handleEdit(e.id_TipoReporte)}>
-                    Editar
-                  </Button>
+                  <Flex gap={8}>
+                    <Button onClick={() => handleEdit(e.id_TipoReporte)}>
+                      Editar
+                    </Button>
+                    <Button
+                      danger
+                      onClick={() => handleDelete(e.id_TipoReporte)}
+                      className="main-button-danger"
+                    >
+                      Eliminar
+                    </Button>
+                  </Flex>
                 )}
               </Flex>
             </Row>
           </Form>
         </Card>
       ))}
-    </div>
+    </Flex>
   );
 };
