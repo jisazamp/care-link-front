@@ -29,6 +29,16 @@ const menuItems = [
     key: "3",
     icon: <CheckCircleOutlined />,
     label: "Gestión de Actividades",
+    children: [
+      {
+        key: "3.1",
+        label: <Link to="/actividades">Listado de actividades</Link>,
+      },
+      {
+        key: "3.2",
+        label: <Link to="/actividades/crear">Registrar nuevas actividades</Link>,
+      },
+    ],
   },
 ];
 
