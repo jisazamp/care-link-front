@@ -196,6 +196,24 @@ export type ClinicalEvolution = {
   tipo_report: string;
 };
 
+export type Activity = {
+  id: number;
+  id_profesional?: number;
+  id_tipo_actividad?: number;
+  comentarios?: string | null;
+  descripcion?: string | null;
+  duracion?: number | null;
+  fecha?: string | null;
+  nombre: string;
+  profesional?: Professional;
+  tipo_actividad?: ActivityType;
+}
+
+export type ActivityType = {
+  id: number;
+  tipo: string;
+}
+
 export type Login = {
   access_token: string;
   token_type: "bearer";

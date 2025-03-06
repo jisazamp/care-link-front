@@ -24,6 +24,8 @@ import { ContractDetails } from "./components/Contracts/components/ContractDetai
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
+import { ActivitiesList } from "./components/ActivitiesList/ActivitiesList";
+import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
 
 export const colors = {
   primary: {
@@ -231,6 +233,30 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <ContractDetails />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/actividades"
+              element={
+                <PrivateRoute>
+                  <ActivitiesList />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/actividades/crear"
+              element={
+                <PrivateRoute>
+                  <CreateActivityForm />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/actividades/:id/editar"
+              element={
+                <PrivateRoute>
+                  <CreateActivityForm />
                 </PrivateRoute>
               }
             />
