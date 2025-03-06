@@ -97,6 +97,7 @@ export const Vaccines = () => {
                   <Space>
                     <Button
                       type="link"
+                      className="main-button-link"
                       onClick={() => {
                         setEditingIndex(index);
                         setShowModal(true);

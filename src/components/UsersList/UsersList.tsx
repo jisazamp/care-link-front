@@ -10,35 +10,27 @@ import {
 import type { User } from "../../types";
 import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
 import { useGetUsers } from "../../hooks/useGetUsers/useGetUsers";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const { Title } = Typography;
+const { confirm } = Modal;
 
 export const UsersList = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
-
   const { data, isPending } = useGetUsers();
-  const { mutateAsync: deleteUser, isPending: isDeletingUser } =
-    useDeleteUserMutation();
+  const { mutate: deleteUser } = useDeleteUserMutation();
 
-  const showModal = (user: User) => {
-    setIsModalOpen(true);
-    setUserToDelete(user);
-  };
-
-  const handleOk = async () => {
-    if (userToDelete) {
-      await deleteUser(userToDelete.id_usuario);
-      setUserToDelete(null);
-      setIsModalOpen(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setUserToDelete(null);
+  const showDeleteConfirm = (user: User) => {
+    confirm({
+      title: "Confirmar acción",
+      content: `¿Está seguro que desea eliminar al usuario ${user.nombres} ${user.apellidos}? Esto es una acción destructiva y no se puede deshacer`,
+      okText: "Sí, eliminar",
+      cancelText: "No eliminar",
+      cancelButtonProps: { type: "primary", style: { backgroundColor: "#F32013" } },
+      okButtonProps: { type: "link", style: { color: "#000" } },
+      onOk: () => {
+        deleteUser(user.id_usuario);
+      },
+    });
   };
 
   return (
@@ -72,8 +64,9 @@ export const UsersList = () => {
                 </Link>,
                 <Button
                   type="link"
-                  onClick={() => showModal(item)}
-                  className="main-button-link"
+                  onClick={() => showDeleteConfirm(item)}
+                  danger
+                  key="eiminar"
                 >
                   Eliminar
                 </Button>,
@@ -97,53 +90,6 @@ export const UsersList = () => {
           )}
         />
       </Card>
-      <DeleteUserModal
-        confirmLoading={isDeletingUser}
-        open={isModalOpen}
-        userToDelete={userToDelete}
-        onCancel={handleCancel}
-        onOk={handleOk}
-      />
     </>
-  );
-};
-
-interface DeleteUserModalProps {
-  confirmLoading: boolean;
-  open: boolean;
-  userToDelete: User | null;
-  onCancel: () => void;
-  onOk: () => void;
-}
-
-export const DeleteUserModal = ({
-  confirmLoading,
-  open,
-  userToDelete,
-  onCancel,
-  onOk,
-}: DeleteUserModalProps) => {
-  return (
-    <Modal
-      cancelText="No eliminar"
-      okText="Sí, eliminar"
-      open={open}
-      title="Confirmar acción"
-      confirmLoading={confirmLoading}
-      okButtonProps={{
-        type: "default",
-        style: { backgroundColor: "#F32013" },
-      }}
-      cancelButtonProps={{
-        type: "text",
-      }}
-      onCancel={onCancel}
-      onClose={onCancel}
-      onOk={onOk}
-    >
-      <Typography.Paragraph
-        style={{ marginBottom: "30px" }}
-      >{`¿Está seguro que desea eliminar al usuario ${userToDelete?.nombres} ${userToDelete?.apellidos}? Esto es una acción destructiva y no se puede deshacer`}</Typography.Paragraph>
-    </Modal>
   );
 };

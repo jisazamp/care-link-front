@@ -144,6 +144,7 @@ export const SpecialConditions = () => {
               <Button
                 icon={<PlusOutlined />}
                 style={{ alignSelf: "flex-end" }}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndex(null);
                   setShowModal("alergies");
@@ -173,6 +174,7 @@ export const SpecialConditions = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndex(index);
                           setShowModal("alergies");
@@ -202,6 +204,7 @@ export const SpecialConditions = () => {
               <Button
                 icon={<PlusOutlined />}
                 style={{ alignSelf: "flex-end", marginBottom: 8 }}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndex(null);
                   setShowModal("diet");
@@ -231,6 +234,7 @@ export const SpecialConditions = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndex(index);
                           setShowModal("diet");
@@ -260,6 +264,7 @@ export const SpecialConditions = () => {
               extra={
                 <Button
                   icon={<PlusOutlined />}
+                  className="main-button-white"
                   onClick={() => {
                     setEditingIndex(null);
                     setShowModal("disability");
@@ -290,6 +295,7 @@ export const SpecialConditions = () => {
                       <Space>
                         <Button
                           type="link"
+                          className="main-button-link"
                           onClick={() => {
                             setEditingIndex(index);
                             setShowModal("disability");
@@ -319,6 +325,7 @@ export const SpecialConditions = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndex(null);
                   setShowModal("limitations");
@@ -349,6 +356,7 @@ export const SpecialConditions = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndex(index);
                           setShowModal("limitations");
@@ -377,6 +385,7 @@ export const SpecialConditions = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndex(null);
                   setShowModal("otherAlergies");
@@ -407,6 +416,7 @@ export const SpecialConditions = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndex(index);
                           setShowModal("otherAlergies");
@@ -435,6 +445,7 @@ export const SpecialConditions = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndex(null);
                   setShowModal("surgeries");
@@ -467,6 +478,7 @@ export const SpecialConditions = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndex(index);
                           setShowModal("surgeries");

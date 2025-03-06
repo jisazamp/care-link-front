@@ -151,6 +151,7 @@ export const MedicalTreatments = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndex(null);
                   setShowModal("pharma");
@@ -183,6 +184,7 @@ export const MedicalTreatments = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndex(index);
                           setShowModal("pharma");
@@ -215,6 +217,7 @@ export const MedicalTreatments = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndexNursing(null);
                   setShowModal("nursing");
@@ -250,6 +253,7 @@ export const MedicalTreatments = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndexNursing(index);
                           setShowModal("nursing");
@@ -282,6 +286,7 @@ export const MedicalTreatments = () => {
             extra={
               <Button
                 icon={<PlusOutlined />}
+                className="main-button-white"
                 onClick={() => {
                   setEditingIndexPhysioterapeutic(null);
                   setShowModal("physioterapeutic");
@@ -317,6 +322,7 @@ export const MedicalTreatments = () => {
                     <Space>
                       <Button
                         type="link"
+                        className="main-button-link"
                         onClick={() => {
                           setEditingIndexPhysioterapeutic(index);
                           setShowModal("physioterapeutic");

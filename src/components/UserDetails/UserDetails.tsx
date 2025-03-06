@@ -25,7 +25,6 @@ import { queryClient } from "../../main";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
 import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
-import { useEffect, useState } from "react";
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
@@ -93,9 +92,6 @@ const contractsColumns = [
 ];
 
 export const UserDetails: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<FamilyMember | null>(null);
-
   const navigate = useNavigate();
   const params = useParams();
   const userId = params.id;
@@ -103,11 +99,7 @@ export const UserDetails: React.FC = () => {
   const { data: user, isLoading: loadingUser } = useGetUserById(userId);
   const { data: familyMembers, isLoading: loadingFamilyMembers } =
     useGetUserFamilyMembers(userId);
-  const {
-    mutate: deleteFamilyMember,
-    isSuccess: isSuccessDeleteFamilyMember,
-    isPending: loadingUserDeletion,
-  } = useDeleteFamilyMemberMutation(userId);
+  const { mutate: deleteFamilyMember } = useDeleteFamilyMemberMutation(userId);
   const { mutate: deleteRecord } = useDeleteRecordMutation();
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
@@ -163,13 +155,12 @@ export const UserDetails: React.FC = () => {
             </Link>
             <Divider type="vertical" />
             <Button
-              className="main-button-link"
+              danger
               size="small"
               type="link"
-              onClick={() => {
-                setUserToDelete(record.acudiente);
-                setIsModalOpen(true);
-              }}
+              onClick={() =>
+                handleDeleteFamilyMember(record.acudiente.id_acudiente)
+              }
             >
               Eliminar
             </Button>
@@ -178,13 +169,6 @@ export const UserDetails: React.FC = () => {
       },
     ];
 
-  useEffect(() => {
-    if (isSuccessDeleteFamilyMember) {
-      setIsModalOpen(false);
-      setUserToDelete(null);
-    }
-  }, [isSuccessDeleteFamilyMember]);
-
   const handleDeleteRecord = () => {
     confirm({
       title: "¿Estás seguro de que deseas eliminar la historia clínica?",
@@ -192,6 +176,11 @@ export const UserDetails: React.FC = () => {
       okText: "Sí, eliminar",
       okType: "danger",
       cancelText: "Cancelar",
+      cancelButtonProps: {
+        type: "primary",
+        style: { backgroundColor: "#F32013" },
+      },
+      okButtonProps: { type: "link", style: { color: "#000" } },
       onOk() {
         if (userId) {
           deleteRecord(Number(record?.data.data?.id_historiaclinica), {
@@ -215,6 +204,11 @@ export const UserDetails: React.FC = () => {
       content: "Esta acción no se puede deshacer.",
       okText: "Sí, eliminar",
       okType: "danger",
+      cancelButtonProps: {
+        type: "primary",
+        style: { backgroundColor: "#F32013" },
+      },
+      okButtonProps: { type: "link", style: { color: "#000" } },
       cancelText: "Cancelar",
       onOk() {
         deleteReportMutation.mutate(reportId, {
@@ -224,6 +218,26 @@ export const UserDetails: React.FC = () => {
             });
           },
         });
+      },
+    });
+  };
+
+  const handleDeleteFamilyMember = (memberId: number) => {
+    confirm({
+      title: "¿Estás seguro de que deseas eliminar este familiar?",
+      content: "Esta acción no se puede deshacer.",
+      okText: "Sí, eliminar",
+      okType: "danger",
+      cancelText: "Cancelar",
+      cancelButtonProps: {
+        type: "primary",
+        style: { backgroundColor: "#F32013" },
+      },
+      okButtonProps: { type: "link", style: { color: "#000" } },
+      onOk() {
+        if (memberId) {
+          deleteFamilyMember(memberId);
+        }
       },
     });
   };
@@ -683,6 +697,7 @@ export const UserDetails: React.FC = () => {
                           className="main-button-link"
                           size="small"
                           type="link"
+                          danger
                           onClick={() =>
                             handleDeleteReport(record.id_reporteclinico)
                           }
@@ -723,7 +738,7 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Contratos"
               extra={
-                <Button type="primary" icon={<PlusOutlined />}>
+                <Button icon={<PlusOutlined />} className="main-button-white">
                   Agregar
                 </Button>
               }
@@ -739,29 +754,6 @@ export const UserDetails: React.FC = () => {
           <Divider />
         </>
       )}
-      <Modal
-        cancelText="No eliminar"
-        okText="Sí, eliminar"
-        onOk={() => {
-          if (userToDelete) {
-            deleteFamilyMember(userToDelete.id_acudiente);
-          }
-        }}
-        onCancel={() => setIsModalOpen(false)}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-        confirmLoading={loadingUserDeletion}
-        title="Confirmar acción"
-        okButtonProps={{
-          type: "default",
-          style: { backgroundColor: "#F32013" },
-        }}
-        cancelButtonProps={{
-          type: "text",
-        }}
-      >
-        <Typography.Text>{`¿Estás seguro que deseas eliminar al acudiente ${userToDelete?.nombres} ${userToDelete?.apellidos}?`}</Typography.Text>
-      </Modal>
     </>
   );
 };
