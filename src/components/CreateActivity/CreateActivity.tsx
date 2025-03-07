@@ -209,7 +209,12 @@ export const CreateActivityForm = () => {
             name="descripcion"
             control={control}
             render={({ field }) => (
-              <Input.TextArea {...field} placeholder="Descripción" rows={4} />
+              <Input.TextArea
+                {...field}
+                placeholder="Descripción"
+                rows={4}
+                value={field.value === null ? undefined : field.value}
+              />
             )}
           />
         </Form.Item>
@@ -263,7 +268,12 @@ export const CreateActivityForm = () => {
             name="comentarios"
             control={control}
             render={({ field }) => (
-              <Input.TextArea {...field} placeholder="Comentarios" rows={3} />
+              <Input.TextArea
+                {...field}
+                value={field.value === null ? undefined : field.value}
+                placeholder="Comentarios"
+                rows={3}
+              />
             )}
           />
         </Form.Item>
