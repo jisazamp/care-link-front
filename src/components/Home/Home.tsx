@@ -17,7 +17,6 @@ export const Home = () => {
           <CardUserFlow />
           <CardSheduActivities />
         </Flex>
-        {/* 🔹 Nueva sección con las tarjetas de gráficas */}
         <GenericsCards />
       </Flex>
     </>
