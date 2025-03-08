@@ -1,36 +1,48 @@
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { Activity } from "../../../../types";
 import { Button, Card, Table, Typography } from "antd";
+import { ColumnsType } from "antd/es/table";
+import { useGetUpcomingActivities } from "../../../../hooks/useGetUpcomingActivities/useGetUpcomingActivities";
+
+dayjs.extend(relativeTime);
 
 const { Title } = Typography;
 
-const columnsActivities = [
-  { title: "Actividad", dataIndex: "activity", key: "activity" },
-  { title: "Fecha", dataIndex: "date", key: "date" },
-  {
-    title: "Acciones",
-    key: "actions",
-    render: () => (
-      <span>
-        <Button type="link">Editar</Button> | <Button type="link">Ver</Button>
-      </span>
-    ),
-  },
-];
+export const CardSheduActivities = () => {
+  const { data: activities } = useGetUpcomingActivities();
 
-const activitiesData = [
-  { key: "1", activity: "Ping Pong", date: "Dentro de 7 días" },
-  { key: "2", activity: "Yoga", date: "Dentro de 7 días" },
-  { key: "3", activity: "Arte", date: "Dentro de 7 días" },
-];
+  const columnsActivities: ColumnsType<Activity> = [
+    { title: "Actividad", dataIndex: "nombre", key: "activity" },
+    {
+      title: "Fecha",
+      dataIndex: "fecha",
+      key: "date",
+      render: (_, record) =>
+        dayjs(record.fecha).from(dayjs()),
+    },
+    {
+      title: "Acciones",
+      key: "actions",
+      render: () => (
+        <span>
+          <Button type="link">Editar</Button> | <Button type="link">Ver</Button>
+        </span>
+      ),
+    },
+  ];
 
-export const CardSheduActivities = () => (
-  <Card
-    title={<Title level={5}>Actividades programadas</Title>}
-    style={{ flex: 1 }}
-  >
-    <Table
-      dataSource={activitiesData}
-      columns={columnsActivities}
-      pagination={{ pageSize: 5 }}
-    />
-  </Card>
-);
+  return (
+    <Card
+      title={<Title level={5}>Actividades programadas</Title>}
+      style={{ flex: 1 }}
+    >
+      <Table
+        rowKey="id"
+        dataSource={activities?.data.data}
+        columns={columnsActivities}
+        pagination={{ pageSize: 5 }}
+      />
+    </Card>
+  );
+};
