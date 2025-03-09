@@ -112,6 +112,7 @@ export const formSchema = z.object({
   abused: z.boolean(),
   initialDiagnosis: z.string().optional().default(""),
   vaccines: z.array(vaccineSchema).default([]),
+  attachedDocuments: z.array(z.instanceof(File)).default([]),
 });
 
 export type FormValues = z.infer<typeof formSchema>;

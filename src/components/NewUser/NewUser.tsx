@@ -456,7 +456,7 @@ export const NewUser: React.FC = () => {
                           maxCount={1}
                           accept="image/*"
                           listType="picture"
-                          fileList={field.value?.fileList || []} // Use the fileList from the form
+                          fileList={field.value?.fileList || []}
                         >
                           <Button
                             style={{
