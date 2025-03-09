@@ -10,7 +10,9 @@ import {
   Row,
   Spin,
   Typography,
+  Upload,
 } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type {
   MedicalRecord as MedicalRecordType,
@@ -34,7 +36,6 @@ import {
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
 import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
 import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
-import { PlusOutlined } from "@ant-design/icons";
 import { SocialPerception } from "./components/SocialPerception/SocialPerception";
 import { SpecialConditions } from "./components/SpecialConditions/SpecialConditions";
 import { Toxicology } from "./components/Toxicology/Toxicology";
@@ -53,7 +54,7 @@ import { useGetRecordInterventions } from "../../hooks/useGetUserInterventions/u
 import { useGetRecordVaccines } from "../../hooks/useGetUserVaccines/useGetUserVaccines";
 import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export const MedicalRecord: React.FC = () => {
   const params = useParams();
@@ -61,8 +62,10 @@ export const MedicalRecord: React.FC = () => {
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    shouldFocusError: false,
   });
   const { reset, getValues } = methods;
+  console.log(methods.formState.errors);
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
     useCreateUserMedicalRecord(userId);
@@ -183,11 +186,14 @@ export const MedicalRecord: React.FC = () => {
 
     if (!userMedicalRecord?.data.data?.id_historiaclinica) {
       createUserMedicalRecord({
-        record,
-        medicines,
-        cares,
-        interventions,
-        vaccines,
+        data: {
+          record,
+          medicines,
+          cares,
+          interventions,
+          vaccines,
+        },
+        files: data.attachedDocuments,
       });
       return;
     }
@@ -526,20 +532,35 @@ export const MedicalRecord: React.FC = () => {
             <Col span={24}>
               <Card
                 bordered
-                extra={
-                  <Button icon={<PlusOutlined />} className="main-button-white">
-                    Agregar
-                  </Button>
-                }
                 title={
                   <Title level={4} style={{ margin: 0 }}>
                     Adjuntar documentos
                   </Title>
                 }
               >
-                <div style={{ textAlign: "center", padding: "16px" }}>
-                  <Text>No se han adjuntado documentos.</Text>
-                </div>
+                <Controller
+                  control={methods.control}
+                  name="attachedDocuments"
+                  render={({ field }) => (
+                    <Upload
+                      {...field}
+                      beforeUpload={() => false}
+                      onChange={(info) => {
+                        const files = info.fileList.map(
+                          (item) => item.originFileObj || item
+                        );
+                        field.onChange(files);
+                      }}
+                    >
+                      <Button
+                        icon={<UploadOutlined />}
+                        className="main-button-white"
+                      >
+                        Agregar
+                      </Button>
+                    </Upload>
+                  )}
+                />
               </Card>
             </Col>
           </Row>

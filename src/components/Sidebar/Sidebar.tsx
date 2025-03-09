@@ -4,7 +4,8 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { getSelectedKey } from "../../utils/getSelectedKey";
 
 const menuItems = [
   {
@@ -36,17 +37,25 @@ const menuItems = [
       },
       {
         key: "3.2",
-        label: <Link to="/actividades/crear">Registrar nuevas actividades</Link>,
+        label: (
+          <Link to="/actividades/crear">Registrar nuevas actividades</Link>
+        ),
       },
     ],
   },
 ];
 
-export const Sidebar = () => (
-  <Menu
-    theme="light"
-    mode="inline"
-    items={menuItems}
-    style={{ backgroundColor: "#FFFFFF", fontWeight: "500" }}
-  />
-);
+export const Sidebar = () => {
+  const location = useLocation();
+  const selectedKey = getSelectedKey(location.pathname);
+
+  return (
+    <Menu
+      items={menuItems}
+      mode="inline"
+      selectedKeys={[selectedKey]}
+      style={{ backgroundColor: "#FFFFFF", fontWeight: "500" }}
+      theme="light"
+    />
+  );
+};
