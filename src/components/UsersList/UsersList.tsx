@@ -25,7 +25,10 @@ export const UsersList = () => {
       content: `¿Está seguro que desea eliminar al usuario ${user.nombres} ${user.apellidos}? Esto es una acción destructiva y no se puede deshacer`,
       okText: "Sí, eliminar",
       cancelText: "No eliminar",
-      cancelButtonProps: { type: "primary", style: { backgroundColor: "#F32013" } },
+      cancelButtonProps: {
+        type: "primary",
+        style: { backgroundColor: "#F32013" },
+      },
       okButtonProps: { type: "link", style: { color: "#000" } },
       onOk: () => {
         deleteUser(user.id_usuario);
@@ -74,11 +77,9 @@ export const UsersList = () => {
             >
               <List.Item.Meta
                 avatar={
-                  <Avatar
-                    alt="Avatar"
-                    size={40}
-                    src="https://via.placeholder.com/72"
-                  />
+                  item.url_imagen ? (
+                    <Avatar alt="Avatar" size={40} src={item.url_imagen} />
+                  ) : null
                 }
                 title={`${item.nombres} ${item.apellidos}`}
                 description={item.email}

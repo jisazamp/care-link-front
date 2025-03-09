@@ -3,8 +3,30 @@ import { client } from "../../api/client";
 import { queryClient } from "../../main";
 import { useMutation } from "@tanstack/react-query";
 
-const editUser = ({ user, id }: { user: Partial<User>; id: number | string }) =>
-  client.patch(`/api/users/${id}`, user);
+const editUser = ({
+  id,
+  photoFile,
+  user,
+}: {
+  id: number | string;
+  photoFile?: File;
+  user: Partial<User>;
+}) => {
+  const formData = new FormData();
+
+  formData.append("user", JSON.stringify(user));
+
+  if (photoFile) {
+    formData.append("photo", photoFile);
+  }
+
+  return client.patch<{ data: User }>(`/api/users/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
 export const useEditUserMutation = (id?: string | number) => {
   return useMutation({
     mutationKey: ["edit-user"],

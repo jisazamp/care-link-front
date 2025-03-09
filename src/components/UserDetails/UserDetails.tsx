@@ -17,7 +17,6 @@ import {
   Tooltip,
 } from "antd";
 import dayjs from "dayjs";
-import patientImage from "../assets/Patients/patient1.jpg";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { FamilyMember } from "../../types";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -290,14 +289,16 @@ export const UserDetails: React.FC = () => {
               style={{ marginTop: 3 }}
             >
               <Row gutter={24} align="middle">
-                <Col lg={4}>
-                  <Avatar
-                    src={patientImage}
-                    size={120}
-                    alt="Avatar del paciente"
-                    style={{ border: "1px solid #ddd" }}
-                  />
-                </Col>
+                {user?.data.data.url_imagen && (
+                  <Col lg={4}>
+                    <Avatar
+                      src={user.data.data.url_imagen}
+                      size={120}
+                      alt="Avatar del paciente"
+                      style={{ border: "1px solid #ddd" }}
+                    />
+                  </Col>
+                )}
                 <Col lg={10}>
                   <Flex vertical gap={10}>
                     <Typography.Text style={{ textTransform: "uppercase" }}>

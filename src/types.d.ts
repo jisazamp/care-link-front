@@ -19,6 +19,7 @@ export type User = {
   grado_escolaridad: string | null;
   ha_estado_en_otro_centro: boolean | null;
   id_usuario: number | null;
+  is_deleted: boolean;
   lee: boolean | null;
   lugar_nacimiento: string | null;
   lugar_procedencia: string | null;
@@ -31,7 +32,7 @@ export type User = {
   regimen_seguridad_social: string | null;
   telefono: string | null;
   tipo_afiliacion: string | null;
-  is_deleted: boolean;
+  url_imagen?: string | null;
 };
 
 export interface FamilyMember {

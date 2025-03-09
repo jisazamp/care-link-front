@@ -17,16 +17,17 @@ import {
   Flex,
 } from "antd";
 import request from "axios";
+import { CivilStatus, Gender, UserFamilyType, UserStatus } from "../../enums";
 import { UploadOutlined } from "@ant-design/icons";
+import { User } from "../../types";
 import { useCreateUserMutation } from "../../hooks/useCreateUserMutation/useCreateUserMutation";
+import { useEditUserMutation } from "../../hooks/useEditUserMutation/useEditUserMutation";
 import { useEffect } from "react";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User } from "../../types";
-import { CivilStatus, Gender, UserFamilyType, UserStatus } from "../../enums";
-import { useNavigate } from "react-router-dom";
-import { useEditUserMutation } from "../../hooks/useEditUserMutation/useEditUserMutation";
+import { useImageFile } from "../../hooks/useImageFile/useImageFile";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -104,8 +105,13 @@ export const NewUser: React.FC = () => {
     isSuccess: isSuccessCreateUser,
     isPending: isPendingCreateUser,
   } = useCreateUserMutation();
-  const { mutate: editUser, isSuccess: isSuccessEditUser } =
+  const { mutate: editUser, isSuccess: isSuccessEditUser, isPending: isPendingEditUser } =
     useEditUserMutation(userId);
+  const { data: imageFile, isLoading: isLoadingFile, isError: isErrorFile } = useImageFile(
+    data?.data.data.url_imagen ?? "",
+    "user-photo.jpg",
+    "image/jpeg"
+  );
 
   const onSubmit = (data: FormValues) => {
     const user: Partial<User> = {
@@ -127,27 +133,70 @@ export const NewUser: React.FC = () => {
       telefono: data.phone,
       is_deleted: false,
     };
+
+    const photoFile = data.photo?.fileList?.[0]?.originFileObj;
+
     if (!userId) {
-      createUser(user);
+      createUser({ user, photoFile });
       return;
     }
-    editUser({ user: user, id: userId });
+    editUser({ user, id: userId, photoFile });
   };
 
   useEffect(() => {
     if (data?.data.data) {
-      reset({
-        dateOfBirth: dayjs(data.data.data.fecha_nacimiento),
-        documentNumber: data.data.data.n_documento + "",
-        firstName: data.data.data.nombres + "",
-        lastName: data.data.data.apellidos + "",
-        userId: data.data.data.id_usuario + "",
-        maritalStatus: data.data.data.estado_civil as CivilStatus,
-        gender: data.data.data.genero as Gender,
-        email: data.data.data.email ?? "",
-        phone: data.data.data.telefono ?? "",
-        address: data.data.data.direccion ?? "",
-      });
+      const userData = data.data.data;
+
+      const setImage = async () => {
+        const resetValues = {
+          ...userData,
+          dateOfBirth: dayjs(userData.fecha_nacimiento),
+          documentNumber: userData.n_documento + "",
+          firstName: userData.nombres + "",
+          lastName: userData.apellidos + "",
+          userId: userData.id_usuario + "",
+          maritalStatus: userData.estado_civil as CivilStatus,
+          gender: userData.genero as Gender,
+          email: userData.email ?? "",
+          phone: userData.telefono ?? "",
+          address: userData.direccion ?? "",
+        };
+
+        if (userData.url_imagen) {
+
+
+          if (isLoadingFile) {
+            return;
+          }
+
+          if (isErrorFile) {
+            console.error("Error fetching user photo");
+            reset(resetValues);
+            return;
+          }
+
+          if (imageFile) {
+            const fileList = [
+              {
+                uid: "-1",
+                name: imageFile.name,
+                status: "done",
+                url: userData.url_imagen,
+                originFileObj: imageFile,
+              },
+            ];
+
+            reset({
+              ...resetValues,
+              photo: { fileList },
+            });
+          }
+        } else {
+          reset(resetValues);
+        }
+      };
+
+      setImage();
     }
   }, [data?.data.data, reset]);
 
@@ -401,12 +450,13 @@ export const NewUser: React.FC = () => {
                         <Upload
                           {...field}
                           beforeUpload={(file) => {
-                            field.onChange(file);
+                            field.onChange({ fileList: [file] });
                             return false;
                           }}
                           maxCount={1}
                           accept="image/*"
                           listType="picture"
+                          fileList={field.value?.fileList || []} // Use the fileList from the form
                         >
                           <Button
                             style={{
@@ -507,7 +557,8 @@ export const NewUser: React.FC = () => {
                 <Button
                   type="default"
                   htmlType="submit"
-                  loading={isPendingCreateUser}
+                  loading={isPendingCreateUser || isPendingEditUser}
+                  disabled={isPendingCreateUser || isPendingEditUser}
                 >
                   Guardar y continuar
                 </Button>
