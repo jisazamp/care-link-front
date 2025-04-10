@@ -1,6 +1,8 @@
 import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 import { BillingContract } from "./BillingContract/BillingContract";
 import { CreateContract } from "./CreateContract/CreateContract";
+import dayjs, { Dayjs } from "dayjs";
+import { FormProvider, useForm } from "react-hook-form";
 import { ServicesContract } from "./ServicesContract/ServicesContract";
 import { Steps, Button, Card, Typography, Breadcrumb } from "antd";
 import { useState } from "react";
@@ -12,24 +14,48 @@ import {
   DollarOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
+import { CreateContractRequest } from "../../../types";
+import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 
 const { Title } = Typography;
 
-interface Service {
-  key: string;
-  startDate: string;
-  endDate: string;
-  serviceType: string;
-  quantity: number;
+export interface Service {
   description: string;
+  endDate: Dayjs | null;
+  key: string;
+  price: number;
+  quantity: number;
   selected: boolean;
+  serviceType: string;
+  startDate: Dayjs | null;
+}
+
+export interface FormValues {
+  billed: string;
+  contractType: string;
+  endDate: Dayjs | null;
+  selectedDatesService: string[];
+  selectedDatesTransport: string[];
+  services: Service[];
+  startDate: Dayjs | null;
 }
 
 export const FormContracts = () => {
+  const { id } = useParams();
+
+  const methods = useForm<FormValues>({
+    defaultValues: {
+      endDate: null,
+      selectedDatesService: [],
+      selectedDatesTransport: [],
+      services: [],
+      startDate: null,
+    },
+  });
+
   const [currentStep, setCurrentStep] = useState(0);
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [services, setServices] = useState<Service[]>([]);
+  const createContractMutation = useCreateContract();
 
   const steps = [
     {
@@ -38,8 +64,8 @@ export const FormContracts = () => {
       content: (
         <CreateContract
           onNext={(data) => {
-            setStartDate(data.startDate);
-            setEndDate(data.endDate);
+            methods.setValue("startDate", data.startDate);
+            methods.setValue("endDate", data.endDate);
             setCurrentStep(1);
           }}
         />
@@ -50,10 +76,8 @@ export const FormContracts = () => {
       icon: <SolutionOutlined />,
       content: (
         <ServicesContract
-          startDate={startDate}
-          endDate={endDate}
-          onNext={(selectedServices: Service[]) => {
-            setServices(selectedServices);
+          onNext={(services: Service[]) => {
+            methods.setValue("services", services);
             setCurrentStep(2);
           }}
           onBack={() => setCurrentStep(0)}
@@ -73,17 +97,17 @@ export const FormContracts = () => {
     {
       title: "Configuración y Agenda",
       icon: <CalendarOutlined />,
-      content: (
-        <AgendaSettingsContract
-          services={services}
-          onBack={() => setCurrentStep(2)}
-        />
-      ),
+      content: <AgendaSettingsContract onBack={() => setCurrentStep(2)} />,
     },
   ];
 
+  const resetAll = () => {
+    methods.reset();
+    setCurrentStep(0);
+  };
+
   return (
-    <>
+    <FormProvider {...methods}>
       <Breadcrumb
         style={{ marginBottom: 16 }}
         items={[
@@ -113,8 +137,8 @@ export const FormContracts = () => {
       <Card bordered style={{ marginTop: 24, textAlign: "right" }}>
         <Button
           className="main-button"
-          onClick={() => setCurrentStep(0)}
           style={{ marginRight: 8 }}
+          onClick={resetAll}
         >
           Restablecer
         </Button>
@@ -123,10 +147,40 @@ export const FormContracts = () => {
           type="primary"
           className="main-button"
           disabled={currentStep !== steps.length - 1}
+          loading={createContractMutation.isPending}
+          onClick={methods.handleSubmit((data) => {
+            const contractData: CreateContractRequest = {
+              id_usuario: Number(id),
+              tipo_contrato: data.contractType,
+              fecha_inicio:
+                data.startDate?.format("YYYY-MM-DD") ??
+                dayjs().format("YYYY-MM-DD"),
+              fecha_fin:
+                data.endDate?.format("YYYY-MM-DD") ??
+                dayjs().add(1, "month").format("YYYY-MM-DD"),
+              facturar_contrato: data.billed === "no" ? false : true,
+              servicios: data.services.map((s) => ({
+                id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
+                fecha:
+                  s.startDate?.format("YYYY-MM-DD") ??
+                  dayjs().format("YYYY-MM-DD"),
+                descripcion: s.description,
+                precio_por_dia: s.price,
+                fechas_servicio: s.serviceType.includes("Transporte")
+                  ? methods
+                    .getValues("selectedDatesTransport")
+                    .map((f) => ({ fecha: f }))
+                  : methods
+                    .getValues("selectedDatesService")
+                    .map((f) => ({ fecha: f })),
+              })),
+            };
+            createContractMutation.mutate(contractData);
+          })}
         >
           Guardar y Continuar
         </Button>
       </Card>
-    </>
+    </FormProvider>
   );
 };

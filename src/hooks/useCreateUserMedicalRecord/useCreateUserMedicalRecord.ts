@@ -25,19 +25,31 @@ const createMedicalRecord = ({
   files?: File[];
 }) => {
   const formData = new FormData();
+
   formData.append("record", JSON.stringify(data.record));
+
   if (data.medicines) {
-    formData.append("medicines", JSON.stringify(data.medicines));
+    const cleanedMedicines = data.medicines.map(({ id, ...rest }) => rest);
+    formData.append("medicines", JSON.stringify(cleanedMedicines));
   }
+
   if (data.cares) {
-    formData.append("cares", JSON.stringify(data.cares));
+    const cleanedCares = data.cares.map(({ id, ...rest }) => rest);
+    formData.append("cares", JSON.stringify(cleanedCares));
   }
+
   if (data.interventions) {
-    formData.append("interventions", JSON.stringify(data.interventions));
+    const cleanedInterventions = data.interventions.map(
+      ({ id, ...rest }) => rest
+    );
+    formData.append("interventions", JSON.stringify(cleanedInterventions));
   }
+
   if (data.vaccines) {
-    formData.append("vaccines", JSON.stringify(data.vaccines));
+    const cleanedVaccines = data.vaccines.map(({ id, ...rest }) => rest);
+    formData.append("vaccines", JSON.stringify(cleanedVaccines));
   }
+
   if (files) {
     for (let file of files) {
       formData.append("attachments", file);
