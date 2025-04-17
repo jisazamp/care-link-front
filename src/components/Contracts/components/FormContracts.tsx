@@ -79,7 +79,7 @@ export const FormContracts = () => {
 
   const startDate = methods.watch("startDate");
   const [currentStep, setCurrentStep] = useState(0);
-  const createContractMutation = useCreateContract();
+  const createContractMutation = useCreateContract(id);
 
   const onSubmit = (data: FormValues) => {
     const contractData: CreateContractRequest = {

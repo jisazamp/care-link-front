@@ -28,9 +28,40 @@ import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGe
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
+import { ColumnsType } from "antd/es/table";
 
 const { Title } = Typography;
 const { confirm } = Modal;
+
+export const contractsColumns: ColumnsType<any> = [
+  {
+    title: "ID Contrato",
+    dataIndex: "id_contrato",
+    key: "id_contrato",
+  },
+  {
+    title: "Tipo de Contrato",
+    dataIndex: "tipo_contrato",
+    key: "tipo_contrato",
+  },
+  {
+    title: "Fecha Inicio",
+    dataIndex: "fecha_inicio",
+    key: "fecha_inicio",
+  },
+  {
+    title: "Fecha Fin",
+    dataIndex: "fecha_fin",
+    key: "fecha_fin",
+  },
+  {
+    title: "Facturar",
+    dataIndex: "facturar_contrato",
+    key: "facturar_contrato",
+    render: (value: boolean) => (value ? "Sí" : "No"),
+  },
+];
 
 const contractsData = [
   {
@@ -51,45 +82,6 @@ const contractsData = [
   },
 ];
 
-const contractsColumns = [
-  {
-    title: <Checkbox />,
-    dataIndex: "checkbox",
-    render: () => <Checkbox />,
-    width: "5%",
-  },
-  {
-    title: "Fecha de inicio",
-    dataIndex: "fechaInicio",
-    key: "fechaInicio",
-  },
-  {
-    title: "Estado",
-    dataIndex: "estado",
-    key: "estado",
-  },
-  {
-    title: "Servicios",
-    dataIndex: "servicios",
-    key: "servicios",
-  },
-  {
-    title: "Firmado",
-    dataIndex: "firmado",
-    key: "firmado",
-  },
-  {
-    title: "Estado Facturación",
-    dataIndex: "estadoFacturacion",
-    key: "estadoFacturacion",
-  },
-  {
-    title: "Acciones",
-    dataIndex: "acciones",
-    key: "acciones",
-  },
-];
-
 export const UserDetails: React.FC = () => {
   const navigate = useNavigate();
   const params = useParams();
@@ -103,6 +95,7 @@ export const UserDetails: React.FC = () => {
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
+  const { data: userContracts } = useGetUserContracts(userId);
   const deleteReportMutation = useDeleteMedicalReport();
 
   const records = record?.data.data;
@@ -747,8 +740,9 @@ export const UserDetails: React.FC = () => {
             >
               <Table
                 columns={contractsColumns}
-                dataSource={contractsData}
+                dataSource={userContracts?.data}
                 pagination={false}
+                rowKey="id_contrato"
               />
             </Card>
           </Space>
