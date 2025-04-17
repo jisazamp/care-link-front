@@ -208,12 +208,12 @@ export type Activity = {
   nombre: string;
   profesional?: Professional;
   tipo_actividad?: ActivityType;
-}
+};
 
 export type ActivityType = {
   id: number;
   tipo: string;
-}
+};
 
 export type Login = {
   access_token: string;
@@ -224,4 +224,19 @@ export type CreateFamilyMemberRequest = {
   userId?: number | string;
   family_member: Omit<FamilyMember, "id_acudiente">;
   kinship: { parentezco: Kinship };
+};
+
+export type CreateContractRequest = {
+  id_usuario: number;
+  tipo_contrato: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  facturar_contrato: boolean;
+  servicios: {
+    descripcion: string;
+    fecha: string;
+    fechas_servicio: { fecha: string }[];
+    id_servicio: number;
+    precio_por_dia: number;
+  }[];
 };

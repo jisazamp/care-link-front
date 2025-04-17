@@ -37,9 +37,13 @@ export type PhysioRegimen = z.infer<typeof physioterapeuticRegimenSchema>;
 
 export const vaccineSchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
-  date: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta").optional(),
+  date: z
+    .custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta")
+    .optional(),
   name: z.string(),
-  nextDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta").optional(),
+  nextDate: z
+    .custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta")
+    .optional(),
   secondaryEffects: z.string().optional(),
 });
 
@@ -69,6 +73,25 @@ export const otherAlergies = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
   alergy: z.string(),
 });
+
+const fileSchema = z
+  .instanceof(File)
+  .refine((file) => file.size <= 5 * 1024 * 1024, {
+    message: "El archivo debe pesar menos de 5MB",
+  });
+
+const attachedDocumentsSchema = z
+  .array(fileSchema)
+  .optional()
+  .refine(
+    (files) =>
+      !files ||
+      files.length === 0 ||
+      files.every((file) => file instanceof File),
+    {
+      message: "Todos los archivos deben ser válidos",
+    }
+  );
 
 export const formSchema = z.object({
   bloodPressure: z.number({ coerce: true }).nullable().default(null),
@@ -112,6 +135,7 @@ export const formSchema = z.object({
   abused: z.boolean(),
   initialDiagnosis: z.string().optional().default(""),
   vaccines: z.array(vaccineSchema).default([]),
+  attachedDocuments: attachedDocumentsSchema,
 });
 
 export type FormValues = z.infer<typeof formSchema>;

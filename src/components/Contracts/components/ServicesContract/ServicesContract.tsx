@@ -11,97 +11,80 @@ import {
   Table,
 } from "antd";
 import dayjs from "dayjs";
-import { DeleteOutlined } from "@ant-design/icons";
-import { useState, useEffect } from "react";
+import type { FormValues } from "../FormContracts";
+import type { Service } from "../FormContracts";
+import { useFormContext } from "react-hook-form";
+import { useEffect } from "react";
 
-interface Service {
-  key: string;
-  startDate: string;
-  endDate: string;
-  serviceType: string;
-  quantity: number;
-  description: string;
-  selected: boolean;
-}
+const WEEKS_IN_MONTH = 4;
 
 interface ServicesContractProps {
-  startDate: string;
-  endDate: string;
   onNext?: (selectedServices: Service[]) => void;
   onBack?: () => void;
 }
 
-export const ServicesContract = ({
-  startDate,
-  endDate,
-  onNext,
-  onBack,
-}: ServicesContractProps) => {
-  const [services, setServices] = useState<Service[]>([
+export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
+  const methods = useFormContext<FormValues>();
+  const startDate = methods.watch('startDate');
+  const endDate = methods.watch('endDate');
+  const services = methods.watch("services");
+
+  const startingServices: Service[] = [
     {
       key: "1",
       startDate,
       endDate,
       serviceType: "",
-      quantity: 1,
+      quantity: 0,
       description: "",
       selected: true,
+      price: 0,
     },
     {
       key: "2",
       startDate,
       endDate,
       serviceType: "",
-      quantity: 15,
+      quantity: 0,
       description: "",
       selected: true,
+      price: 0,
     },
-  ]);
+  ];
 
-  // Actualizar fechas cuando se reciben desde CreateContract.tsx
-  useEffect(() => {
-    setServices((prev) =>
-      prev.map((service) => ({
-        ...service,
-        startDate,
-        endDate,
-      })),
-    );
-  }, [startDate, endDate]);
 
-  // Manejar cambios en el tipo de servicio y calcular la cantidad disponible automáticamente
   const handleServiceChange = (key: string, value: string) => {
     const quantity =
       value.includes("Tiquetera") || value.includes("Transporte")
-        ? parseInt(value.split(" ")[1])
-        : 15;
+        ? parseInt(value.split(" ")[1]) * WEEKS_IN_MONTH
+        : 0;
 
-    setServices((prev) =>
-      prev.map((service) =>
-        service.key === key
-          ? { ...service, serviceType: value, quantity }
-          : service,
-      ),
+    const newServices = services.map((s) =>
+      s.key === key ? { ...s, serviceType: value, quantity } : s
     );
+    methods.setValue("services", newServices);
   };
 
-  // Manejar cambios en la descripción del servicio
   const handleDescriptionChange = (key: string, value: string) => {
-    setServices((prev) =>
-      prev.map((service) =>
-        service.key === key ? { ...service, description: value } : service,
-      ),
+    const newServices = services.map((s) =>
+      s.key === key ? { ...s, description: value } : s
     );
+    methods.setValue("services", newServices);
   };
 
-  // Función para manejar el botón "Siguiente"
+  const handlePriceChange = (key: string, value: number) => {
+    const newServices = services.map((s) =>
+      s.key === key ? { ...s, price: value } : s
+    );
+    methods.setValue("services", newServices);
+  };
+
   const handleNext = () => {
     if (onNext) {
-      onNext(services); // ✅ Enviar los servicios seleccionados correctamente
+      onNext(services);
     }
   };
 
-  // Columnas de la tabla
   const columns = [
     {
       title: "Activar",
@@ -111,13 +94,10 @@ export const ServicesContract = ({
           checked={record.selected}
           onChange={(e) => {
             const checked = e.target.checked;
-            setServices((prev) =>
-              prev.map((service) =>
-                service.key === record.key
-                  ? { ...service, selected: checked }
-                  : service,
-              ),
+            const newServices = services.map((s) =>
+              s.key === record.key ? { ...s, selected: checked } : s
             );
+            methods.setValue("services", newServices);
           }}
         />
       ),
@@ -155,7 +135,7 @@ export const ServicesContract = ({
           onChange={(value) => handleServiceChange(record.key, value)}
         >
           {record.key === "1"
-            ? Array.from({ length: 15 }, (_, i) => (
+            ? Array.from({ length: 5 }, (_, i) => (
               <Select.Option
                 key={`Tiquetera ${i + 1}`}
                 value={`Tiquetera ${i + 1}`}
@@ -163,7 +143,7 @@ export const ServicesContract = ({
                 Tiquetera {i + 1}
               </Select.Option>
             ))
-            : Array.from({ length: 15 }, (_, i) => (
+            : Array.from({ length: 5 }, (_, i) => (
               <Select.Option
                 key={`Transporte ${i + 1}`}
                 value={`Transporte ${i + 1}`}
@@ -193,6 +173,21 @@ export const ServicesContract = ({
       ),
     },
     {
+      title: "Precio por día",
+      dataIndex: "price",
+      render: (_: unknown, record: Service) => (
+        <Input
+          type="number"
+          value={record.price}
+          onChange={(e) =>
+            handlePriceChange(record.key, parseFloat(e.target.value) || 0)
+          }
+          min={0}
+        />
+      ),
+    },
+    {
+      /*
       title: "Acciones",
       dataIndex: "actions",
       render: (_: unknown, record: Service) => (
@@ -202,15 +197,20 @@ export const ServicesContract = ({
           icon={<DeleteOutlined />}
           onClick={() => {
             setServices((prev) =>
-              prev.filter((service) => service.key !== record.key),
+              prev.filter((service) => service.key !== record.key)
             );
           }}
         >
           Eliminar
         </Button>
       ),
+    */
     },
   ];
+
+  useEffect(() => {
+    methods.setValue('services', startingServices);
+  }, [])
 
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>

@@ -163,14 +163,11 @@ export const NewUser: React.FC = () => {
         };
 
         if (userData.url_imagen) {
-
-
           if (isLoadingFile) {
             return;
           }
 
           if (isErrorFile) {
-            console.error("Error fetching user photo");
             reset(resetValues);
             return;
           }
@@ -198,7 +195,7 @@ export const NewUser: React.FC = () => {
 
       setImage();
     }
-  }, [data?.data.data, reset]);
+  }, [data?.data.data, reset, isLoadingFile]);
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
@@ -456,7 +453,7 @@ export const NewUser: React.FC = () => {
                           maxCount={1}
                           accept="image/*"
                           listType="picture"
-                          fileList={field.value?.fileList || []} // Use the fileList from the form
+                          fileList={field.value?.fileList || []}
                         >
                           <Button
                             style={{

@@ -42,7 +42,7 @@ export const Header = () => {
         Sistema de Gestión
       </Typography.Title>
       <Flex gap="middle">
-        <Tooltip title="Buscar">
+        {/*<Tooltip title="Buscar">
           <Button
             type="text"
             shape="circle"
@@ -66,7 +66,7 @@ export const Header = () => {
               </Badge>
             }
           />
-        </Tooltip>
+        </Tooltip>*/}
         <Flex gap="small" style={{ alignItems: "center" }}>
           <Avatar icon={<UserOutlined />} />
           <Typography.Paragraph style={{ color: "#fff", margin: 0 }}>
