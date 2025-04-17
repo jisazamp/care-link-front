@@ -14,7 +14,6 @@ import dayjs from "dayjs";
 import type { FormValues } from "../FormContracts";
 import type { Service } from "../FormContracts";
 import { useFormContext } from "react-hook-form";
-import { useEffect } from "react";
 
 const WEEKS_IN_MONTH = 4;
 
@@ -25,33 +24,7 @@ interface ServicesContractProps {
 
 export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const methods = useFormContext<FormValues>();
-  const startDate = methods.watch('startDate');
-  const endDate = methods.watch('endDate');
   const services = methods.watch("services");
-
-  const startingServices: Service[] = [
-    {
-      key: "1",
-      startDate,
-      endDate,
-      serviceType: "",
-      quantity: 0,
-      description: "",
-      selected: true,
-      price: 0,
-    },
-    {
-      key: "2",
-      startDate,
-      endDate,
-      serviceType: "",
-      quantity: 0,
-      description: "",
-      selected: true,
-      price: 0,
-    },
-  ];
-
 
   const handleServiceChange = (key: string, value: string) => {
     const quantity =
@@ -86,7 +59,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   };
 
   const columns = [
-    {
+    {/*
       title: "Activar",
       dataIndex: "selected",
       render: (_: unknown, record: Service) => (
@@ -102,7 +75,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         />
       ),
       width: 80,
-    },
+    */},
     {
       title: "Inicia el",
       dataIndex: "startDate",
@@ -207,10 +180,6 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     */
     },
   ];
-
-  useEffect(() => {
-    methods.setValue('services', startingServices);
-  }, [])
 
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>

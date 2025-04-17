@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { FormProvider, useForm } from "react-hook-form";
 import { ServicesContract } from "./ServicesContract/ServicesContract";
 import { Steps, Button, Card, Typography, Breadcrumb } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HomeOutlined,
   UserOutlined,
@@ -44,18 +44,53 @@ export interface FormValues {
 export const FormContracts = () => {
   const { id } = useParams();
 
+  const startingServices: Service[] = [
+    {
+      key: "1",
+      startDate: null,
+      endDate: null,
+      serviceType: "",
+      quantity: 0,
+      description: "",
+      selected: true,
+      price: 0,
+    },
+    {
+      key: "2",
+      startDate: null,
+      endDate: null,
+      serviceType: "",
+      quantity: 0,
+      description: "",
+      selected: true,
+      price: 0,
+    },
+  ];
+
   const methods = useForm<FormValues>({
     defaultValues: {
       endDate: null,
       selectedDatesService: [],
       selectedDatesTransport: [],
-      services: [],
+      services: startingServices,
       startDate: null,
     },
   });
 
+  const startDate = methods.watch("startDate");
   const [currentStep, setCurrentStep] = useState(0);
   const createContractMutation = useCreateContract();
+
+  useEffect(() => {
+    if (startDate) {
+      const newServices: Service[] = startingServices.map((s) => ({
+        ...s,
+        startDate,
+        endDate: startDate.add(1, "month"),
+      }));
+      methods.setValue("services", newServices);
+    }
+  }, [startDate, methods.setValue]);
 
   const steps = [
     {
