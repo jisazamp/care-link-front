@@ -81,6 +81,35 @@ export const FormContracts = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const createContractMutation = useCreateContract();
 
+  const onSubmit = (data: FormValues) => {
+    const contractData: CreateContractRequest = {
+      id_usuario: Number(id),
+      tipo_contrato: data.contractType,
+      fecha_inicio:
+        data.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
+      fecha_fin:
+        data.endDate?.format("YYYY-MM-DD") ??
+        dayjs().add(1, "month").format("YYYY-MM-DD"),
+      facturar_contrato: data.billed === "no" ? false : true,
+      servicios: data.services.filter(s => !!s.quantity).map((s) => ({
+        id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
+        fecha:
+          s.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
+        descripcion: s.description,
+        precio_por_dia: s.price,
+        fechas_servicio: s.serviceType.includes("Transporte")
+          ? methods
+            .getValues("selectedDatesTransport")
+            .map((f) => ({ fecha: f }))
+          : methods
+            .getValues("selectedDatesService")
+            .map((f) => ({ fecha: f })),
+      })),
+    };
+
+    createContractMutation.mutate(contractData);
+  };
+
   useEffect(() => {
     if (startDate) {
       const newServices: Service[] = startingServices.map((s) => ({
@@ -183,35 +212,7 @@ export const FormContracts = () => {
           className="main-button"
           disabled={currentStep !== steps.length - 1}
           loading={createContractMutation.isPending}
-          onClick={methods.handleSubmit((data) => {
-            const contractData: CreateContractRequest = {
-              id_usuario: Number(id),
-              tipo_contrato: data.contractType,
-              fecha_inicio:
-                data.startDate?.format("YYYY-MM-DD") ??
-                dayjs().format("YYYY-MM-DD"),
-              fecha_fin:
-                data.endDate?.format("YYYY-MM-DD") ??
-                dayjs().add(1, "month").format("YYYY-MM-DD"),
-              facturar_contrato: data.billed === "no" ? false : true,
-              servicios: data.services.map((s) => ({
-                id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
-                fecha:
-                  s.startDate?.format("YYYY-MM-DD") ??
-                  dayjs().format("YYYY-MM-DD"),
-                descripcion: s.description,
-                precio_por_dia: s.price,
-                fechas_servicio: s.serviceType.includes("Transporte")
-                  ? methods
-                    .getValues("selectedDatesTransport")
-                    .map((f) => ({ fecha: f }))
-                  : methods
-                    .getValues("selectedDatesService")
-                    .map((f) => ({ fecha: f })),
-              })),
-            };
-            createContractMutation.mutate(contractData);
-          })}
+          onClick={methods.handleSubmit(onSubmit)}
         >
           Guardar y Continuar
         </Button>
