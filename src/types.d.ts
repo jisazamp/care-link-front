@@ -240,3 +240,25 @@ export type CreateContractRequest = {
     precio_por_dia: number;
   }[];
 };
+
+export type Contract = {
+  id_contrato: number;
+  id_usuario: number;
+  facturar_contrato: boolean;
+  fecha_fin: string;
+  fecha_inicio: string;
+  tipo_contrato: 'Nuevo' | 'Recurrente';
+}
+
+export type Service = {
+  id_servicio_contratado: number;
+  id_servicio: number;
+  descripcion: string;
+  fecha: string;
+  fechas_servicio: { fecha: string }[]
+  precio_por_dia: number;
+}
+
+export interface UserContractsResponse extends Contract {
+  servicios: Service[]
+}

@@ -1,11 +1,11 @@
 import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 import { BillingContract } from "./BillingContract/BillingContract";
 import { CreateContract } from "./CreateContract/CreateContract";
-import dayjs, { Dayjs } from "dayjs";
+import type { Dayjs } from "dayjs";
 import { FormProvider, useForm } from "react-hook-form";
 import { ServicesContract } from "./ServicesContract/ServicesContract";
 import { Steps, Button, Card, Typography, Breadcrumb } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HomeOutlined,
   UserOutlined,
@@ -14,11 +14,42 @@ import {
   DollarOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
-import { CreateContractRequest } from "../../../types";
+import { useNavigate, useParams } from "react-router-dom";
+import { Contract, CreateContractRequest } from "../../../types";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
+import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
+import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
+import { useUpdateContractDates } from "../../../hooks/useUpdateContractDates/useUpdateContractDates";
+import {
+  convertContractData,
+  buildContractFromForm,
+  buildContractData,
+} from "./utils/utils";
 
 const { Title } = Typography;
+
+const startingServices: Service[] = [
+  {
+    key: "1",
+    startDate: null,
+    endDate: null,
+    serviceType: "",
+    quantity: 0,
+    description: "",
+    selected: true,
+    price: 0,
+  },
+  {
+    key: "2",
+    startDate: null,
+    endDate: null,
+    serviceType: "",
+    quantity: 0,
+    description: "",
+    selected: true,
+    price: 0,
+  },
+];
 
 export interface Service {
   description: string;
@@ -42,30 +73,105 @@ export interface FormValues {
 }
 
 export const FormContracts = () => {
-  const { id } = useParams();
+  const { id, contractId } = useParams();
+  const navigate = useNavigate();
+
+  const { data: contract } = useGetContractById(contractId);
+  const { mutate: updateContract } = useUpdateContract(contractId);
+  const { mutate: updateContractDates } = useUpdateContractDates();
 
   const methods = useForm<FormValues>({
     defaultValues: {
       endDate: null,
       selectedDatesService: [],
       selectedDatesTransport: [],
-      services: [],
+      services: startingServices,
       startDate: null,
     },
   });
+  const { reset, watch, handleSubmit, getValues, setValue } = methods;
 
+  const startDate = watch("startDate");
   const [currentStep, setCurrentStep] = useState(0);
-  const createContractMutation = useCreateContract();
+  const createContractMutation = useCreateContract(id);
+
+  const onSubmit = (data: FormValues) => {
+    if (contractId) {
+      const newContract: Contract = buildContractFromForm(
+        data,
+        Number(id),
+        Number(contractId)
+      );
+
+      const newServiceDates = data.selectedDatesService.map((s) => ({
+        fecha: s,
+      }));
+      const newTransportDates = data.selectedDatesTransport.map((s) => ({
+        fecha: s,
+      }));
+
+      updateContract(newContract);
+      const serviceContractId =
+        contract?.data.servicios[0].id_servicio_contratado;
+      const serviceTransportId =
+        contract?.data.servicios[1].id_servicio_contratado;
+
+      serviceContractId &&
+        updateContractDates({
+          serviceId: serviceContractId,
+          dates: newServiceDates,
+        });
+
+      serviceTransportId &&
+        updateContractDates({
+          serviceId: serviceTransportId,
+          dates: newTransportDates,
+        });
+      return;
+    }
+
+    const contractData: CreateContractRequest = buildContractData(
+      Number(id),
+      data,
+      getValues
+    );
+
+    createContractMutation.mutate(contractData);
+  };
+
+  useEffect(() => {
+    if (startDate && !contractId) {
+      const newServices: Service[] = startingServices.map((s) => ({
+        ...s,
+        startDate,
+        endDate: startDate.add(1, "month"),
+      }));
+      setValue("services", newServices);
+    }
+  }, [startDate, setValue, contractId]);
+
+  useEffect(() => {
+    if (createContractMutation.isSuccess) {
+      navigate(`/usuarios/${id}/detalles`);
+    }
+  }, [createContractMutation.isSuccess, navigate, id]);
+
+  useEffect(() => {
+    if (contract?.data) {
+      const formValues = convertContractData(contract.data, startingServices);
+      reset(formValues);
+    }
+  }, [contract?.data, reset]);
 
   const steps = [
     {
-      title: "Crear contrato",
+      title: !contractId ? "Crear contrato" : "Editar contrato",
       icon: <FileDoneOutlined />,
       content: (
         <CreateContract
           onNext={(data) => {
-            methods.setValue("startDate", data.startDate);
-            methods.setValue("endDate", data.endDate);
+            setValue("startDate", data.startDate);
+            setValue("endDate", data.endDate);
             setCurrentStep(1);
           }}
         />
@@ -77,7 +183,7 @@ export const FormContracts = () => {
       content: (
         <ServicesContract
           onNext={(services: Service[]) => {
-            methods.setValue("services", services);
+            setValue("services", services);
             setCurrentStep(2);
           }}
           onBack={() => setCurrentStep(0)}
@@ -102,7 +208,7 @@ export const FormContracts = () => {
   ];
 
   const resetAll = () => {
-    methods.reset();
+    reset();
     setCurrentStep(0);
   };
 
@@ -148,35 +254,7 @@ export const FormContracts = () => {
           className="main-button"
           disabled={currentStep !== steps.length - 1}
           loading={createContractMutation.isPending}
-          onClick={methods.handleSubmit((data) => {
-            const contractData: CreateContractRequest = {
-              id_usuario: Number(id),
-              tipo_contrato: data.contractType,
-              fecha_inicio:
-                data.startDate?.format("YYYY-MM-DD") ??
-                dayjs().format("YYYY-MM-DD"),
-              fecha_fin:
-                data.endDate?.format("YYYY-MM-DD") ??
-                dayjs().add(1, "month").format("YYYY-MM-DD"),
-              facturar_contrato: data.billed === "no" ? false : true,
-              servicios: data.services.map((s) => ({
-                id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
-                fecha:
-                  s.startDate?.format("YYYY-MM-DD") ??
-                  dayjs().format("YYYY-MM-DD"),
-                descripcion: s.description,
-                precio_por_dia: s.price,
-                fechas_servicio: s.serviceType.includes("Transporte")
-                  ? methods
-                    .getValues("selectedDatesTransport")
-                    .map((f) => ({ fecha: f }))
-                  : methods
-                    .getValues("selectedDatesService")
-                    .map((f) => ({ fecha: f })),
-              })),
-            };
-            createContractMutation.mutate(contractData);
-          })}
+          onClick={handleSubmit(onSubmit)}
         >
           Guardar y Continuar
         </Button>

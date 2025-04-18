@@ -1,52 +1,35 @@
-import React from "react";
-import { Card, Avatar, Table, Button, Typography } from "antd";
+import { Avatar, Button, Card, Col, Flex, Row, Table, Typography } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
+import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
+import dayjs from "dayjs";
+import { useGetContractById } from "../../../../hooks/useGetContractById/useGetContractById";
 
 const { Title, Text } = Typography;
 
 export const ContractDetails: React.FC = () => {
-  // Datos simulados del contrato y paciente
-  const patientData = {
-    nombre: "Juan Antonio Lopez Orrego",
-    documento: "44567890",
-    genero: "Masculino",
-    fechaNacimiento: "1956/11/08",
-    edad: 68,
-    estadoCivil: "Casado",
-    ocupacion: "Pensionado",
-    direccion: "CLL 45 - 60-20 INT 101",
-    telefono: "315 6789 6789",
-    email: "juanantonio@gmail.com",
-  };
+  const { id, contractId } = useParams();
+
+  const { data: user, isLoading: isLoadingUser } = useGetUserById(id);
+  const { data: contract, isLoading: isLoadingContract } =
+    useGetContractById(contractId);
 
   const contractData = {
-    contratoId: "2024001",
-    realizadoPor: "SARA MANUELA GONZALEZ",
-    tipoContrato: "Recurrente",
-    fechaInicio: "2024-11-08",
-    fechaFin: "2024-12-08",
-    facturado: "Sí",
-    vigente: "Sí",
+    contratoId: contract?.data.id_contrato,
+    tipoContrato: contract?.data.tipo_contrato,
+    fechaInicio: contract?.data.fecha_inicio,
+    fechaFin: contract?.data.fecha_fin,
+    facturado: contract?.data.facturar_contrato ? "Sí" : "No",
   };
 
-  const servicesData = [
-    {
-      key: "1",
-      inicia: "10/11/2024",
-      finaliza: "10/12/2024",
-      servicio: "Tiquetera 15",
-      cantidad: 15,
-      descripcion: "Ingreso a sede en pasa día",
-    },
-    {
-      key: "2",
-      inicia: "10/11/2024",
-      finaliza: "10/12/2024",
-      servicio: "Transporte",
-      cantidad: 15,
-      descripcion: "Transporte ambos trayectos",
-    },
-  ];
+  const servicesData = contract?.data.servicios.map((s) => ({
+    key: s.id_servicio,
+    inicia: s.fecha,
+    finaliza: dayjs(s.fecha).add(1, "month").format("YYYY-MM-DD"),
+    servicio: s.id_servicio === 1 ? "Transporte" : "Cuidado",
+    cantidad: s.fechas_servicio.length,
+    descripcion: s.descripcion,
+  }));
 
   const billingData = [
     {
@@ -67,45 +50,70 @@ export const ContractDetails: React.FC = () => {
 
   return (
     <div className="contract-details-container">
-      {/* Tarjeta 1: Información del Paciente */}
-      <Card className="full-width-card patient-info-card">
-        <div className="patient-info-container">
-          <Avatar
-            src="https://via.placeholder.com/80"
-            size={80}
-            className="patient-avatar"
-          />
-
-          <div className="patient-details">
-            <Title level={4} className="patient-name">
-              {patientData.nombre}
-            </Title>
-            <Typography.Text className="patient-data">
-              <strong>{patientData.documento}</strong> - {patientData.genero} -{" "}
-              {patientData.fechaNacimiento} - {patientData.edad} años
-            </Typography.Text>
-            <Typography.Text className="patient-data">
-              {patientData.estadoCivil} - {patientData.ocupacion}
-            </Typography.Text>
-          </div>
-
-          <div className="patient-contact">
-            <Typography.Text strong>{patientData.direccion}</Typography.Text>
-            <Typography.Text>
-              {patientData.telefono} - {patientData.email}
-            </Typography.Text>
-          </div>
-        </div>
+      <Card
+        title="Datos básicos y de localización"
+        style={{ marginTop: 3 }}
+        loading={isLoadingUser}
+      >
+        <Row gutter={24} align="middle">
+          {user?.data.data.url_imagen && (
+            <Col lg={4}>
+              <Avatar
+                src={user.data.data.url_imagen}
+                size={120}
+                alt="Avatar del paciente"
+                style={{ border: "1px solid #ddd" }}
+              />
+            </Col>
+          )}
+          <Col lg={10}>
+            <Flex vertical gap={10}>
+              <Typography.Text style={{ textTransform: "uppercase" }}>
+                {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
+              </Typography.Text>
+              <Flex gap={4}>
+                <Typography.Text style={{ fontWeight: "bold" }}>
+                  {`${user?.data.data.n_documento}`}
+                </Typography.Text>
+                <Typography.Text>-</Typography.Text>
+                <Typography.Text>{user?.data.data.genero}</Typography.Text>
+                <Typography.Text>-</Typography.Text>
+                <Typography.Text>
+                  {dayjs(user?.data.data.fecha_nacimiento).format("DD-MM-YYYY")}
+                </Typography.Text>
+                <Typography.Text>-</Typography.Text>
+                <Typography.Text style={{ fontWeight: "bold" }}>
+                  {dayjs().diff(
+                    dayjs(user?.data.data.fecha_nacimiento),
+                    "years"
+                  )}{" "}
+                  años
+                </Typography.Text>
+              </Flex>
+              <Typography.Text>{user?.data.data.estado_civil}</Typography.Text>
+            </Flex>
+          </Col>
+          <Col lg={10}>
+            <Flex vertical gap={10}>
+              <Typography.Text>{user?.data.data.direccion}</Typography.Text>
+              <Flex gap={4}>
+                <Typography.Text>{user?.data.data.telefono}</Typography.Text>
+                <Typography.Text>-</Typography.Text>
+                <Typography.Text>{user?.data.data.email}</Typography.Text>
+              </Flex>
+            </Flex>
+          </Col>
+        </Row>
       </Card>
 
-      {/* Tarjeta 2: Detalles del contrato */}
-      <Card className="full-width-card contract-card">
-        {/* 🔹 HEAD de la Tarjeta */}
+      <Card
+        className="full-width-card contract-card"
+        loading={isLoadingContract}
+      >
         <div className="contract-header">
           <div className="title-wrapper">
             <Title level={5} className="contract-title">
-              Contrato {contractData.contratoId} - Realizado por:{" "}
-              {contractData.realizadoPor}
+              Contrato #{contractData.contratoId}
             </Title>
           </div>
           <div className="contract-actions">
@@ -118,7 +126,6 @@ export const ContractDetails: React.FC = () => {
           </div>
         </div>
 
-        {/* 🔹 BODY de la Tarjeta */}
         <div className="contract-body">
           <div className="contract-field">
             <Text className="field-title">Tipo de Contrato</Text>
@@ -143,38 +150,25 @@ export const ContractDetails: React.FC = () => {
               <Text>
                 <strong>Facturado:</strong> {contractData.facturado}
               </Text>
-              <div className="status-edit">
-                <Text>
-                  <strong>Vigente:</strong> {contractData.vigente}
-                </Text>
-                <Button type="link" className="edit-link">
-                  Editar
-                </Button>
-              </div>
             </div>
           </div>
         </div>
       </Card>
 
-      {/* Tarjeta 3: Servicios */}
       <Card className="full-width-card services-card">
-        {/* 🔹 HEAD de la Tarjeta */}
         <div className="services-header">
           <Title level={5} className="services-title">
             Servicios
           </Title>
-          <Button type="default" className="add-button">
+          {/*<Button type="default" className="add-button">
             <PlusCircleOutlined /> Agregar
-          </Button>
+          </Button>*/}
         </div>
 
-        {/* 🔹 CUERPO de la Tarjeta */}
         <div className="services-body">
-          {/* Subtítulo de la tabla */}
           <Text className="table-subtitle">
             Servicios o productos incluidos
           </Text>
-
           <Table
             columns={[
               { title: "Inicia el", dataIndex: "inicia" },
@@ -183,6 +177,7 @@ export const ContractDetails: React.FC = () => {
               { title: "Cantidad Disponible", dataIndex: "cantidad" },
               { title: "Descripción", dataIndex: "descripcion" },
               {
+                /*
                 title: "Acciones",
                 render: () => (
                   <>
@@ -191,6 +186,7 @@ export const ContractDetails: React.FC = () => {
                     </Button>
                   </>
                 ),
+              */
               },
             ]}
             dataSource={servicesData}

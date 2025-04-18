@@ -1,7 +1,6 @@
 import {
   Button,
   Card,
-  Checkbox,
   Col,
   DatePicker,
   Input,
@@ -14,7 +13,6 @@ import dayjs from "dayjs";
 import type { FormValues } from "../FormContracts";
 import type { Service } from "../FormContracts";
 import { useFormContext } from "react-hook-form";
-import { useEffect } from "react";
 
 const WEEKS_IN_MONTH = 4;
 
@@ -25,42 +23,16 @@ interface ServicesContractProps {
 
 export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const methods = useFormContext<FormValues>();
-  const startDate = methods.watch('startDate');
-  const endDate = methods.watch('endDate');
   const services = methods.watch("services");
 
-  const startingServices: Service[] = [
-    {
-      key: "1",
-      startDate,
-      endDate,
-      serviceType: "",
-      quantity: 0,
-      description: "",
-      selected: true,
-      price: 0,
-    },
-    {
-      key: "2",
-      startDate,
-      endDate,
-      serviceType: "",
-      quantity: 0,
-      description: "",
-      selected: true,
-      price: 0,
-    },
-  ];
-
-
-  const handleServiceChange = (key: string, value: string) => {
+  const handleServiceChange = (key: string, value?: string) => {
     const quantity =
-      value.includes("Tiquetera") || value.includes("Transporte")
+      value && (value.includes("Tiquetera") || value.includes("Transporte"))
         ? parseInt(value.split(" ")[1]) * WEEKS_IN_MONTH
         : 0;
 
     const newServices = services.map((s) =>
-      s.key === key ? { ...s, serviceType: value, quantity } : s
+      s.key === key ? { ...s, serviceType: value || "", quantity } : s
     );
     methods.setValue("services", newServices);
   };
@@ -87,6 +59,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
 
   const columns = [
     {
+      /*
       title: "Activar",
       dataIndex: "selected",
       render: (_: unknown, record: Service) => (
@@ -102,6 +75,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         />
       ),
       width: 80,
+    */
     },
     {
       title: "Inicia el",
@@ -133,6 +107,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           style={{ width: "100%", minWidth: 200 }}
           value={record.serviceType || undefined}
           onChange={(value) => handleServiceChange(record.key, value)}
+          allowClear
         >
           {record.key === "1"
             ? Array.from({ length: 5 }, (_, i) => (
@@ -177,12 +152,16 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
       dataIndex: "price",
       render: (_: unknown, record: Service) => (
         <Input
-          type="number"
-          value={record.price}
-          onChange={(e) =>
-            handlePriceChange(record.key, parseFloat(e.target.value) || 0)
-          }
-          min={0}
+          type="text"
+          value={new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: "COP",
+            minimumFractionDigits: 0,
+          }).format(record.price || 0)}
+          onChange={(e) => {
+            const parsed = parseInt(e.target.value.replace(/\D/g, ""), 10) || 0;
+            handlePriceChange(record.key, parsed);
+          }}
         />
       ),
     },
@@ -207,10 +186,6 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     */
     },
   ];
-
-  useEffect(() => {
-    methods.setValue('services', startingServices);
-  }, [])
 
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>

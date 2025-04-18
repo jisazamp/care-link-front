@@ -91,14 +91,14 @@ export const AgendaSettingsContract = ({
     );
   };
 
-  const disabledDate = (current: Dayjs) => {
+  /* const disabledDate = (current: Dayjs) => {
     if (!startDate || !endDate) return true;
 
     const start = typeof startDate === "string" ? dayjs(startDate) : startDate;
     const end = typeof endDate === "string" ? dayjs(endDate) : endDate;
 
     return current.isBefore(start, "day") || current.isAfter(end, "day");
-  };
+  }; */
 
   return (
     <Card bordered>
@@ -112,11 +112,12 @@ export const AgendaSettingsContract = ({
         >
           <Calendar
             fullscreen={false}
-            onSelect={(date) => handleSelectDate(date, "service")}
-            fullCellRender={(date) =>
-              renderDateCell(date, selectedDatesService)
-            }
-            disabledDate={disabledDate}
+            onSelect={(date, info) => {
+              if (info.source === "date") {
+                handleSelectDate(date, "service");
+              }
+            }}
+            fullCellRender={(date) => renderDateCell(date, selectedDatesService)}
             style={{ width: "300px", margin: "auto" }}
           />
         </Card>
@@ -129,11 +130,12 @@ export const AgendaSettingsContract = ({
         >
           <Calendar
             fullscreen={false}
-            onSelect={(date) => handleSelectDate(date, "transport")}
-            fullCellRender={(date) =>
-              renderDateCell(date, selectedDatesTransport)
-            }
-            disabledDate={disabledDate}
+            onSelect={(date, info) => {
+              if (info.source === "date") {
+                handleSelectDate(date, "transport");
+              }
+            }}
+            fullCellRender={(date) => renderDateCell(date, selectedDatesTransport)}
             style={{ width: "300px", margin: "auto" }}
           />
         </Card>
