@@ -1,3 +1,4 @@
+// import '../wdyr.js';
 import "antd/dist/reset.css";
 import dayjs from "dayjs";
 import es from "dayjs/locale/es";
