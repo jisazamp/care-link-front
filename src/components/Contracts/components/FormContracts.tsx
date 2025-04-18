@@ -15,11 +15,75 @@ import {
   CalendarOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { CreateContractRequest } from "../../../types";
+import { Contract, CreateContractRequest } from "../../../types";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
+import type { Service as ContractService } from "../../../types";
 
 const { Title } = Typography;
+
+const convertServicesData = (
+  services: ContractService[],
+  startingServices: Service[]
+): Service[] => {
+  let result: Service[] = services.map((s) => ({
+    description: s.descripcion,
+    endDate: dayjs(s.fecha).add(1, "month"),
+    key: s.id_servicio + "",
+    price: s.precio_por_dia,
+    quantity: s.fechas_servicio.length,
+    selected: !!s.fechas_servicio.length,
+    serviceType:
+      s.id_servicio === 1
+        ? `Tiquetera ${s.fechas_servicio.length / 4}`
+        : `Transporte ${s.fechas_servicio.length / 4}`,
+    startDate: dayjs(s.fecha),
+  }));
+
+  if (services.length === 1)
+    result = [
+      ...result,
+      {
+        ...startingServices[1],
+        startDate: result[0].startDate,
+        endDate: result[0].endDate,
+      },
+    ];
+
+  return result;
+};
+
+const convertSelectedDates = (dates: { fecha: string }[]): string[] =>
+  dates.map((d) => d.fecha);
+
+const convertContractData = (
+  contract: Contract & { servicios: ContractService[] },
+  startingServices: Service[]
+): FormValues => {
+  const {
+    tipo_contrato,
+    facturar_contrato,
+    fecha_inicio,
+    fecha_fin,
+    servicios,
+  } = contract;
+
+  const services = convertServicesData(servicios, startingServices);
+
+  return {
+    contractType: tipo_contrato,
+    billed: facturar_contrato ? "si" : "no",
+    startDate: dayjs(fecha_inicio),
+    endDate: dayjs(fecha_fin),
+    services,
+    selectedDatesService: convertSelectedDates(
+      servicios[0]?.fechas_servicio ?? []
+    ),
+    selectedDatesTransport: convertSelectedDates(
+      servicios[1]?.fechas_servicio ?? []
+    ),
+  };
+};
 
 export interface Service {
   description: string;
@@ -138,56 +202,8 @@ export const FormContracts = () => {
 
   useEffect(() => {
     if (contract?.data) {
-      const {
-        tipo_contrato,
-        facturar_contrato,
-        fecha_inicio,
-        fecha_fin,
-        servicios,
-      } = contract.data;
-
-      let services: Service[] = servicios.map((s) => ({
-        description: s.descripcion,
-        endDate: dayjs(s.fecha).add(1, "month"),
-        key: s.id_servicio + "",
-        price: s.precio_por_dia,
-        quantity: s.fechas_servicio.length,
-        selected: !!s.fechas_servicio.length,
-        serviceType:
-          s.id_servicio === 1
-            ? `Tiquetera ${s.fechas_servicio.length / 4}`
-            : `Transporte ${s.fechas_servicio.length / 4}`,
-        startDate: dayjs(s.fecha),
-      }));
-
-      let selectedDatesService: string[] = [];
-      let selectedDatesTransport: string[] = [];
-
-      servicios.forEach((s) =>
-        s.id_servicio === 1
-          ? (selectedDatesService = s.fechas_servicio.map((f) => f.fecha))
-          : (selectedDatesTransport = s.fechas_servicio.map((f) => f.fecha))
-      );
-
-      if (services.length === 1)
-        services = [
-          ...services,
-          {
-            ...startingServices[1],
-            startDate: services[0].startDate,
-            endDate: services[0].endDate,
-          },
-        ];
-
-      methods.reset({
-        contractType: tipo_contrato,
-        billed: facturar_contrato ? "si" : "no",
-        startDate: dayjs(fecha_inicio),
-        endDate: dayjs(fecha_fin),
-        services,
-        selectedDatesService,
-        selectedDatesTransport,
-      });
+      const formValues = convertContractData(contract.data, startingServices);
+      methods.reset(formValues);
     }
   }, [contract?.data, methods, startingServices]);
 
