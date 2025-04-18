@@ -229,6 +229,14 @@ export const App = () => {
               }
             />
             <Route
+              path="/usuarios/:id/contrato/:contractId/editar"
+              element={
+                <PrivateRoute>
+                  <FormContracts />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="/usuarios/:id/contrato/:contractId"
               element={
                 <PrivateRoute>

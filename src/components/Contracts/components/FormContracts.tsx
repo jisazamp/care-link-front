@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { FormProvider, useForm } from "react-hook-form";
 import { ServicesContract } from "./ServicesContract/ServicesContract";
 import { Steps, Button, Card, Typography, Breadcrumb } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   HomeOutlined,
   UserOutlined,
@@ -17,6 +17,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { CreateContractRequest } from "../../../types";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
+import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 
 const { Title } = Typography;
 
@@ -42,31 +43,36 @@ export interface FormValues {
 }
 
 export const FormContracts = () => {
-  const { id } = useParams();
+  const { id, contractId } = useParams();
   const navigate = useNavigate();
 
-  const startingServices: Service[] = [
-    {
-      key: "1",
-      startDate: null,
-      endDate: null,
-      serviceType: "",
-      quantity: 0,
-      description: "",
-      selected: true,
-      price: 0,
-    },
-    {
-      key: "2",
-      startDate: null,
-      endDate: null,
-      serviceType: "",
-      quantity: 0,
-      description: "",
-      selected: true,
-      price: 0,
-    },
-  ];
+  const { data: contract } = useGetContractById(contractId);
+
+  const startingServices: Service[] = useMemo(
+    () => [
+      {
+        key: "1",
+        startDate: null,
+        endDate: null,
+        serviceType: "",
+        quantity: 0,
+        description: "",
+        selected: true,
+        price: 0,
+      },
+      {
+        key: "2",
+        startDate: null,
+        endDate: null,
+        serviceType: "",
+        quantity: 0,
+        description: "",
+        selected: true,
+        price: 0,
+      },
+    ],
+    []
+  );
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -114,7 +120,7 @@ export const FormContracts = () => {
   };
 
   useEffect(() => {
-    if (startDate) {
+    if (startDate && !contractId) {
       const newServices: Service[] = startingServices.map((s) => ({
         ...s,
         startDate,
@@ -122,13 +128,68 @@ export const FormContracts = () => {
       }));
       methods.setValue("services", newServices);
     }
-  }, [startDate, methods.setValue]);
+  }, [startDate, methods.setValue, methods, startingServices, contractId]);
 
   useEffect(() => {
     if (createContractMutation.isSuccess) {
       navigate(`/usuarios/${id}/detalles`);
     }
-  }, [createContractMutation.isSuccess, navigate]);
+  }, [createContractMutation.isSuccess, navigate, id]);
+
+  useEffect(() => {
+    if (contract?.data) {
+      const {
+        tipo_contrato,
+        facturar_contrato,
+        fecha_inicio,
+        fecha_fin,
+        servicios,
+      } = contract.data;
+
+      let services: Service[] = servicios.map((s) => ({
+        description: s.descripcion,
+        endDate: dayjs(s.fecha).add(1, "month"),
+        key: s.id_servicio + "",
+        price: s.precio_por_dia,
+        quantity: s.fechas_servicio.length,
+        selected: !!s.fechas_servicio.length,
+        serviceType:
+          s.id_servicio === 1
+            ? `Tiquetera ${s.fechas_servicio.length / 4}`
+            : `Transporte ${s.fechas_servicio.length / 4}`,
+        startDate: dayjs(s.fecha),
+      }));
+
+      let selectedDatesService: string[] = [];
+      let selectedDatesTransport: string[] = [];
+
+      servicios.forEach((s) =>
+        s.id_servicio === 1
+          ? (selectedDatesService = s.fechas_servicio.map((f) => f.fecha))
+          : (selectedDatesTransport = s.fechas_servicio.map((f) => f.fecha))
+      );
+
+      if (services.length === 1)
+        services = [
+          ...services,
+          {
+            ...startingServices[1],
+            startDate: services[0].startDate,
+            endDate: services[0].endDate,
+          },
+        ];
+
+      methods.reset({
+        contractType: tipo_contrato,
+        billed: facturar_contrato ? "si" : "no",
+        startDate: dayjs(fecha_inicio),
+        endDate: dayjs(fecha_fin),
+        services,
+        selectedDatesService,
+        selectedDatesTransport,
+      });
+    }
+  }, [contract?.data, methods, startingServices]);
 
   const steps = [
     {
