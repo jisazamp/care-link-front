@@ -19,6 +19,7 @@ import { Contract, CreateContractRequest } from "../../../types";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import type { Service as ContractService } from "../../../types";
+import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
 
 const { Title } = Typography;
 
@@ -134,6 +135,7 @@ export const FormContracts = () => {
   const navigate = useNavigate();
 
   const { data: contract } = useGetContractById(contractId);
+  const { mutate: updateContract } = useUpdateContract(contractId);
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -152,7 +154,17 @@ export const FormContracts = () => {
 
   const onSubmit = (data: FormValues) => {
     if (contractId) {
-      console.log("Editing...");
+      const newContract: Contract = {
+        id_usuario: Number(id),
+        id_contrato: Number(contractId),
+        facturar_contrato: data.billed === "si" ? true : false,
+        tipo_contrato: data.contractType as "Nuevo" | "Recurrente",
+        fecha_inicio:
+          data.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
+        fecha_fin:
+          data.endDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
+      };
+      updateContract(newContract);
       return;
     }
 
