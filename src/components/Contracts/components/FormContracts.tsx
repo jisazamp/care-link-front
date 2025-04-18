@@ -19,6 +19,7 @@ import { Contract, CreateContractRequest } from "../../../types";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
+import { useUpdateContractDates } from "../../../hooks/useUpdateContractDates/useUpdateContractDates";
 import {
   convertContractData,
   buildContractFromForm,
@@ -77,6 +78,7 @@ export const FormContracts = () => {
 
   const { data: contract } = useGetContractById(contractId);
   const { mutate: updateContract } = useUpdateContract(contractId);
+  const { mutate: updateContractDates } = useUpdateContractDates();
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -100,7 +102,31 @@ export const FormContracts = () => {
         Number(id),
         Number(contractId)
       );
+
+      const newServiceDates = data.selectedDatesService.map((s) => ({
+        fecha: s,
+      }));
+      const newTransportDates = data.selectedDatesTransport.map((s) => ({
+        fecha: s,
+      }));
+
       updateContract(newContract);
+      const serviceContractId =
+        contract?.data.servicios[0].id_servicio_contratado;
+      const serviceTransportId =
+        contract?.data.servicios[1].id_servicio_contratado;
+
+      serviceContractId &&
+        updateContractDates({
+          serviceId: serviceContractId,
+          dates: newServiceDates,
+        });
+
+      serviceTransportId &&
+        updateContractDates({
+          serviceId: serviceTransportId,
+          dates: newTransportDates,
+        });
       return;
     }
 

@@ -251,6 +251,7 @@ export type Contract = {
 }
 
 export type Service = {
+  id_servicio_contratado: number;
   id_servicio: number;
   descripcion: string;
   fecha: string;
