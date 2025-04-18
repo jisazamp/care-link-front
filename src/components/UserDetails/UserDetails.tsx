@@ -3,7 +3,6 @@ import {
   Breadcrumb,
   Button,
   Card,
-  Checkbox,
   Col,
   Divider,
   Row,
@@ -36,11 +35,6 @@ const { confirm } = Modal;
 
 export const contractsColumns: ColumnsType<any> = [
   {
-    title: "ID Contrato",
-    dataIndex: "id_contrato",
-    key: "id_contrato",
-  },
-  {
     title: "Tipo de Contrato",
     dataIndex: "tipo_contrato",
     key: "tipo_contrato",
@@ -60,25 +54,6 @@ export const contractsColumns: ColumnsType<any> = [
     dataIndex: "facturar_contrato",
     key: "facturar_contrato",
     render: (value: boolean) => (value ? "Sí" : "No"),
-  },
-];
-
-const contractsData = [
-  {
-    key: "1",
-    fechaInicio: "12/12/2024",
-    estado: "Activo",
-    servicios: "Centro día, transporte",
-    firmado: "Sí",
-    estadoFacturacion: "Al día",
-    acciones: [
-      <a key="view" href="#">
-        Ver
-      </a>,
-      <a key="edit" href="#" style={{ marginLeft: 8 }}>
-        Editar
-      </a>,
-    ],
   },
 ];
 

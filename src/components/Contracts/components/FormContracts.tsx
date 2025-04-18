@@ -14,7 +14,7 @@ import {
   DollarOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CreateContractRequest } from "../../../types";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 
@@ -43,6 +43,7 @@ export interface FormValues {
 
 export const FormContracts = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const startingServices: Service[] = [
     {
@@ -91,20 +92,22 @@ export const FormContracts = () => {
         data.endDate?.format("YYYY-MM-DD") ??
         dayjs().add(1, "month").format("YYYY-MM-DD"),
       facturar_contrato: data.billed === "no" ? false : true,
-      servicios: data.services.filter(s => !!s.quantity).map((s) => ({
-        id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
-        fecha:
-          s.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
-        descripcion: s.description,
-        precio_por_dia: s.price,
-        fechas_servicio: s.serviceType.includes("Transporte")
-          ? methods
-            .getValues("selectedDatesTransport")
-            .map((f) => ({ fecha: f }))
-          : methods
-            .getValues("selectedDatesService")
-            .map((f) => ({ fecha: f })),
-      })),
+      servicios: data.services
+        .filter((s) => !!s.quantity)
+        .map((s) => ({
+          id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
+          fecha:
+            s.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
+          descripcion: s.description,
+          precio_por_dia: s.price,
+          fechas_servicio: s.serviceType.includes("Transporte")
+            ? methods
+              .getValues("selectedDatesTransport")
+              .map((f) => ({ fecha: f }))
+            : methods
+              .getValues("selectedDatesService")
+              .map((f) => ({ fecha: f })),
+        })),
     };
 
     createContractMutation.mutate(contractData);
@@ -120,6 +123,12 @@ export const FormContracts = () => {
       methods.setValue("services", newServices);
     }
   }, [startDate, methods.setValue]);
+
+  useEffect(() => {
+    if (createContractMutation.isSuccess) {
+      navigate(`/usuarios/${id}/detalles`);
+    }
+  }, [createContractMutation.isSuccess, navigate]);
 
   const steps = [
     {
