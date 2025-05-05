@@ -707,7 +707,11 @@ export const UserDetails: React.FC = () => {
             <Card
               title="Contratos"
               extra={
-                <Button icon={<PlusOutlined />} className="main-button-white">
+                <Button
+                  icon={<PlusOutlined />}
+                  className="main-button-white"
+                  onClick={() => navigate(`/usuarios/${userId}/contrato`)}
+                >
                   Agregar
                 </Button>
               }
