@@ -1,1 +1,1 @@
-npx biome check --fix src
+npx biome check --fix --unsafe --staged src
