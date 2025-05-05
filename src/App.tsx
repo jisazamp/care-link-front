@@ -1,31 +1,31 @@
 import "./index.css";
+import { ConfigProvider } from "antd";
 import es from "antd/es/date-picker/locale/es_ES";
 import esES from "antd/es/locale/es_ES";
 import {
+  Navigate,
+  Route,
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate,
 } from "react-router-dom";
-import { ConfigProvider } from "antd";
+import { ActivitiesList } from "./components/ActivitiesList/ActivitiesList";
+import { ContractDetails } from "./components/Contracts/components/ContractDetails/ContractDetails";
+import { FormContracts } from "./components/Contracts/components/FormContracts";
+import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
+import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
 import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
-import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
-import { NewUser } from "./components/NewUser/NewUser";
-import { UserDetails } from "./components/UserDetails/UserDetails";
-import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { MainLayout } from "./components/MainLayout/MainLayout";
-import { UsersList } from "./components/UsersList/UsersList";
-import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
-import { UserList } from "./components/UserList/UserList";
-import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
-import { FormContracts } from "./components/Contracts/components/FormContracts";
-import { ContractDetails } from "./components/Contracts/components/ContractDetails/ContractDetails";
-import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
+import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
+import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
-import { ActivitiesList } from "./components/ActivitiesList/ActivitiesList";
-import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
+import { NewUser } from "./components/NewUser/NewUser";
+import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
+import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
+import { UserDetails } from "./components/UserDetails/UserDetails";
+import { UserList } from "./components/UserList/UserList";
+import { UsersList } from "./components/UsersList/UsersList";
 
 export const colors = {
   primary: {
@@ -45,8 +45,8 @@ const spanishLocale: typeof es = {
 
 const locale: typeof esES = {
   ...esES,
-  DatePicker: {
-    ...esES.DatePicker!,
+  DatePicker: esES.DatePicker && {
+    ...esES.DatePicker,
     lang: spanishLocale.lang,
   },
 };

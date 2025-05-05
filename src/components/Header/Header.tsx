@@ -1,6 +1,3 @@
-import { Avatar, Badge, Layout, Typography, Flex, Tooltip, Button } from "antd";
-import { useAuthStore } from "../../store/auth";
-import { queryClient } from "../../main";
 import {
   BellOutlined,
   LogoutOutlined,
@@ -8,7 +5,10 @@ import {
   SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { Avatar, Badge, Button, Flex, Layout, Tooltip, Typography } from "antd";
 import { useGetUserInfo } from "../../hooks/useGetUserInfo/useGetUserInfo";
+import { queryClient } from "../../main";
+import { useAuthStore } from "../../store/auth";
 
 const { Header: AntHeader } = Layout;
 

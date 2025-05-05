@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import { z } from "zod";
 
 export const pharmacotherapeuticRegimenSchema = z.object({
@@ -90,7 +90,7 @@ const attachedDocumentsSchema = z
       files.every((file) => file instanceof File),
     {
       message: "Todos los archivos deben ser válidos",
-    }
+    },
   );
 
 export const formSchema = z.object({

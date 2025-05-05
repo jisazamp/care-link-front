@@ -1,6 +1,6 @@
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
 
 const deleteFamilyMember = (id: number) =>
   client.delete(`/api/family_members/${id}`);

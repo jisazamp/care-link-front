@@ -1,8 +1,8 @@
-import { Header } from "../Header/Header";
 import { Layout } from "antd";
-import { Outlet } from "react-router-dom";
-import { Sidebar } from "../Sidebar/Sidebar";
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import { Header } from "../Header/Header";
+import { Sidebar } from "../Sidebar/Sidebar";
 
 export const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(true);

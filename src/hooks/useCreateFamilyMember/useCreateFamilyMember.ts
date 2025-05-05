@@ -1,11 +1,11 @@
-import type { CreateFamilyMemberRequest } from "../../types";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
+import type { CreateFamilyMemberRequest } from "../../types";
 
 const createFamilyMember = async (request: CreateFamilyMemberRequest) => {
   const userId = request.userId;
-  delete request.userId;
+  request.userId = undefined;
   return client.post(`/api/family_members/:id?id=${userId}`, request);
 };
 

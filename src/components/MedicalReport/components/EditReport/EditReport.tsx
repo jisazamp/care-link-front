@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { DeleteOutlined, UserOutlined } from "@ant-design/icons";
 import {
   Avatar,
   Button,
@@ -8,15 +8,14 @@ import {
   Flex,
   Form,
   Input,
+  Modal,
   Row,
   Select,
   Typography,
-  Modal,
 } from "antd";
-import dayjs, { Dayjs } from "dayjs";
-import { ClinicalEvolution } from "../../../../types";
-import { DeleteOutlined, UserOutlined } from "@ant-design/icons";
-import { queryClient } from "../../../../main";
+import dayjs, { type Dayjs } from "dayjs";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { useCreateClinicalEvolution } from "../../../../hooks/useCreateClinicalEvolution/useCreateClinicalEvolution";
 import { useDeleteClinicalEvolution } from "../../../../hooks/useDeleteClinicalEvolution/useDeleteClinicalEvolution";
 import { useEditClinicalEvolution } from "../../../../hooks/useEditClinicalEvolution/useEditClinicalEvolution";
@@ -24,7 +23,8 @@ import { useGetClinicalEvolutions } from "../../../../hooks/useGetClinicalEvolut
 import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
-import { useParams } from "react-router-dom";
+import { queryClient } from "../../../../main";
+import type { ClinicalEvolution } from "../../../../types";
 
 const { Text } = Typography;
 const { confirm } = Modal;
@@ -83,7 +83,7 @@ export const EditReport: React.FC = () => {
             queryKey: [`report-${reportId}-clinical-evolutions`],
           });
         },
-      }
+      },
     );
   };
 
@@ -381,7 +381,7 @@ export const EditReport: React.FC = () => {
                       icon={<DeleteOutlined />}
                       shape="circle"
                       onClick={() => handleDelete(e.id_TipoReporte)}
-                    ></Button>
+                    />
                   </Flex>
                 )}
               </Flex>

@@ -1,29 +1,29 @@
-import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
-import { BillingContract } from "./BillingContract/BillingContract";
-import { CreateContract } from "./CreateContract/CreateContract";
-import type { Dayjs } from "dayjs";
-import { FormProvider, useForm } from "react-hook-form";
-import { ServicesContract } from "./ServicesContract/ServicesContract";
-import { Steps, Button, Card, Typography, Breadcrumb } from "antd";
-import { useEffect, useState } from "react";
 import {
-  HomeOutlined,
-  UserOutlined,
-  FileDoneOutlined,
-  SolutionOutlined,
-  DollarOutlined,
   CalendarOutlined,
+  DollarOutlined,
+  FileDoneOutlined,
+  HomeOutlined,
+  SolutionOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { Breadcrumb, Button, Card, Steps, Typography } from "antd";
+import type { Dayjs } from "dayjs";
+import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { Contract, CreateContractRequest } from "../../../types";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
 import { useUpdateContractDates } from "../../../hooks/useUpdateContractDates/useUpdateContractDates";
+import type { Contract, CreateContractRequest } from "../../../types";
+import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
+import { BillingContract } from "./BillingContract/BillingContract";
+import { CreateContract } from "./CreateContract/CreateContract";
+import { ServicesContract } from "./ServicesContract/ServicesContract";
 import {
-  convertContractData,
-  buildContractFromForm,
   buildContractData,
+  buildContractFromForm,
+  convertContractData,
 } from "./utils/utils";
 
 const { Title } = Typography;
@@ -100,7 +100,7 @@ export const FormContracts = () => {
       const newContract: Contract = buildContractFromForm(
         data,
         Number(id),
-        Number(contractId)
+        Number(contractId),
       );
 
       const newServiceDates = data.selectedDatesService.map((s) => ({
@@ -133,7 +133,7 @@ export const FormContracts = () => {
     const contractData: CreateContractRequest = buildContractData(
       Number(id),
       data,
-      getValues
+      getValues,
     );
 
     createContractMutation.mutate(contractData);

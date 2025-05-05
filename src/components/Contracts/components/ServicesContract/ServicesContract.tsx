@@ -10,9 +10,9 @@ import {
   Table,
 } from "antd";
 import dayjs from "dayjs";
+import { useFormContext } from "react-hook-form";
 import type { FormValues } from "../FormContracts";
 import type { Service } from "../FormContracts";
-import { useFormContext } from "react-hook-form";
 
 const WEEKS_IN_MONTH = 4;
 
@@ -28,25 +28,25 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const handleServiceChange = (key: string, value?: string) => {
     const quantity =
       value && (value.includes("Tiquetera") || value.includes("Transporte"))
-        ? parseInt(value.split(" ")[1]) * WEEKS_IN_MONTH
+        ? Number.parseInt(value.split(" ")[1]) * WEEKS_IN_MONTH
         : 0;
 
     const newServices = services.map((s) =>
-      s.key === key ? { ...s, serviceType: value || "", quantity } : s
+      s.key === key ? { ...s, serviceType: value || "", quantity } : s,
     );
     methods.setValue("services", newServices);
   };
 
   const handleDescriptionChange = (key: string, value: string) => {
     const newServices = services.map((s) =>
-      s.key === key ? { ...s, description: value } : s
+      s.key === key ? { ...s, description: value } : s,
     );
     methods.setValue("services", newServices);
   };
 
   const handlePriceChange = (key: string, value: number) => {
     const newServices = services.map((s) =>
-      s.key === key ? { ...s, price: value } : s
+      s.key === key ? { ...s, price: value } : s,
     );
     methods.setValue("services", newServices);
   };
@@ -111,21 +111,21 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         >
           {record.key === "1"
             ? Array.from({ length: 5 }, (_, i) => (
-              <Select.Option
-                key={`Tiquetera ${i + 1}`}
-                value={`Tiquetera ${i + 1}`}
-              >
-                Tiquetera {i + 1}
-              </Select.Option>
-            ))
+                <Select.Option
+                  key={`Tiquetera ${i + 1}`}
+                  value={`Tiquetera ${i + 1}`}
+                >
+                  Tiquetera {i + 1}
+                </Select.Option>
+              ))
             : Array.from({ length: 5 }, (_, i) => (
-              <Select.Option
-                key={`Transporte ${i + 1}`}
-                value={`Transporte ${i + 1}`}
-              >
-                Transporte {i + 1}
-              </Select.Option>
-            ))}
+                <Select.Option
+                  key={`Transporte ${i + 1}`}
+                  value={`Transporte ${i + 1}`}
+                >
+                  Transporte {i + 1}
+                </Select.Option>
+              ))}
         </Select>
       ),
     },
@@ -159,7 +159,8 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
             minimumFractionDigits: 0,
           }).format(record.price || 0)}
           onChange={(e) => {
-            const parsed = parseInt(e.target.value.replace(/\D/g, ""), 10) || 0;
+            const parsed =
+              Number.parseInt(e.target.value.replace(/\D/g, ""), 10) || 0;
             handlePriceChange(record.key, parsed);
           }}
         />

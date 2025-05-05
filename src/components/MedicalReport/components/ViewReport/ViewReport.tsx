@@ -1,18 +1,11 @@
-import {
-  Card,
-  Descriptions,
-  Table,
-  Avatar,
-  Typography,
-  Flex,
-} from "antd";
+import { Avatar, Card, Descriptions, Flex, Table, Typography } from "antd";
 import dayjs from "dayjs";
-import patientImage from "../../../assets/Patients/patient1.jpg";
+import { useParams } from "react-router-dom";
+import { useGetClinicalEvolutions } from "../../../../hooks/useGetClinicalEvolutions/useGetClinicalEvolutions";
+import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import { useParams } from "react-router-dom";
-import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
-import { useGetClinicalEvolutions } from "../../../../hooks/useGetClinicalEvolutions/useGetClinicalEvolutions";
+import patientImage from "../../../assets/Patients/patient1.jpg";
 
 const { Title } = Typography;
 

@@ -1,20 +1,20 @@
-import React from "react";
 import {
-  Layout,
-  Card,
-  Typography,
-  Row,
-  Col,
-  Divider,
-  Button,
-  Table,
-  Checkbox,
-} from "antd";
-import {
-  EditOutlined,
   DeleteOutlined,
+  EditOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Layout,
+  Row,
+  Table,
+  Typography,
+} from "antd";
+import type React from "react";
 import avatar from "../assets/Patients/patient1.jpg";
 
 const { Content } = Layout;
@@ -67,7 +67,7 @@ const columns = [
     key: "treatments",
     render: (text: string) => (
       <span>
-        {text} | <a>Ver</a>
+        {text} | <a href="https://google.com">Ver</a>
       </span>
     ),
   },
@@ -77,8 +77,10 @@ const columns = [
     key: "actions",
     render: () => (
       <span>
-        <a style={{ marginRight: 8 }}>Ver</a>
-        <a>Editar</a>
+        <a style={{ marginRight: 8 }} href="https://google.com">
+          Ver
+        </a>
+        <a href="https://google.com">Editar</a>
       </span>
     ),
   },

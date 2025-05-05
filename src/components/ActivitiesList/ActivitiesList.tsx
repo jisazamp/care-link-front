@@ -7,11 +7,11 @@ import {
   Modal,
   Typography,
 } from "antd";
-import type { Activity } from "../../types";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDeleteActivity } from "../../hooks/useDeleteActivity/useDeleteActivity";
 import { useGetActivities } from "../../hooks/useGetActivities/useGetActivities";
-import { useState } from "react";
+import type { Activity } from "../../types";
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;
@@ -22,7 +22,7 @@ export const ActivitiesList = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
-    null
+    null,
   );
 
   const showModal = (activity: Activity) => {
@@ -72,18 +72,23 @@ export const ActivitiesList = () => {
             <List.Item
               actions={[
                 <Button
+                  key={item.id}
                   type="link"
                   className="main-button-link"
                   onClick={() => showModal(item)}
                 >
                   Detalles
                 </Button>,
-                <Link to={`/actividades/${item.id}/editar`}>
+                <Link
+                  key={`link/${item.id}`}
+                  to={`/actividades/${item.id}/editar`}
+                >
                   <Button type="link" className="main-button-link">
                     Editar
                   </Button>
                 </Link>,
                 <Button
+                  key={item.id}
                   type="link"
                   danger
                   onClick={() => showDeleteConfirm(item)}

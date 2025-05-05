@@ -1,27 +1,27 @@
 import {
-  Card,
-  Table,
-  Typography,
-  Row,
-  Col,
-  Space,
-  Badge,
-  Tooltip,
-  Divider,
-} from "antd";
-import {
-  InfoCircleOutlined,
   CaretUpOutlined,
   EllipsisOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
+  Badge,
+  Card,
+  Col,
+  Divider,
+  Row,
+  Space,
+  Table,
+  Tooltip,
+  Typography,
+} from "antd";
+import {
   CartesianGrid,
   Tooltip as ChartTooltip,
+  Line,
+  LineChart,
   ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from "recharts";
 
 const { Title, Text } = Typography;
@@ -50,7 +50,11 @@ const columnsUserFlow = [
     title: "Contrato",
     dataIndex: "contract",
     key: "contract",
-    render: () => <a style={{ color: "#7f34b4" }}>Ver</a>,
+    render: () => (
+      <a style={{ color: "#7f34b4" }} href="https://google.com">
+        Ver
+      </a>
+    ),
   },
   {
     title: "Visitas del mes",

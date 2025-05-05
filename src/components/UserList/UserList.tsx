@@ -1,26 +1,26 @@
-import React from "react";
 import {
-  Layout,
-  Card,
-  Typography,
-  Breadcrumb,
-  Space,
-  Button,
-  Table,
-  Input,
-  Dropdown,
-  Menu,
-  Avatar,
-  Tag,
-} from "antd";
-import {
-  SearchOutlined,
-  DownOutlined,
-  ReloadOutlined,
-  SettingOutlined,
-  FullscreenOutlined,
   ColumnHeightOutlined,
+  DownOutlined,
+  FullscreenOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
+import {
+  Avatar,
+  Breadcrumb,
+  Button,
+  Card,
+  Dropdown,
+  Input,
+  Layout,
+  Menu,
+  Space,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
+import type React from "react";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -83,10 +83,14 @@ export const UserList: React.FC = () => {
               description: "Lorem ipsum dolor sit amet.",
               status: <Tag color="green">Activo</Tag>,
               actions: [
-                <a key="edit" href="#">
+                <a key="edit" href="https://google.com">
                   Editar
                 </a>,
-                <a key="delete" href="#" style={{ marginLeft: 8 }}>
+                <a
+                  key="delete"
+                  href="https://google.com"
+                  style={{ marginLeft: 8 }}
+                >
                   Eliminar
                 </a>,
               ],

@@ -1,6 +1,6 @@
-import type { ClinicalEvolution } from "../../types";
-import { client } from "../../api/client";
 import { useMutation } from "@tanstack/react-query";
+import { client } from "../../api/client";
+import type { ClinicalEvolution } from "../../types";
 
 const editEvolution = ({
   data,

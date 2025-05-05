@@ -1,9 +1,9 @@
-import { AlergiesModal } from "./components/AlergiesModal/AlergiesModal";
-import { Card, Flex, Typography, Checkbox, Button, Table, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { Button, Card, Checkbox, Flex, Space, Table, Typography } from "antd";
 import { useState } from "react";
-import { FormValues } from "../../schema/schema";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import type { FormValues } from "../../schema/schema";
+import { AlergiesModal } from "./components/AlergiesModal/AlergiesModal";
 import { DietModal } from "./components/DietModal/DietModal";
 import { DisabilityModal } from "./components/DisabilityModal/DisabilityModal";
 import { LimitationsModal } from "./components/LimitationsModal/LimitationsModal";
@@ -259,66 +259,64 @@ export const SpecialConditions = () => {
           </Card>
         )}
         {selectedValues.includes("disability") && (
-          <>
-            <Card
-              extra={
-                <Button
-                  icon={<PlusOutlined />}
-                  className="main-button-white"
-                  onClick={() => {
-                    setEditingIndex(null);
-                    setShowModal("disability");
-                  }}
-                >
-                  Agregar
-                </Button>
-              }
-              title={
-                <Title level={5} style={{ margin: 0 }}>
-                  Tipos de discapacidad del paciente
-                </Title>
-              }
-              style={{ marginBottom: 8 }}
-            >
-              <Table
-                rowKey="id"
-                columns={[
-                  {
-                    title: "Discapacidades",
-                    dataIndex: "disability",
-                  },
-                  {
-                    title: "Acciones",
-                    key: "acciones",
-                    align: "center",
-                    render: (_, __, index) => (
-                      <Space>
-                        <Button
-                          type="link"
-                          className="main-button-link"
-                          onClick={() => {
-                            setEditingIndex(index);
-                            setShowModal("disability");
-                          }}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          type="link"
-                          danger
-                          onClick={() => removeDisability(index)}
-                        >
-                          Eliminar
-                        </Button>
-                      </Space>
-                    ),
-                  },
-                ]}
-                dataSource={disability}
-                pagination={false}
-              />
-            </Card>
-          </>
+          <Card
+            extra={
+              <Button
+                icon={<PlusOutlined />}
+                className="main-button-white"
+                onClick={() => {
+                  setEditingIndex(null);
+                  setShowModal("disability");
+                }}
+              >
+                Agregar
+              </Button>
+            }
+            title={
+              <Title level={5} style={{ margin: 0 }}>
+                Tipos de discapacidad del paciente
+              </Title>
+            }
+            style={{ marginBottom: 8 }}
+          >
+            <Table
+              rowKey="id"
+              columns={[
+                {
+                  title: "Discapacidades",
+                  dataIndex: "disability",
+                },
+                {
+                  title: "Acciones",
+                  key: "acciones",
+                  align: "center",
+                  render: (_, __, index) => (
+                    <Space>
+                      <Button
+                        type="link"
+                        className="main-button-link"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setShowModal("disability");
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => removeDisability(index)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Space>
+                  ),
+                },
+              ]}
+              dataSource={disability}
+              pagination={false}
+            />
+          </Card>
         )}
         {selectedValues.includes("limitations") && (
           <Card

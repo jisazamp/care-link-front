@@ -1,9 +1,9 @@
+import { Button, Card, Table, Typography } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Activity } from "../../../../types";
-import { Button, Card, Table, Typography } from "antd";
-import { ColumnsType } from "antd/es/table";
 import { useGetUpcomingActivities } from "../../../../hooks/useGetUpcomingActivities/useGetUpcomingActivities";
+import type { Activity } from "../../../../types";
 
 dayjs.extend(relativeTime);
 
@@ -18,8 +18,7 @@ export const CardSheduActivities = () => {
       title: "Fecha",
       dataIndex: "fecha",
       key: "date",
-      render: (_, record) =>
-        dayjs(record.fecha).from(dayjs()),
+      render: (_, record) => dayjs(record.fecha).from(dayjs()),
     },
     {
       title: "Acciones",

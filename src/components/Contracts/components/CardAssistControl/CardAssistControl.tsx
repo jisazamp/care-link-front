@@ -26,7 +26,7 @@ const columnsAttendance = [
             height: 10,
             marginRight: 8,
           }}
-        ></span>
+        />
         {text}
       </div>
     ),

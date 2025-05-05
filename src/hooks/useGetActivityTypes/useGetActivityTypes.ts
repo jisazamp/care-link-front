@@ -1,6 +1,6 @@
-import type { ActivityType } from "../../types";
-import { client } from "../../api/client";
 import { useQuery } from "@tanstack/react-query";
+import { client } from "../../api/client";
+import type { ActivityType } from "../../types";
 
 const getActivityTypes = () =>
   client.get<{ data: ActivityType[] }>("/api/activity_types");

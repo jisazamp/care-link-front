@@ -1,5 +1,5 @@
-import { client } from "../../api/client";
 import { useMutation } from "@tanstack/react-query";
+import { client } from "../../api/client";
 import { queryClient } from "../../main";
 
 const deleteActivity = (id?: string | number) =>

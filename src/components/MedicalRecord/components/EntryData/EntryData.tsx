@@ -1,6 +1,6 @@
-import { Card, Row, Col, Typography, Form, DatePicker, Input } from "antd";
-import { FormValues } from "../../schema/schema";
-import { useFormContext, Controller } from "react-hook-form";
+import { Card, Col, DatePicker, Form, Input, Row, Typography } from "antd";
+import { Controller, useFormContext } from "react-hook-form";
+import type { FormValues } from "../../schema/schema";
 
 const { Title, Text } = Typography;
 

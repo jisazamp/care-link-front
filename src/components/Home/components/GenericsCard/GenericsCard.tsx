@@ -1,5 +1,5 @@
-import { Card, Typography, Row, Col } from "antd";
 import { Line } from "@ant-design/plots";
+import { Card, Col, Row, Typography } from "antd";
 
 const { Title, Text } = Typography;
 
@@ -103,7 +103,7 @@ export const GenericsCards = () => {
           </Title>
           <Line {...configEfficiency} />
           <Text type="secondary">
-            Aumento <Text type="success">12%</Text> <a href="#">Ver reporte</a>
+            Aumento <Text type="success">12%</Text> Ver reporte
           </Text>
         </Card>
       </Col>

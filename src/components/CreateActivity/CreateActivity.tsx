@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   Card,
@@ -11,18 +12,17 @@ import {
   Typography,
 } from "antd";
 import dayjs from "dayjs";
-import { Activity } from "../../types";
-import { Dayjs, isDayjs } from "dayjs";
-import { useCreateActivity } from "../../hooks/useCreateActivity/useCreateActivity";
+import { type Dayjs, isDayjs } from "dayjs";
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import { z } from "zod";
+import { useCreateActivity } from "../../hooks/useCreateActivity/useCreateActivity";
+import { useEditActivity } from "../../hooks/useEditActivity/useEditActivity";
 import { useGetActivityById } from "../../hooks/useGetActivityById/useGetActivityById";
 import { useGetActivityTypes } from "../../hooks/useGetActivityTypes/useGetActivityTypes";
 import { useGetProfessionals } from "../../hooks/useGetProfessionals/useGetProfessionals";
-import { useNavigate, useParams } from "react-router-dom";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEditActivity } from "../../hooks/useEditActivity/useEditActivity";
+import type { Activity } from "../../types";
 
 export const activityFormSchema = z.object({
   comentarios: z.string().nullish(),

@@ -1,7 +1,7 @@
-import { User } from "../../types";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
+import type { User } from "../../types";
 
 const editUser = ({
   id,

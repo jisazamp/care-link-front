@@ -1,10 +1,10 @@
-import type { MedicalReport } from "../../types";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
+import type { MedicalReport } from "../../types";
 
 const createMedicalReport = ({ data }: { data: Partial<MedicalReport> }) =>
-  client.post(`/api/medical_reports`, data);
+  client.post("/api/medical_reports", data);
 
 export const useCreateMedicalReport = (id?: string | number) => {
   return useMutation({

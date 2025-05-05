@@ -1,13 +1,13 @@
-import type {
-  MedicalRecord,
-  UserMedicine,
-  UserCare,
-  UserIntervention,
-  UserVaccine,
-} from "../../types";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
+import type {
+  MedicalRecord,
+  UserCare,
+  UserIntervention,
+  UserMedicine,
+  UserVaccine,
+} from "../../types";
 
 type CreateMedicalRecordType = {
   record: MedicalRecord;
@@ -40,7 +40,7 @@ const createMedicalRecord = ({
 
   if (data.interventions) {
     const cleanedInterventions = data.interventions.map(
-      ({ id, ...rest }) => rest
+      ({ id, ...rest }) => rest,
     );
     formData.append("interventions", JSON.stringify(cleanedInterventions));
   }
@@ -51,7 +51,7 @@ const createMedicalRecord = ({
   }
 
   if (files) {
-    for (let file of files) {
+    for (const file of files) {
       formData.append("attachments", file);
     }
   }

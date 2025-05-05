@@ -1,5 +1,5 @@
-import axios from "axios";
 import { message } from "antd";
+import axios from "axios";
 import { useAuthStore } from "../store/auth";
 
 export const client = axios.create({
@@ -16,7 +16,7 @@ client.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 client.interceptors.response.use(
@@ -35,8 +35,8 @@ client.interceptors.response.use(
 
     message.error(
       error.response?.data?.message ||
-      "Algo salió mal al intentar procesar la solicitud"
+        "Algo salió mal al intentar procesar la solicitud",
     );
     return Promise.reject(error);
-  }
+  },
 );

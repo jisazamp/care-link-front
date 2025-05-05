@@ -1,6 +1,6 @@
-import { UserCare } from "../../types";
-import { client } from "../../api/client";
 import { useMutation } from "@tanstack/react-query";
+import { client } from "../../api/client";
+import type { UserCare } from "../../types";
 
 const editCare = ({
   care,

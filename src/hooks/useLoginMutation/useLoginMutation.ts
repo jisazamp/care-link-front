@@ -1,7 +1,7 @@
-import type { AuthorizedUser, Login } from "../../types";
-import { client } from "../../api/client";
 import { useMutation } from "@tanstack/react-query";
+import { client } from "../../api/client";
 import { useAuthStore } from "../../store/auth";
+import type { AuthorizedUser, Login } from "../../types";
 
 const login = ({
   email,

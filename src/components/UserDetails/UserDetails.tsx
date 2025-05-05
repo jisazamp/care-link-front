@@ -1,3 +1,4 @@
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Avatar,
   Breadcrumb,
@@ -5,35 +6,34 @@ import {
   Card,
   Col,
   Divider,
+  Flex,
+  Modal,
   Row,
   Space,
-  Table,
-  TableProps,
-  Typography,
-  Modal,
-  Flex,
   Spin,
+  Table,
+  type TableProps,
   Tooltip,
+  Typography,
 } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { FamilyMember } from "../../types";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { queryClient } from "../../main";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
 import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
-import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
-import { ColumnsType } from "antd/es/table";
+import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
+import { queryClient } from "../../main";
+import type { FamilyMember } from "../../types";
 
 const { Title } = Typography;
 const { confirm } = Modal;
 
-export const contractsColumns: ColumnsType<any> = [
+export const contractsColumns: ColumnsType<unknown> = [
   {
     title: "Tipo de Contrato",
     dataIndex: "tipo_contrato",
@@ -251,7 +251,7 @@ export const UserDetails: React.FC = () => {
                     icon={<DeleteOutlined />}
                     className="main-button-white"
                     shape="circle"
-                  ></Button>
+                  />
                 </Space>
               }
               style={{ marginTop: 3 }}
@@ -283,14 +283,14 @@ export const UserDetails: React.FC = () => {
                       <Typography.Text>-</Typography.Text>
                       <Typography.Text>
                         {dayjs(user?.data.data.fecha_nacimiento).format(
-                          "DD-MM-YYYY"
+                          "DD-MM-YYYY",
                         )}
                       </Typography.Text>
                       <Typography.Text>-</Typography.Text>
                       <Typography.Text style={{ fontWeight: "bold" }}>
                         {dayjs().diff(
                           dayjs(user?.data.data.fecha_nacimiento),
-                          "years"
+                          "years",
                         )}{" "}
                         años
                       </Typography.Text>
@@ -333,7 +333,7 @@ export const UserDetails: React.FC = () => {
                       className="main-button-white"
                       shape="circle"
                       onClick={handleDeleteRecord}
-                    ></Button>
+                    />
                   </Space>
                 ) : (
                   <Space>

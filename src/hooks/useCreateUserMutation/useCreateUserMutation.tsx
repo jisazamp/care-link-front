@@ -1,12 +1,12 @@
-import type { User } from "../../types";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
+import type { User } from "../../types";
 
 const createUser = (user: Partial<User>, photoFile?: File) => {
   const formData = new FormData();
 
-  formData.append("user", JSON.stringify(user))
+  formData.append("user", JSON.stringify(user));
 
   if (photoFile) {
     formData.append("photo", photoFile);

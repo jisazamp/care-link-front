@@ -1,10 +1,10 @@
-import type { ClinicalEvolution } from "../../types";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
+import type { ClinicalEvolution } from "../../types";
 
 const createClinicalEvolution = (
-  data: Omit<ClinicalEvolution, "id_TipoReporte" | "profesional">
+  data: Omit<ClinicalEvolution, "id_TipoReporte" | "profesional">,
 ) => client.post(`/api/reports/${data.id_reporteclinico}/evolutions`, data);
 
 export const useCreateClinicalEvolution = (reportId?: number | string) =>
