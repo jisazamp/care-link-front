@@ -1,5 +1,5 @@
-import { client } from "../../api/client";
 import { useMutation } from "@tanstack/react-query";
+import { client } from "../../api/client";
 
 const deleteRecord = (id: number) => client.delete(`/api/records/${id}`);
 

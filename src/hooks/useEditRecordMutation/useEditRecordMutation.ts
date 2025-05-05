@@ -1,13 +1,13 @@
+import { useMutation } from "@tanstack/react-query";
+import { client } from "../../api/client";
+import { queryClient } from "../../main";
 import type {
   MedicalRecord,
-  UserMedicine,
   UserCare,
   UserIntervention,
+  UserMedicine,
   UserVaccine,
 } from "../../types";
-import { client } from "../../api/client";
-import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "../../main";
 
 type EditMedicalRecordType = {
   record: MedicalRecord;

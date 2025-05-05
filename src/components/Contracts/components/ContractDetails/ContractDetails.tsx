@@ -1,9 +1,9 @@
-import { Avatar, Button, Card, Col, Flex, Row, Table, Typography } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
-import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
+import { Avatar, Button, Card, Col, Flex, Row, Table, Typography } from "antd";
 import dayjs from "dayjs";
+import { useParams } from "react-router-dom";
 import { useGetContractById } from "../../../../hooks/useGetContractById/useGetContractById";
+import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 
 const { Title, Text } = Typography;
 
@@ -85,7 +85,7 @@ export const ContractDetails: React.FC = () => {
                 <Typography.Text style={{ fontWeight: "bold" }}>
                   {dayjs().diff(
                     dayjs(user?.data.data.fecha_nacimiento),
-                    "years"
+                    "years",
                   )}{" "}
                   años
                 </Typography.Text>

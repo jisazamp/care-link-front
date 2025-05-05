@@ -1,25 +1,25 @@
+import { PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
   Checkbox,
   Form,
+  Modal,
   Space,
   Table,
   Typography,
-  Modal,
 } from "antd";
+import { useEffect, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
-import { FormValues } from "../../schema/schema";
-import { NursingCarePlanModal } from "./components/NursingCarePlanModal/NursingCarePlanModal";
-import { PharmoterapeuticModal } from "./components/PharmoterapeuticalModal/PharmoterapeuticalRegimen";
-import { PhysioterapeuticModal } from "./components/PhysioterapeuticModal/PhysioterapeuticModal";
-import { PlusOutlined } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
 import { useDeleteCareMutation } from "../../../../hooks/useDeleteCareMutation/useDeleteCareMutation";
 import { useDeleteInterventionMutation } from "../../../../hooks/useDeleteInterventionMutation/useDeleteUserIntervention";
 import { useDeleteMedicineMutation } from "../../../../hooks/useDeleteMedicineMutation/useDeleteMedicineMutation";
-import { useEffect, useState } from "react";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import { useParams } from "react-router-dom";
+import type { FormValues } from "../../schema/schema";
+import { NursingCarePlanModal } from "./components/NursingCarePlanModal/NursingCarePlanModal";
+import { PharmoterapeuticModal } from "./components/PharmoterapeuticalModal/PharmoterapeuticalRegimen";
+import { PhysioterapeuticModal } from "./components/PhysioterapeuticModal/PhysioterapeuticModal";
 
 const { Title } = Typography;
 
@@ -42,7 +42,7 @@ export const MedicalTreatments = () => {
   >(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingIndexNursing, setEditingIndexNursing] = useState<number | null>(
-    null
+    null,
   );
   const [editingIndexPhysioterapeutic, setEditingIndexPhysioterapeutic] =
     useState<number | null>(null);
@@ -101,7 +101,7 @@ export const MedicalTreatments = () => {
   useEffect(() => {
     if (deleteInterventionMutatino.isSuccess) {
       removePhysio(
-        physioRegimen.findIndex((n) => n.id === interventionToDelete)
+        physioRegimen.findIndex((n) => n.id === interventionToDelete),
       );
     }
   }, [
@@ -335,7 +335,7 @@ export const MedicalTreatments = () => {
                         danger
                         onClick={() => {
                           setInterventionToDelete(
-                            Number(physioRegimen[index].id)
+                            Number(physioRegimen[index].id),
                           );
                           setIsDeleteInterventionModalOpen(true);
                         }}
@@ -396,7 +396,7 @@ export const MedicalTreatments = () => {
         open={isDeleteModalOpen}
         onOk={() => {
           if (pharmaToDelete !== null) {
-            if (!isNaN(pharmaToDelete)) {
+            if (!Number.isNaN(pharmaToDelete)) {
               deletePharmaMutation.mutate({
                 id: Number(recordQuery.data?.data.data?.id_historiaclinica),
                 medicineId: Number(pharmaToDelete),
@@ -425,14 +425,14 @@ export const MedicalTreatments = () => {
         open={isDeleteNursingModalOpen}
         onOk={() => {
           if (nursingToDelete !== null) {
-            if (!isNaN(nursingToDelete)) {
+            if (!Number.isNaN(nursingToDelete)) {
               deleteCareMutation.mutate({
                 id: Number(recordQuery.data?.data.data?.id_historiaclinica),
                 careId: Number(nursingToDelete),
               });
             } else {
               removeNursing(
-                nursingCare.findIndex((n) => n.id === nursingToDelete)
+                nursingCare.findIndex((n) => n.id === nursingToDelete),
               );
             }
             setIsDeleteNursingModalOpen(false);
@@ -456,14 +456,14 @@ export const MedicalTreatments = () => {
         open={isDeleteInterventionModalOpen}
         onOk={() => {
           if (interventionToDelete !== null) {
-            if (!isNaN(interventionToDelete)) {
+            if (!Number.isNaN(interventionToDelete)) {
               deleteInterventionMutatino.mutate({
                 id: Number(recordQuery.data?.data.data?.id_historiaclinica),
                 interventionId: Number(interventionToDelete),
               });
             } else {
               removePhysio(
-                physioRegimen.findIndex((n) => n.id === interventionToDelete)
+                physioRegimen.findIndex((n) => n.id === interventionToDelete),
               );
             }
             setIsDeleteInterventionModalOpen(false);

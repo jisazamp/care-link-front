@@ -1,5 +1,5 @@
-import { Layout, Card, Button, Form, Checkbox, Row, Col } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
+import { Button, Card, Checkbox, Col, Form, Layout, Row } from "antd";
 
 export const BillingContract = ({
   onNext,
@@ -38,7 +38,7 @@ export const BillingContract = ({
 
                       {/* Body */}
                       <div style={{ marginTop: 16 }}>
-                        <Form.Item label="Pago"></Form.Item>
+                        <Form.Item label="Pago" />
 
                         <Form.Item
                           name="registerPayment"

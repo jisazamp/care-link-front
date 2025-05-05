@@ -1,7 +1,7 @@
 import {
+  CheckCircleOutlined,
   HomeOutlined,
   UserOutlined,
-  CheckCircleOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router-dom";

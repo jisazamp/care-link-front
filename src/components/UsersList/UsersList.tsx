@@ -1,16 +1,16 @@
 import {
   Avatar,
   Breadcrumb,
+  Button,
   Card,
-  Typography,
   List,
   Modal,
-  Button,
+  Typography,
 } from "antd";
-import type { User } from "../../types";
+import { Link } from "react-router-dom";
 import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
 import { useGetUsers } from "../../hooks/useGetUsers/useGetUsers";
-import { Link } from "react-router-dom";
+import type { User } from "../../types";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -54,13 +54,20 @@ export const UsersList = () => {
           pagination={{ position: "bottom", align: "end" }}
           renderItem={(item) => (
             <List.Item
+              key={item.id_usuario}
               actions={[
-                <Link to={`/usuarios/${item.id_usuario}/detalles`}>
+                <Link
+                  key={`details/${item.id_usuario}`}
+                  to={`/usuarios/${item.id_usuario}/detalles`}
+                >
                   <Button type="link" className="main-button-link">
                     Detalles
                   </Button>
                 </Link>,
-                <Link to={`/usuarios/${item.id_usuario}/editar`}>
+                <Link
+                  key={`edit/${item.id_usuario}`}
+                  to={`/usuarios/${item.id_usuario}/editar`}
+                >
                   <Button type="link" className="main-button-link">
                     Editar
                   </Button>

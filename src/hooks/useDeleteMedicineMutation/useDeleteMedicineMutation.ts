@@ -1,5 +1,5 @@
-import { client } from "../../api/client";
 import { useMutation } from "@tanstack/react-query";
+import { client } from "../../api/client";
 
 const deleteMedicine = ({
   id,
@@ -11,7 +11,7 @@ const deleteMedicine = ({
 
 export const useDeleteMedicineMutation = () => {
   return useMutation({
-    mutationKey: [`delete-medicine`],
+    mutationKey: ["delete-medicine"],
     mutationFn: deleteMedicine,
   });
 };

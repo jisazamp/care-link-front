@@ -1,6 +1,6 @@
-import type { Contract, Service } from "../../types";
-import { client } from "../../api/client";
 import { useQuery } from "@tanstack/react-query";
+import { client } from "../../api/client";
+import type { Contract, Service } from "../../types";
 
 const getContractById = (id: number | string | undefined) =>
   client.get<Contract & { servicios: Service[] }>(`/api/contrato/${id}`);

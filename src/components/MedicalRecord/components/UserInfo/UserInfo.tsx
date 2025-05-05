@@ -1,7 +1,7 @@
+import { Avatar, Card, Col, Flex, Row, Typography } from "antd";
 import dayjs from "dayjs";
-import { Card, Row, Col, Avatar, Typography, Flex } from "antd";
-import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 import { useParams } from "react-router-dom";
+import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 
 const { Title } = Typography;
 
@@ -43,7 +43,7 @@ export const UserInfo = () => {
                 <Typography.Text style={{ fontWeight: "bold" }}>
                   {dayjs().diff(
                     dayjs(user?.data.data.fecha_nacimiento),
-                    "years"
+                    "years",
                   )}{" "}
                   años
                 </Typography.Text>

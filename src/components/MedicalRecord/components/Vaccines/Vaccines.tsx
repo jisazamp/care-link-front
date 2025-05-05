@@ -1,12 +1,12 @@
-import { Card, Flex, Typography, Button, Table, Space, Modal } from "antd";
-import { FormValues } from "../../schema/schema";
 import { PlusOutlined } from "@ant-design/icons";
-import { VaccinesModal } from "./components/VaccinesModal/VaccinesModal";
-import { useDeleteVaccineMutation } from "../../../../hooks/useDeleteVaccineMutation/useDeleteVaccineMutation";
+import { Button, Card, Flex, Modal, Space, Table, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useParams } from "react-router-dom";
+import { useDeleteVaccineMutation } from "../../../../hooks/useDeleteVaccineMutation/useDeleteVaccineMutation";
+import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import type { FormValues } from "../../schema/schema";
+import { VaccinesModal } from "./components/VaccinesModal/VaccinesModal";
 
 const { Title } = Typography;
 
@@ -143,7 +143,7 @@ export const Vaccines = () => {
         open={isDeleteModalOpen}
         onOk={() => {
           if (vaccineToDelete !== null) {
-            if (!isNaN(vaccineToDelete)) {
+            if (!Number.isNaN(vaccineToDelete)) {
               deleteVaccine({
                 id: Number(record?.data.data?.id_historiaclinica),
                 vaccineId: Number(vaccineToDelete),

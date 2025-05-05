@@ -1,33 +1,38 @@
-import { z } from "zod";
-import dayjs, { Dayjs } from "dayjs";
-import { useForm, Controller } from "react-hook-form";
+import { UploadOutlined } from "@ant-design/icons";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Breadcrumb,
-  Spin,
   Button,
   Card,
   Col,
   DatePicker,
+  Flex,
   Form,
   Input,
   Row,
   Select,
+  Spin,
   Typography,
   Upload,
-  Flex,
 } from "antd";
 import request from "axios";
-import { CivilStatus, Gender, UserFamilyType, UserStatus } from "../../enums";
-import { UploadOutlined } from "@ant-design/icons";
-import { User } from "../../types";
-import { useCreateUserMutation } from "../../hooks/useCreateUserMutation/useCreateUserMutation";
-import { useEditUserMutation } from "../../hooks/useEditUserMutation/useEditUserMutation";
+import dayjs, { type Dayjs } from "dayjs";
 import { useEffect } from "react";
-import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  CivilStatus,
+  type Gender,
+  type UserFamilyType,
+  type UserStatus,
+} from "../../enums";
+import { useCreateUserMutation } from "../../hooks/useCreateUserMutation/useCreateUserMutation";
+import { useEditUserMutation } from "../../hooks/useEditUserMutation/useEditUserMutation";
+import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useImageFile } from "../../hooks/useImageFile/useImageFile";
+import type { User } from "../../types";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -75,7 +80,7 @@ const formSchema = z.object({
         (value.file instanceof File && value.file.size <= 5 * 1024 * 1024),
       {
         message: "La foto debe ser un archivo válido y pesar menos de 5MB",
-      }
+      },
     ),
 });
 
@@ -105,12 +110,19 @@ export const NewUser: React.FC = () => {
     isSuccess: isSuccessCreateUser,
     isPending: isPendingCreateUser,
   } = useCreateUserMutation();
-  const { mutate: editUser, isSuccess: isSuccessEditUser, isPending: isPendingEditUser } =
-    useEditUserMutation(userId);
-  const { data: imageFile, isLoading: isLoadingFile, isError: isErrorFile } = useImageFile(
+  const {
+    mutate: editUser,
+    isSuccess: isSuccessEditUser,
+    isPending: isPendingEditUser,
+  } = useEditUserMutation(userId);
+  const {
+    data: imageFile,
+    isLoading: isLoadingFile,
+    isError: isErrorFile,
+  } = useImageFile(
     data?.data.data.url_imagen ?? "",
     "user-photo.jpg",
-    "image/jpeg"
+    "image/jpeg",
   );
 
   const onSubmit = (data: FormValues) => {
@@ -151,10 +163,10 @@ export const NewUser: React.FC = () => {
         const resetValues = {
           ...userData,
           dateOfBirth: dayjs(userData.fecha_nacimiento),
-          documentNumber: userData.n_documento + "",
-          firstName: userData.nombres + "",
-          lastName: userData.apellidos + "",
-          userId: userData.id_usuario + "",
+          documentNumber: `${userData.n_documento}`,
+          firstName: `${userData.nombres}`,
+          lastName: `${userData.apellidos}`,
+          userId: `${userData.id_usuario}`,
           maritalStatus: userData.estado_civil as CivilStatus,
           gender: userData.genero as Gender,
           email: userData.email ?? "",
@@ -195,7 +207,7 @@ export const NewUser: React.FC = () => {
 
       setImage();
     }
-  }, [data?.data.data, reset, isLoadingFile]);
+  }, [data?.data.data, reset, isLoadingFile, imageFile, isErrorFile]);
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
@@ -436,7 +448,7 @@ export const NewUser: React.FC = () => {
                     validateStatus={errors.photo ? "error" : ""}
                     help={
                       errors.photo?.message && (
-                        <Text type="danger">{errors.photo.message + ""}</Text>
+                        <Text type="danger">{`${errors.photo.message}`}</Text>
                       )
                     }
                   >

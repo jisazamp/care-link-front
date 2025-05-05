@@ -1,7 +1,7 @@
 import { Breadcrumb } from "antd";
+import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import { EditReport } from "./components/EditReport/EditReport";
 import { NewReport } from "./components/NewReport/NewReport";
-import { Routes, Route, useLocation, useParams } from "react-router-dom";
 import { ViewReport } from "./components/ViewReport/ViewReport";
 
 export const MedicalReport: React.FC = () => {
@@ -16,7 +16,7 @@ export const MedicalReport: React.FC = () => {
   if (id) {
     breadcrumbItems.push({
       path: `/usuarios/${id}/detalles`,
-      label: `Nombre_Usuario`,
+      label: "Nombre_Usuario",
     });
   }
 
@@ -40,8 +40,8 @@ export const MedicalReport: React.FC = () => {
   return (
     <div style={{ padding: "16px" }}>
       <Breadcrumb style={{ marginBottom: "16px" }}>
-        {breadcrumbItems.map((item, index) => (
-          <Breadcrumb.Item key={index}>{item.label}</Breadcrumb.Item>
+        {breadcrumbItems.map((item) => (
+          <Breadcrumb.Item key={item.path}>{item.label}</Breadcrumb.Item>
         ))}
       </Breadcrumb>
       <Routes>

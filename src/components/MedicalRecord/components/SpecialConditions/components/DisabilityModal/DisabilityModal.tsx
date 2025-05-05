@@ -1,10 +1,10 @@
-import { Button, Col, Form, Input, Modal, Row } from "antd";
-import { FormValues, disabilitySchema } from "../../../../schema/schema";
-import { useEffect } from "react";
-import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Col, Form, Input, Modal, Row } from "antd";
+import { useEffect } from "react";
+import { Controller, type UseFieldArrayAppend, useForm } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import type { z } from "zod";
+import { type FormValues, disabilitySchema } from "../../../../schema/schema";
 
 type DisabilityForm = z.infer<typeof disabilitySchema>;
 

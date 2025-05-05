@@ -1,3 +1,4 @@
+import { UploadOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -9,14 +10,13 @@ import {
   Select,
   Upload,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport/useCreateMedicalReport";
-import { MedicalReport } from "../../../../types";
-import { Dayjs } from "dayjs";
-import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import { useNavigate, useParams } from "react-router-dom";
+import type { Dayjs } from "dayjs";
 import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport/useCreateMedicalReport";
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
+import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import type { MedicalReport } from "../../../../types";
 
 export const NewReport: React.FC = () => {
   const { id } = useParams();
@@ -43,7 +43,7 @@ export const NewReport: React.FC = () => {
   }) => {
     const medicalReport: Partial<MedicalReport> = {
       id_historiaclinica: Number(
-        medicalRecordQuery.data?.data.data?.id_historiaclinica
+        medicalRecordQuery.data?.data.data?.id_historiaclinica,
       ),
       Frecuencia_cardiaca: values.heartRate,
       Obs_habitosalimenticios: values.treatmentObservation,

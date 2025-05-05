@@ -1,7 +1,7 @@
-import type { FamilyMember } from "../../types";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
+import type { FamilyMember } from "../../types";
 
 const updateFamilyMember = ({
   id,

@@ -1,3 +1,5 @@
+import { UploadOutlined } from "@ant-design/icons";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Breadcrumb,
   Button,
@@ -12,8 +14,19 @@ import {
   Typography,
   Upload,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useEffect } from "react";
+import { Controller, FormProvider } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
+import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
+import { useGetRecordMedicines } from "../../hooks/useGetRecordMedicines/useGetRecordMedicines";
+import { useGetRecordCares } from "../../hooks/useGetUserCares/useGetUserCares";
+import { useGetRecordInterventions } from "../../hooks/useGetUserInterventions/useGetUserInterventions";
+import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useGetRecordVaccines } from "../../hooks/useGetUserVaccines/useGetUserVaccines";
 import type {
   MedicalRecord as MedicalRecordType,
   UserCare,
@@ -23,16 +36,7 @@ import type {
 import type { UserMedicine } from "../../types";
 import { BasicHealthData } from "./components/BasicHealthData/BasicHealthData";
 import { BiophysicalSkills } from "./components/BiophysicalSkills/BiophysicalSkills";
-import { Controller, FormProvider } from "react-hook-form";
 import { EntryData } from "./components/EntryData/EntryData";
-import {
-  FormValues,
-  NursingCarePlan,
-  PharmacoRegimen,
-  PhysioRegimen,
-  Vaccine,
-  formSchema,
-} from "./schema/schema";
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
 import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
 import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
@@ -41,18 +45,15 @@ import { SpecialConditions } from "./components/SpecialConditions/SpecialConditi
 import { Toxicology } from "./components/Toxicology/Toxicology";
 import { UserInfo } from "./components/UserInfo/UserInfo";
 import { Vaccines } from "./components/Vaccines/Vaccines";
-import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useGetRecordCares } from "../../hooks/useGetUserCares/useGetUserCares";
-import { useGetRecordMedicines } from "../../hooks/useGetRecordMedicines/useGetRecordMedicines";
-import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import { useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useGetRecordInterventions } from "../../hooks/useGetUserInterventions/useGetUserInterventions";
-import { useGetRecordVaccines } from "../../hooks/useGetUserVaccines/useGetUserVaccines";
-import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
+import {
+  type FormValues,
+  type NursingCarePlan,
+  type PharmacoRegimen,
+  type PhysioRegimen,
+  type Vaccine,
+  formSchema,
+  physioterapeuticRegimenSchema,
+} from "./schema/schema";
 
 const { Title } = Typography;
 
@@ -77,7 +78,7 @@ export const MedicalRecord: React.FC = () => {
     useGetRecordMedicines(userMedicalRecord?.data.data?.id_historiaclinica);
 
   const { data: userCares, isLoading: loadingUserCares } = useGetRecordCares(
-    userMedicalRecord?.data.data?.id_historiaclinica
+    userMedicalRecord?.data.data?.id_historiaclinica,
   );
 
   const { data: userInterventions, isLoading: loadingUserInterventions } =
@@ -99,7 +100,7 @@ export const MedicalRecord: React.FC = () => {
       alcoholismo: data.alcholism,
       alergico_medicamento: !!data.alergies.length,
       altura: data.height,
-      apariencia_personal: data.personalAppearance + "",
+      apariencia_personal: `${data.personalAppearance}`,
       cafeina: data.caffeine,
       cirugias: data.surgeries
         .map((a) => `${a.observation}:${a.date.format("YYYY-MM-DD")}`)
@@ -107,11 +108,11 @@ export const MedicalRecord: React.FC = () => {
       comunicacion_no_verbal: data.nonVerbalCommunication,
       comunicacion_verbal: data.verbalCommunication,
       continencia: data.continence,
-      cuidado_personal: data.personalCare + "",
+      cuidado_personal: `${data.personalCare}`,
       dieta_especial: data.diet.map((a) => a.diet).join(","),
       discapacidades: data.disabilities.map((a) => a.disability).join(","),
-      emer_medica: data.externalService + "",
-      eps: data.eps + "",
+      emer_medica: `${data.externalService}`,
+      eps: `${data.eps}`,
       estado_de_animo: data.mood,
       fecha_ingreso: data.entryDate.format("YYYY-MM-DD"),
       frecuencia_cardiaca: Number(data.bpm),
@@ -124,22 +125,22 @@ export const MedicalRecord: React.FC = () => {
       motivo_ingreso: data.entryReason,
       observ_dietaEspecial: "",
       observ_otrasalergias: "",
-      observaciones_iniciales: data.initialDiagnosis + "",
+      observaciones_iniciales: `${data.initialDiagnosis}`,
       otras_alergias: data.otherAlergies.map((a) => a.alergy).join(","),
       peso: Number(data.weight),
       presion_arterial: Number(data.bloodPressure),
       sustanciaspsico: data.psycoactive,
       tabaquismo: data.tabaquism,
-      telefono_emermedica: data.externalServicePhone + "",
+      telefono_emermedica: `${data.externalServicePhone}`,
       temperatura_corporal: Number(data.temperature),
-      tipo_alimentacion: data.feeding + "",
-      tipo_de_movilidad: data.mobility + "",
-      tipo_de_sueno: data.sleepType + "",
+      tipo_alimentacion: `${data.feeding}`,
+      tipo_de_movilidad: `${data.mobility}`,
+      tipo_de_sueno: `${data.sleepType}`,
       tipo_sangre: data.bloodType ?? "O+",
     };
 
     const medicines: UserMedicine[] = [];
-    data.pharmacotherapeuticRegimen.forEach((p) => {
+    for (const p of data.pharmacotherapeuticRegimen) {
       const medicine: UserMedicine = {
         id: p.id ?? "",
         Fecha_inicio: p.startDate.format("YYYY-MM-DD"),
@@ -148,10 +149,10 @@ export const MedicalRecord: React.FC = () => {
         periodicidad: p.frequency,
       };
       medicines.push(medicine);
-    });
+    }
 
     const cares: UserCare[] = [];
-    data.nursingCarePlan.forEach((n) => {
+    for (const n of data.nursingCarePlan) {
       const care: UserCare = {
         id: n.id ?? "",
         diagnostico: n.diagnosis,
@@ -159,10 +160,10 @@ export const MedicalRecord: React.FC = () => {
         intervencion: n.intervention,
       };
       cares.push(care);
-    });
+    }
 
     const interventions: UserIntervention[] = [];
-    data.physioterapeuticRegimen.forEach((n) => {
+    for (const n of data.physioterapeuticRegimen) {
       const intervention: UserIntervention = {
         id: n.id ?? "",
         diagnostico: n.diagnosis,
@@ -170,10 +171,10 @@ export const MedicalRecord: React.FC = () => {
         intervencion: n.intervention,
       };
       interventions.push(intervention);
-    });
+    }
 
     const vaccines: UserVaccine[] = [];
-    data.vaccines.forEach((v) => {
+    for (const v of data.vaccines) {
       const vaccine: UserVaccine = {
         id: v.id ?? "",
         efectos_secundarios: v.secondaryEffects,
@@ -182,7 +183,7 @@ export const MedicalRecord: React.FC = () => {
         vacuna: v.name,
       };
       vaccines.push(vaccine);
-    });
+    }
 
     if (!userMedicalRecord?.data.data?.id_historiaclinica) {
       createUserMedicalRecord({
@@ -264,13 +265,13 @@ export const MedicalRecord: React.FC = () => {
         disabilities: disabilities ?? [],
         entryDate: dayjs(data.fecha_ingreso),
         entryReason: data.motivo_ingreso,
-        eps: data.eps + "",
-        externalService: data.emer_medica + "",
-        externalServicePhone: data.telefono_emermedica + "",
+        eps: `${data.eps}`,
+        externalService: `${data.emer_medica}`,
+        externalServicePhone: `${data.telefono_emermedica}`,
         feeding: data.tipo_alimentacion,
         hasExternalService: !!data.emer_medica,
         height: data.altura,
-        initialDiagnosis: data.observaciones_iniciales + "",
+        initialDiagnosis: `${data.observaciones_iniciales}`,
         limitations: limitations ?? [],
         mobility: data.tipo_de_movilidad,
         mood: data.estado_de_animo,
@@ -336,7 +337,7 @@ export const MedicalRecord: React.FC = () => {
           frequency: e.frecuencia,
           diagnosis: e.diagnostico,
           intervention: e.intervencion,
-        })
+        }),
       );
       const medicalTreatments: string[] = getValues("medicalTreatments") ?? [];
       if (userInterventions.data.data.length)
@@ -547,7 +548,7 @@ export const MedicalRecord: React.FC = () => {
                       beforeUpload={() => false}
                       onChange={(info) => {
                         const files = info.fileList.map(
-                          (item) => item.originFileObj || item
+                          (item) => item.originFileObj || item,
                         );
                         field.onChange(files);
                       }}

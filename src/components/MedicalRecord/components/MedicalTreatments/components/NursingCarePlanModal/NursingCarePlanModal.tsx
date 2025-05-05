@@ -1,12 +1,15 @@
-import { Button, Col, Form, Input, Modal, Row } from "antd";
-import { FormValues, nursingCarePlanSchema } from "../../../../schema/schema";
-import { useEffect } from "react";
-import { useForm, UseFieldArrayAppend, Controller } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Col, Form, Input, Modal, Row } from "antd";
+import { useEffect } from "react";
+import { Controller, type UseFieldArrayAppend, useForm } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import type { z } from "zod";
 import { useEditCare } from "../../../../../../hooks/useEditNursing/useEditNursing";
 import type { UserCare } from "../../../../../../types";
+import {
+  type FormValues,
+  nursingCarePlanSchema,
+} from "../../../../schema/schema";
 
 type NursingCarePlanForm = z.infer<typeof nursingCarePlanSchema>;
 
@@ -76,7 +79,11 @@ export const NursingCarePlanModal = ({
         <Button key="cancel" className="main-button-white" onClick={onCancel}>
           Cancelar
         </Button>,
-        <Button key="confirm" onClick={handleSubmit(onSubmit)} loading={editMutation.isPending}>
+        <Button
+          key="confirm"
+          onClick={handleSubmit(onSubmit)}
+          loading={editMutation.isPending}
+        >
           Guardar
         </Button>,
       ]}

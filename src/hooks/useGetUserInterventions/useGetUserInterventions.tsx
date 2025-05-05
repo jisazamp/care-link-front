@@ -1,6 +1,6 @@
-import type { UserIntervention } from "../../types";
-import { client } from "../../api/client";
 import { useQuery } from "@tanstack/react-query";
+import { client } from "../../api/client";
+import type { UserIntervention } from "../../types";
 
 const getRecordInterventions = (recordId?: number) =>
   client.get<{ data: UserIntervention[] }>(
@@ -12,6 +12,6 @@ export const useGetRecordInterventions = (recordId?: number) => {
     queryKey: [`record-${recordId}-interventions`],
     queryFn: () => getRecordInterventions(recordId),
     enabled: !!recordId,
-    staleTime: Infinity
+    staleTime: Number.POSITIVE_INFINITY,
   });
 };

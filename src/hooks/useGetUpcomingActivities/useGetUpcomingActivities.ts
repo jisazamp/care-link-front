@@ -1,6 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import type { Activity } from "../../types";
-import { useQuery } from "@tanstack/react-query";
 
 const getUpcomingActivities = () =>
   client.get<{ data: Activity[] }>("/api/activities-upcoming");

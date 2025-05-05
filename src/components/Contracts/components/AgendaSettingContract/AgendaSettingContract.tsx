@@ -1,8 +1,8 @@
-import dayjs, { Dayjs } from "dayjs";
-import type { FormValues } from "../FormContracts";
-import { Card, Typography, Button, Calendar } from "antd";
+import { Button, Calendar, Card, Typography } from "antd";
+import dayjs, { type Dayjs } from "dayjs";
+import { useCallback, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
-import { useMemo, useCallback } from "react";
+import type { FormValues } from "../FormContracts";
 
 const { Title } = Typography;
 
@@ -24,7 +24,7 @@ export const AgendaSettingsContract = ({
   const { maxServiceDays, maxTransportDays } = useMemo(() => {
     const service = services.find((s) => s.serviceType.includes("Tiquetera"));
     const transport = services.find((s) =>
-      s.serviceType.includes("Transporte")
+      s.serviceType.includes("Transporte"),
     );
 
     return {
@@ -63,7 +63,7 @@ export const AgendaSettingsContract = ({
       maxServiceDays,
       maxTransportDays,
       setValue,
-    ]
+    ],
   );
 
   const renderDateCell = (date: Dayjs, selectedDates: string[]) => {
@@ -117,7 +117,9 @@ export const AgendaSettingsContract = ({
                 handleSelectDate(date, "service");
               }
             }}
-            fullCellRender={(date) => renderDateCell(date, selectedDatesService)}
+            fullCellRender={(date) =>
+              renderDateCell(date, selectedDatesService)
+            }
             style={{ width: "300px", margin: "auto" }}
           />
         </Card>
@@ -135,7 +137,9 @@ export const AgendaSettingsContract = ({
                 handleSelectDate(date, "transport");
               }
             }}
-            fullCellRender={(date) => renderDateCell(date, selectedDatesTransport)}
+            fullCellRender={(date) =>
+              renderDateCell(date, selectedDatesTransport)
+            }
             style={{ width: "300px", margin: "auto" }}
           />
         </Card>

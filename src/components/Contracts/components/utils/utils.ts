@@ -1,20 +1,20 @@
 import dayjs from "dayjs";
+import type { UseFormGetValues } from "react-hook-form";
 import type {
   Contract,
   Service as ContractService,
   CreateContractRequest,
 } from "../../../../types";
-import type { Service, FormValues } from "../FormContracts";
-import type { UseFormGetValues } from "react-hook-form";
+import type { FormValues, Service } from "../FormContracts";
 
 export const convertServicesData = (
   services: ContractService[],
-  startingServices: Service[]
+  startingServices: Service[],
 ): Service[] => {
   let result: Service[] = services.map((s) => ({
     description: s.descripcion,
     endDate: dayjs(s.fecha).add(1, "month"),
-    key: s.id_servicio + "",
+    key: `${s.id_servicio}`,
     price: s.precio_por_dia,
     quantity: s.fechas_servicio.length,
     selected: !!s.fechas_servicio.length,
@@ -43,7 +43,7 @@ export const convertSelectedDates = (dates: { fecha: string }[]): string[] =>
 
 export const convertContractData = (
   contract: Contract & { servicios: ContractService[] },
-  startingServices: Service[]
+  startingServices: Service[],
 ): FormValues => {
   const {
     tipo_contrato,
@@ -62,10 +62,10 @@ export const convertContractData = (
     endDate: dayjs(fecha_fin),
     services,
     selectedDatesService: convertSelectedDates(
-      servicios[0]?.fechas_servicio ?? []
+      servicios[0]?.fechas_servicio ?? [],
     ),
     selectedDatesTransport: convertSelectedDates(
-      servicios[1]?.fechas_servicio ?? []
+      servicios[1]?.fechas_servicio ?? [],
     ),
   };
 };
@@ -73,11 +73,11 @@ export const convertContractData = (
 export const buildContractFromForm = (
   data: FormValues,
   userId: number,
-  contractId: number
+  contractId: number,
 ): Contract => ({
   id_usuario: userId,
   id_contrato: contractId,
-  facturar_contrato: data.billed === "si" ? true : false,
+  facturar_contrato: data.billed === "si",
   tipo_contrato: data.contractType as "Nuevo" | "Recurrente",
   fecha_inicio:
     data.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
@@ -87,7 +87,7 @@ export const buildContractFromForm = (
 export const buildContractData = (
   id: string | number,
   data: FormValues,
-  getValues: UseFormGetValues<FormValues>
+  getValues: UseFormGetValues<FormValues>,
 ): CreateContractRequest => {
   return {
     id_usuario: Number(id),
@@ -97,10 +97,10 @@ export const buildContractData = (
     fecha_fin:
       data.endDate?.format("YYYY-MM-DD") ??
       dayjs().add(1, "month").format("YYYY-MM-DD"),
-    facturar_contrato: data.billed === "no" ? false : true,
+    facturar_contrato: data.billed !== "no",
     servicios: data.services
-      .filter((s: any) => !!s.quantity)
-      .map((s: any) => ({
+      .filter((s) => !!s.quantity)
+      .map((s) => ({
         id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
         fecha:
           s.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
@@ -108,11 +108,11 @@ export const buildContractData = (
         precio_por_dia: s.price,
         fechas_servicio: s.serviceType.includes("Transporte")
           ? getValues("selectedDatesTransport").map((f: string) => ({
-            fecha: f,
-          }))
+              fecha: f,
+            }))
           : getValues("selectedDatesService").map((f: string) => ({
-            fecha: f,
-          })),
+              fecha: f,
+            })),
       })),
   };
 };

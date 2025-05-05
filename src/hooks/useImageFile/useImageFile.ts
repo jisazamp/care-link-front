@@ -18,6 +18,6 @@ export const useImageFile = (
     queryFn: () => fetchImage(url),
     enabled: !!url,
     select: (blob) => new File([blob], filename, { type: mimeType }),
-    staleTime: Infinity,
+    staleTime: Number.POSITIVE_INFINITY,
   });
 };

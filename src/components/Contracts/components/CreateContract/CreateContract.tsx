@@ -1,9 +1,9 @@
-import { Controller, useFormContext } from "react-hook-form";
-import { Dayjs } from "dayjs";
 import { FileDoneOutlined } from "@ant-design/icons";
-import { FormValues } from "../FormContracts";
-import { Layout, Card, Form, Select, DatePicker, Button } from "antd";
+import { Button, Card, DatePicker, Form, Layout, Select } from "antd";
+import type { Dayjs } from "dayjs";
 import { useEffect } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import type { FormValues } from "../FormContracts";
 
 const { Option } = Select;
 
@@ -22,8 +22,8 @@ export const CreateContract = ({
   const methods = useFormContext<FormValues>();
   const startDate = methods.watch("startDate");
   const endDate = methods.watch("endDate");
-  const contractType = methods.watch('contractType');
-  const billed = methods.watch('billed');
+  const contractType = methods.watch("contractType");
+  const billed = methods.watch("billed");
 
   const handleNext = () => {
     if (startDate && endDate && contractType && billed) {
