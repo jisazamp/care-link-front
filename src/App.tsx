@@ -26,6 +26,7 @@ import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalRep
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
+import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 
 export const colors = {
   primary: {
@@ -197,10 +198,10 @@ export const App = () => {
               }
             />
             <Route
-              path="/usuarios/:id/reportes/:reportId/detalle"
+              path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
               element={
                 <PrivateRoute>
-                  <ViewReport />
+                  <NewEvolutionReport />
                 </PrivateRoute>
               }
             />

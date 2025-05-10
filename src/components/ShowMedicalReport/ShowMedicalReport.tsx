@@ -13,12 +13,14 @@ import {
   Row,
   Table,
   Typography,
+  Descriptions,
+  Avatar,
 } from "antd";
 import type React from "react";
-import avatar from "../assets/Patients/patient1.jpg";
+import  avatar  from "../assets/Patients/patient1.jpg";
 
 const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Title,} = Typography;
 
 const dataSource = [
   {
@@ -114,56 +116,36 @@ export const ShowMedicalReport: React.FC = () => {
                   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                <Row align="middle">
-                  <Col flex="96px">
-                    <img
-                      src={avatar}
-                      alt="Avatar del paciente"
-                      style={{
-                        width: "96px",
-                        height: "96px",
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                      }}
-                    />
+                <Row align="middle" gutter={24}>
+                  <Col>
+                    <Avatar src={avatar} size={96} />
                   </Col>
                   <Col flex="auto">
-                    <Row>
-                      <Col span={12}>
-                        <div style={{ lineHeight: "1.5", color: "#212529" }}>
-                          <Title
-                            level={5}
-                            style={{ margin: 0, fontWeight: 600 }}
-                          >
-                            JUAN ANTONIO LOPEZ ORREGO
-                          </Title>
-                          <Text style={{ fontSize: "14px", color: "#495057" }}>
-                            44567890 - Masculino - 1956/11/08 - 68 años
-                          </Text>
-                          <br />
-                          <Text style={{ fontSize: "14px", color: "#495057" }}>
-                            Casado - Pensionado
-                          </Text>
-                        </div>
-                      </Col>
-                      <Col span={12}>
-                        <div style={{ lineHeight: "1.5", color: "#212529" }}>
-                          <Text style={{ fontSize: "14px", color: "#495057" }}>
-                            CLL 45 - 60-20 INT 101
-                          </Text>
-                          <br />
-                          <Text style={{ fontSize: "14px", color: "#495057" }}>
-                            315 6789 6789 - juanantonio@gmail.com
-                          </Text>
-                        </div>
-                      </Col>
-                    </Row>
+                    <Descriptions
+                      column={3}
+                      size="small"
+                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
+                      contentStyle={{ color: "#333333", fontSize: 14 }}
+                      style={{ width: "100%" }}
+                    >
+                      <Descriptions.Item label="Documento">1036688393</Descriptions.Item>
+                      <Descriptions.Item label="Edad">52 años</Descriptions.Item>
+                      <Descriptions.Item label="Género">Masculino</Descriptions.Item>
+                      <Descriptions.Item label="Dirección">calle 3 # 78 - 19</Descriptions.Item>
+                      <Descriptions.Item label="Teléfono">3016414872</Descriptions.Item>
+                      <Descriptions.Item label="Email">davidrestrepove@gmail.com</Descriptions.Item>
+                      <Descriptions.Item label="Tipo de Sangre">O+</Descriptions.Item>
+                      <Descriptions.Item label="Estado Civil">Divorciado</Descriptions.Item>
+                      <Descriptions.Item label="EPS">SURA</Descriptions.Item>
+                      <Descriptions.Item label="N° Afiliación">6043214545</Descriptions.Item>
+                      <Descriptions.Item label="Fecha de Ingreso">05-05-2025</Descriptions.Item>
+                    </Descriptions>
                   </Col>
                 </Row>
               </Card>
             </Col>
 
-            {/* Segunda tarjeta: Tipo de reporte */}
+            {/* Segunda tarjeta: Detalles del Reporte Clínico */}
             <Col span={24}>
               <Card
                 className="card-legacy"
@@ -181,8 +163,7 @@ export const ShowMedicalReport: React.FC = () => {
                       level={5}
                       style={{ fontWeight: "bold", color: "#333333" }}
                     >
-                      Reporte clínico - 001 10-20-2024 - Realizado por: SARA
-                      MANUELA GONZALEZ
+                      Detalles del Reporte Clínico
                     </Title>
                   </Col>
                   <Col>
@@ -191,128 +172,19 @@ export const ShowMedicalReport: React.FC = () => {
                   </Col>
                 </Row>
                 <Divider style={{ margin: "12px 0" }} />
-                <Row>
-                  <Col span={12}>
-                    <div style={{ paddingBottom: "8px" }}>
-                      <Title
-                        level={5}
-                        style={{
-                          fontWeight: "bold",
-                          fontSize: "14px",
-                          color: "#495057",
-                        }}
-                      >
-                        Tipo de reporte
-                      </Title>
-                      <Text style={{ fontSize: "14px", color: "#333333" }}>
-                        Enfermería
-                      </Text>
-                    </div>
-                    <div style={{ paddingBottom: "8px" }}>
-                      <Title
-                        level={5}
-                        style={{
-                          fontWeight: "bold",
-                          fontSize: "14px",
-                          color: "#495057",
-                        }}
-                      >
-                        Motivo de consulta
-                      </Title>
-                      <Text style={{ fontSize: "14px", color: "#333333" }}>
-                        Usuario se cayó en la mañana mientras se bañaba
-                      </Text>
-                    </div>
-                  </Col>
-                  <Col span={12}>
-                    <div style={{ paddingBottom: "8px" }}>
-                      <Title
-                        level={5}
-                        style={{
-                          fontWeight: "bold",
-                          fontSize: "14px",
-                          color: "#495057",
-                        }}
-                      >
-                        Exploración física
-                      </Title>
-                      <Text style={{ fontSize: "14px", color: "#333333" }}>
-                        Peso: 65 kg
-                      </Text>
-                      <br />
-                      <Text style={{ fontSize: "14px", color: "#333333" }}>
-                        Presión arterial: 110 mm
-                      </Text>
-                      <br />
-                      <Text style={{ fontSize: "14px", color: "#333333" }}>
-                        Frecuencia cardíaca: 80 lpm
-                      </Text>
-                      <br />
-                      <Text style={{ fontSize: "14px", color: "#333333" }}>
-                        Temperatura corporal: 38° - Fiebre leve
-                      </Text>
-                      <br />
-                      <Text style={{ fontSize: "14px", color: "#333333" }}>
-                        Pulsioximetría: 95%
-                      </Text>
-                    </div>
-                  </Col>
-                </Row>
-                <Divider style={{ margin: "12px 0" }} />
-                <Row>
-                  <Col span={24}>
-                    <Title
-                      level={5}
-                      style={{
-                        fontWeight: "bold",
-                        fontSize: "14px",
-                        color: "#495057",
-                      }}
-                    >
-                      Diagnóstico
-                    </Title>
-                    <Text style={{ fontSize: "14px", color: "#333333" }}>
-                      Integridad de la piel alterada relacionada con herida en
-                      la rodilla izquierda debido a traumatismo leve
-                    </Text>
-                  </Col>
-                </Row>
-                <Divider style={{ margin: "12px 0" }} />
-                <Row>
-                  <Col span={24}>
-                    <Title
-                      level={5}
-                      style={{
-                        fontWeight: "bold",
-                        fontSize: "14px",
-                        color: "#495057",
-                      }}
-                    >
-                      Observaciones
-                    </Title>
-                    <Text style={{ fontSize: "14px", color: "#666666" }}>
-                      Visible solo para el propietario del reporte.
-                    </Text>
-                  </Col>
-                </Row>
-                <Divider style={{ margin: "12px 0" }} />
-                <Row>
-                  <Col span={24}>
-                    <Title
-                      level={5}
-                      style={{
-                        fontWeight: "bold",
-                        fontSize: "14px",
-                        color: "#495057",
-                      }}
-                    >
-                      Remisión
-                    </Title>
-                    <Text style={{ fontSize: "14px", color: "#666666" }}>
-                      Ortopedia
-                    </Text>
-                  </Col>
-                </Row>
+                <Descriptions
+                  column={2}
+                  size="small"
+                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
+                  contentStyle={{ color: "#333333", fontSize: 14 }}
+                  style={{ width: "100%" }}
+                >
+                  <Descriptions.Item label="Tipo de Reporte">psicologia</Descriptions.Item>
+                  <Descriptions.Item label="Motivo de Consulta">Agregar motivo de consulta</Descriptions.Item>
+                  <Descriptions.Item label="Diagnóstico" span={2}>UN DIAGNÓSTICO</Descriptions.Item>
+                  <Descriptions.Item label="Observaciones" span={2}>Campo para agregar observaciones internas</Descriptions.Item>
+                  <Descriptions.Item label="Remisión" span={2}>especialista</Descriptions.Item>
+                </Descriptions>
               </Card>
             </Col>
 
