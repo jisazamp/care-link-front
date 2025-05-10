@@ -258,3 +258,19 @@ export type Service = {
 export interface UserContractsResponse extends Contract {
   servicios: Service[];
 }
+
+export type Bill = {
+  id_factura: number;
+  id_contrato: number;
+  fecha_emision: string;
+  total_factura: number;
+};
+
+export type Payment = {
+  id_pago: number;
+  id_factura: number;
+  id_metodo_pago: number;
+  id_tipo_pago: number;
+  fecha_pago: string;
+  valor: number;
+};

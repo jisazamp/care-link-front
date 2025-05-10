@@ -7,20 +7,29 @@ import {
   Col,
   DatePicker,
   Form,
+  type FormInstance,
   Input,
   InputNumber,
   Layout,
   Row,
   Typography,
 } from "antd";
-import { useState } from "react";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
+import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
 
 interface BillingContractProps {
   onNext?: () => void;
   onBack?: () => void;
 }
 
-const PaymentForm: React.FC = () => {
+interface PaymentFormProps {
+  form: FormInstance<unknown>;
+}
+
+const PaymentForm: React.FC<PaymentFormProps> = ({ form }) => {
   return (
     <Card title="Formulario de pago" style={{ marginTop: 16 }}>
       <Form.List name="payments">
@@ -109,17 +118,43 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   onBack,
 }) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const { contractId } = useParams();
+  const { data: bills } = useGetBill(Number(contractId));
+  const { data: payments } = useGetBillPayments(
+    Number(bills?.data[0].id_factura),
+  );
+  const [form] = Form.useForm();
+
+  const billsTotal = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+  }).format(bills?.data.reduce((a, b) => a + b.total_factura, 0) ?? 0);
+
+  useEffect(() => {
+    if (payments?.data?.length) {
+      form.setFieldsValue({
+        payments: payments.data.map((payment) => ({
+          paymentMethod: "Efectivo",
+          paymentDate: dayjs(payment.fecha_pago),
+          amount: payment.valor,
+        })),
+      });
+      setShowPaymentForm(true);
+    }
+  }, [payments, form.setFieldsValue]);
 
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>
       <Row justify="center">
         <Col span={18}>
           <Card>
-            <Form layout="vertical">
+            <Form layout="vertical" form={form}>
               <Card>
                 <Row justify="space-between" align="middle">
                   <Col>
-                    <h3 style={{ margin: 0 }}>Descargar factura</h3>
+                    <h3 style={{ margin: 0 }}>
+                      Descargar factura ({billsTotal})
+                    </h3>
                   </Col>
                   <Col>
                     <Button type="primary" icon={<DownloadOutlined />} disabled>
@@ -137,7 +172,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 </Form.Item>
               </Card>
 
-              <Form>{showPaymentForm && <PaymentForm />}</Form>
+              {showPaymentForm && <PaymentForm form={form} />}
             </Form>
           </Card>
 
