@@ -23,7 +23,7 @@ import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById"
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import patientImage from "../../../assets/Patients/patient1.jpg";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export const ViewReport: React.FC = () => {
   const { id, reportId } = useParams();
