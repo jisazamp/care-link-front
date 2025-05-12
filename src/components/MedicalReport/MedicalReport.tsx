@@ -3,6 +3,7 @@ import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import { EditReport } from "./components/EditReport/EditReport";
 import { NewReport } from "./components/NewReport/NewReport";
 import { ViewReport } from "./components/ViewReport/ViewReport";
+import { NewEvolutionReport } from "./components/NewEvolutionReport/NewEvolutionReport";
 
 export const MedicalReport: React.FC = () => {
   const location = useLocation();
@@ -48,6 +49,7 @@ export const MedicalReport: React.FC = () => {
         <Route path="newReport" element={<NewReport />} />
         <Route path="viewReport" element={<ViewReport />} />
         <Route path="editReport" element={<EditReport />} />
+        <Route path="nuevo-reporte-evolucion" element={<NewEvolutionReport />} />
       </Routes>
     </div>
   );

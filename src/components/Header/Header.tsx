@@ -1,11 +1,10 @@
 import {
-  BellOutlined,
+
   LogoutOutlined,
-  QuestionCircleOutlined,
-  SearchOutlined,
+
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Badge, Button, Flex, Layout, Tooltip, Typography } from "antd";
+import { Avatar,  Button, Flex, Layout, Tooltip, Typography } from "antd";
 import { useGetUserInfo } from "../../hooks/useGetUserInfo/useGetUserInfo";
 import { queryClient } from "../../main";
 import { useAuthStore } from "../../store/auth";
