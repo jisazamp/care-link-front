@@ -144,6 +144,8 @@ export const NewUser: React.FC = () => {
       proteccion_exequial: false,
       telefono: data.phone,
       is_deleted: false,
+      profesion: data.occupation ?? "",
+      tipo_usuario: data.userType ?? "Nuevo",
     };
 
     const photoFile = data.photo?.fileList?.[0]?.originFileObj;
@@ -156,58 +158,49 @@ export const NewUser: React.FC = () => {
   };
 
   useEffect(() => {
-    if (data?.data.data) {
-      const userData = data.data.data;
+    if (!data?.data.data) return;
 
-      const setImage = async () => {
-        const resetValues = {
-          ...userData,
-          dateOfBirth: dayjs(userData.fecha_nacimiento),
-          documentNumber: `${userData.n_documento}`,
-          firstName: `${userData.nombres}`,
-          lastName: `${userData.apellidos}`,
-          userId: `${userData.id_usuario}`,
-          maritalStatus: userData.estado_civil as CivilStatus,
-          gender: userData.genero as Gender,
-          email: userData.email ?? "",
-          phone: userData.telefono ?? "",
-          address: userData.direccion ?? "",
-        };
+    const userData = data.data.data;
 
-        if (userData.url_imagen) {
-          if (isLoadingFile) {
-            return;
-          }
+    const resetValues: FormValues = {
+      ...userData,
+      dateOfBirth: dayjs(userData.fecha_nacimiento),
+      documentNumber: `${userData.n_documento}`,
+      firstName: `${userData.nombres}`,
+      lastName: `${userData.apellidos}`,
+      userId: `${userData.id_usuario}`,
+      maritalStatus: userData.estado_civil as CivilStatus,
+      gender: userData.genero as Gender,
+      email: userData.email ?? "",
+      phone: userData.telefono ?? "",
+      address: userData.direccion ?? "",
+      occupation: userData.profesion ?? "",
+      userType: (userData.tipo_usuario as "Nuevo" | "Recurrente") ?? "Nuevo",
+    };
 
-          if (isErrorFile) {
-            reset(resetValues);
-            return;
-          }
+    reset(resetValues);
+  }, [data?.data.data, reset]);
 
-          if (imageFile) {
-            const fileList = [
-              {
-                uid: "-1",
-                name: imageFile.name,
-                status: "done",
-                url: userData.url_imagen,
-                originFileObj: imageFile,
-              },
-            ];
+  useEffect(() => {
+    const userData = data?.data.data;
+    if (!userData?.url_imagen || !imageFile || isLoadingFile || isErrorFile)
+      return;
 
-            reset({
-              ...resetValues,
-              photo: { fileList },
-            });
-          }
-        } else {
-          reset(resetValues);
-        }
-      };
+    const fileList = [
+      {
+        uid: "-1",
+        name: imageFile.name,
+        status: "done",
+        url: userData.url_imagen,
+        originFileObj: imageFile,
+      },
+    ];
 
-      setImage();
-    }
-  }, [data?.data.data, reset, isLoadingFile, imageFile, isErrorFile]);
+    reset((prev) => ({
+      ...prev,
+      photo: { fileList },
+    }));
+  }, [data?.data.data, imageFile, isLoadingFile, isErrorFile, reset]);
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {

@@ -32,6 +32,8 @@ export type User = {
   regimen_seguridad_social: string | null;
   telefono: string | null;
   tipo_afiliacion: string | null;
+  profesion: string | null;
+  tipo_usuario: string | null;
   url_imagen?: string | null;
 };
 
