@@ -1,3 +1,4 @@
+import { PlusOutlined } from "@ant-design/icons";
 import {
   Breadcrumb,
   Button,
@@ -62,7 +63,16 @@ export const ActivitiesList = () => {
         ]}
         style={{ margin: "16px 0" }}
       />
-      <Card title={<Title level={5}>Lista de actividades</Title>}>
+      <Card
+        title={<Title level={5}>Lista de actividades</Title>}
+        extra={
+          <Link to="/actividades/crear">
+            <Button className="main-button-white" icon={<PlusOutlined />}>
+              Agregar
+            </Button>
+          </Link>
+        }
+      >
         <List
           dataSource={data?.data.data}
           itemLayout="horizontal"

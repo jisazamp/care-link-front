@@ -62,13 +62,14 @@ export const CreateActivityForm = () => {
   const {
     control,
     formState: { errors },
-    reset,
     handleSubmit,
+    resetField,
   } = useForm<ActivityFormValues>({
     resolver: zodResolver(activityFormSchema),
     defaultValues: {
       nombre: "",
       descripcion: "",
+      duracion: 0,
       fecha: "",
       comentarios: "",
       id_profesional: undefined,
@@ -98,18 +99,20 @@ export const CreateActivityForm = () => {
   };
 
   useEffect(() => {
-    if (activity) {
-      reset({
-        id_profesional: activity.id_profesional,
-        id_tipo_actividad: activity.id_tipo_actividad,
-        comentarios: activity.comentarios,
-        descripcion: activity.descripcion,
-        duracion: activity.duracion,
-        fecha: activity.fecha ? dayjs(activity.fecha) : undefined,
-        nombre: activity.nombre,
+    if (activityData?.data.data && !isLoadingActivity) {
+      const activity = activityData?.data.data;
+      resetField("id_profesional", { defaultValue: activity.id_profesional });
+      resetField("id_tipo_actividad", {
+        defaultValue: activity.id_tipo_actividad,
       });
+      resetField("comentarios", { defaultValue: activity.comentarios });
+      resetField("fecha", {
+        defaultValue: activity.fecha ? dayjs(activity.fecha) : null,
+      });
+      resetField("descripcion", { defaultValue: activity.descripcion });
+      resetField("nombre", { defaultValue: activity.nombre });
     }
-  }, [activity, reset]);
+  }, [activityData?.data.data, isLoadingActivity, resetField]);
 
   if (isLoadingActivity)
     return (
@@ -211,6 +214,7 @@ export const CreateActivityForm = () => {
             render={({ field }) => (
               <Input.TextArea
                 {...field}
+                maxLength={255}
                 placeholder="Descripción"
                 rows={4}
                 value={field.value === null ? undefined : field.value}
@@ -259,7 +263,7 @@ export const CreateActivityForm = () => {
           </Form.Item>
         </Flex>
 
-        <Form.Item
+        {/*<Form.Item
           label="Comentarios"
           validateStatus={errors.comentarios ? "error" : ""}
           help={errors.comentarios?.message}
@@ -276,7 +280,7 @@ export const CreateActivityForm = () => {
               />
             )}
           />
-        </Form.Item>
+        </Form.Item>*/}
 
         <Flex align="flex-end" justify="flex-end">
           <Form.Item>
