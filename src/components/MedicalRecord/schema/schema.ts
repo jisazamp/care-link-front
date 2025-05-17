@@ -3,10 +3,9 @@ import { z } from "zod";
 
 export const pharmacotherapeuticRegimenSchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
-  endDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
   frequency: z.string().min(1, "La frecuencia es requerida"),
   medicine: z.string().min(1, "El medicamento es requerido"),
-  startDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
+  observations: z.string(),
 });
 
 export type PharmacoRegimen = z.infer<typeof pharmacotherapeuticRegimenSchema>;
@@ -134,7 +133,6 @@ export const formSchema = z.object({
   mood: z.string(),
   abused: z.boolean(),
   initialDiagnosis: z.string().optional().default(""),
-  vaccines: z.array(vaccineSchema).default([]),
   attachedDocuments: attachedDocumentsSchema,
 });
 

@@ -163,8 +163,7 @@ export type UserMedicine = {
   id?: string | number;
   medicamento: string;
   periodicidad: string;
-  Fecha_inicio: string;
-  fecha_fin: string;
+  observaciones: string;
 };
 
 export type UserCare = {
