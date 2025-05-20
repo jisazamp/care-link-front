@@ -18,8 +18,22 @@ export const BiophysicalSkills = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="normal">Normal</Option>
-                  <Option value="especial">Especial</Option>
+                  <Option value="autonoma">
+                    Alimentación autónoma sin dificultad
+                  </Option>
+                  <Option value="autonomaAdaptaciones">
+                    Alimentación autónoma con adaptaciones
+                  </Option>
+                  <Option value="asistidaParcial">
+                    Alimentación asistida parcialmente
+                  </Option>
+                  <Option value="asistida">
+                    Alimentación totalmente asistida
+                  </Option>
+                  <Option value="alternativa">
+                    Ingesta por vía alternativa (sonda nasogástrica,
+                    gastrostomía)
+                  </Option>
                 </Select>
               )}
             />
@@ -32,8 +46,21 @@ export const BiophysicalSkills = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="regular">Regular</Option>
-                  <Option value="irregular">Irregular</Option>
+                  <Option value="conservado">
+                    Patrón de sueño conservado (sin alteraciones)
+                  </Option>
+                  <Option value="fragmentado">
+                    Sueño fragmentado/no reparador
+                  </Option>
+                  <Option value="dificultad">
+                    Dificultad para conciliar o mantener el sueño
+                  </Option>
+                  <Option value="medicacion">
+                    Uso de medicación para inducir el sueño
+                  </Option>
+                  <Option value="hipersomnia">
+                    Hipersomnia o somnolencia diurna excesiva
+                  </Option>
                 </Select>
               )}
             />
