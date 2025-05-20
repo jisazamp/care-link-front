@@ -95,6 +95,7 @@ export type MedicalRecord = {
   observ_otrasalergias: string;
   observaciones_iniciales: string;
   otras_alergias: string | null;
+  diagnosticos: string | null;
   peso: number;
   presion_arterial: number;
   sustanciaspsico: boolean;
@@ -124,7 +125,7 @@ export type MedicalReport = {
   areasomatica: string;
   circunferencia_cintura: number;
   consumo_aguadiaria: number;
-  diagnostico: string;
+  diagnosticos: string;
   fecha_registro: string;
   frecuencia_actividadfisica: string;
   frecuencia_respiratoria: number;

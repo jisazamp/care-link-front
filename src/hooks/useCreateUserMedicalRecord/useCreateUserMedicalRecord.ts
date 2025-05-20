@@ -48,6 +48,8 @@ const createMedicalRecord = ({
     formData.append("vaccines", JSON.stringify(cleanedVaccines));
   } */
 
+  formData.append("vaccines", JSON.stringify([]));
+
   if (files) {
     for (const file of files) {
       formData.append("attachments", file);

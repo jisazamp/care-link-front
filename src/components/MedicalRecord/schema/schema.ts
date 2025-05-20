@@ -68,6 +68,11 @@ export const limitationsSchema = z.object({
   limitation: z.string(),
 });
 
+export const diagnosticSchema = z.object({
+  id: z.union([z.number(), z.string()]).nullable().optional(),
+  diagnostic: z.string(),
+});
+
 export const otherAlergies = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
   alergy: z.string(),
@@ -115,6 +120,7 @@ export const formSchema = z.object({
   disabilities: z.array(disabilitySchema).default([]),
   limitations: z.array(limitationsSchema).default([]),
   otherAlergies: z.array(otherAlergies).default([]),
+  diagnostic: z.array(diagnosticSchema).default([]),
   surgeries: z.array(surgeriesSchema).default([]),
   temperature: z.number({ coerce: true }).nullable().default(null),
   weight: z.number({ coerce: true }).nullable().default(null),

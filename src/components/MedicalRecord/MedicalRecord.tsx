@@ -95,6 +95,7 @@ export const MedicalRecord: React.FC = () => {
       cirugias: data.surgeries
         .map((a) => `${a.observation}:${a.date.format("YYYY-MM-DD")}`)
         .join(","),
+      diagnosticos: data.diagnostic.map((d) => d.diagnostic).join(","),
       comunicacion_no_verbal: data.nonVerbalCommunication,
       comunicacion_verbal: data.verbalCommunication,
       continencia: data.continence,
@@ -218,6 +219,10 @@ export const MedicalRecord: React.FC = () => {
         ?.split(",")
         .filter((a) => !!a)
         .map((e) => ({ id: uuidv4(), limitation: e }));
+      const diagnostics = data.diagnosticos
+        ?.split(",")
+        .filter((a) => !!a)
+        .map((e) => ({ id: uuidv4(), diagnostics: e }));
       const otherAlergies = data.otras_alergias
         ?.split(",")
         .filter((a) => !!a)
@@ -237,6 +242,7 @@ export const MedicalRecord: React.FC = () => {
       if (limitations?.length) specialConditions.push("limitations");
       if (otherAlergies?.length) specialConditions.push("otherAlergies");
       if (surgeries?.length) specialConditions.push("surgeries");
+      if (diagnostics?.length) specialConditions.push("diagnostic");
 
       reset((values) => ({
         ...values,
@@ -268,6 +274,9 @@ export const MedicalRecord: React.FC = () => {
         personalCare: data.cuidado_personal,
         psycoactive: data.sustanciaspsico,
         sleepType: data.tipo_de_sueno,
+        diagnostic:
+          diagnostics?.map((d) => ({ id: d.id, diagnostic: d.diagnostics })) ??
+          [],
         specialConditions,
         surgeries: surgeries ?? [],
         tabaquism: data.tabaquismo,
