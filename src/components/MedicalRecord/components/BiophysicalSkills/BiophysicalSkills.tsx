@@ -73,8 +73,17 @@ export const BiophysicalSkills = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value={true}>Sí</Option>
-                  <Option value={false}>No</Option>
+                  <Option value="total">Continencia total</Option>
+                  <Option value="urinariaOcasional">
+                    Incontinencia urinaria ocasional
+                  </Option>
+                  <Option value="urinariaPermanente">
+                    Incontinencia urinaria permanente
+                  </Option>
+                  <Option value="fecal">Incontinencia fecal</Option>
+                  <Option value="urinariaFecal">
+                    Incontinencia urinaria y fecal
+                  </Option>
                 </Select>
               )}
             />
@@ -87,8 +96,24 @@ export const BiophysicalSkills = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="conAyuda">Con ayuda</Option>
-                  <Option value="independiente">Independiente</Option>
+                  <Option value="autonoma">
+                    Deambulación autónoma sin ayudas
+                  </Option>
+                  <Option value="tecnica">
+                    Deambulación con ayuda técnica (bastón, caminador)
+                  </Option>
+                  <Option value="humana">
+                    Deambulación con asistencia humana
+                  </Option>
+                  <Option value="limitada">
+                    Postrado/a con movilidad limitada
+                  </Option>
+                  <Option value="sillaRuedasAutonomia">
+                    En silla de ruedas con autonomía
+                  </Option>
+                  <Option value="sillaRuedasDependencia">
+                    En silla de ruedas con dependencia
+                  </Option>
                 </Select>
               )}
             />
@@ -101,8 +126,18 @@ export const BiophysicalSkills = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="independiente">Independiente</Option>
-                  <Option value="conAyudaParcial">Con ayuda parcial</Option>
+                  <Option value="independiente">
+                    Independiente en AVD (actividades de la vida diaria)
+                  </Option>
+                  <Option value="supervisionOcasional">
+                    Requiere supervisión ocasional
+                  </Option>
+                  <Option value="dependienteParcial">
+                    Dependiente parcial (requiere ayuda para algunas AVD)
+                  </Option>
+                  <Option value="dependienteTotal">
+                    Dependiente total en AVD
+                  </Option>
                 </Select>
               )}
             />
@@ -115,8 +150,19 @@ export const BiophysicalSkills = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="buena">Buena</Option>
-                  <Option value="desaliñada">Desaliñada</Option>
+                  <Option value="adecuados">
+                    Apariencia e higiene personal adecuados
+                  </Option>
+                  <Option value="descuidada">
+                    Apariencia descuidada ocasional
+                  </Option>
+                  <Option value="falta">
+                    Evidencia falta de cuidado personal
+                  </Option>
+                  <Option value="asistencia">
+                    Requiere asistencia para mantener la higiene y la
+                    presentación
+                  </Option>
                 </Select>
               )}
             />

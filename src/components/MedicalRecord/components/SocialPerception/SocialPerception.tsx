@@ -21,8 +21,12 @@ export const SocialPerception = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="activa">Activa</Option>
-                  <Option value="pasiva">Pasiva</Option>
+                  <Option value="fluida">Fluida y coherente</Option>
+                  <Option value="limitada">Limitada pero comprensible</Option>
+                  <Option value="escasa">Escasa o inexistente</Option>
+                  <Option value="mediatizada">
+                    Mediatizada (uso de ayudas técnicas, por ejemplo)
+                  </Option>
                 </Select>
               )}
             />
@@ -35,8 +39,12 @@ export const SocialPerception = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="activa">Activa</Option>
-                  <Option value="pasiva">Pasiva</Option>
+                  <Option value="congruente">Congruente y expresiva</Option>
+                  <Option value="limitada">Limitada en gestualidad</Option>
+                  <Option value="incoherente">
+                    Incoherente con el discurso verbal
+                  </Option>
+                  <Option value="ausente">Prácticamente ausente</Option>
                 </Select>
               )}
             />
@@ -49,9 +57,15 @@ export const SocialPerception = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value="alegre">Alegre</Option>
-                  <Option value="triste">Triste</Option>
+                  <Option value="eutimico">Eutímico (ánimo estable)</Option>
+                  <Option value="hipertimico">
+                    Hipertímico (elevado o eufórico)
+                  </Option>
+                  <Option value="distimico">
+                    Distímico (triste o melancólico)
+                  </Option>
                   <Option value="ansioso">Ansioso</Option>
+                  <Option value="irritable">Irritable</Option>
                 </Select>
               )}
             />
@@ -64,8 +78,22 @@ export const SocialPerception = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value={true}>Sí</Option>
-                  <Option value={false}>No</Option>
+                  <Option value="no">
+                    No se reporta antecedente de maltrato
+                  </Option>
+                  <Option value="fisico">Se reporta maltrato físico</Option>
+                  <Option value="emocional">
+                    Se reporta maltrato psicológico o emocional
+                  </Option>
+                  <Option value="negligencia">
+                    Se reporta negligencia o abandono
+                  </Option>
+                  <Option value="economico">
+                    Se reporta maltrato económico o patrimonial
+                  </Option>
+                  <Option value="noDisponible">
+                    Información no disponible/No indagado
+                  </Option>
                 </Select>
               )}
             />

@@ -21,8 +21,9 @@ export const Toxicology = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value={true}>Sí</Option>
-                  <Option value={false}>No</Option>
+                  <Option value="no">No consume</Option>
+                  <Option value="exfumador">Exfumador/a</Option>
+                  <Option value="activo">Consumo activo</Option>
                 </Select>
               )}
             />
@@ -38,8 +39,19 @@ export const Toxicology = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value={true}>Sí</Option>
-                  <Option value={false}>No</Option>
+                  <Option value="sinAntecedentes">Sin antecedentes</Option>
+                  <Option value="experimental">
+                    Antecedentes de uso experimental
+                  </Option>
+                  <Option value="esporadico">
+                    Uso esporádico experimental
+                  </Option>
+                  <Option value="problematico">
+                    Uso problemático/dependencia diagnosticada
+                  </Option>
+                  <Option value="tratamiento">
+                    Bajo tratamiento por consumo de SPA
+                  </Option>
                 </Select>
               )}
             />
@@ -52,8 +64,15 @@ export const Toxicology = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value={true}>Sí</Option>
-                  <Option value={false}>No</Option>
+                  <Option value="no">No consume</Option>
+                  <Option value="social">Consumo ocasional social</Option>
+                  <Option value="regular">
+                    Consumo regular sin dependencia
+                  </Option>
+                  <Option value="problematico">
+                    Consumo problemático o dependencia (diagnosticada o
+                    sospechada)
+                  </Option>
                 </Select>
               )}
             />
@@ -66,8 +85,14 @@ export const Toxicology = () => {
               control={control}
               render={({ field }) => (
                 <Select {...field} placeholder="Seleccione">
-                  <Option value={true}>Sí</Option>
-                  <Option value={false}>No</Option>
+                  <Option value="no">No consume</Option>
+                  <Option value="ocasional">Consumo ocasional</Option>
+                  <Option value="moderado">
+                    Consumo habitual moderado (1-2 porciones/día)
+                  </Option>
+                  <Option value="elevado">
+                    Consumo elevado (más de 3 porciones/día)
+                  </Option>
                 </Select>
               )}
             />

@@ -67,15 +67,15 @@ export type MedicalRecord = {
   id_historiaclinica?: number;
   Tiene_OtrasAlergias: boolean;
   Tienedieta_especial: boolean;
-  alcoholismo: boolean;
+  alcoholismo: string | null;
   alergico_medicamento: boolean;
   altura: number;
   apariencia_personal: string;
-  cafeina: boolean;
+  cafeina: string | null;
   cirugias: string | null;
   comunicacion_no_verbal: string;
   comunicacion_verbal: string;
-  continencia: boolean;
+  continencia: string | null;
   cuidado_personal: string;
   dieta_especial: string | null;
   discapacidades: string | null;
@@ -87,8 +87,8 @@ export type MedicalRecord = {
   historial_cirugias: string;
   id_usuario: number;
   limitaciones: string | null;
-  maltratado: boolean;
-  maltrato: boolean;
+  maltratado: string | null;
+  maltrato: string | null;
   medicamentos_alergia: string | null;
   motivo_ingreso: string;
   observ_dietaEspecial: string;
@@ -98,13 +98,13 @@ export type MedicalRecord = {
   diagnosticos: string | null;
   peso: number;
   presion_arterial: number;
-  sustanciaspsico: boolean;
-  tabaquismo: boolean;
+  sustanciaspsico: string | null;
+  tabaquismo: string | null;
   telefono_emermedica: string;
   temperatura_corporal: number;
-  tipo_alimentacion: string;
-  tipo_de_movilidad: string;
-  tipo_de_sueno: string;
+  tipo_alimentacion: string | null;
+  tipo_de_movilidad: string | null;
+  tipo_de_sueno: string | null;
   tipo_sangre: string;
 };
 
