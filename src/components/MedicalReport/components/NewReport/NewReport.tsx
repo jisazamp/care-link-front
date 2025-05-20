@@ -17,10 +17,14 @@ import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import type { MedicalReport } from "../../../../types";
+import { useWatch } from "antd/es/form/Form";
 
 export const NewReport: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const [form] = Form.useForm();
+  const reportType = useWatch("reportType", form);
 
   const createMutation = useCreateMedicalReport(id);
   const medicalRecordQuery = useGetUserMedicalRecord(id);
@@ -47,7 +51,7 @@ export const NewReport: React.FC = () => {
       ),
       Frecuencia_cardiaca: values.heartRate,
       Obs_habitosalimenticios: values.treatmentObservation,
-      diagnostico: values.diagnosis,
+      diagnosticos: values.diagnosis,
       fecha_registro: values.registrationDate.format("YYYY-MM-DD"),
       id_profesional: values.professional,
       motivo_consulta: values.consultationReason,
@@ -74,7 +78,7 @@ export const NewReport: React.FC = () => {
         title="Nuevo Reporte Clínico"
         loading={medicalRecordQuery.isLoading}
       >
-        <Form layout="vertical" onFinish={handleFinish}>
+        <Form form={form} layout="vertical" onFinish={handleFinish}>
           <Card title="Datos básicos del reporte" style={{ marginBottom: 16 }}>
             <Row gutter={16}>
               <Col span={12}>
@@ -137,38 +141,42 @@ export const NewReport: React.FC = () => {
               </Col>
             </Row>
           </Card>
-          <Card title="Exploración Física" style={{ marginBottom: 16 }}>
-            <Row gutter={16}>
-              <Col span={4}>
-                <Form.Item label="Peso (kg)" name="weight">
-                  <Input type="number" />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="Presión Arterial" name="bloodPressure">
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="Frecuencia Cardíaca" name="heartRate">
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item
-                  label="Temperatura Corporal (°C)"
-                  name="bodyTemperature"
-                >
-                  <Input />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="Pulsoximetría (%)" name="oxygenSaturation">
-                  <Input />
-                </Form.Item>
-              </Col>
-            </Row>
-          </Card>
+
+          {reportType && reportType !== "psicologia" && (
+            <Card title="Exploración Física" style={{ marginBottom: 16 }}>
+              <Row gutter={16}>
+                <Col span={4}>
+                  <Form.Item label="Peso (kg)" name="weight">
+                    <Input type="number" />
+                  </Form.Item>
+                </Col>
+                <Col span={4}>
+                  <Form.Item label="Presión Arterial" name="bloodPressure">
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col span={4}>
+                  <Form.Item label="Frecuencia Cardíaca" name="heartRate">
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col span={4}>
+                  <Form.Item
+                    label="Temperatura Corporal (°C)"
+                    name="bodyTemperature"
+                  >
+                    <Input />
+                  </Form.Item>
+                </Col>
+                <Col span={4}>
+                  <Form.Item label="Pulsoximetría (%)" name="oxygenSaturation">
+                    <Input />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+          )}
+
           <Card title="Datos del diagnóstico" style={{ marginBottom: 16 }}>
             <Form.Item label="Diagnóstico" name="diagnosis">
               <Input />
@@ -181,14 +189,21 @@ export const NewReport: React.FC = () => {
             </Form.Item>
             <Form.Item label="Remisión" name="referral">
               <Select placeholder="Seleccione una opción">
-                <Select.Option value="no_aplica">No Aplica</Select.Option>
-                <Select.Option value="especialista">Especialista</Select.Option>
-                <Select.Option value="hospitalizacion">
-                  Hospitalización
+                <Select.Option value="psicologia">Psicología</Select.Option>
+                <Select.Option value="fisioterapia">Fisioterapia</Select.Option>
+                <Select.Option value="gerontologia">
+                  Gerontologia
+                </Select.Option>
+                <Select.Option value="enfermeria">
+                  Enfermería
+                </Select.Option>
+                <Select.Option value="especialista">
+                  Especialista
                 </Select.Option>
               </Select>
             </Form.Item>
           </Card>
+
           <Card
             title="Tratamientos y recomendaciones"
             style={{ marginBottom: 16 }}
@@ -197,11 +212,13 @@ export const NewReport: React.FC = () => {
               <Input.TextArea rows={3} />
             </Form.Item>
           </Card>
+
           <Card title="Adjuntar documentos" style={{ marginBottom: 16 }}>
             <Upload>
               <Button icon={<UploadOutlined />}>Agregar</Button>
             </Upload>
           </Card>
+
           <Card style={{ width: "100%", textAlign: "right" }}>
             <Button style={{ marginRight: 8 }} className="main-button-white">
               Restablecer
