@@ -26,12 +26,10 @@ import { useGetRecordMedicines } from "../../hooks/useGetRecordMedicines/useGetR
 import { useGetRecordCares } from "../../hooks/useGetUserCares/useGetUserCares";
 import { useGetRecordInterventions } from "../../hooks/useGetUserInterventions/useGetUserInterventions";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import { useGetRecordVaccines } from "../../hooks/useGetUserVaccines/useGetUserVaccines";
 import type {
   MedicalRecord as MedicalRecordType,
   UserCare,
   UserIntervention,
-  UserVaccine,
 } from "../../types";
 import type { UserMedicine } from "../../types";
 import { BasicHealthData } from "./components/BasicHealthData/BasicHealthData";
@@ -39,20 +37,16 @@ import { BiophysicalSkills } from "./components/BiophysicalSkills/BiophysicalSki
 import { EntryData } from "./components/EntryData/EntryData";
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
 import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
-import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
 import { SocialPerception } from "./components/SocialPerception/SocialPerception";
 import { SpecialConditions } from "./components/SpecialConditions/SpecialConditions";
 import { Toxicology } from "./components/Toxicology/Toxicology";
 import { UserInfo } from "./components/UserInfo/UserInfo";
-import { Vaccines } from "./components/Vaccines/Vaccines";
 import {
   type FormValues,
   type NursingCarePlan,
   type PharmacoRegimen,
   type PhysioRegimen,
-  type Vaccine,
   formSchema,
-  physioterapeuticRegimenSchema,
 } from "./schema/schema";
 
 const { Title } = Typography;
@@ -66,7 +60,6 @@ export const MedicalRecord: React.FC = () => {
     shouldFocusError: false,
   });
   const { reset, getValues } = methods;
-  console.log(methods.formState.errors);
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
     useCreateUserMedicalRecord(userId);
@@ -83,9 +76,6 @@ export const MedicalRecord: React.FC = () => {
 
   const { data: userInterventions, isLoading: loadingUserInterventions } =
     useGetRecordInterventions(userMedicalRecord?.data.data?.id_historiaclinica);
-
-  const { data: userVaccines, isLoading: loadingVaccines } =
-    useGetRecordVaccines(userMedicalRecord?.data.data?.id_historiaclinica);
 
   const { mutate: editRecord, isPending: loadingEditing } =
     useEditRecordMutation({
@@ -105,6 +95,7 @@ export const MedicalRecord: React.FC = () => {
       cirugias: data.surgeries
         .map((a) => `${a.observation}:${a.date.format("YYYY-MM-DD")}`)
         .join(","),
+      diagnosticos: data.diagnostic.map((d) => d.diagnostic).join(","),
       comunicacion_no_verbal: data.nonVerbalCommunication,
       comunicacion_verbal: data.verbalCommunication,
       continencia: data.continence,
@@ -143,10 +134,9 @@ export const MedicalRecord: React.FC = () => {
     for (const p of data.pharmacotherapeuticRegimen) {
       const medicine: UserMedicine = {
         id: p.id ?? "",
-        Fecha_inicio: p.startDate.format("YYYY-MM-DD"),
-        fecha_fin: p.endDate.format("YYYY-MM-DD"),
         medicamento: p.medicine,
         periodicidad: p.frequency,
+        observaciones: p.observations,
       };
       medicines.push(medicine);
     }
@@ -173,7 +163,7 @@ export const MedicalRecord: React.FC = () => {
       interventions.push(intervention);
     }
 
-    const vaccines: UserVaccine[] = [];
+    /* const vaccines: UserVaccine[] = [];
     for (const v of data.vaccines) {
       const vaccine: UserVaccine = {
         id: v.id ?? "",
@@ -183,7 +173,7 @@ export const MedicalRecord: React.FC = () => {
         vacuna: v.name,
       };
       vaccines.push(vaccine);
-    }
+    }*/
 
     if (!userMedicalRecord?.data.data?.id_historiaclinica) {
       createUserMedicalRecord({
@@ -192,7 +182,6 @@ export const MedicalRecord: React.FC = () => {
           medicines,
           cares,
           interventions,
-          vaccines,
         },
         files: data.attachedDocuments,
       });
@@ -207,7 +196,6 @@ export const MedicalRecord: React.FC = () => {
         medicines: medicines.filter((m) => typeof m.id === "string"),
         cares: cares.filter((m) => typeof m.id === "string"),
         interventions: interventions.filter((i) => typeof i.id === "string"),
-        vaccines: vaccines.filter((v) => typeof v.id === "string"),
       },
     });
   };
@@ -231,6 +219,10 @@ export const MedicalRecord: React.FC = () => {
         ?.split(",")
         .filter((a) => !!a)
         .map((e) => ({ id: uuidv4(), limitation: e }));
+      const diagnostics = data.diagnosticos
+        ?.split(",")
+        .filter((a) => !!a)
+        .map((e) => ({ id: uuidv4(), diagnostics: e }));
       const otherAlergies = data.otras_alergias
         ?.split(",")
         .filter((a) => !!a)
@@ -250,6 +242,7 @@ export const MedicalRecord: React.FC = () => {
       if (limitations?.length) specialConditions.push("limitations");
       if (otherAlergies?.length) specialConditions.push("otherAlergies");
       if (surgeries?.length) specialConditions.push("surgeries");
+      if (diagnostics?.length) specialConditions.push("diagnostic");
 
       reset((values) => ({
         ...values,
@@ -281,6 +274,9 @@ export const MedicalRecord: React.FC = () => {
         personalCare: data.cuidado_personal,
         psycoactive: data.sustanciaspsico,
         sleepType: data.tipo_de_sueno,
+        diagnostic:
+          diagnostics?.map((d) => ({ id: d.id, diagnostic: d.diagnostics })) ??
+          [],
         specialConditions,
         surgeries: surgeries ?? [],
         tabaquism: data.tabaquismo,
@@ -295,10 +291,9 @@ export const MedicalRecord: React.FC = () => {
     if (userMedicines?.data.data) {
       const medicines: PharmacoRegimen[] = userMedicines.data.data.map((e) => ({
         id: e.id,
-        endDate: dayjs(e.fecha_fin),
         frequency: e.periodicidad,
         medicine: e.medicamento,
-        startDate: dayjs(e.Fecha_inicio),
+        observations: e.observaciones,
       }));
       const medicalTreatments: string[] = getValues("medicalTreatments") ?? [];
       if (userMedicines.data.data.length)
@@ -350,30 +345,11 @@ export const MedicalRecord: React.FC = () => {
     }
   }, [userInterventions?.data.data, reset, getValues]);
 
-  useEffect(() => {
-    if (userVaccines?.data.data) {
-      const vaccines: Vaccine[] = userVaccines.data.data.map((e) => ({
-        id: e.id,
-        date: e.fecha_administracion
-          ? dayjs(e.fecha_administracion)
-          : undefined,
-        nextDate: e.fecha_proxima ? dayjs(e.fecha_proxima) : undefined,
-        name: e.vacuna,
-        secondaryEffects: e.efectos_secundarios,
-      }));
-      reset((values) => ({
-        ...values,
-        vaccines,
-      }));
-    }
-  }, [userVaccines?.data.data, reset]);
-
   if (
     loadingUserMedicalRecord ||
     loadingUserCares ||
     loadingUserMedicines ||
-    loadingUserInterventions ||
-    loadingVaccines
+    loadingUserInterventions
   ) {
     return (
       <Flex align="center" justify="center" style={{ minHeight: 300 }}>
@@ -410,11 +386,11 @@ export const MedicalRecord: React.FC = () => {
               <BasicHealthData />
             </Col>
           </Row>
-          <Row style={{ margin: "8px 0" }}>
+          {/*<Row style={{ margin: "8px 0" }}>
             <Col span={24}>
               <PhysicalExploration />
             </Col>
-          </Row>
+          </Row>*/}
           <Row style={{ margin: "8px 0" }}>
             <Col span={24}>
               <MedicalTreatments />
@@ -425,11 +401,11 @@ export const MedicalRecord: React.FC = () => {
               <SpecialConditions />
             </Col>
           </Row>
-          <Row style={{ margin: "8px 0" }}>
+          {/*<Row style={{ margin: "8px 0" }}>
             <Col span={24}>
               <Vaccines />
             </Col>
-          </Row>
+          </Row> */}
           <Row style={{ margin: "8px 0" }}>
             <Col span={24}>
               <BiophysicalSkills />

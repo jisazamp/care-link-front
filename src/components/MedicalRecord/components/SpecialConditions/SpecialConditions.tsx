@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import type { FormValues } from "../../schema/schema";
 import { AlergiesModal } from "./components/AlergiesModal/AlergiesModal";
+import { DiagnosticsModal } from "./components/DiagnosticsModal/DiagnosticsModal";
 import { DietModal } from "./components/DietModal/DietModal";
 import { DisabilityModal } from "./components/DisabilityModal/DisabilityModal";
 import { LimitationsModal } from "./components/LimitationsModal/LimitationsModal";
@@ -21,6 +22,7 @@ export const SpecialConditions = () => {
     | "limitations"
     | "otherAlergies"
     | "surgeries"
+    | "diagnostic"
     | null
   >(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -79,6 +81,15 @@ export const SpecialConditions = () => {
     name: "surgeries",
   });
 
+  const {
+    append: appendDiagnostic,
+    update: updateDiagnostic,
+    remove: removeDiagnostic,
+  } = useFieldArray({
+    control,
+    name: "diagnostic",
+  });
+
   const selectedValues = watch("specialConditions", []);
   const alergies = watch("alergies") ?? [];
   const diet = watch("diet") ?? [];
@@ -86,6 +97,7 @@ export const SpecialConditions = () => {
   const limitations = watch("limitations") ?? [];
   const otherAlergies = watch("otherAlergies") ?? [];
   const surgeries = watch("surgeries") ?? [];
+  const diagnostic = watch("diagnostic") ?? [];
 
   const handleCheckboxGroupChange = (values: string[]) => {
     setValue("specialConditions", values);
@@ -133,6 +145,9 @@ export const SpecialConditions = () => {
               <Checkbox value="limitations">Limitaciones o apoyos</Checkbox>
               <Checkbox value="otherAlergies">Otras alergias</Checkbox>
               <Checkbox value="surgeries">Cirugías</Checkbox>
+              <Checkbox value="diagnostic">
+                Diagnóstico cognitivo, psicológico o psiquiátrico vigente
+              </Checkbox>
             </Checkbox.Group>
           )}
         />
@@ -500,6 +515,63 @@ export const SpecialConditions = () => {
             />
           </Card>
         )}
+        {selectedValues.includes("diagnostic") && (
+          <Card
+            extra={
+              <Button
+                icon={<PlusOutlined />}
+                className="main-button-white"
+                onClick={() => {
+                  setEditingIndex(null);
+                  setShowModal("diagnostic");
+                }}
+              >
+                Agregar
+              </Button>
+            }
+            title={
+              <Title level={5} style={{ margin: 0 }}>
+                Diagnósticos vigentes
+              </Title>
+            }
+            style={{ marginBottom: 8 }}
+          >
+            <Table
+              rowKey="id"
+              columns={[
+                { title: "Diagnóstico", dataIndex: "diagnostic" },
+                {
+                  title: "Acciones",
+                  key: "acciones",
+                  align: "center",
+                  render: (_, __, index) => (
+                    <Space>
+                      <Button
+                        type="link"
+                        className="main-button-link"
+                        onClick={() => {
+                          setEditingIndex(index);
+                          setShowModal("diagnostic");
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        onClick={() => removeDiagnostic(index)}
+                      >
+                        Eliminar
+                      </Button>
+                    </Space>
+                  ),
+                },
+              ]}
+              dataSource={diagnostic}
+              pagination={false}
+            />
+          </Card>
+        )}
       </Flex>
       <AlergiesModal
         open={showModal === "alergies"}
@@ -562,6 +634,17 @@ export const SpecialConditions = () => {
         initialData={editingIndex !== null ? surgeries[editingIndex] : null}
         append={appendSurgeries}
         update={updateSurgeries}
+        onCancel={() => {
+          setShowModal(null);
+          setEditingIndex(null);
+        }}
+      />
+      <DiagnosticsModal
+        open={showModal === "diagnostic"}
+        editingIndex={editingIndex}
+        initialData={editingIndex !== null ? diagnostic[editingIndex] : null}
+        append={appendDiagnostic}
+        update={updateDiagnostic}
         onCancel={() => {
           setShowModal(null);
           setEditingIndex(null);

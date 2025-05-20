@@ -6,7 +6,6 @@ import type {
   UserCare,
   UserIntervention,
   UserMedicine,
-  UserVaccine,
 } from "../../types";
 
 type CreateMedicalRecordType = {
@@ -14,7 +13,6 @@ type CreateMedicalRecordType = {
   medicines: UserMedicine[];
   cares: UserCare[];
   interventions: UserIntervention[];
-  vaccines: UserVaccine[];
 };
 
 const createMedicalRecord = ({
@@ -45,10 +43,12 @@ const createMedicalRecord = ({
     formData.append("interventions", JSON.stringify(cleanedInterventions));
   }
 
-  if (data.vaccines) {
+  /* if (data.vaccines) {
     const cleanedVaccines = data.vaccines.map(({ id, ...rest }) => rest);
     formData.append("vaccines", JSON.stringify(cleanedVaccines));
-  }
+  } */
+
+  formData.append("vaccines", JSON.stringify([]));
 
   if (files) {
     for (const file of files) {

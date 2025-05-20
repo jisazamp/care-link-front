@@ -25,7 +25,10 @@ const editRecord = ({
   id: number;
   recordId: number;
   record: Partial<EditMedicalRecordType>;
-}) => client.patch(`/api/users/${id}/medical_record/${recordId}`, record);
+}) => {
+  record.vaccines = [];
+  return client.patch(`/api/users/${id}/medical_record/${recordId}`, record);
+};
 
 interface UseEditRecordMutationProps {
   id?: string | number;

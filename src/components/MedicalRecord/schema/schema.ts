@@ -3,10 +3,9 @@ import { z } from "zod";
 
 export const pharmacotherapeuticRegimenSchema = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
-  endDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
   frequency: z.string().min(1, "La frecuencia es requerida"),
   medicine: z.string().min(1, "El medicamento es requerido"),
-  startDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
+  observations: z.string(),
 });
 
 export type PharmacoRegimen = z.infer<typeof pharmacotherapeuticRegimenSchema>;
@@ -69,6 +68,11 @@ export const limitationsSchema = z.object({
   limitation: z.string(),
 });
 
+export const diagnosticSchema = z.object({
+  id: z.union([z.number(), z.string()]).nullable().optional(),
+  diagnostic: z.string(),
+});
+
 export const otherAlergies = z.object({
   id: z.union([z.number(), z.string()]).nullable().optional(),
   alergy: z.string(),
@@ -116,25 +120,25 @@ export const formSchema = z.object({
   disabilities: z.array(disabilitySchema).default([]),
   limitations: z.array(limitationsSchema).default([]),
   otherAlergies: z.array(otherAlergies).default([]),
+  diagnostic: z.array(diagnosticSchema).default([]),
   surgeries: z.array(surgeriesSchema).default([]),
   temperature: z.number({ coerce: true }).nullable().default(null),
   weight: z.number({ coerce: true }).nullable().default(null),
-  feeding: z.string(),
-  sleepType: z.string(),
-  continence: z.boolean(),
-  mobility: z.string(),
-  personalCare: z.string(),
-  personalAppearance: z.string(),
-  tabaquism: z.boolean(),
-  psycoactive: z.boolean(),
-  alcholism: z.boolean(),
-  caffeine: z.boolean(),
-  verbalCommunication: z.string(),
-  nonVerbalCommunication: z.string(),
-  mood: z.string(),
-  abused: z.boolean(),
+  feeding: z.string().nullable().default(null),
+  sleepType: z.string().nullable().default(null),
+  continence: z.string().nullable().default(null),
+  mobility: z.string().nullable().default(null),
+  personalCare: z.string().nullable().default(null),
+  personalAppearance: z.string().nullable().default(null),
+  tabaquism: z.string().nullable().default(null),
+  psycoactive: z.string().nullable().default(null),
+  alcholism: z.string().nullable().default(null),
+  caffeine: z.string().nullable().default(null),
+  verbalCommunication: z.string().nullable().default(null),
+  nonVerbalCommunication: z.string().nullable().default(null),
+  mood: z.string().nullable().default(null),
+  abused: z.string().nullable().default(null),
   initialDiagnosis: z.string().optional().default(""),
-  vaccines: z.array(vaccineSchema).default([]),
   attachedDocuments: attachedDocumentsSchema,
 });
 

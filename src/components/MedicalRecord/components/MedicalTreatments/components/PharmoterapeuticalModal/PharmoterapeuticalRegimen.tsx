@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Col, DatePicker, Form, Input, Modal, Row } from "antd";
+import { Button, Col, Form, Input, Modal, Row } from "antd";
 import { useEffect } from "react";
 import { Controller, type UseFieldArrayAppend, useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
@@ -41,11 +41,10 @@ export const PharmoterapeuticModal = ({
     if (initialData) reset(initialData);
     else
       reset({
-        endDate: undefined,
         frequency: undefined,
         id: undefined,
         medicine: undefined,
-        startDate: undefined,
+        observations: undefined,
       });
   }, [initialData, reset]);
 
@@ -55,8 +54,7 @@ export const PharmoterapeuticModal = ({
         id: initialData?.id ?? uuidv4(),
         medicamento: data.medicine,
         periodicidad: data.frequency,
-        Fecha_inicio: data.startDate.format("YYYY-MM-DD"),
-        fecha_fin: data.endDate.format("YYYY-MM-DD"),
+        observaciones: data.observations,
       };
       update(editingIndex, {
         ...data,
@@ -97,7 +95,7 @@ export const PharmoterapeuticModal = ({
     >
       <Form layout="vertical">
         <Row gutter={16}>
-          <Col span={24}>
+          {/*<Col span={24}>
             <Form.Item label="Fecha inicio">
               <Controller
                 name="startDate"
@@ -130,7 +128,7 @@ export const PharmoterapeuticModal = ({
                 )}
               />
             </Form.Item>
-          </Col>
+          </Col>*/}
         </Row>
         <Row gutter={16}>
           <Col span={24}>
@@ -148,6 +146,17 @@ export const PharmoterapeuticModal = ({
             <Form.Item label="Frecuencia">
               <Controller
                 name="frequency"
+                control={control}
+                render={({ field }) => <Input {...field} />}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item label="Observaciones">
+              <Controller
+                name="observations"
                 control={control}
                 render={({ field }) => <Input {...field} />}
               />

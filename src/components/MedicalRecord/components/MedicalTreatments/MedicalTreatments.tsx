@@ -167,17 +167,8 @@ export const MedicalTreatments = () => {
               rowKey="id"
               columns={[
                 { title: "Medicamento", dataIndex: "medicine" },
-                {
-                  title: "Fecha de inicio",
-                  dataIndex: "startDate",
-                  render: (_, record) => record.startDate?.format("YYYY-MM-DD"),
-                },
-                {
-                  title: "Fecha de fin",
-                  dataIndex: "endDate",
-                  render: (_, record) => record.endDate?.format("YYYY-MM-DD"),
-                },
                 { title: "Frecuencia", dataIndex: "frequency" },
+                { title: "Observaciones", dataIndex: "observations" },
                 {
                   title: "Acciones",
                   render: (_, __, index) => (
