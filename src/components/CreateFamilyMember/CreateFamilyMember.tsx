@@ -17,7 +17,6 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
-import { Kinship } from "../../enums";
 import { useCreateFamilyMember } from "../../hooks/useCreateFamilyMember/useCreateFamilyMember";
 import { useEditFamilyMemberMutation } from "../../hooks/useEditFamilyMemberMutation/useEditFamilyMemberMutation";
 import { useGetFamilyMemberById } from "../../hooks/useGetFamilyMemberById/useGetFamilyMemberById";
@@ -41,9 +40,8 @@ const formSchema = z.object({
   phone: z.string().optional(),
   isFamilyMember: z.boolean().optional(),
   isAlive: z.boolean().optional(),
-  kinship: z.nativeEnum(Kinship, {
-    errorMap: () => ({ message: "El parentezco es requerido" }),
-  }),
+  kinship: z.string(),
+  customKinship: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -71,9 +69,12 @@ export const CreateFamilyMember = () => {
     formState: { errors },
     handleSubmit,
     reset,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
+
+  const kinshipValue = watch("kinship");
 
   const onSubmit = (data: FormValues) => {
     const request: CreateFamilyMemberRequest = {
@@ -90,12 +91,20 @@ export const CreateFamilyMember = () => {
         vive: data.isAlive ?? false,
       },
       kinship: {
-        parentezco: data.kinship,
+        parentezco:
+          data.kinship === "Otro" && data.customKinship
+            ? data.customKinship
+            : data.kinship,
       },
     };
 
     if (familyMemberId) {
-      editFamilyMember({ id: familyMemberId, request: request.family_member });
+      editFamilyMember({
+        id: userId ?? 0,
+        familiy_member_id: familyMemberId ?? 0,
+        family_member: request.family_member,
+        kinship: request.kinship,
+      });
       return;
     }
 
@@ -121,7 +130,7 @@ export const CreateFamilyMember = () => {
         email: familyMember.data.data.email ?? "",
         firstName: familyMember.data.data.nombres,
         isAlive: familyMember.data.data.vive ?? false,
-        kinship: familyMember.data.data.parentesco as Kinship,
+        kinship: familyMember.data.data.parentesco,
         lastName: familyMember.data.data.apellidos,
         phone: familyMember.data.data.telefono ?? "",
         isFamilyMember: familyMember.data.data.acudiente ?? false,
@@ -170,6 +179,13 @@ export const CreateFamilyMember = () => {
                           <Select {...field}>
                             <Select.Option value="Padre">Padre</Select.Option>
                             <Select.Option value="Madre">Madre</Select.Option>
+                            <Select.Option value="Hijo">Hijo</Select.Option>
+                            <Select.Option value="Hija">Hija</Select.Option>
+                            <Select.Option value="Nieto">Nieto</Select.Option>
+                            <Select.Option value="Nieta">Nieta</Select.Option>
+                            <Select.Option value="Cuidador">
+                              Cuidador
+                            </Select.Option>
                             <Select.Option value="Hermano">
                               Hermano
                             </Select.Option>
@@ -186,6 +202,25 @@ export const CreateFamilyMember = () => {
                         )}
                       />
                     </Form.Item>
+                    {kinshipValue === "Otro" && (
+                      <Form.Item
+                        label="Especifique el parentezco"
+                        validateStatus={errors.customKinship ? "error" : ""}
+                        help={
+                          errors.customKinship?.message && (
+                            <Text type="danger">
+                              {errors.customKinship.message}
+                            </Text>
+                          )
+                        }
+                      >
+                        <Controller
+                          name="customKinship"
+                          control={control}
+                          render={({ field }) => <Input {...field} />}
+                        />
+                      </Form.Item>
+                    )}
                   </Col>
                   <Col span={8}>
                     <Form.Item

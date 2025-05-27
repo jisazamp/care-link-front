@@ -5,11 +5,22 @@ import type { FamilyMember } from "../../types";
 
 const updateFamilyMember = ({
   id,
-  request,
+  familiy_member_id,
+  family_member,
+  kinship,
 }: {
   id: number | string;
-  request: Partial<FamilyMember>;
-}) => client.patch(`/api/family_members/${id}`, request);
+  familiy_member_id: number | string;
+  family_member: Partial<FamilyMember>;
+  kinship: { parentezco: string };
+}) =>
+  client.patch(
+    `/api/family_members/${id}?family_member_id=${familiy_member_id}`,
+    {
+      family_member,
+      kinship,
+    },
+  );
 
 export const useEditFamilyMemberMutation = (id?: number | string) => {
   return useMutation({
