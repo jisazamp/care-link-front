@@ -1,10 +1,4 @@
-import type {
-  CivilStatus,
-  Gender,
-  Kinship,
-  UserFamilyType,
-  UserStatus,
-} from "./enums";
+import type { CivilStatus, Gender, UserFamilyType, UserStatus } from "./enums";
 
 export type User = {
   apellidos: string | null;
@@ -225,7 +219,7 @@ export type Login = {
 export type CreateFamilyMemberRequest = {
   userId?: number | string;
   family_member: Omit<FamilyMember, "id_acudiente">;
-  kinship: { parentezco: Kinship };
+  kinship: { parentezco: string };
 };
 
 export type CreateContractRequest = {

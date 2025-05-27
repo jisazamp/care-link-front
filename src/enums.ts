@@ -23,16 +23,3 @@ export enum UserFamilyType {
   NUCLEAR = "Nuclear",
   RECONSTITUTED = "Reconstituida",
 }
-
-export enum Kinship {
-  AUNT = "Tía",
-  BROTHER = "Hermano",
-  COUSIN = "Primo",
-  CUZ = "Prima",
-  FATHER = "Padre",
-  FRIEND = "Amigo",
-  MOTHER = "Madre",
-  OTHER = "Otro",
-  SISTER = "Hermana",
-  UNCLE = "Tío",
-}
