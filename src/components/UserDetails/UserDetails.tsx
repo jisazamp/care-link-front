@@ -28,12 +28,12 @@ import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/use
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { queryClient } from "../../main";
-import type { FamilyMember } from "../../types";
+import type { Contract, FamilyMember } from "../../types";
 
 const { Title } = Typography;
 const { confirm } = Modal;
 
-export const contractsColumns: ColumnsType<unknown> = [
+export const contractsColumns: ColumnsType<Contract> = [
   {
     title: "Tipo de Contrato",
     dataIndex: "tipo_contrato",
@@ -54,6 +54,25 @@ export const contractsColumns: ColumnsType<unknown> = [
     dataIndex: "facturar_contrato",
     key: "facturar_contrato",
     render: (value: boolean) => (value ? "Sí" : "No"),
+  },
+  {
+    title: "Acciones",
+    key: "acciones",
+    render: (_, contract) => (
+      <Space>
+        <Link
+          to={`/usuarios/${contract.id_usuario}/contrato/${contract.id_contrato}/editar`}
+        >
+          <Button type="link" className="main-button-link" size="small">
+            Editar
+          </Button>
+        </Link>
+        <Divider type="vertical" />
+        <Button danger size="small" type="link">
+          Eliminar
+        </Button>
+      </Space>
+    ),
   },
 ];
 
