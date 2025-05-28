@@ -106,9 +106,11 @@ export const FormContracts = () => {
       const newServiceDates = data.selectedDatesService.map((s) => ({
         fecha: s,
       }));
-      const newTransportDates = data.selectedDatesTransport.map((s) => ({
-        fecha: s,
-      }));
+      const newTransportDates = data.services[1].quantity
+        ? data.selectedDatesTransport.map((s) => ({
+            fecha: s,
+          }))
+        : [];
 
       updateContract(newContract);
       const serviceContractId =
@@ -122,11 +124,15 @@ export const FormContracts = () => {
           dates: newServiceDates,
         });
 
-      serviceTransportId &&
-        updateContractDates({
-          serviceId: serviceTransportId,
-          dates: newTransportDates,
-        });
+      setTimeout(
+        () =>
+          serviceTransportId &&
+          updateContractDates({
+            serviceId: serviceTransportId,
+            dates: newTransportDates,
+          }),
+        1500,
+      );
       return;
     }
 

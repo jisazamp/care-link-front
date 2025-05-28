@@ -18,9 +18,6 @@ export const AgendaSettingsContract = ({
   const selectedDatesService = watch("selectedDatesService") || [];
   const selectedDatesTransport = watch("selectedDatesTransport") || [];
 
-  const startDate = watch("startDate"); // Expected to be a string or Dayjs
-  const endDate = watch("endDate");
-
   const { maxServiceDays, maxTransportDays } = useMemo(() => {
     const service = services.find((s) => s.serviceType.includes("Tiquetera"));
     const transport = services.find((s) =>
