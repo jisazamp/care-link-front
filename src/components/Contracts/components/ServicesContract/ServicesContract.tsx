@@ -44,13 +44,6 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     methods.setValue("services", newServices);
   };
 
-  const handlePriceChange = (key: string, value: number) => {
-    const newServices = services.map((s) =>
-      s.key === key ? { ...s, price: value } : s,
-    );
-    methods.setValue("services", newServices);
-  };
-
   const handleNext = () => {
     if (onNext) {
       onNext(services);
@@ -144,25 +137,6 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           maxLength={200}
           value={record.description}
           onChange={(e) => handleDescriptionChange(record.key, e.target.value)}
-        />
-      ),
-    },
-    {
-      title: "Precio por día",
-      dataIndex: "price",
-      render: (_: unknown, record: Service) => (
-        <Input
-          type="text"
-          value={new Intl.NumberFormat("es-CO", {
-            style: "currency",
-            currency: "COP",
-            minimumFractionDigits: 0,
-          }).format(record.price || 0)}
-          onChange={(e) => {
-            const parsed =
-              Number.parseInt(e.target.value.replace(/\D/g, ""), 10) || 0;
-            handlePriceChange(record.key, parsed);
-          }}
         />
       ),
     },
