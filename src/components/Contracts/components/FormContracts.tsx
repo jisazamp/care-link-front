@@ -116,7 +116,7 @@ export const FormContracts = () => {
       const serviceContractId =
         contract?.data.servicios[0].id_servicio_contratado;
       const serviceTransportId =
-        contract?.data.servicios[1].id_servicio_contratado;
+        contract?.data.servicios?.[1]?.id_servicio_contratado ?? 0;
 
       serviceContractId &&
         updateContractDates({
@@ -124,15 +124,12 @@ export const FormContracts = () => {
           dates: newServiceDates,
         });
 
-      setTimeout(
-        () =>
-          serviceTransportId &&
-          updateContractDates({
-            serviceId: serviceTransportId,
-            dates: newTransportDates,
-          }),
-        1500,
-      );
+      serviceTransportId &&
+        updateContractDates({
+          serviceId: serviceTransportId,
+          dates: newTransportDates,
+        });
+
       return;
     }
 
