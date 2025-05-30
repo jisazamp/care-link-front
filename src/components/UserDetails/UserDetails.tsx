@@ -29,52 +29,10 @@ import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/use
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { queryClient } from "../../main";
 import type { Contract, FamilyMember } from "../../types";
+import { useDeleteContract } from "../../hooks/useDeleteContract";
 
 const { Title } = Typography;
 const { confirm } = Modal;
-
-export const contractsColumns: ColumnsType<Contract> = [
-  {
-    title: "Tipo de Contrato",
-    dataIndex: "tipo_contrato",
-    key: "tipo_contrato",
-  },
-  {
-    title: "Fecha Inicio",
-    dataIndex: "fecha_inicio",
-    key: "fecha_inicio",
-  },
-  {
-    title: "Fecha Fin",
-    dataIndex: "fecha_fin",
-    key: "fecha_fin",
-  },
-  {
-    title: "Facturar",
-    dataIndex: "facturar_contrato",
-    key: "facturar_contrato",
-    render: (value: boolean) => (value ? "Sí" : "No"),
-  },
-  {
-    title: "Acciones",
-    key: "acciones",
-    render: (_, contract) => (
-      <Space>
-        <Link
-          to={`/usuarios/${contract.id_usuario}/contrato/${contract.id_contrato}/editar`}
-        >
-          <Button type="link" className="main-button-link" size="small">
-            Editar
-          </Button>
-        </Link>
-        <Divider type="vertical" />
-        <Button danger size="small" type="link">
-          Eliminar
-        </Button>
-      </Space>
-    ),
-  },
-];
 
 export const UserDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -86,6 +44,7 @@ export const UserDetails: React.FC = () => {
     useGetUserFamilyMembers(userId);
   const { mutate: deleteFamilyMember } = useDeleteFamilyMemberMutation(userId);
   const { mutate: deleteRecord } = useDeleteRecordMutation();
+  const { deleteContractFn } = useDeleteContract();
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
@@ -208,6 +167,31 @@ export const UserDetails: React.FC = () => {
     });
   };
 
+  const handleDeleteContract = (contractId: number) => {
+    confirm({
+      title: "¿Estás seguro de que deseas eliminar este contrato?",
+      content: "Esta acción no se puede deshacer.",
+      okText: "Sí, eliminar",
+      okType: "danger",
+      cancelText: "Cancelar",
+      cancelButtonProps: {
+        type: "primary",
+        style: { backgroundColor: "#F32013" },
+      },
+      okButtonProps: { type: "link", style: { color: "#000" } },
+      onOk() {
+        if (contractId) {
+          deleteContractFn(contractId, {
+            onSuccess: () =>
+              queryClient.invalidateQueries({
+                queryKey: [`user-${userId}-contracts`],
+              }),
+          });
+        }
+      },
+    });
+  };
+
   const handleDeleteFamilyMember = (memberId: number) => {
     confirm({
       title: "¿Estás seguro de que deseas eliminar este familiar?",
@@ -227,6 +211,54 @@ export const UserDetails: React.FC = () => {
       },
     });
   };
+
+  const contractsColumns: ColumnsType<Contract> = [
+    {
+      title: "Tipo de Contrato",
+      dataIndex: "tipo_contrato",
+      key: "tipo_contrato",
+    },
+    {
+      title: "Fecha Inicio",
+      dataIndex: "fecha_inicio",
+      key: "fecha_inicio",
+    },
+    {
+      title: "Fecha Fin",
+      dataIndex: "fecha_fin",
+      key: "fecha_fin",
+    },
+    {
+      title: "Facturar",
+      dataIndex: "facturar_contrato",
+      key: "facturar_contrato",
+      render: (value: boolean) => (value ? "Sí" : "No"),
+    },
+    {
+      title: "Acciones",
+      key: "acciones",
+      render: (_, contract) => (
+        <Space>
+          <Link
+            to={`/usuarios/${contract.id_usuario}/contrato/${contract.id_contrato}/editar`}
+          >
+            <Button type="link" className="main-button-link" size="small">
+              Editar
+            </Button>
+          </Link>
+          <Divider type="vertical" />
+          <Button
+            danger
+            size="small"
+            type="link"
+            onClick={() => handleDeleteContract(contract.id_contrato)}
+          >
+            Eliminar
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <>
