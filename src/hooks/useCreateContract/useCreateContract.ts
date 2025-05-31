@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import type { CreateContractRequest } from "../../types";
+import type { Contract, CreateContractRequest } from "../../types";
 
 const createContract = (data: CreateContractRequest) =>
-  client.post("/api/contratos", data);
+  client.post<{ data: Contract }>("/api/contratos", data);
 
 export const useCreateContract = (id: string | number | undefined) => {
   return useMutation({
