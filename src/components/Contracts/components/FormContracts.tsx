@@ -25,6 +25,7 @@ import {
   buildContractFromForm,
   convertContractData,
 } from "./utils/utils";
+import { useCreateBill } from "../../../hooks/useCreateBill";
 
 const { Title } = Typography;
 
@@ -94,6 +95,7 @@ export const FormContracts = () => {
   const startDate = watch("startDate");
   const [currentStep, setCurrentStep] = useState(0);
   const createContractMutation = useCreateContract(id);
+  const { createContractBillFn } = useCreateBill();
 
   const onSubmit = (data: FormValues) => {
     if (contractId) {
@@ -108,8 +110,8 @@ export const FormContracts = () => {
       }));
       const newTransportDates = data.services[1].quantity
         ? data.selectedDatesTransport.map((s) => ({
-            fecha: s,
-          }))
+          fecha: s,
+        }))
         : [];
 
       updateContract(newContract);
@@ -139,7 +141,12 @@ export const FormContracts = () => {
       getValues,
     );
 
-    createContractMutation.mutate(contractData);
+    createContractMutation.mutate(contractData, {
+      onSuccess: (data) => {
+        const contract = data.data.data;
+        createContractBillFn(contract.id_contrato);
+      },
+    });
   };
 
   useEffect(() => {
