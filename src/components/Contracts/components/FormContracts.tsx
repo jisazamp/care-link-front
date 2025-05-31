@@ -11,6 +11,7 @@ import type { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+import { useCreateBill } from "../../../hooks/useCreateBill";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
@@ -25,7 +26,6 @@ import {
   buildContractFromForm,
   convertContractData,
 } from "./utils/utils";
-import { useCreateBill } from "../../../hooks/useCreateBill";
 
 const { Title } = Typography;
 
@@ -110,8 +110,8 @@ export const FormContracts = () => {
       }));
       const newTransportDates = data.services[1].quantity
         ? data.selectedDatesTransport.map((s) => ({
-          fecha: s,
-        }))
+            fecha: s,
+          }))
         : [];
 
       updateContract(newContract);

@@ -16,9 +16,12 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
+import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
+import type { FormValues } from "../FormContracts";
 
 interface BillingContractProps {
   onNext?: () => void;
@@ -119,16 +122,33 @@ export const BillingContract: React.FC<BillingContractProps> = ({
 }) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const { contractId } = useParams();
+  const { watch } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
   const { data: payments } = useGetBillPayments(
     Number(bills?.data[0].id_factura),
   );
   const [form] = Form.useForm();
 
-  const billsTotal = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-  }).format(bills?.data.reduce((a, b) => a + b.total_factura, 0) ?? 0);
+  const { calculatePartialBillFn, partialBill } = useCalculatePartialBill();
+  const services = watch("services");
+  const contractStartDate = watch("startDate");
+  const selectedServicesIds = services.map((s) => Number(s.key));
+  const selectedServicesQuantities = services.map((s) => s.quantity);
+  const startingContractYear = contractStartDate?.year();
+
+  const billsTotal =
+    contractId &&
+    new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+    }).format(bills?.data.reduce((a, b) => a + b.total_factura, 0) ?? 0);
+
+  const partialBillFormatted =
+    !contractId &&
+    new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+    }).format(partialBill?.data.data ?? 0);
 
   useEffect(() => {
     if (payments?.data?.length) {
@@ -143,6 +163,21 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     }
   }, [payments, form.setFieldsValue]);
 
+  useEffect(() => {
+    if (
+      startingContractYear &&
+      selectedServicesIds &&
+      selectedServicesQuantities &&
+      !contractId
+    ) {
+      calculatePartialBillFn({
+        service_ids: selectedServicesIds,
+        quantities: selectedServicesQuantities,
+        year: startingContractYear,
+      });
+    }
+  }, []);
+
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>
       <Row justify="center">
@@ -153,7 +188,8 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 <Row justify="space-between" align="middle">
                   <Col>
                     <h3 style={{ margin: 0 }}>
-                      Descargar factura ({billsTotal})
+                      Descargar factura (
+                      {contractId ? billsTotal : partialBillFormatted})
                     </h3>
                   </Col>
                   <Col>

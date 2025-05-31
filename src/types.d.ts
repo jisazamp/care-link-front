@@ -274,3 +274,9 @@ export type Payment = {
   fecha_pago: string;
   valor: number;
 };
+
+interface CalculateBillBody {
+  service_ids: number[];
+  quantities: number[];
+  year: number;
+}
