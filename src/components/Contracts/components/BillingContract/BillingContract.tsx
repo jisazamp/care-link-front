@@ -12,6 +12,7 @@ import {
   InputNumber,
   Layout,
   Row,
+  Select,
   Typography,
 } from "antd";
 import dayjs from "dayjs";
@@ -21,6 +22,7 @@ import { useParams } from "react-router-dom";
 import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
+import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
 import type { FormValues } from "../FormContracts";
 
 interface BillingContractProps {
@@ -33,6 +35,8 @@ interface PaymentFormProps {
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = () => {
+  const { paymentMethodsLoading, paymentMethodsData } = useGetPaymentMethods();
+
   return (
     <Card title="Formulario de pago" style={{ marginTop: 16 }}>
       <Form.List name="payments">
@@ -67,7 +71,13 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
                   ]}
                   style={{ marginBottom: 40 }}
                 >
-                  <Input placeholder="Ej. Transferencia, Efectivo" />
+                  <Select
+                    options={paymentMethodsData?.data.data.map((m) => ({
+                      value: m.id_metodo_pago,
+                      label: m.nombre,
+                    }))}
+                    loading={paymentMethodsLoading}
+                  />
                 </Form.Item>
 
                 <Form.Item

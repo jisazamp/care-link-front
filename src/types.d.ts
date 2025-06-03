@@ -280,3 +280,8 @@ interface CalculateBillBody {
   quantities: number[];
   year: number;
 }
+
+export interface PaymentMethod {
+  id_metodo_pago: number;
+  nombre: string;
+}
