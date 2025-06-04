@@ -7,16 +7,18 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Breadcrumb, Button, Card, Steps, Typography } from "antd";
+import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateBill } from "../../../hooks/useCreateBill";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
+import { useCreatePayment } from "../../../hooks/useCreatePayment/useCreatePayment";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
 import { useUpdateContractDates } from "../../../hooks/useUpdateContractDates/useUpdateContractDates";
-import type { Contract, CreateContractRequest } from "../../../types";
+import type { Contract, CreateContractRequest, Payment } from "../../../types";
 import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 import { BillingContract } from "./BillingContract/BillingContract";
 import { CreateContract } from "./CreateContract/CreateContract";
@@ -71,6 +73,7 @@ export interface FormValues {
   selectedDatesTransport: string[];
   services: Service[];
   startDate: Dayjs | null;
+  payments: { paymentMethod: number; paymentDate: string; amount: number }[];
 }
 
 export const FormContracts = () => {
@@ -96,6 +99,7 @@ export const FormContracts = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const createContractMutation = useCreateContract(id);
   const { createContractBillFn } = useCreateBill();
+  const { createPaymentFn } = useCreatePayment();
 
   const onSubmit = (data: FormValues) => {
     if (contractId) {
@@ -144,7 +148,23 @@ export const FormContracts = () => {
     createContractMutation.mutate(contractData, {
       onSuccess: (data) => {
         const contract = data.data.data;
-        createContractBillFn(contract.id_contrato);
+        createContractBillFn(contract.id_contrato, {
+          onSuccess: (data) => {
+            const billId = data.data.data.id_factura;
+            const paymentData: Omit<Payment, "id_pago">[] = getValues(
+              "payments",
+            ).map((p) => ({
+              id_factura: billId,
+              id_metodo_pago: p.paymentMethod,
+              valor: p.amount,
+              fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
+              id_tipo_pago: 1,
+            }));
+            for (let i = 0; i < paymentData.length; i++) {
+              createPaymentFn(paymentData[i]);
+            }
+          },
+        });
       },
     });
   };
