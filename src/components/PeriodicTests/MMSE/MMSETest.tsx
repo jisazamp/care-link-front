@@ -1,62 +1,118 @@
 import React, { useState } from "react";
-import { Card, Steps, Typography, Space, } from "antd";
+import { Card, Steps, Button, Typography, Space, Alert, Progress } from "antd";
 import { MMSEQuestions } from "./MMSEQuestions";
-import { MMSEConfirmation } from "./MMSEConfirmation";
-import { MMSEResult } from "./MMSEResult";
-import { MMSEInstructions } from "./MMSEInstructions";
+import { mmseCriteria } from "./mmseCriteria";
 
-const { Title } = Typography;
-
-interface Step {
-  title: string;
-}
-
-const steps: Step[] = [
-  { title: "Cuestionario" },
-  { title: "Confirmación" },
-  { title: "Resultado" },
-];
+const { Title, Text } = Typography;
+const { Step } = Steps;
 
 export const MMSETest: React.FC = () => {
-  const [current, setCurrent] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [result, setResult] = useState<{ score: number } | null>(null);
+  const [score, setScore] = useState<number | null>(null);
+  const [interpretation, setInterpretation] = useState<string>("");
 
-  const next = () => setCurrent(current + 1);
-  const prev = () => setCurrent(current - 1);
+  const handleNext = () => {
+    setCurrentStep(1);
+  };
 
-  const handleAnswers = (values: Record<string, string>) => setAnswers(values);
-  const handleResult = (res: { score: number }) => setResult(res);
+  const handleAnswersChange = (newAnswers: Record<string, string>) => {
+    setAnswers(newAnswers);
+  };
+
+  const calculateScore = () => {
+    let totalScore = 0;
+    let maxScore = 0;
+
+    mmseCriteria.forEach((criterion: { key: string; points: number; correct: (answer: string) => boolean | number }) => {
+      const answer = answers[criterion.key];
+      const result = criterion.correct(answer);
+      
+      if (typeof result === "number") {
+        totalScore += result;
+      } else if (result === true) {
+        totalScore += criterion.points;
+      }
+      
+      maxScore += criterion.points;
+    });
+
+    const percentage = (totalScore / maxScore) * 100;
+    setScore(totalScore);
+
+    // Interpretación según el puntaje
+    if (totalScore >= 24) {
+      setInterpretation("Normal: No hay evidencia de deterioro cognitivo");
+    } else if (totalScore >= 19) {
+      setInterpretation("Deterioro cognitivo leve");
+    } else if (totalScore >= 10) {
+      setInterpretation("Deterioro cognitivo moderado");
+    } else {
+      setInterpretation("Deterioro cognitivo severo");
+    }
+
+    setCurrentStep(2);
+  };
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <MMSEQuestions
+            onNext={handleNext}
+            onChange={handleAnswersChange}
+            answers={answers}
+          />
+        );
+      case 1:
+        return (
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Title level={4}>Revisión de respuestas</Title>
+            {Object.entries(answers).map(([key, value]) => (
+              <Card key={key} size="small" style={{ marginBottom: 8 }}>
+                <Text strong>{key}: </Text>
+                <Text>{value}</Text>
+              </Card>
+            ))}
+            <Button type="primary" onClick={calculateScore}>
+              Calcular puntaje
+            </Button>
+          </Space>
+        );
+      case 2:
+        return (
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Title level={4}>Resultados del test MMSE</Title>
+            <Progress
+              type="circle"
+              percent={score ? (score / 30) * 100 : 0}
+              format={(percent) => `${score}/30`}
+            />
+            <Alert
+              message="Interpretación"
+              description={interpretation}
+              type={score && score >= 24 ? "success" : "warning"}
+              showIcon
+            />
+            <Button onClick={() => setCurrentStep(0)}>
+              Realizar test nuevamente
+            </Button>
+          </Space>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <Card style={{ margin: 24 }}>
-      <Title level={3}>Mini-Mental State Examination (MMSE)</Title>
-      <Steps current={current} style={{ marginBottom: 32 }}>
-        {steps.map((item) => (
-          <Steps.Step key={item.title} title={item.title} />
-        ))}
+    <Card>
+      <Title level={3} style={{ marginBottom: 16 }}>Mini-Mental State Examination (MMSE)</Title>
+      <Steps current={currentStep} style={{ marginBottom: 24 }}>
+        <Step title="Preguntas" description="Responda las preguntas" />
+        <Step title="Revisión" description="Revise sus respuestas" />
+        <Step title="Resultados" description="Ver resultados" />
       </Steps>
-      <Space direction="vertical" style={{ width: "100%" }}>
-        {current === 0 && (
-          <>
-            <MMSEInstructions />
-            <MMSEQuestions onNext={next} onChange={handleAnswers} answers={answers} />
-          </>
-        )}
-        {current === 1 && (
-          <MMSEConfirmation
-            answers={answers}
-            onPrev={prev}
-            onNext={() => {
-              // Simular cálculo de resultado
-              const score = Object.values(answers).filter((v) => v === "Sí").length;
-              handleResult({ score });
-              next();
-            }}
-          />
-        )}
-        {current === 2 && <MMSEResult result={result} onPrev={prev} />}
-      </Space>
+      <div style={{ marginTop: 24 }}>{renderStepContent()}</div>
     </Card>
   );
 }; 

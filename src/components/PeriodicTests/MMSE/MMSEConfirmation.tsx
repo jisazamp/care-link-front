@@ -5,11 +5,11 @@ import { MMSEQuestion, MMSEConfirmationProps } from "./types";
 const { Title } = Typography;
 
 const questions: MMSEQuestion[] = [
-  { key: "q1", label: "¿Está básicamente satisfecho con su vida?", options: ["Sí", "No"] },
-  { key: "q2", label: "¿Ha abandonado muchas de sus actividades e intereses?", options: ["Sí", "No"] },
-  { key: "q3", label: "¿Siente que su vida está vacía?", options: ["Sí", "No"] },
-  { key: "q4", label: "¿Se siente lleno de energía?", options: ["Sí", "No"] },
-  { key: "q5", label: "¿Siente que le falta motivación?", options: ["Sí", "No"] },
+  { key: "q1", label: "¿Está básicamente satisfecho con su vida?", type: "select", options: ["Sí", "No"] },
+  { key: "q2", label: "¿Ha abandonado muchas de sus actividades e intereses?", type: "select", options: ["Sí", "No"] },
+  { key: "q3", label: "¿Siente que su vida está vacía?", type: "select", options: ["Sí", "No"] },
+  { key: "q4", label: "¿Se siente lleno de energía?", type: "select", options: ["Sí", "No"] },
+  { key: "q5", label: "¿Siente que le falta motivación?", type: "select", options: ["Sí", "No"] },
 ];
 
 export const MMSEConfirmation: React.FC<MMSEConfirmationProps> = ({ answers, onPrev, onNext }) => {

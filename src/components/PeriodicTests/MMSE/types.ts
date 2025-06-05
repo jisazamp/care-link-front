@@ -1,12 +1,14 @@
 export interface MMSEQuestion {
   key: string;
   label: string;
-  options: string[];
+  type: "input" | "select";
+  options?: string[];
+  help?: string;
 }
 
 export interface MMSEQuestionsProps {
   onNext: () => void;
-  onChange: (values: Record<string, string>) => void;
+  onChange: (answers: Record<string, string>) => void;
   answers: Record<string, string>;
 }
 
@@ -21,4 +23,10 @@ export interface MMSEResultProps {
     score: number;
   } | null;
   onPrev: () => void;
+}
+
+export interface MMSECriterion {
+  key: string;
+  points: number;
+  correct: (answer: string) => boolean | number;
 }

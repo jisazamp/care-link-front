@@ -29,14 +29,7 @@ import { UsersList } from "./components/UsersList/UsersList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
-
-export const colors = {
-  primary: {
-    main: "#9957C2",
-    secondary: "#22075E",
-    link: "#7F34B4",
-  },
-};
+import { colors } from "./theme";
 
 const spanishLocale: typeof es = {
   ...es,
