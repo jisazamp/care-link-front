@@ -27,6 +27,8 @@ import { UserDetails } from "./components/UserDetails/UserDetails";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
+import { MMSETest } from "./components/PeriodicTests/MMSE";
+import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 
 export const colors = {
   primary: {
@@ -266,6 +268,22 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <CreateActivityForm />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/pruebas/mmse"
+              element={
+                <PrivateRoute>
+                  <MMSETest />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/pruebas/yesavage"
+              element={
+                <PrivateRoute>
+                  <YesavageTest />
                 </PrivateRoute>
               }
             />
