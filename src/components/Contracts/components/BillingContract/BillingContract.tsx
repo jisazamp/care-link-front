@@ -226,7 +226,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const { contractId } = useParams();
   const { watch, setValue } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
-  const { data: payments, isPending: loadingPayments } = useGetBillPayments(
+  const { data: payments } = useGetBillPayments(
     Number(bills?.data[0].id_factura),
   );
   const [form] = Form.useForm();
@@ -284,7 +284,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     >
       <Row justify="center">
         <Col span={18}>
-          <Card loading={calculatePartialBillPending || loadingPayments}>
+          <Card loading={calculatePartialBillPending}>
             <Card>
               <Row justify="space-between" align="middle">
                 <Col>

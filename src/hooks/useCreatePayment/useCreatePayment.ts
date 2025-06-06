@@ -8,6 +8,7 @@ const createPayment = (data: Omit<Payment, "id_pago">) =>
 const useCreatePayment = () => {
   const {
     mutate: createPaymentFn,
+    mutateAsync: createPaymentFnAsync,
     isPending: createPaymentPending,
     data: createPaymentData,
   } = useMutation({
@@ -15,7 +16,12 @@ const useCreatePayment = () => {
     mutationFn: createPayment,
   });
 
-  return { createPaymentFn, createPaymentData, createPaymentPending };
+  return {
+    createPaymentFn,
+    createPaymentFnAsync,
+    createPaymentData,
+    createPaymentPending,
+  };
 };
 
 export { useCreatePayment };

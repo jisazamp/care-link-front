@@ -101,8 +101,8 @@ export const FormContracts = () => {
   const startDate = watch("startDate");
   const [currentStep, setCurrentStep] = useState(0);
   const createContractMutation = useCreateContract(id);
-  const { createContractBillFn } = useCreateBill();
-  const { createPaymentFn } = useCreatePayment();
+  const { createContractBillFn, createContractPending } = useCreateBill();
+  const { createPaymentFnAsync, createPaymentPending } = useCreatePayment();
   const { contractBillData } = useGetContractBill(Number(contractId));
   const { paymentMethodsData } = useGetPaymentMethods();
   const { data: billPayments } = useGetBillPayments(
@@ -130,7 +130,7 @@ export const FormContracts = () => {
       const billId = contractBillData?.data.data.id_factura;
 
       updateContract(newContract, {
-        onSuccess: () => {
+        onSuccess: async () => {
           if (billId) {
             const paymentData: Omit<Payment, "id_pago">[] = newPayments.map(
               (p) => ({
@@ -145,7 +145,7 @@ export const FormContracts = () => {
               }),
             );
             for (let i = 0; i < paymentData.length; i++) {
-              createPaymentFn(paymentData[i]);
+              await createPaymentFnAsync(paymentData[i]);
             }
 
             navigate(`/usuarios/${id}/detalles`);
@@ -182,7 +182,7 @@ export const FormContracts = () => {
       onSuccess: (data) => {
         const contract = data.data.data;
         createContractBillFn(contract.id_contrato, {
-          onSuccess: (data) => {
+          onSuccess: async (data) => {
             const billId = data.data.data.id_factura;
             const paymentData: Omit<Payment, "id_pago">[] = getValues(
               "payments",
@@ -194,8 +194,9 @@ export const FormContracts = () => {
               id_tipo_pago: 1,
             }));
             for (let i = 0; i < paymentData.length; i++) {
-              createPaymentFn(paymentData[i]);
+              await createPaymentFnAsync(paymentData[i]);
             }
+            navigate(`/usuarios/${id}/detalles`);
           },
         });
       },
@@ -212,12 +213,6 @@ export const FormContracts = () => {
       setValue("services", newServices);
     }
   }, [startDate, setValue, contractId]);
-
-  useEffect(() => {
-    if (createContractMutation.isSuccess) {
-      navigate(`/usuarios/${id}/detalles`);
-    }
-  }, [createContractMutation.isSuccess, navigate, id]);
 
   useEffect(() => {
     if (contract?.data) {
@@ -316,7 +311,11 @@ export const FormContracts = () => {
           type="primary"
           className="main-button"
           disabled={currentStep !== steps.length - 1}
-          loading={createContractMutation.isPending}
+          loading={
+            createContractMutation.isPending ||
+            createContractPending ||
+            createPaymentPending
+          }
           onClick={handleSubmit(onSubmit)}
         >
           Guardar y Continuar
