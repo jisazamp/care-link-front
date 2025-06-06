@@ -15,6 +15,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useCreateBill } from "../../../hooks/useCreateBill";
 import { useCreateContract } from "../../../hooks/useCreateContract/useCreateContract";
 import { useCreatePayment } from "../../../hooks/useCreatePayment/useCreatePayment";
+import { useGetBillPayments } from "../../../hooks/useGetBillPayments/useGetBillPayments";
+import { useGetContractBill } from "../../../hooks/useGetContractBill";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
 import { useUpdateContractDates } from "../../../hooks/useUpdateContractDates/useUpdateContractDates";
@@ -83,6 +85,7 @@ export const FormContracts = () => {
   const { data: contract } = useGetContractById(contractId);
   const { mutate: updateContract } = useUpdateContract(contractId);
   const { mutate: updateContractDates } = useUpdateContractDates();
+  const { data: billPayments } = useGetBillPayments(Number(contractId));
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -100,6 +103,7 @@ export const FormContracts = () => {
   const createContractMutation = useCreateContract(id);
   const { createContractBillFn } = useCreateBill();
   const { createPaymentFn } = useCreatePayment();
+  const { contractBillData } = useGetContractBill(Number(contractId));
 
   const onSubmit = (data: FormValues) => {
     if (contractId) {
@@ -117,6 +121,24 @@ export const FormContracts = () => {
             fecha: s,
           }))
         : [];
+
+      const newPayments = data.payments.slice(billPayments?.data.length);
+      const billId = contractBillData?.data.data.id_factura;
+
+      if (newPayments && billId) {
+        const paymentData: Omit<Payment, "id_pago">[] = getValues(
+          "payments",
+        ).map((p) => ({
+          id_factura: billId,
+          id_metodo_pago: p.paymentMethod,
+          valor: p.amount,
+          fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
+          id_tipo_pago: 1,
+        }));
+        for (let i = 0; i < paymentData.length; i++) {
+          createPaymentFn(paymentData[i]);
+        }
+      }
 
       updateContract(newContract);
       const serviceContractId =
