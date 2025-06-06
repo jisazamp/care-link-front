@@ -24,6 +24,8 @@ import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
 import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
 import type { FormValues } from "../FormContracts";
+import { queryClient } from "../../../../main";
+import { useGetContractBill } from "../../../../hooks/useGetContractBill";
 
 interface BillingContractProps {
   onNext?: () => void;
@@ -35,10 +37,12 @@ interface PaymentFormProps {
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = () => {
+  const { contractId } = useParams();
   const { deletePaymentFn, deletePaymentPending } = useDeletePayment();
   const { paymentMethodsLoading, paymentMethodsData } = useGetPaymentMethods();
   const form = Form.useFormInstance();
   const payments = Form.useWatch("payments", form);
+  const { contractBillData } = useGetContractBill(Number(contractId));
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [paymentIndexToDelete, setPaymentIndexToDelete] = useState<
@@ -52,8 +56,12 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
       try {
         deletePaymentFn(paymentToDelete.id, {
           onSuccess: () => {
-            message.success("Pago eliminado exitosamente");
             const updatedPayments = [...payments];
+            queryClient.invalidateQueries({
+              queryKey: [
+                `bill-${contractBillData?.data.data.id_factura ?? 0}-payments`,
+              ],
+            });
             updatedPayments.splice(index, 1);
             form.setFieldsValue({ payments: updatedPayments });
           },
@@ -218,7 +226,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const { contractId } = useParams();
   const { watch, setValue } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
-  const { data: payments } = useGetBillPayments(
+  const { data: payments, isPending: loadingPayments } = useGetBillPayments(
     Number(bills?.data[0].id_factura),
   );
   const [form] = Form.useForm();
@@ -276,7 +284,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     >
       <Row justify="center">
         <Col span={18}>
-          <Card loading={calculatePartialBillPending}>
+          <Card loading={calculatePartialBillPending || loadingPayments}>
             <Card>
               <Row justify="space-between" align="middle">
                 <Col>

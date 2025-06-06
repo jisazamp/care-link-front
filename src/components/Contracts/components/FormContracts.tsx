@@ -30,6 +30,7 @@ import {
   buildContractFromForm,
   convertContractData,
 } from "./utils/utils";
+import { useGetPaymentMethods } from "../../../hooks/useGetPaymentMethods";
 
 const { Title } = Typography;
 
@@ -85,7 +86,6 @@ export const FormContracts = () => {
   const { data: contract } = useGetContractById(contractId);
   const { mutate: updateContract } = useUpdateContract(contractId);
   const { mutate: updateContractDates } = useUpdateContractDates();
-  const { data: billPayments } = useGetBillPayments(Number(contractId));
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -104,6 +104,10 @@ export const FormContracts = () => {
   const { createContractBillFn } = useCreateBill();
   const { createPaymentFn } = useCreatePayment();
   const { contractBillData } = useGetContractBill(Number(contractId));
+  const { paymentMethodsData } = useGetPaymentMethods();
+  const { data: billPayments } = useGetBillPayments(
+    Number(contractBillData?.data.data.id_factura),
+  );
 
   const onSubmit = (data: FormValues) => {
     if (contractId) {
@@ -125,22 +129,29 @@ export const FormContracts = () => {
       const newPayments = data.payments.slice(billPayments?.data.length);
       const billId = contractBillData?.data.data.id_factura;
 
-      if (newPayments && billId) {
-        const paymentData: Omit<Payment, "id_pago">[] = getValues(
-          "payments",
-        ).map((p) => ({
-          id_factura: billId,
-          id_metodo_pago: p.paymentMethod,
-          valor: p.amount,
-          fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
-          id_tipo_pago: 1,
-        }));
-        for (let i = 0; i < paymentData.length; i++) {
-          createPaymentFn(paymentData[i]);
-        }
-      }
+      updateContract(newContract, {
+        onSuccess: () => {
+          if (billId) {
+            const paymentData: Omit<Payment, "id_pago">[] = newPayments.map(
+              (p) => ({
+                id_factura: billId,
+                id_metodo_pago:
+                  paymentMethodsData?.data.data.find(
+                    (m) => m.nombre === `${p.paymentMethod}`,
+                  )?.id_metodo_pago ?? 1,
+                valor: p.amount,
+                fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
+                id_tipo_pago: 1,
+              }),
+            );
+            for (let i = 0; i < paymentData.length; i++) {
+              createPaymentFn(paymentData[i]);
+            }
 
-      updateContract(newContract);
+            navigate(`/usuarios/${id}/detalles`);
+          }
+        },
+      });
       const serviceContractId =
         contract?.data.servicios[0].id_servicio_contratado;
       const serviceTransportId =

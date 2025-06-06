@@ -10,6 +10,7 @@ const useGetContractBill = (contractId: number | undefined) => {
     queryKey: [`contract-${contractId}-bill`],
     queryFn: () => getContractBill(contractId),
     enabled: !!contractId,
+    staleTime: Number.POSITIVE_INFINITY,
   });
 
   return { contractBillData, contractBillLoading };
