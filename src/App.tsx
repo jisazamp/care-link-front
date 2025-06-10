@@ -27,14 +27,9 @@ import { UserDetails } from "./components/UserDetails/UserDetails";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
-
-export const colors = {
-  primary: {
-    main: "#9957C2",
-    secondary: "#22075E",
-    link: "#7F34B4",
-  },
-};
+import { MMSETest } from "./components/PeriodicTests/MMSE";
+import { YesavageTest } from "./components/PeriodicTests/Yesavage";
+import { colors } from "./theme";
 
 const spanishLocale: typeof es = {
   ...es,
@@ -266,6 +261,22 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <CreateActivityForm />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/pruebas/mmse"
+              element={
+                <PrivateRoute>
+                  <MMSETest />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/pruebas/yesavage"
+              element={
+                <PrivateRoute>
+                  <YesavageTest />
                 </PrivateRoute>
               }
             />
