@@ -13,6 +13,7 @@ import {
   Spin,
   Typography,
   Upload,
+  Collapse,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect } from "react";
@@ -48,8 +49,11 @@ import {
   type PhysioRegimen,
   formSchema,
 } from "./schema/schema";
+import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
+import { Vaccines } from "./components/Vaccines/Vaccines";
 
 const { Title } = Typography;
+const { Panel } = Collapse;
 
 export const MedicalRecord: React.FC = () => {
   const params = useParams();
@@ -366,61 +370,41 @@ export const MedicalRecord: React.FC = () => {
             items={[{ title: "Inicio" }, { title: "Historia clínica" }]}
             style={{ margin: "16px 0" }}
           />
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
+          <Collapse accordion style={{ width: "100%", background: "transparent" }}>
+            <Panel header="Datos del usuario" key="user-info">
               <UserInfo />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Servicio externo para emergencias médicas" key="medical-services">
               <MedicalServices />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Datos básicos de ingreso" key="entry-data">
               <EntryData />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Datos básicos de salud" key="basic-health-data">
               <BasicHealthData />
-            </Col>
-          </Row>
-          {/*<Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Exploración física inicial" key="physical-exploration">
               <PhysicalExploration />
-            </Col>
-          </Row>*/}
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Tratamientos o medicamentos" key="medical-treatments">
               <MedicalTreatments />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Condiciones especiales" key="special-conditions">
               <SpecialConditions />
-            </Col>
-          </Row>
-          {/*<Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Esquema de vacunación" key="vaccines">
               <Vaccines />
-            </Col>
-          </Row> */}
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Habilidades biofísicas" key="biophysical-skills">
               <BiophysicalSkills />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Hábitos o antecedentes toxicológicos" key="toxicology">
               <Toxicology />
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Habilidades de percepción social" key="social-perception">
               <SocialPerception />
-            </Col>
-          </Row>
+            </Panel>
+          </Collapse>
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
@@ -447,64 +431,6 @@ export const MedicalRecord: React.FC = () => {
               </Card>
             </Col>
           </Row>
-          {/*<Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Card
-                bordered
-                extra={
-                  <Button icon={<PlusOutlined />} className="main-button-white">
-                    Nuevo
-                  </Button>
-                }
-                title={
-                  <Title level={4} style={{ margin: 0 }}>
-                    Pruebas y Test
-                  </Title>
-                }
-                style={{ marginBottom: 8 }}
-              >
-                <Table
-                  columns={[
-                    {
-                      title: "Profesional",
-                      dataIndex: "profesional",
-                      key: "profesional",
-                      align: "center",
-                    },
-                    {
-                      title: "Tipo de prueba",
-                      dataIndex: "tipoPrueba",
-                      key: "tipoPrueba",
-                      align: "center",
-                    },
-                    {
-                      title: "Fecha",
-                      dataIndex: "fecha",
-                      key: "fecha",
-                      align: "center",
-                    },
-                    {
-                      title: "Acciones",
-                      key: "acciones",
-                      align: "center",
-                      render: () => (
-                        <Space>
-                          <Button type="link" style={{ color: "#1890ff" }}>
-                            Ver
-                          </Button>
-                          <Button type="link" style={{ color: "#faad14" }}>
-                            Editar
-                          </Button>
-                        </Space>
-                      ),
-                    },
-                  ]}
-                  dataSource={[]}
-                  pagination={false}
-                />
-              </Card>
-            </Col>
-          </Row>*/}
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card

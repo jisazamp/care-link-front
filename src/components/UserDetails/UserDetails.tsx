@@ -514,6 +514,31 @@ export const UserDetails: React.FC = () => {
                           <Typography.Text style={{ fontWeight: 400 }}>
                             {records.dieta_especial ? "Sí" : "No"}
                           </Typography.Text>{" "}
+                          <Link to={`/usuarios/${userId}/historia#dieta`}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>
+                              Ver
+                            </Typography.Text>
+                          </Link>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Observaciones Dieta: 
+                          <Link to={`/usuarios/${userId}/historia#observaciones-dieta`}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>
+                              Ver
+                            </Typography.Text>
+                          </Link>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Apoyos y tratamientos: 
+                          <Link to={`/usuarios/${userId}/historia#apoyos-tratamientos`}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>
+                              Ver
+                            </Typography.Text>
+                          </Link>
                         </Typography.Text>
                       </Flex>
                     </Flex>
