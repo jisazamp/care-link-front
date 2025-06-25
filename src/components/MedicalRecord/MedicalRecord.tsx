@@ -16,10 +16,10 @@ import {
   Collapse,
 } from "antd";
 import dayjs from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
 import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
@@ -58,6 +58,8 @@ const { Panel } = Collapse;
 export const MedicalRecord: React.FC = () => {
   const params = useParams();
   const userId = params.id;
+  const location = useLocation();
+  const [activePanel, setActivePanel] = useState<string | string[]>("");
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -86,6 +88,38 @@ export const MedicalRecord: React.FC = () => {
       id: userId,
       recordId: userMedicalRecord?.data.data?.id_historiaclinica,
     });
+
+  // Mapeo de hash a key del Collapse
+  const hashToPanelKey: Record<string, string> = {
+    "#user-info": "user-info",
+    "#medical-services": "medical-services",
+    "#entry-data": "entry-data",
+    "#basic-health-data": "basic-health-data",
+    "#physical-exploration": "physical-exploration",
+    "#medical-treatments": "medical-treatments",
+    "#special-conditions": "special-conditions",
+    "#vaccines": "vaccines",
+    "#biophysical-skills": "biophysical-skills",
+    "#toxicology": "toxicology",
+    "#social-perception": "social-perception",
+    "#dieta": "special-conditions",
+    "#diet": "special-conditions",
+    "#observaciones-dieta": "special-conditions",
+    "#apoyos-tratamientos": "special-conditions",
+    // Agrega más si tienes hashes específicos
+  };
+
+  useEffect(() => {
+    if (location.hash && hashToPanelKey[location.hash]) {
+      setActivePanel(hashToPanelKey[location.hash]);
+      setTimeout(() => {
+        const el = document.getElementById(location.hash.replace('#', ''));
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200);
+    }
+  }, [location.hash]);
 
   const onSubmit = (data: FormValues) => {
     const record: MedicalRecordType = {
@@ -370,7 +404,7 @@ export const MedicalRecord: React.FC = () => {
             items={[{ title: "Inicio" }, { title: "Historia clínica" }]}
             style={{ margin: "16px 0" }}
           />
-          <Collapse accordion style={{ width: "100%", background: "transparent" }}>
+          <Collapse accordion style={{ width: "100%", background: "transparent" }} activeKey={activePanel} onChange={setActivePanel}>
             <Panel header="Datos del usuario" key="user-info">
               <UserInfo />
             </Panel>

@@ -1,5 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Card, Checkbox, Flex, Space, Table, Typography } from "antd";
+import { Button, Card, Checkbox, Flex, Space, Table, Typography, Collapse } from "antd";
 import { useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import type { FormValues } from "../../schema/schema";
@@ -153,425 +153,441 @@ export const SpecialConditions = () => {
         />
       </Flex>
       <Flex vertical style={{ marginTop: 8 }}>
-        {selectedValues.includes("alergies") && (
-          <Card
-            extra={
-              <Button
-                icon={<PlusOutlined />}
-                style={{ alignSelf: "flex-end" }}
-                className="main-button-white"
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal("alergies");
-                }}
+        <Collapse bordered={false} style={{ background: "transparent" }}>
+          {selectedValues.includes("alergies") && (
+            <Collapse.Panel header="Alergias a medicamentos" key="alergies">
+              <Card
+                extra={
+                  <Button
+                    icon={<PlusOutlined />}
+                    style={{ alignSelf: "flex-end" }}
+                    className="main-button-white"
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setShowModal("alergies");
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                }
+                title={
+                  <Title level={5} style={{ margin: 0 }}>
+                    Alergias a medicamentos
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
-                Agregar
-              </Button>
-            }
-            title={
-              <Title level={5} style={{ margin: 0 }}>
-                Alergias a medicamentos
-              </Title>
-            }
-            style={{ marginBottom: 8 }}
-          >
-            <Table
-              rowKey="id"
-              columns={[
-                {
-                  title: "Medicamentos a los que presenta alergia",
-                  dataIndex: "medicine",
-                },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  render: (_, __, index) => (
-                    <Space>
-                      <Button
-                        type="link"
-                        className="main-button-link"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setShowModal("alergies");
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={() => removeAlergies(index)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Space>
-                  ),
-                },
-              ]}
-              dataSource={alergies}
-              pagination={false}
-            />
-          </Card>
-        )}
-        {selectedValues.includes("diet") && (
-          <Card
-            extra={
-              <Button
-                icon={<PlusOutlined />}
-                style={{ alignSelf: "flex-end", marginBottom: 8 }}
-                className="main-button-white"
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal("diet");
-                }}
+                <Table
+                  rowKey="id"
+                  columns={[
+                    {
+                      title: "Medicamentos a los que presenta alergia",
+                      dataIndex: "medicine",
+                    },
+                    {
+                      title: "Acciones",
+                      key: "acciones",
+                      render: (_, __, index) => (
+                        <Space>
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            onClick={() => {
+                              setEditingIndex(index);
+                              setShowModal("alergies");
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() => removeAlergies(index)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                  dataSource={alergies}
+                  pagination={false}
+                />
+              </Card>
+            </Collapse.Panel>
+          )}
+          {selectedValues.includes("diet") && (
+            <Collapse.Panel header="Dieta" key="diet">
+              <Card
+                extra={
+                  <Button
+                    icon={<PlusOutlined />}
+                    style={{ alignSelf: "flex-end", marginBottom: 8 }}
+                    className="main-button-white"
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setShowModal("diet");
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                }
+                title={
+                  <Title level={5} style={{ margin: 0 }}>
+                    Dieta
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
-                Agregar
-              </Button>
-            }
-            title={
-              <Title level={5} style={{ margin: 0 }}>
-                Dieta
-              </Title>
-            }
-            style={{ marginBottom: 8 }}
-          >
-            <Table
-              rowKey="id"
-              columns={[
-                {
-                  title: "Tipo de dieta",
-                  dataIndex: "diet",
-                },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  render: (_, __, index) => (
-                    <Space>
-                      <Button
-                        type="link"
-                        className="main-button-link"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setShowModal("diet");
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={() => removeDiet(index)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Space>
-                  ),
-                },
-              ]}
-              dataSource={diet}
-              pagination={false}
-            />
-          </Card>
-        )}
-        {selectedValues.includes("disability") && (
-          <Card
-            extra={
-              <Button
-                icon={<PlusOutlined />}
-                className="main-button-white"
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal("disability");
-                }}
+                <Table
+                  rowKey="id"
+                  columns={[
+                    {
+                      title: "Tipo de dieta",
+                      dataIndex: "diet",
+                    },
+                    {
+                      title: "Acciones",
+                      key: "acciones",
+                      render: (_, __, index) => (
+                        <Space>
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            onClick={() => {
+                              setEditingIndex(index);
+                              setShowModal("diet");
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() => removeDiet(index)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                  dataSource={diet}
+                  pagination={false}
+                />
+              </Card>
+            </Collapse.Panel>
+          )}
+          {selectedValues.includes("disability") && (
+            <Collapse.Panel header="Tipos de discapacidad del paciente" key="disability">
+              <Card
+                extra={
+                  <Button
+                    icon={<PlusOutlined />}
+                    className="main-button-white"
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setShowModal("disability");
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                }
+                title={
+                  <Title level={5} style={{ margin: 0 }}>
+                    Tipos de discapacidad del paciente
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
-                Agregar
-              </Button>
-            }
-            title={
-              <Title level={5} style={{ margin: 0 }}>
-                Tipos de discapacidad del paciente
-              </Title>
-            }
-            style={{ marginBottom: 8 }}
-          >
-            <Table
-              rowKey="id"
-              columns={[
-                {
-                  title: "Discapacidades",
-                  dataIndex: "disability",
-                },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  align: "center",
-                  render: (_, __, index) => (
-                    <Space>
-                      <Button
-                        type="link"
-                        className="main-button-link"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setShowModal("disability");
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={() => removeDisability(index)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Space>
-                  ),
-                },
-              ]}
-              dataSource={disability}
-              pagination={false}
-            />
-          </Card>
-        )}
-        {selectedValues.includes("limitations") && (
-          <Card
-            extra={
-              <Button
-                icon={<PlusOutlined />}
-                className="main-button-white"
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal("limitations");
-                }}
+                <Table
+                  rowKey="id"
+                  columns={[
+                    {
+                      title: "Discapacidades",
+                      dataIndex: "disability",
+                    },
+                    {
+                      title: "Acciones",
+                      key: "acciones",
+                      align: "center",
+                      render: (_, __, index) => (
+                        <Space>
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            onClick={() => {
+                              setEditingIndex(index);
+                              setShowModal("disability");
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() => removeDisability(index)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                  dataSource={disability}
+                  pagination={false}
+                />
+              </Card>
+            </Collapse.Panel>
+          )}
+          {selectedValues.includes("limitations") && (
+            <Collapse.Panel header="Limitaciones permanentes que requieren apoyos o cuidados" key="limitations">
+              <Card
+                extra={
+                  <Button
+                    icon={<PlusOutlined />}
+                    className="main-button-white"
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setShowModal("limitations");
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                }
+                title={
+                  <Title level={5} style={{ margin: 0 }}>
+                    Limitaciones permanentes que requieren apoyos o cuidados
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
-                Agregar
-              </Button>
-            }
-            title={
-              <Title level={5} style={{ margin: 0 }}>
-                Limitaciones permanentes que requieren apoyos o cuidados
-              </Title>
-            }
-            style={{ marginBottom: 8 }}
-          >
-            <Table
-              rowKey="id"
-              columns={[
-                {
-                  title: "Limitaciones",
-                  dataIndex: "limitation",
-                },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  align: "center",
-                  render: (_, __, index) => (
-                    <Space>
-                      <Button
-                        type="link"
-                        className="main-button-link"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setShowModal("limitations");
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={() => removeLimitations(index)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Space>
-                  ),
-                },
-              ]}
-              dataSource={limitations}
-              pagination={false}
-            />
-          </Card>
-        )}
-        {selectedValues.includes("otherAlergies") && (
-          <Card
-            extra={
-              <Button
-                icon={<PlusOutlined />}
-                className="main-button-white"
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal("otherAlergies");
-                }}
+                <Table
+                  rowKey="id"
+                  columns={[
+                    {
+                      title: "Limitaciones",
+                      dataIndex: "limitation",
+                    },
+                    {
+                      title: "Acciones",
+                      key: "acciones",
+                      align: "center",
+                      render: (_, __, index) => (
+                        <Space>
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            onClick={() => {
+                              setEditingIndex(index);
+                              setShowModal("limitations");
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() => removeLimitations(index)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                  dataSource={limitations}
+                  pagination={false}
+                />
+              </Card>
+            </Collapse.Panel>
+          )}
+          {selectedValues.includes("otherAlergies") && (
+            <Collapse.Panel header="Otras alergias" key="otherAlergies">
+              <Card
+                extra={
+                  <Button
+                    icon={<PlusOutlined />}
+                    className="main-button-white"
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setShowModal("otherAlergies");
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                }
+                title={
+                  <Title level={5} style={{ margin: 0 }}>
+                    Otras alergias
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
-                Agregar
-              </Button>
-            }
-            title={
-              <Title level={5} style={{ margin: 0 }}>
-                Otras alergias
-              </Title>
-            }
-            style={{ marginBottom: 8 }}
-          >
-            <Table
-              rowKey="id"
-              columns={[
-                {
-                  title: "Alergia",
-                  dataIndex: "alergy",
-                },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  align: "center",
-                  render: (_, __, index) => (
-                    <Space>
-                      <Button
-                        type="link"
-                        className="main-button-link"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setShowModal("otherAlergies");
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={() => removeOtherAlergies(index)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Space>
-                  ),
-                },
-              ]}
-              dataSource={otherAlergies}
-              pagination={false}
-            />
-          </Card>
-        )}
-        {selectedValues.includes("surgeries") && (
-          <Card
-            extra={
-              <Button
-                icon={<PlusOutlined />}
-                className="main-button-white"
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal("surgeries");
-                }}
+                <Table
+                  rowKey="id"
+                  columns={[
+                    {
+                      title: "Alergia",
+                      dataIndex: "alergy",
+                    },
+                    {
+                      title: "Acciones",
+                      key: "acciones",
+                      align: "center",
+                      render: (_, __, index) => (
+                        <Space>
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            onClick={() => {
+                              setEditingIndex(index);
+                              setShowModal("otherAlergies");
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() => removeOtherAlergies(index)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                  dataSource={otherAlergies}
+                  pagination={false}
+                />
+              </Card>
+            </Collapse.Panel>
+          )}
+          {selectedValues.includes("surgeries") && (
+            <Collapse.Panel header="Historial de cirugías, traumatismos o accidentes" key="surgeries">
+              <Card
+                extra={
+                  <Button
+                    icon={<PlusOutlined />}
+                    className="main-button-white"
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setShowModal("surgeries");
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                }
+                title={
+                  <Title level={5} style={{ margin: 0 }}>
+                    Historial de cirugías, traumatismos o accidentes
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
-                Agregar
-              </Button>
-            }
-            title={
-              <Title level={5} style={{ margin: 0 }}>
-                Historial de cirugías, traumatismos o accidentes
-              </Title>
-            }
-            style={{ marginBottom: 8 }}
-          >
-            <Table
-              rowKey="id"
-              columns={[
-                { title: "Observaciones", dataIndex: "observation" },
-                {
-                  title: "Fecha de ocurrencia",
-                  dataIndex: "date",
-                  render: (_, record) => record.date?.format("YYYY-MM-DD"),
-                },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  align: "center",
-                  render: (_, __, index) => (
-                    <Space>
-                      <Button
-                        type="link"
-                        className="main-button-link"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setShowModal("surgeries");
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={() => removeSurgeries(index)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Space>
-                  ),
-                },
-              ]}
-              dataSource={surgeries}
-              pagination={false}
-            />
-          </Card>
-        )}
-        {selectedValues.includes("diagnostic") && (
-          <Card
-            extra={
-              <Button
-                icon={<PlusOutlined />}
-                className="main-button-white"
-                onClick={() => {
-                  setEditingIndex(null);
-                  setShowModal("diagnostic");
-                }}
+                <Table
+                  rowKey="id"
+                  columns={[
+                    { title: "Observaciones", dataIndex: "observation" },
+                    {
+                      title: "Fecha de ocurrencia",
+                      dataIndex: "date",
+                      render: (_, record) => record.date?.format("YYYY-MM-DD"),
+                    },
+                    {
+                      title: "Acciones",
+                      key: "acciones",
+                      align: "center",
+                      render: (_, __, index) => (
+                        <Space>
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            onClick={() => {
+                              setEditingIndex(index);
+                              setShowModal("surgeries");
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() => removeSurgeries(index)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                  dataSource={surgeries}
+                  pagination={false}
+                />
+              </Card>
+            </Collapse.Panel>
+          )}
+          {selectedValues.includes("diagnostic") && (
+            <Collapse.Panel header="Diagnósticos vigentes" key="diagnostic">
+              <Card
+                extra={
+                  <Button
+                    icon={<PlusOutlined />}
+                    className="main-button-white"
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setShowModal("diagnostic");
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                }
+                title={
+                  <Title level={5} style={{ margin: 0 }}>
+                    Diagnósticos vigentes
+                  </Title>
+                }
+                style={{ marginBottom: 8 }}
               >
-                Agregar
-              </Button>
-            }
-            title={
-              <Title level={5} style={{ margin: 0 }}>
-                Diagnósticos vigentes
-              </Title>
-            }
-            style={{ marginBottom: 8 }}
-          >
-            <Table
-              rowKey="id"
-              columns={[
-                { title: "Diagnóstico", dataIndex: "diagnostic" },
-                {
-                  title: "Acciones",
-                  key: "acciones",
-                  align: "center",
-                  render: (_, __, index) => (
-                    <Space>
-                      <Button
-                        type="link"
-                        className="main-button-link"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setShowModal("diagnostic");
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        type="link"
-                        danger
-                        onClick={() => removeDiagnostic(index)}
-                      >
-                        Eliminar
-                      </Button>
-                    </Space>
-                  ),
-                },
-              ]}
-              dataSource={diagnostic}
-              pagination={false}
-            />
-          </Card>
-        )}
+                <Table
+                  rowKey="id"
+                  columns={[
+                    { title: "Diagnóstico", dataIndex: "diagnostic" },
+                    {
+                      title: "Acciones",
+                      key: "acciones",
+                      align: "center",
+                      render: (_, __, index) => (
+                        <Space>
+                          <Button
+                            type="link"
+                            className="main-button-link"
+                            onClick={() => {
+                              setEditingIndex(index);
+                              setShowModal("diagnostic");
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="link"
+                            danger
+                            onClick={() => removeDiagnostic(index)}
+                          >
+                            Eliminar
+                          </Button>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                  dataSource={diagnostic}
+                  pagination={false}
+                />
+              </Card>
+            </Collapse.Panel>
+          )}
+        </Collapse>
       </Flex>
       <AlergiesModal
         open={showModal === "alergies"}

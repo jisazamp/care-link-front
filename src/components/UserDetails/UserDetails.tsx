@@ -454,90 +454,75 @@ export const UserDetails: React.FC = () => {
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Discapacidad:{" "}
-                          <Typography.Text style={{ fontWeight: 400 }}>
-                            {records.discapacidades ? "Sí" : "No"}
-                          </Typography.Text>{" "}
-                          {records.discapacidades
-                            ?.split(",")
-                            .filter((a) => !!a)
-                            .map((e) => (
-                              <Typography.Text
-                                key={e}
-                                style={{
-                                  backgroundColor: "#F1E6F5",
-                                  borderRadius: 20,
-                                  fontWeight: 500,
-                                  marginLeft: 5,
-                                  paddingBottom: 4,
-                                  paddingLeft: 8,
-                                  paddingRight: 8,
-                                  paddingTop: 4,
-                                }}
-                              >
-                                {e}
-                              </Typography.Text>
-                            ))}
-                        </Typography.Text>
-                        <Typography.Text
-                          style={{ fontWeight: 500, marginRight: 5 }}
-                        >
-                          Limitaciones:{" "}
-                          <Typography.Text style={{ fontWeight: 400 }}>
-                            {records.limitaciones ? "Sí" : "No"}
-                          </Typography.Text>{" "}
-                          {records.limitaciones
-                            ?.split(",")
-                            .filter((a) => !!a)
-                            .map((e) => (
-                              <Typography.Text
-                                key={e}
-                                style={{
-                                  backgroundColor: "#F1E6F5",
-                                  borderRadius: 20,
-                                  fontWeight: 500,
-                                  marginLeft: 5,
-                                  paddingBottom: 4,
-                                  paddingLeft: 8,
-                                  paddingRight: 8,
-                                  paddingTop: 4,
-                                }}
-                              >
-                                {e}
-                              </Typography.Text>
-                            ))}
-                        </Typography.Text>
-                        <Typography.Text
-                          style={{ fontWeight: 500, marginRight: 5 }}
-                        >
-                          Dieta Especial:{" "}
-                          <Typography.Text style={{ fontWeight: 400 }}>
-                            {records.dieta_especial ? "Sí" : "No"}
-                          </Typography.Text>{" "}
-                          <Link to={`/usuarios/${userId}/historia#dieta`}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>
-                              Ver
+                          Discapacidad: <Typography.Text style={{ fontWeight: 400 }}>{records.discapacidades ? "Sí" : "No"}</Typography.Text>
+                          <Link to={`/usuarios/${userId}/historia#special-conditions`} style={{ marginLeft: 12 }}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                          </Link>
+                          {records.discapacidades?.split(",").filter((a) => !!a).map((e) => (
+                            <Typography.Text
+                              key={e}
+                              style={{
+                                backgroundColor: "#F1E6F5",
+                                borderRadius: 20,
+                                fontWeight: 500,
+                                marginLeft: 5,
+                                paddingBottom: 4,
+                                paddingLeft: 8,
+                                paddingRight: 8,
+                                paddingTop: 4,
+                              }}
+                            >
+                              {e}
                             </Typography.Text>
+                          ))}
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Limitaciones: <Typography.Text style={{ fontWeight: 400 }}>{records.limitaciones ? "Sí" : "No"}</Typography.Text>
+                          <Link to={`/usuarios/${userId}/historia#special-conditions`} style={{ marginLeft: 12 }}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                          </Link>
+                          {records.limitaciones?.split(",").filter((a) => !!a).map((e) => (
+                            <Typography.Text
+                              key={e}
+                              style={{
+                                backgroundColor: "#F1E6F5",
+                                borderRadius: 20,
+                                fontWeight: 500,
+                                marginLeft: 5,
+                                paddingBottom: 4,
+                                paddingLeft: 8,
+                                paddingRight: 8,
+                                paddingTop: 4,
+                              }}
+                            >
+                              {e}
+                            </Typography.Text>
+                          ))}
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Dieta Especial: <Typography.Text style={{ fontWeight: 400 }}>{records.dieta_especial ? "Sí" : "No"}</Typography.Text>
+                          <Link to={`/usuarios/${userId}/historia#dieta`} style={{ marginLeft: 12 }}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
                           </Link>
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Observaciones Dieta: 
-                          <Link to={`/usuarios/${userId}/historia#observaciones-dieta`}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>
-                              Ver
-                            </Typography.Text>
+                          Observaciones Dieta:
+                          <Link to={`/usuarios/${userId}/historia#observaciones-dieta`} style={{ marginLeft: 12 }}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
                           </Link>
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Apoyos y tratamientos: 
-                          <Link to={`/usuarios/${userId}/historia#apoyos-tratamientos`}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>
-                              Ver
-                            </Typography.Text>
+                          Apoyos y tratamientos:
+                          <Link to={`/usuarios/${userId}/historia#apoyos-tratamientos`} style={{ marginLeft: 12 }}>
+                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
                           </Link>
                         </Typography.Text>
                       </Flex>
