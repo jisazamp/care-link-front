@@ -286,7 +286,7 @@ export const UserDetails: React.FC = () => {
           <Title level={3} className="page-title">
             {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
           </Title>
-          <Collapse accordion style={{ background: "transparent" }}>
+          <Collapse accordion style={{ background: "transparent", width: "100%" }}>
             <Panel header="Datos básicos y de localización" key="1">
               <Card
                 extra={
@@ -307,7 +307,7 @@ export const UserDetails: React.FC = () => {
                     />
                   </Space>
                 }
-                style={{ marginTop: 3 }}
+                style={{ marginTop: 3, width: "100%" }}
               >
                 <Row gutter={24} align="middle">
                   {user?.data.data.url_imagen && (
@@ -402,6 +402,7 @@ export const UserDetails: React.FC = () => {
                   )
                 }
                 loading={loadingRecord}
+                style={{ width: "100%" }}
               >
                 {records ? (
                   <Flex vertical gap={60}>
@@ -664,6 +665,7 @@ export const UserDetails: React.FC = () => {
                   </Tooltip>
                 }
                 className="detail-card"
+                style={{ width: "100%" }}
               >
                 <Table
                   rowKey="id_profesional"
@@ -750,6 +752,7 @@ export const UserDetails: React.FC = () => {
                     </Button>
                   </Link>
                 }
+                style={{ width: "100%" }}
               >
                 <Table
                   rowKey="id_acudiente"
@@ -773,6 +776,7 @@ export const UserDetails: React.FC = () => {
                   </Button>
                 }
                 className="detail-card"
+                style={{ width: "100%" }}
               >
                 <Table
                   columns={contractsColumns}

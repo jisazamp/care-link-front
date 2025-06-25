@@ -1,13 +1,11 @@
 import {
   ColumnHeightOutlined,
-  DeleteOutlined,
   DownOutlined,
-  EditOutlined,
-  EyeOutlined,
   FullscreenOutlined,
   ReloadOutlined,
-  SearchOutlined,
   SettingOutlined,
+  QuestionCircleOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -21,7 +19,6 @@ import {
   Modal,
   Space,
   Table,
-  Tag,
   Tooltip,
   Typography,
 } from "antd";
@@ -138,6 +135,7 @@ export const UsersList: React.FC = () => {
       dataIndex: "avatar",
       key: "avatar",
       width: 70,
+      fixed: "left" as const,
       render: (_: unknown, user: User) =>
         user.url_imagen ? (
           <Avatar src={user.url_imagen} size={40} />
@@ -149,12 +147,11 @@ export const UsersList: React.FC = () => {
         ),
     },
     {
-      title: "Nombre",
+      title: "",
       dataIndex: "nombres",
       key: "nombres",
-      width: 350,
+      ellipsis: true,
       render: (_: unknown, user: User) => {
-        // Calcular edad
         let edad = "";
         if (user.fecha_nacimiento) {
           const nacimiento = new Date(user.fecha_nacimiento);
@@ -166,7 +163,6 @@ export const UsersList: React.FC = () => {
           }
           edad = `${years} años`;
         }
-        // Información secundaria
         const info = [
           user.n_documento,
           user.genero,
@@ -180,16 +176,17 @@ export const UsersList: React.FC = () => {
           user.email,
         ]
           .filter(Boolean)
-          .join(" - ");
+          .join(" | ");
         return (
-          <div style={{ minWidth: 0 }}>
+          <div style={{ minWidth: 0, width: "100%" }}>
             <div
               style={{
                 fontWeight: 500,
-                textTransform: "uppercase",
+                textTransform: "none",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
+                width: "100%",
               }}
             >
               {user.nombres} {user.apellidos}
@@ -201,7 +198,7 @@ export const UsersList: React.FC = () => {
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                maxWidth: 320,
+                width: "100%",
               }}
               title={info}
             >
@@ -212,58 +209,61 @@ export const UsersList: React.FC = () => {
       },
     },
     {
-      title: "Estado",
+      title: "",
       dataIndex: "estado",
       key: "estado",
       width: 100,
+      align: "center" as const,
       render: (estado: string) => (
-        <Tag color={estado === "ACTIVO" ? "green" : "default"}>
-          {estado === "ACTIVO" ? "Activo" : "Inactivo"}
-        </Tag>
+        <span style={{ color: "#888", fontSize: 14 }}>{estado === "ACTIVO" ? "Activo" : "Inactivo"}</span>
       ),
     },
     {
-      title: "Acciones",
+      title: "",
       key: "acciones",
       width: 180,
+      fixed: "right" as const,
       align: "center" as const,
-      render: (_: unknown, user: User) => (
-        <Space size="small">
-          <Tooltip title="Detalles">
-            <Link to={`/usuarios/${user.id_usuario}/detalles`}>
+      render: (_: unknown, user: User) => {
+        const menu = (
+          <Menu>
+            <Menu.Item key="details">
+              <Link to={`/usuarios/${user.id_usuario}/detalles`} style={{ color: '#7f34b4' }}>
+                Ver detalles
+              </Link>
+            </Menu.Item>
+          </Menu>
+        );
+        return (
+          <Space size="small">
+            <Tooltip title="Editar">
+              <Link to={`/usuarios/${user.id_usuario}/editar`}>
+                <Button
+                  type="link"
+                  icon={null}
+                  style={{ color: "#7f34b4" }}
+                >
+                  Editar
+                </Button>
+              </Link>
+            </Tooltip>
+            <Tooltip title="Eliminar">
               <Button
                 type="link"
-                icon={<EyeOutlined />}
-                style={{ color: "#22075E" }}
+                icon={null}
+                style={{ color: "#7f34b4" }}
+                danger
+                onClick={() => showDeleteConfirm(user)}
               >
-                Detalles
+                Eliminar
               </Button>
-            </Link>
-          </Tooltip>
-          <Tooltip title="Editar">
-            <Link to={`/usuarios/${user.id_usuario}/editar`}>
-              <Button
-                type="link"
-                icon={<EditOutlined />}
-                style={{ color: "#22075E" }}
-              >
-                Editar
-              </Button>
-            </Link>
-          </Tooltip>
-          <Tooltip title="Eliminar">
-            <Button
-              type="link"
-              icon={<DeleteOutlined />}
-              style={{ color: "#22075E" }}
-              danger
-              onClick={() => showDeleteConfirm(user)}
-            >
-              Eliminar
-            </Button>
-          </Tooltip>
-        </Space>
-      ),
+            </Tooltip>
+            <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
+              <Button type="text" style={{ color: '#7f34b4', fontSize: 20, padding: '0 8px' }}>...</Button>
+            </Dropdown>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -283,7 +283,7 @@ export const UsersList: React.FC = () => {
   );
 
   return (
-    <Content className="content-wrapper" style={{ padding: "16px" }}>
+    <Content className="content-wrapper" style={{ padding: "16px", width: "100%" }}>
       <Breadcrumb style={{ marginBottom: "16px" }}>
         <Breadcrumb.Item>Home</Breadcrumb.Item>
         <Breadcrumb.Item>Usuarios</Breadcrumb.Item>
@@ -295,42 +295,54 @@ export const UsersList: React.FC = () => {
       </Title>
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Card className="detail-card">
-          <Space
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Space>
-              <Typography.Text strong>Buscar por</Typography.Text>
+        <Card className="usuarios-search-card" style={{ width: "100%" }}>
+          <div className="usuarios-search-body" style={{ width: "100%" }}>
+            <div className="usuarios-search-left" style={{ flex: 1, minWidth: 0 }}>
+              <span className="usuarios-search-label">Buscar por</span>
+              <QuestionCircleOutlined style={{ fontSize: 16, color: "rgba(0,0,0,0.65)", marginLeft: 4, marginRight: 4, verticalAlign: "middle" }} />
+              <span className="usuarios-search-colon">:</span>
               <Input
+                className="usuarios-search-input"
                 placeholder="Ingrese un valor"
-                prefix={<SearchOutlined />}
-                style={{ width: "300px" }}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onPressEnter={handleSearch}
                 allowClear
+                bordered={false}
+                style={{ 
+                  boxShadow: "none", 
+                  height: 32, 
+                  fontSize: 14, 
+                  verticalAlign: "middle",
+                  width: "100%",
+                  flex: 1,
+                  minWidth: 200
+                }}
               />
-            </Space>
-            <Space size="small">
-              <Button type="default" onClick={handleReset}>
+            </div>
+            <div className="usuarios-search-actions" style={{ flexShrink: 0 }}>
+              <Button className="usuarios-btn-secondary" style={{ height: 32, fontWeight: 400 }} onClick={handleReset}>
                 Restablecer
               </Button>
-              <Button type="primary" onClick={handleSearch}>
+              <Button className="usuarios-btn-primary" style={{ height: 32, fontWeight: 400, display: "flex", alignItems: "center" }} onClick={handleSearch} icon={<SearchOutlined style={{ fontSize: 16, marginRight: 4 }} />}>
                 Buscar
               </Button>
-            </Space>
-          </Space>
+              <Button type="text" style={{ color: '#7f34b4', height: 32, fontWeight: 400, fontSize: 14, padding: '0 8px' }}>
+                Más Opciones <DownOutlined />
+              </Button>
+            </div>
+          </div>
         </Card>
 
-        <Card>
+        <Card style={{ width: "100%" }}>
           <Table
+            className="usuarios-table"
             dataSource={users.map((u) => ({ ...u, key: u.id_usuario }))}
             columns={columns}
             loading={isPending}
+            showHeader={false}
+            style={{ width: "100%" }}
+            scroll={{ x: "max-content" }}
             pagination={{
               total: (filtered ?? data?.data.data ?? []).length,
               current: pagination.current,
@@ -354,20 +366,18 @@ export const UsersList: React.FC = () => {
                 <Typography.Text strong>Lista de usuarios</Typography.Text>
                 <Space>
                   <Dropdown overlay={sortMenu} trigger={["click"]}>
-                    <Button>
-                      Ordenar por{" "}
-                      {sortKey === "nombre"
+                    <Button type="text" style={{ color: '#595959', fontWeight: 400, fontSize: 14 }}>
+                      Ordenar por {sortKey === "nombre"
                         ? "nombre"
                         : sortKey === "estado"
-                          ? "estado"
-                          : "fecha de creación"}{" "}
-                      <DownOutlined />
+                        ? "estado"
+                        : "fecha de creación"} <DownOutlined style={{ color: '#595959' }} />
                     </Button>
                   </Dropdown>
-                  <Button icon={<ReloadOutlined />} onClick={() => refetch()} />
-                  <Button icon={<ColumnHeightOutlined />} />
-                  <Button icon={<SettingOutlined />} />
-                  <Button icon={<FullscreenOutlined />} />
+                  <Button type="text" icon={<ReloadOutlined style={{ color: '#595959', fontSize: 18 }} />} onClick={() => refetch()} />
+                  <Button type="text" icon={<ColumnHeightOutlined style={{ color: '#595959', fontSize: 18 }} />} />
+                  <Button type="text" icon={<SettingOutlined style={{ color: '#595959', fontSize: 18 }} />} />
+                  <Button type="text" icon={<FullscreenOutlined style={{ color: '#595959', fontSize: 18 }} />} />
                 </Space>
               </Space>
             )}
