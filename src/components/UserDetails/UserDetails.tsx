@@ -542,34 +542,32 @@ export const UserDetails: React.FC = () => {
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Cirugias:{" "}
-                          <Typography.Text style={{ fontWeight: 400 }}>
-                            {records.cirugias ? "Sí" : "No"}
-                          </Typography.Text>
+                          Cirugias: <Typography.Text style={{ fontWeight: 400 }}>{records.cirugias ? "Sí" : "No"}</Typography.Text>
+                          {records.cirugias && (
+                            <Link to={`/usuarios/${userId}/historia#surgeries`} style={{ marginLeft: 12 }}>
+                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            </Link>
+                          )}
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Alergias a medicamentos:{" "}
-                          <Typography.Text style={{ fontWeight: 400 }}>
-                            {records.alergico_medicamento ? "Sí" : "No"}
-                          </Typography.Text>
+                          Alergias a medicamentos: <Typography.Text style={{ fontWeight: 400 }}>{records.alergico_medicamento ? "Sí" : "No"}</Typography.Text>
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Otras alergias:{" "}
-                          <Typography.Text style={{ fontWeight: 400 }}>
-                            {records.otras_alergias ? "Sí" : "No"}
-                          </Typography.Text>{" "}
+                          Otras alergias: <Typography.Text style={{ fontWeight: 400 }}>{records.otras_alergias ? "Sí" : "No"}</Typography.Text>
+                          {records.otras_alergias && (
+                            <Link to={`/usuarios/${userId}/historia#otherAlergies`} style={{ marginLeft: 12 }}>
+                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            </Link>
+                          )}
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Condiciones especiales:{" "}
-                          <Typography.Text style={{ fontWeight: 400 }}>
-                            {records.otras_alergias ? "Sí" : "No"}
-                          </Typography.Text>{" "}
+                          Condiciones especiales: <Typography.Text style={{ fontWeight: 400 }}>{records.otras_alergias ? "Sí" : "No"}</Typography.Text>
                         </Typography.Text>
                       </Flex>
                     </Flex>
@@ -690,7 +688,7 @@ export const UserDetails: React.FC = () => {
                               className="main-button-link"
                               size="small"
                             >
-                              Detalles
+                              ver
                             </Button>
                           </Link>
                           <Divider type="vertical" />

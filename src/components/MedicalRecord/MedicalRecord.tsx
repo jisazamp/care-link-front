@@ -110,6 +110,8 @@ export const MedicalRecord: React.FC = () => {
     "#discapacidad": "special-conditions",
     "#limitaciones": "special-conditions",
     "#tratamientos": "special-conditions",
+    "#surgeries": "special-conditions",
+    "#otherAlergies": "special-conditions",
   };
 
   // Mapeo de hash a key del sub-panel del Collapse anidado
@@ -118,6 +120,8 @@ export const MedicalRecord: React.FC = () => {
     "#limitaciones": "limitations",
     "#dieta": "diet",
     "#tratamientos": "alergies", // Asumiendo que tratamientos se refiere a alergias a medicamentos
+    "#surgeries": "surgeries",
+    "#otherAlergies": "otherAlergies",
   };
 
   useEffect(() => {
