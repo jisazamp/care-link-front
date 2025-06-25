@@ -21,8 +21,8 @@ import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
-import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
-import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
+/* import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
+ */import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
@@ -51,8 +51,8 @@ export const UserDetails: React.FC = () => {
     useGetUserMedicalRecord(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
   const { data: userContracts } = useGetUserContracts(userId);
-  const deleteReportMutation = useDeleteMedicalReport();
-
+/*   const deleteReportMutation = useDeleteMedicalReport();
+ */
   const records = record?.data.data;
 
   const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
@@ -145,7 +145,7 @@ export const UserDetails: React.FC = () => {
     });
   };
 
-  const handleDeleteReport = (reportId: number) => {
+/*   const handleDeleteReport = (reportId: number) => {
     confirm({
       title: "¿Estás seguro de que deseas eliminar este reporte clínico?",
       content: "Esta acción no se puede deshacer.",
@@ -167,7 +167,7 @@ export const UserDetails: React.FC = () => {
         });
       },
     });
-  };
+  }; */
 
   const handleDeleteContract = (contractId: number) => {
     confirm({
@@ -704,7 +704,7 @@ export const UserDetails: React.FC = () => {
                             </Button>
                           </Link>
                           <Divider type="vertical" />
-                          <Button
+{/*                           <Button
                             className="main-button-link"
                             size="small"
                             type="link"
@@ -714,7 +714,7 @@ export const UserDetails: React.FC = () => {
                             }
                           >
                             Eliminar
-                          </Button>
+                          </Button> */}
                         </Space>
                       ),
                     },
