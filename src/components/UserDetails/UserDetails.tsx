@@ -1,14 +1,14 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  Avatar,
+
   Breadcrumb,
   Button,
   Card,
-  Col,
+  
   Divider,
   Flex,
   Modal,
-  Row,
+  
   Space,
   Spin,
   Table,
@@ -288,87 +288,65 @@ export const UserDetails: React.FC = () => {
           </Title>
           <Collapse accordion style={{ background: "transparent", width: "100%" }}>
             <Panel header="Datos básicos y de localización" key="1">
-              <Card
-                extra={
-                  <Space>
+              <div className="user-details-card" style={{ width: "100%" }}>
+                <div className="user-details-head">
+                  <div className="user-details-title-wrapper">
+                    <span className="user-details-title">Datos básicos y de localización</span>
+                  </div>
+                  <div className="user-details-actions">
                     <Link to={`/usuarios/${userId}/editar`}>
-                      <Button
-                        className="main-button-white"
-                        variant="outlined"
-                        icon={<EditOutlined />}
-                      >
+                      <button className="user-details-btn">
+                        <span className="user-details-btn-icon"><EditOutlined /></span>
                         Editar
-                      </Button>
+                      </button>
                     </Link>
-                    <Button
-                      icon={<DeleteOutlined />}
-                      className="main-button-white"
-                      shape="circle"
-                    />
-                  </Space>
-                }
-                style={{ marginTop: 3, width: "100%" }}
-              >
-                <Row gutter={24} align="middle">
-                  {user?.data.data.url_imagen && (
-                    <Col lg={4}>
-                      <Avatar
+                    <button className="user-details-btn user-details-btn-danger">
+                      <span className="user-details-btn-icon"><DeleteOutlined /></span>
+                    </button>
+                  </div>
+                </div>
+                <div className="user-details-body">
+                  <div className="user-details-avatar">
+                    {user?.data.data.url_imagen ? (
+                      <img
                         src={user.data.data.url_imagen}
-                        size={120}
                         alt="Avatar del paciente"
-                        style={{ border: "1px solid #ddd" }}
+                        className="user-details-avatar-img"
                       />
-                    </Col>
-                  )}
-                  <Col lg={10}>
-                    <Flex vertical gap={10}>
-                      <Typography.Text style={{ textTransform: "uppercase" }}>
+                    ) : (
+                      <div className="user-details-avatar-img" style={{ background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: '#bbb' }}>
+                        {user?.data.data.nombres?.[0] ?? 'U'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="user-details-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 40, marginBottom: 4 }}>
+                      <div className="user-details-info-name" style={{ fontWeight: 500, fontSize: 18, minWidth: 260 }}>
                         {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
-                      </Typography.Text>
-                      <Flex gap={4}>
-                        <Typography.Text style={{ fontWeight: "bold" }}>
-                          {`${user?.data.data.n_documento}`}
-                        </Typography.Text>
-                        <Typography.Text>-</Typography.Text>
-                        <Typography.Text>
-                          {user?.data.data.genero}
-                        </Typography.Text>
-                        <Typography.Text>-</Typography.Text>
-                        <Typography.Text>
-                          {dayjs(user?.data.data.fecha_nacimiento).format(
-                            "DD-MM-YYYY",
-                          )}
-                        </Typography.Text>
-                        <Typography.Text>-</Typography.Text>
-                        <Typography.Text style={{ fontWeight: "bold" }}>
-                          {dayjs().diff(
-                            dayjs(user?.data.data.fecha_nacimiento),
-                            "years",
-                          )}{" "}
-                          años
-                        </Typography.Text>
-                      </Flex>
-                      <Typography.Text>
-                        {user?.data.data.estado_civil}
-                      </Typography.Text>
-                    </Flex>
-                  </Col>
-                  <Col lg={10}>
-                    <Flex vertical gap={10}>
-                      <Typography.Text>
+                      </div>
+                      <div style={{ color: '#222', fontSize: 15, minWidth: 220 }}>
+                        <span className="user-details-info-bold">{user?.data.data.n_documento}</span>
+                        <span> - {user?.data.data.genero}</span>
+                        <span> - {dayjs(user?.data.data.fecha_nacimiento).format("YYYY/MM/DD")}</span>
+                        <span> - <span className="user-details-info-bold">{dayjs().diff(dayjs(user?.data.data.fecha_nacimiento), "years")} años</span></span>
+                      </div>
+                      <div style={{ color: '#222', fontSize: 15, minWidth: 220 }}>
                         {user?.data.data.direccion}
-                      </Typography.Text>
-                      <Flex gap={4}>
-                        <Typography.Text>
-                          {user?.data.data.telefono}
-                        </Typography.Text>
-                        <Typography.Text>-</Typography.Text>
-                        <Typography.Text>{user?.data.data.email}</Typography.Text>
-                      </Flex>
-                    </Flex>
-                  </Col>
-                </Row>
-              </Card>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 40, marginBottom: 4 }}>
+                      <div style={{ color: '#222', fontSize: 15, minWidth: 260 }}>
+                        {user?.data.data.estado_civil}
+                        {user?.data.data.profesion && <span> - {user?.data.data.profesion}</span>}
+                      </div>
+                      <div style={{ color: '#222', fontSize: 15, minWidth: 220 }}>
+                        {user?.data.data.telefono}
+                        {user?.data.data.email && <span> - {user?.data.data.email}</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </Panel>
             <Panel header="Historia Clínica" key="2">
               <Card
@@ -402,7 +380,6 @@ export const UserDetails: React.FC = () => {
                   )
                 }
                 loading={loadingRecord}
-                style={{ width: "100%" }}
               >
                 {records ? (
                   <Flex vertical gap={60}>
@@ -665,7 +642,6 @@ export const UserDetails: React.FC = () => {
                   </Tooltip>
                 }
                 className="detail-card"
-                style={{ width: "100%" }}
               >
                 <Table
                   rowKey="id_profesional"
@@ -752,7 +728,6 @@ export const UserDetails: React.FC = () => {
                     </Button>
                   </Link>
                 }
-                style={{ width: "100%" }}
               >
                 <Table
                   rowKey="id_acudiente"
@@ -776,7 +751,6 @@ export const UserDetails: React.FC = () => {
                   </Button>
                 }
                 className="detail-card"
-                style={{ width: "100%" }}
               >
                 <Table
                   columns={contractsColumns}
