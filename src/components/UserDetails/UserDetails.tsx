@@ -455,9 +455,11 @@ export const UserDetails: React.FC = () => {
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
                           Discapacidad: <Typography.Text style={{ fontWeight: 400 }}>{records.discapacidades ? "Sí" : "No"}</Typography.Text>
-                          <Link to={`/usuarios/${userId}/historia#special-conditions`} style={{ marginLeft: 12 }}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
-                          </Link>
+                          {records.discapacidades && (
+                            <Link to={`/usuarios/${userId}/historia#discapacidad`} style={{ marginLeft: 12 }}>
+                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            </Link>
+                          )}
                           {records.discapacidades?.split(",").filter((a) => !!a).map((e) => (
                             <Typography.Text
                               key={e}
@@ -480,9 +482,11 @@ export const UserDetails: React.FC = () => {
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
                           Limitaciones: <Typography.Text style={{ fontWeight: 400 }}>{records.limitaciones ? "Sí" : "No"}</Typography.Text>
-                          <Link to={`/usuarios/${userId}/historia#special-conditions`} style={{ marginLeft: 12 }}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
-                          </Link>
+                          {records.limitaciones && (
+                            <Link to={`/usuarios/${userId}/historia#limitaciones`} style={{ marginLeft: 12 }}>
+                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            </Link>
+                          )}
                           {records.limitaciones?.split(",").filter((a) => !!a).map((e) => (
                             <Typography.Text
                               key={e}
@@ -505,6 +509,11 @@ export const UserDetails: React.FC = () => {
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
                           Dieta Especial: <Typography.Text style={{ fontWeight: 400 }}>{records.dieta_especial ? "Sí" : "No"}</Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Observaciones Dieta:
                           <Link to={`/usuarios/${userId}/historia#dieta`} style={{ marginLeft: 12 }}>
                             <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
                           </Link>
@@ -512,16 +521,8 @@ export const UserDetails: React.FC = () => {
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Observaciones Dieta:
-                          <Link to={`/usuarios/${userId}/historia#observaciones-dieta`} style={{ marginLeft: 12 }}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
-                          </Link>
-                        </Typography.Text>
-                        <Typography.Text
-                          style={{ fontWeight: 500, marginRight: 5 }}
-                        >
                           Apoyos y tratamientos:
-                          <Link to={`/usuarios/${userId}/historia#apoyos-tratamientos`} style={{ marginLeft: 12 }}>
+                          <Link to={`/usuarios/${userId}/historia#medical-treatments`} style={{ marginLeft: 12 }}>
                             <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
                           </Link>
                         </Typography.Text>

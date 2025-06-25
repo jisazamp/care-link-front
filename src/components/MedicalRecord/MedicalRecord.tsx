@@ -60,6 +60,7 @@ export const MedicalRecord: React.FC = () => {
   const userId = params.id;
   const location = useLocation();
   const [activePanel, setActivePanel] = useState<string | string[]>("");
+  const [activeSubPanel, setActiveSubPanel] = useState<string | string[]>("");
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -106,12 +107,28 @@ export const MedicalRecord: React.FC = () => {
     "#diet": "special-conditions",
     "#observaciones-dieta": "special-conditions",
     "#apoyos-tratamientos": "special-conditions",
-    // Agrega más si tienes hashes específicos
+    "#discapacidad": "special-conditions",
+    "#limitaciones": "special-conditions",
+    "#tratamientos": "special-conditions",
+  };
+
+  // Mapeo de hash a key del sub-panel del Collapse anidado
+  const hashToSubPanelKey: Record<string, string> = {
+    "#discapacidad": "disability",
+    "#limitaciones": "limitations",
+    "#dieta": "diet",
+    "#tratamientos": "alergies", // Asumiendo que tratamientos se refiere a alergias a medicamentos
   };
 
   useEffect(() => {
     if (location.hash && hashToPanelKey[location.hash]) {
       setActivePanel(hashToPanelKey[location.hash]);
+      
+      // Si es un hash que corresponde a un sub-panel, también abrir ese sub-panel
+      if (hashToSubPanelKey[location.hash]) {
+        setActiveSubPanel(hashToSubPanelKey[location.hash]);
+      }
+      
       setTimeout(() => {
         const el = document.getElementById(location.hash.replace('#', ''));
         if (el) {
@@ -424,7 +441,10 @@ export const MedicalRecord: React.FC = () => {
               <MedicalTreatments />
             </Panel>
             <Panel header="Condiciones especiales" key="special-conditions">
-              <SpecialConditions />
+              <SpecialConditions 
+                activeSubPanel={activeSubPanel}
+                setActiveSubPanel={setActiveSubPanel}
+              />
             </Panel>
             <Panel header="Esquema de vacunación" key="vaccines">
               <Vaccines />

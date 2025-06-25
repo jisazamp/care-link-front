@@ -1,6 +1,6 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Card, Checkbox, Flex, Space, Table, Typography, Collapse } from "antd";
-import { useState } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import type { FormValues } from "../../schema/schema";
 import { AlergiesModal } from "./components/AlergiesModal/AlergiesModal";
@@ -10,11 +10,21 @@ import { DisabilityModal } from "./components/DisabilityModal/DisabilityModal";
 import { LimitationsModal } from "./components/LimitationsModal/LimitationsModal";
 import { OtherAlergiesModal } from "./components/OtherAlergies/OtherAlergies";
 import { SurgeriesModal } from "./components/SurgeriesModal/SurgeriesModal";
+import { useLocation } from "react-router-dom";
 
 const { Title } = Typography;
 
-export const SpecialConditions = () => {
+interface SpecialConditionsProps {
+  activeSubPanel: string | string[];
+  setActiveSubPanel: Dispatch<SetStateAction<string | string[]>>;
+}
+
+export const SpecialConditions: React.FC<SpecialConditionsProps> = ({ 
+  activeSubPanel, 
+  setActiveSubPanel 
+}) => {
   const { control, watch, setValue } = useFormContext<FormValues>();
+  const location = useLocation();
   const [showModal, setShowModal] = useState<
     | "alergies"
     | "diet"
@@ -99,8 +109,44 @@ export const SpecialConditions = () => {
   const surgeries = watch("surgeries") ?? [];
   const diagnostic = watch("diagnostic") ?? [];
 
+  // Mapeo de hash a valor del checkbox
+  const hashToCheckboxValue: Record<string, string> = {
+    "#discapacidad": "disability",
+    "#limitaciones": "limitations",
+    "#dieta": "diet", 
+    "#tratamientos": "alergies",
+  };
+
+  // Efecto para manejar navegación directa a hash
+  useEffect(() => {
+    if (location.hash && hashToCheckboxValue[location.hash]) {
+      const checkboxValue = hashToCheckboxValue[location.hash];
+      
+      // Si el checkbox no está seleccionado, seleccionarlo
+      if (!selectedValues.includes(checkboxValue)) {
+        const newValues = [...selectedValues, checkboxValue];
+        setValue("specialConditions", newValues);
+      }
+      
+      // Abrir el sub-panel correspondiente
+      setActiveSubPanel(checkboxValue);
+    }
+  }, [location.hash, selectedValues, setValue, setActiveSubPanel]);
+
   const handleCheckboxGroupChange = (values: string[]) => {
     setValue("specialConditions", values);
+    
+    // Si hay un hash activo, abrir automáticamente el sub-panel correspondiente
+    const hashToSubPanel: Record<string, string> = {
+      "#discapacidad": "disability",
+      "#limitaciones": "limitations", 
+      "#dieta": "diet",
+      "#tratamientos": "alergies",
+    };
+    
+    if (location.hash && hashToSubPanel[location.hash] && values.includes(hashToSubPanel[location.hash])) {
+      setActiveSubPanel(hashToSubPanel[location.hash]);
+    }
   };
 
   return (
@@ -153,7 +199,12 @@ export const SpecialConditions = () => {
         />
       </Flex>
       <Flex vertical style={{ marginTop: 8 }}>
-        <Collapse bordered={false} style={{ background: "transparent" }}>
+        <Collapse 
+          bordered={false} 
+          style={{ background: "transparent" }}
+          activeKey={activeSubPanel}
+          onChange={setActiveSubPanel}
+        >
           {selectedValues.includes("alergies") && (
             <Collapse.Panel header="Alergias a medicamentos" key="alergies">
               <Card
