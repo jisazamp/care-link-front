@@ -13,22 +13,21 @@ import { ContractDetails } from "./components/Contracts/components/ContractDetai
 import { FormContracts } from "./components/Contracts/components/FormContracts";
 import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
-import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
+import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
+import { MMSETest } from "./components/PeriodicTests/MMSE";
+import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
-import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
-import { MMSETest } from "./components/PeriodicTests/MMSE";
-import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { colors } from "./theme";
 
 const spanishLocale: typeof es = {
@@ -185,7 +184,7 @@ export const App = () => {
               }
             />
             <Route
-              path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
+              path="/usuarios/:id/reportes/:reportId/detalles/old"
               element={
                 <PrivateRoute>
                   <NewEvolutionReport />

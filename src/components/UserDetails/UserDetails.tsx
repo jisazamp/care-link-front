@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Col,
+  Collapse,
   Divider,
   Flex,
   Modal,
@@ -15,11 +16,11 @@ import {
   type TableProps,
   Tooltip,
   Typography,
-  Collapse,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDeleteContract } from "../../hooks/useDeleteContract";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
 import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
@@ -30,7 +31,6 @@ import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/use
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { queryClient } from "../../main";
 import type { Contract, FamilyMember } from "../../types";
-import { useDeleteContract } from "../../hooks/useDeleteContract";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -286,7 +286,11 @@ export const UserDetails: React.FC = () => {
           <Title level={3} className="page-title">
             {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
           </Title>
-          <Collapse accordion style={{ background: "transparent" }}>
+          <Collapse
+            defaultActiveKey="1"
+            accordion
+            style={{ background: "transparent" }}
+          >
             <Panel header="Datos básicos y de localización" key="1">
               <Card
                 extra={
@@ -363,7 +367,9 @@ export const UserDetails: React.FC = () => {
                           {user?.data.data.telefono}
                         </Typography.Text>
                         <Typography.Text>-</Typography.Text>
-                        <Typography.Text>{user?.data.data.email}</Typography.Text>
+                        <Typography.Text>
+                          {user?.data.data.email}
+                        </Typography.Text>
                       </Flex>
                     </Flex>
                   </Col>
@@ -595,37 +601,62 @@ export const UserDetails: React.FC = () => {
                         </Typography.Title>
                       </Flex>
                       <Flex vertical gap={10} style={{ flex: 2 }}>
-                        <Flex gap={10}>
+                        <Flex vertical gap={10}>
                           <Typography.Text style={{ fontWeight: 500 }}>
-                            Cafeina{" "}
-                            <Typography.Text style={{ fontWeight: 400 }}>
-                              {records.cafeina ? "Sí" : "No"}
+                            Cafeina:{" "}
+                            <Typography.Text
+                              style={{
+                                fontWeight: 400,
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {records.cafeina ?? "No"}
                             </Typography.Text>
                           </Typography.Text>
                           <Typography.Text style={{ fontWeight: 500 }}>
-                            Tabaquismo{" "}
-                            <Typography.Text style={{ fontWeight: 400 }}>
-                              {records.tabaquismo ? "Sí" : "No"}
+                            Tabaquismo:{" "}
+                            <Typography.Text
+                              style={{
+                                fontWeight: 400,
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {records.tabaquismo ?? "No"}
                             </Typography.Text>
                           </Typography.Text>
                           <Typography.Text style={{ fontWeight: 500 }}>
-                            Alcoholismo{" "}
-                            <Typography.Text style={{ fontWeight: 400 }}>
-                              {records.alcoholismo ? "Sí" : "No"}
+                            Alcoholismo:{" "}
+                            <Typography.Text
+                              style={{
+                                fontWeight: 400,
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {records.alcoholismo ?? "No"}
                             </Typography.Text>
                           </Typography.Text>
                           <Typography.Text style={{ fontWeight: 500 }}>
-                            Sustancias Psicoactivas{" "}
-                            <Typography.Text style={{ fontWeight: 400 }}>
-                              {records.sustanciaspsico ? "Sí" : "No"}
+                            Sustancias Psicoactivas:{" "}
+                            <Typography.Text
+                              style={{
+                                fontWeight: 400,
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {records.sustanciaspsico ?? "No"}
                             </Typography.Text>
                           </Typography.Text>
                         </Flex>
                         <Flex gap={10} style={{ flex: 2 }}>
                           <Typography.Text style={{ fontWeight: 500 }}>
-                            Maltratado{" "}
-                            <Typography.Text style={{ fontWeight: 400 }}>
-                              {records.maltratado ? "Sí" : "No"}
+                            Maltrato:{" "}
+                            <Typography.Text
+                              style={{
+                                fontWeight: 400,
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {records.maltratado ?? "No"}
                             </Typography.Text>
                           </Typography.Text>
                         </Flex>
@@ -686,6 +717,11 @@ export const UserDetails: React.FC = () => {
                     {
                       title: "Tipo reporte",
                       dataIndex: "tipo_reporte",
+                      render: (_, record) => (
+                        <Typography style={{ textTransform: "capitalize" }}>
+                          {record.tipo_reporte}
+                        </Typography>
+                      ),
                     },
                     {
                       title: "Acciones",

@@ -17,10 +17,10 @@ import {
   Avatar,
 } from "antd";
 import type React from "react";
-import  avatar  from "../assets/Patients/patient1.jpg";
+import avatar from "../assets/Patients/patient1.jpg";
 
 const { Content } = Layout;
-const { Title,} = Typography;
+const { Title } = Typography;
 
 const dataSource = [
   {
@@ -124,21 +124,45 @@ export const ShowMedicalReport: React.FC = () => {
                     <Descriptions
                       column={3}
                       size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
+                      labelStyle={{
+                        fontWeight: 500,
+                        color: "#495057",
+                        fontSize: 14,
+                      }}
                       contentStyle={{ color: "#333333", fontSize: 14 }}
                       style={{ width: "100%" }}
                     >
-                      <Descriptions.Item label="Documento">1036688393</Descriptions.Item>
-                      <Descriptions.Item label="Edad">52 años</Descriptions.Item>
-                      <Descriptions.Item label="Género">Masculino</Descriptions.Item>
-                      <Descriptions.Item label="Dirección">calle 3 # 78 - 19</Descriptions.Item>
-                      <Descriptions.Item label="Teléfono">3016414872</Descriptions.Item>
-                      <Descriptions.Item label="Email">davidrestrepove@gmail.com</Descriptions.Item>
-                      <Descriptions.Item label="Tipo de Sangre">O+</Descriptions.Item>
-                      <Descriptions.Item label="Estado Civil">Divorciado</Descriptions.Item>
+                      <Descriptions.Item label="Documento">
+                        1036688393
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Edad">
+                        52 años
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Género">
+                        Masculino
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Dirección">
+                        calle 3 # 78 - 19
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Teléfono">
+                        3016414872
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Email">
+                        davidrestrepove@gmail.com
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Tipo de Sangre">
+                        O+
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Estado Civil">
+                        Divorciado
+                      </Descriptions.Item>
                       <Descriptions.Item label="EPS">SURA</Descriptions.Item>
-                      <Descriptions.Item label="N° Afiliación">6043214545</Descriptions.Item>
-                      <Descriptions.Item label="Fecha de Ingreso">05-05-2025</Descriptions.Item>
+                      <Descriptions.Item label="N° Afiliación">
+                        6043214545
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Fecha de Ingreso">
+                        05-05-2025
+                      </Descriptions.Item>
                     </Descriptions>
                   </Col>
                 </Row>
@@ -175,15 +199,29 @@ export const ShowMedicalReport: React.FC = () => {
                 <Descriptions
                   column={2}
                   size="small"
-                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
+                  labelStyle={{
+                    fontWeight: 500,
+                    color: "#495057",
+                    fontSize: 14,
+                  }}
                   contentStyle={{ color: "#333333", fontSize: 14 }}
                   style={{ width: "100%" }}
                 >
-                  <Descriptions.Item label="Tipo de Reporte">psicologia</Descriptions.Item>
-                  <Descriptions.Item label="Motivo de Consulta">Agregar motivo de consulta</Descriptions.Item>
-                  <Descriptions.Item label="Diagnóstico" span={2}>UN DIAGNÓSTICO</Descriptions.Item>
-                  <Descriptions.Item label="Observaciones" span={2}>Campo para agregar observaciones internas</Descriptions.Item>
-                  <Descriptions.Item label="Remisión" span={2}>especialista</Descriptions.Item>
+                  <Descriptions.Item label="Tipo de Reporte">
+                    psicologia
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Motivo de Consulta">
+                    Agregar motivo de consulta
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Diagnóstico" span={2}>
+                    UN DIAGNÓSTICO
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Observaciones" span={2}>
+                    Campo para agregar observaciones internas
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Remisión" span={2}>
+                    especialista
+                  </Descriptions.Item>
                 </Descriptions>
               </Card>
             </Col>
