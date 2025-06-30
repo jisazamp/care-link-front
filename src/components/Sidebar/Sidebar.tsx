@@ -1,18 +1,9 @@
-import {
-  CheckCircleOutlined,
-  HomeOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { CheckCircleOutlined, UserOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import { getSelectedKey } from "../../utils/getSelectedKey";
 
 const menuItems = [
-  {
-    key: "1",
-    icon: <HomeOutlined />,
-    label: <Link to="inicio">Inicio</Link>,
-  },
   {
     key: "2",
     icon: <UserOutlined />,
@@ -21,9 +12,8 @@ const menuItems = [
       { key: "2.1", label: <Link to="usuarios">Listado de usuarios</Link> },
       {
         key: "2.2",
-        label: <Link to="usuarios/crear">Registrar nuevo usuarios</Link>,
+        label: <Link to="usuarios/crear">Registrar nuevo usuario</Link>,
       },
-      { key: "2.3", label: "Nuevo Reporte Clínico" },
     ],
   },
   {
