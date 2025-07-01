@@ -21,15 +21,55 @@ interface ServicesContractProps {
   onBack?: () => void;
 }
 
+const getSelectorOptions = (recordKey: string) => {
+  switch (recordKey) {
+    case "1":
+      return Array.from({ length: 5 }, (_, i) => (
+        <Select.Option key={`Tiquetera ${i + 1}`} value={`Tiquetera ${i + 1}`}>
+          Tiquetera {i + 1}
+        </Select.Option>
+      ));
+    case "2":
+      return Array.from({ length: 5 }, (_, i) => (
+        <Select.Option
+          key={`Transporte ${i + 1}`}
+          value={`Transporte ${i + 1}`}
+        >
+          Transporte {i + 1}
+        </Select.Option>
+      ));
+    case "3":
+      return (
+        <Select.Option key="Servicio dia" value="Servicio dia">
+          Servicio día
+        </Select.Option>
+      );
+    default:
+      return null;
+  }
+};
+
 export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const methods = useFormContext<FormValues>();
   const services = methods.watch("services");
 
   const handleServiceChange = (key: string, value?: string) => {
+    switch (key) {
+      case "1":
+        methods.setValue("selectedDatesService", []);
+        break;
+      case "2":
+        methods.setValue("selectedDatesTransport", []);
+        break;
+      case "3":
+        methods.setValue("selectedDateDay", null);
+        break;
+    }
+
     const quantity =
       value && (value.includes("Tiquetera") || value.includes("Transporte"))
         ? Number.parseInt(value.split(" ")[1]) * WEEKS_IN_MONTH
-        : 0;
+        : 1;
 
     const newServices = services.map((s) =>
       s.key === key ? { ...s, serviceType: value || "", quantity } : s,
@@ -102,23 +142,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           onChange={(value) => handleServiceChange(record.key, value)}
           allowClear
         >
-          {record.key === "1"
-            ? Array.from({ length: 5 }, (_, i) => (
-                <Select.Option
-                  key={`Tiquetera ${i + 1}`}
-                  value={`Tiquetera ${i + 1}`}
-                >
-                  Tiquetera {i + 1}
-                </Select.Option>
-              ))
-            : Array.from({ length: 5 }, (_, i) => (
-                <Select.Option
-                  key={`Transporte ${i + 1}`}
-                  value={`Transporte ${i + 1}`}
-                >
-                  Transporte {i + 1}
-                </Select.Option>
-              ))}
+          {getSelectorOptions(record.key)}
         </Select>
       ),
     },
@@ -164,7 +188,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
 
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>
-      <Card bordered>
+      <Card variant="borderless">
         <Row justify="space-between" align="middle">
           <Col>
             <h3 style={{ margin: 0 }}>Servicios o productos incluidos</h3>
@@ -179,7 +203,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         />
       </Card>
 
-      <Card bordered style={{ marginTop: 24, textAlign: "right" }}>
+      <Card variant="borderless" style={{ marginTop: 24, textAlign: "right" }}>
         {onBack && (
           <Button onClick={onBack} style={{ marginRight: 8 }}>
             Atrás

@@ -18,42 +18,51 @@ import { useCreatePayment } from "../../../hooks/useCreatePayment/useCreatePayme
 import { useGetBillPayments } from "../../../hooks/useGetBillPayments/useGetBillPayments";
 import { useGetContractBill } from "../../../hooks/useGetContractBill";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
+import { useGetPaymentMethods } from "../../../hooks/useGetPaymentMethods";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
-import { useUpdateContractDates } from "../../../hooks/useUpdateContractDates/useUpdateContractDates";
-import type { Contract, CreateContractRequest, Payment } from "../../../types";
+import type {
+  CreateContractRequest,
+  Payment,
+  UpdateContractRequest,
+} from "../../../types";
 import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 import { BillingContract } from "./BillingContract/BillingContract";
 import { CreateContract } from "./CreateContract/CreateContract";
 import { ServicesContract } from "./ServicesContract/ServicesContract";
-import {
-  buildContractData,
-  buildContractFromForm,
-  convertContractData,
-} from "./utils/utils";
-import { useGetPaymentMethods } from "../../../hooks/useGetPaymentMethods";
+import { buildContractData, convertContractData } from "./utils/utils";
 
 const { Title } = Typography;
 
 const startingServices: Service[] = [
   {
-    key: "1",
-    startDate: null,
-    endDate: null,
-    serviceType: "",
-    quantity: 0,
     description: "",
-    selected: true,
+    endDate: null,
+    key: "1",
     price: 0,
+    quantity: 0,
+    selected: true,
+    serviceType: "",
+    startDate: null,
   },
   {
-    key: "2",
-    startDate: null,
-    endDate: null,
-    serviceType: "",
-    quantity: 0,
     description: "",
-    selected: true,
+    endDate: null,
+    key: "2",
     price: 0,
+    quantity: 0,
+    selected: true,
+    serviceType: "",
+    startDate: null,
+  },
+  {
+    description: "",
+    endDate: null,
+    key: "3",
+    price: 0,
+    quantity: 0,
+    selected: true,
+    serviceType: "",
+    startDate: null,
   },
 ];
 
@@ -74,6 +83,7 @@ export interface FormValues {
   endDate: Dayjs | null;
   selectedDatesService: string[];
   selectedDatesTransport: string[];
+  selectedDateDay: string | null;
   services: Service[];
   startDate: Dayjs | null;
   payments: { paymentMethod: number; paymentDate: string; amount: number }[];
@@ -85,13 +95,13 @@ export const FormContracts = () => {
 
   const { data: contract } = useGetContractById(contractId);
   const { mutate: updateContract } = useUpdateContract(contractId);
-  const { mutate: updateContractDates } = useUpdateContractDates();
 
   const methods = useForm<FormValues>({
     defaultValues: {
       endDate: null,
       selectedDatesService: [],
       selectedDatesTransport: [],
+      selectedDateDay: null,
       services: startingServices,
       startDate: null,
     },
@@ -111,22 +121,14 @@ export const FormContracts = () => {
 
   const onSubmit = (data: FormValues) => {
     if (contractId) {
-      const newContract: Contract = buildContractFromForm(
-        data,
+      const newContract: UpdateContractRequest = buildContractData(
         Number(id),
-        Number(contractId),
-      );
+        data,
+        getValues,
+      ) as UpdateContractRequest;
+      newContract.id_contrato = Number(contractId);
 
-      const newServiceDates = data.selectedDatesService.map((s) => ({
-        fecha: s,
-      }));
-      const newTransportDates = data.services[1].quantity
-        ? data.selectedDatesTransport.map((s) => ({
-            fecha: s,
-          }))
-        : [];
-
-      const newPayments = data.payments.slice(billPayments?.data.length);
+      const newPayments = data.payments?.slice(billPayments?.data.length) ?? [];
       const billId = contractBillData?.data.data.id_factura;
 
       updateContract(newContract, {
@@ -147,27 +149,10 @@ export const FormContracts = () => {
             for (let i = 0; i < paymentData.length; i++) {
               await createPaymentFnAsync(paymentData[i]);
             }
-
             navigate(`/usuarios/${id}/detalles`);
           }
         },
       });
-      const serviceContractId =
-        contract?.data.servicios[0].id_servicio_contratado;
-      const serviceTransportId =
-        contract?.data.servicios?.[1]?.id_servicio_contratado ?? 0;
-
-      serviceContractId &&
-        updateContractDates({
-          serviceId: serviceContractId,
-          dates: newServiceDates,
-        });
-
-      serviceTransportId &&
-        updateContractDates({
-          serviceId: serviceTransportId,
-          dates: newTransportDates,
-        });
 
       return;
     }
@@ -217,6 +202,43 @@ export const FormContracts = () => {
   useEffect(() => {
     if (contract?.data) {
       const formValues = convertContractData(contract.data, startingServices);
+      const { services } = formValues;
+      let newServices: Service[] = [...services];
+
+      const careService = services.find((e) => e.key === "1");
+      const transportService = services.find((e) => e.key === "2");
+      const dayService = services.find((e) => e.key === "3");
+
+      if (!careService)
+        newServices = [
+          ...services,
+          {
+            ...startingServices[0],
+            startDate: dayjs(contract.data.fecha_inicio),
+            endDate: dayjs(contract.data.fecha_inicio).add(1, "month"),
+          },
+        ];
+      if (!transportService)
+        newServices = [
+          ...services,
+          {
+            ...startingServices[1],
+            startDate: dayjs(contract.data.fecha_inicio),
+            endDate: dayjs(contract.data.fecha_inicio).add(1, "month"),
+          },
+        ];
+      if (!dayService)
+        newServices = [
+          ...services,
+          {
+            ...startingServices[2],
+            serviceType: "",
+            startDate: dayjs(contract.data.fecha_inicio),
+            endDate: dayjs(contract.data.fecha_inicio).add(1, "month"),
+          },
+        ];
+      formValues.services = newServices;
+
       reset(formValues);
     }
   }, [contract?.data, reset]);
@@ -281,7 +303,7 @@ export const FormContracts = () => {
           { title: "Contrato" },
         ]}
       />
-      <Card bordered>
+      <Card variant="borderless">
         <Title level={4}>Gestión de Contratos</Title>
         <Steps
           current={currentStep}
@@ -298,7 +320,7 @@ export const FormContracts = () => {
         />
       </Card>
       <div style={{ marginTop: "24px" }}>{steps[currentStep].content}</div>
-      <Card bordered style={{ marginTop: 24, textAlign: "right" }}>
+      <Card variant="borderless" style={{ marginTop: 24, textAlign: "right" }}>
         <Button
           className="main-button"
           style={{ marginRight: 8 }}
