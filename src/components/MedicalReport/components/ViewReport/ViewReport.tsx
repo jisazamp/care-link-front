@@ -11,7 +11,7 @@ import {
   Row,
   Table,
   Typography,
-  Descriptions,
+
   Avatar,
   Checkbox,
 } from "antd";
@@ -139,160 +139,150 @@ export const ViewReport: React.FC = () => {
           {user?.nombres} {user?.apellidos}
         </h1>
       </div>
-      <Card className="main-frame" style={{ border: "none", backgroundColor: "transparent" }}>
-        <Card className="inner-frame" style={{ margin: "auto 16px auto", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)", backgroundColor: "#fff" }}>
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}>
-                <Row align="middle" gutter={24}>
-                  <Col>
-                    <Avatar src={patientImage} size={96} />
-                  </Col>
-                  <Col flex="auto">
-                    <Title level={5} style={{ margin: 0, fontWeight: 600 }}>{user?.nombres} {user?.apellidos}</Title>
-                    <Descriptions
-                      column={3}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Documento">{user?.n_documento}</Descriptions.Item>
-                      <Descriptions.Item label="Edad">{user?.fecha_nacimiento ? dayjs().diff(dayjs(user?.fecha_nacimiento), "years") + " años" : "-"}</Descriptions.Item>
-                      <Descriptions.Item label="Género">{user?.genero}</Descriptions.Item>
-                      <Descriptions.Item label="Dirección">{user?.direccion}</Descriptions.Item>
-                      <Descriptions.Item label="Teléfono">{user?.telefono}</Descriptions.Item>
-                      <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
-                      <Descriptions.Item label="Tipo de Sangre">{record?.tipo_sangre}</Descriptions.Item>
-                      <Descriptions.Item label="Estado Civil">{user?.estado_civil}</Descriptions.Item>
-                      <Descriptions.Item label="EPS">{record?.eps}</Descriptions.Item>
-                      <Descriptions.Item label="N° Afiliación">{record?.telefono_emermedica}</Descriptions.Item> {/* No existe campo de afiliación, se deja teléfono emergencia */}
-                      <Descriptions.Item label="Fecha de Ingreso">{user?.fecha_registro ? dayjs(user?.fecha_registro).format("DD-MM-YYYY") : "-"}</Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-
-            {/* Segunda tarjeta: Detalles del Reporte Clínico */}
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF" }}>
-                <Row justify="space-between" align="middle">
-                  <Col>
-                    <Title level={5} style={{ fontWeight: "bold", color: "#333333", margin: 0 }}>
-                      {encabezadoReporte}
-                    </Title>
-                  </Col>
-                  <Col>
-                    <Button type="text" icon={<EditOutlined />} />
-                    <Button type="text" icon={<DeleteOutlined />} />
-                  </Col>
-                </Row>
-                <Divider style={{ margin: "12px 0" }} />
-                <Row gutter={32}>
-                  <Col span={12}>
-                    <Descriptions
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Tipo de Reporte">{report?.tipo_reporte}</Descriptions.Item>
-                      <Descriptions.Item label="Motivo de Consulta">{report?.motivo_consulta}</Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                  <Col span={12}>
-                    <Descriptions
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Exploración física">
-                        <div>
-                          <div>Peso: {exploracion.peso}</div>
-                          <div>Presión arterial: {exploracion.presion}</div>
-                          <div>Frecuencia cardíaca: {exploracion.frecuencia}</div>
-                          <div>Temperatura corporal: {exploracion.temperatura}</div>
-                          <div>Pulsioximetría: {exploracion.pulsioximetria}</div>
-                        </div>
-                      </Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={24}>
-                    <Descriptions
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Diagnóstico">{report?.diagnostico}</Descriptions.Item>
-                      <Descriptions.Item label="Observaciones">{report?.observaciones}</Descriptions.Item>
-                      <Descriptions.Item label="Remisión">{report?.remision}</Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-
-            {/* Tercera tarjeta: Tratamiento y recomendaciones */}
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF" }}>
-                <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
-                  Tratamiento y recomendaciones
-                </Title>
-                <Divider style={{ margin: "12px 0" }} />
-                <Row>
-                  <Col span={6} style={{ display: "flex", alignItems: "flex-start" }}>
-                    <Title level={4} style={{ fontWeight: "bold", fontSize: "16px", color: "#495057" }}>
-                      Recomendaciones
-                    </Title>
-                  </Col>
-                  <Col span={18}>
-                    <ul style={{ paddingLeft: "20px", color: "#333333", fontSize: "14px", lineHeight: "1.6" }}>
-                      {recomendaciones.map((rec, idx) => (
-                        <li key={idx}>{rec}</li>
-                      ))}
-                    </ul>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-
-            {/* Cuarta tarjeta: Reportes de Evolución Clínica */}
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF" }}>
-                <Row justify="space-between" align="middle">
-                  <Col>
-                    <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
-                      Reportes de Evolución Clínica
-                    </Title>
-                  </Col>
-                  <Col>
-                    <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(`/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`)}>
-                      Agregar
-                    </Button>
-                  </Col>
-                </Row>
-                <Divider style={{ margin: "12px 0" }} />
-                <Table
-                  rowKey="id_TipoReporte"
-                  columns={columns}
-                  dataSource={evolutions}
-                  pagination={false}
-                  locale={{ emptyText: "No hay reportes clínicos registrados" }}
-                  style={{ marginBottom: 0 }}
+      <Row gutter={[0, 24]} style={{ width: '100%', margin: 0 }}>
+        <Col span={24} style={{ width: '100%' }}>
+          {/* Tarjeta de información básica del paciente */}
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "32px 48px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", width: '100%', minHeight: 120 }}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%' }}>
+              <Avatar src={patientImage} size={72} style={{ marginRight: 32, flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'row', gap: 48, width: '100%' }}>
+                {/* Columna izquierda: datos personales */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 320, textAlign: 'left' }}>
+                  <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 4 }}>{user?.nombres} {user?.apellidos}</div>
+                  <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 2 }}>{user?.n_documento}</div>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>
+                    {user?.genero} - {user?.fecha_nacimiento ? dayjs(user?.fecha_nacimiento).format('YYYY/MM/DD') : '-'} - <span style={{ fontWeight: 700 }}>{user?.fecha_nacimiento ? dayjs().diff(dayjs(user?.fecha_nacimiento), 'years') + ' años' : '-'}</span>
+                  </div>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>{user?.estado_civil}{user?.profesion ? ` - ${user?.profesion}` : ''}</div>
+                </div>
+                {/* Columna derecha: datos de contacto, más cerca y alineados a la izquierda */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 220, textAlign: 'left' }}>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>{user?.direccion}</div>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>{user?.telefono}{user?.email ? ` - ${user?.email}` : ''}</div>
+                  {record?.eps && <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>EPS: {record?.eps}</div>}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col span={24} style={{ width: '100%' }}>
+          {/* Tarjeta de Reporte clínico */}
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "0 0 32px 0", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", width: '100%' }}>
+            {/* Encabezado con acciones */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px 48px 0 48px' }}>
+              <div style={{ fontWeight: 500, fontSize: 18, color: '#222', textAlign: 'left' }}>
+                {`Reporte clínico - ${report?.id_reporteclinico ?? ''} ${report?.fecha_registro ? new Date(report.fecha_registro).toLocaleDateString() : ''} - Realizado por: `}
+                <span style={{ fontWeight: 700 }}>{report?.profesional?.nombres} {report?.profesional?.apellidos}</span>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Button
+                  type="default"
+                  icon={<EditOutlined />}
+                  style={{ display: 'flex', alignItems: 'center', fontWeight: 500, color: '#7f34b4', borderColor: '#7f34b4', borderRadius: 2, background: '#fff', padding: '0 16px', height: 32 }}
+                  onClick={() => navigate(`/usuarios/${id}/reportes/${reportId}`)}
+                >
+                  Editar
+                </Button>
+                <Button
+                  type="default"
+                  shape="circle"
+                  icon={<DeleteOutlined />}
+                  style={{ color: '#f32013', borderColor: '#f32013', background: '#fff', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  // onClick={handleDeleteReport} // Aquí puedes agregar la lógica de eliminación
                 />
-              </Card>
-            </Col>
-          </Row>
-        </Card>
-      </Card>
+              </div>
+            </div>
+            {/* Divisor horizontal */}
+            <div style={{ borderBottom: '2px solid #f0f0f0', margin: '24px 0 0 0', width: '100%' }} />
+            {/* Cuerpo de la tarjeta: filas independientes */}
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '32px 48px 0 48px', gap: 0 }}>
+              {/* Fila: Tipo de reporte */}
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Tipo de reporte</div>
+                <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{report?.tipo_reporte ?? '-'}</div>
+              </div>
+              {/* Fila: Motivo de consulta */}
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Motivo de consulta</div>
+                <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{report?.motivo_consulta || <span style={{ color: '#bbb' }}>Agregar motivo de consulta</span>}</div>
+              </div>
+              {/* Fila: Exploración física */}
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Exploración física</div>
+                <div style={{ color: '#222', fontSize: 15, flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
+                  <div><span style={{ fontWeight: 600 }}>Peso:</span> {report?.peso ? `${report.peso} kg` : '-'}</div>
+                  <div><span style={{ fontWeight: 600 }}>Presión arterial:</span> {report?.presion_arterial ? `${report.presion_arterial} mmHg` : '-'}</div>
+                  <div><span style={{ fontWeight: 600 }}>Frecuencia cardíaca:</span> {report?.Frecuencia_cardiaca ?? '-'}</div>
+                  <div><span style={{ fontWeight: 600 }}>Temperatura corporal:</span> {report?.temperatura_corporal ? `${report.temperatura_corporal}°C` : '-'}</div>
+                  <div><span style={{ fontWeight: 600 }}>Pulsioximetría:</span> {report?.saturacionOxigeno ? `${report.saturacionOxigeno}%` : '-'}</div>
+                </div>
+              </div>
+              {/* Fila: Diagnóstico */}
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Diagnóstico</div>
+                <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{report?.diagnosticos || '-'}</div>
+              </div>
+              {/* Fila: Observaciones */}
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Observaciones</div>
+                <div style={{ color: '#bbb', fontSize: 15, flex: 1 }}>{report?.observaciones || 'Campo para agregar observaciones internas'}</div>
+              </div>
+              {/* Fila: Remisión */}
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Remisión</div>
+                <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{report?.remision || '-'}</div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col span={24} style={{ width: '100%' }}>
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "16px 32px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF", width: '100%' }}>
+            <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
+              Tratamiento y recomendaciones
+            </Title>
+            <Divider style={{ margin: "12px 0" }} />
+            <Row>
+              <Col span={6} style={{ display: "flex", alignItems: "flex-start" }}>
+                <Title level={4} style={{ fontWeight: "bold", fontSize: "16px", color: "#495057" }}>
+                  Recomendaciones
+                </Title>
+              </Col>
+              <Col span={18}>
+                <ul style={{ paddingLeft: "20px", color: "#333333", fontSize: "14px", lineHeight: "1.6" }}>
+                  {recomendaciones.map((rec, idx) => (
+                    <li key={idx}>{rec}</li>
+                  ))}
+                </ul>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+        <Col span={24} style={{ width: '100%' }}>
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "16px 32px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF", width: '100%' }}>
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
+                  Reportes de Evolución Clínica
+                </Title>
+              </Col>
+              <Col>
+                <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(`/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`)}>
+                  Agregar
+                </Button>
+              </Col>
+            </Row>
+            <Divider style={{ margin: "12px 0" }} />
+            <Table
+              rowKey="id_TipoReporte"
+              columns={columns}
+              dataSource={evolutions}
+              pagination={false}
+              locale={{ emptyText: "No hay reportes clínicos registrados" }}
+              style={{ marginBottom: 0 }}
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

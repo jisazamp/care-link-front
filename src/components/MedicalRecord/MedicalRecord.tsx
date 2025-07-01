@@ -13,12 +13,13 @@ import {
   Spin,
   Typography,
   Upload,
+  Collapse,
 } from "antd";
 import dayjs from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
 import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
@@ -48,12 +49,18 @@ import {
   type PhysioRegimen,
   formSchema,
 } from "./schema/schema";
+import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
+import { Vaccines } from "./components/Vaccines/Vaccines";
 
 const { Title } = Typography;
+const { Panel } = Collapse;
 
 export const MedicalRecord: React.FC = () => {
   const params = useParams();
   const userId = params.id;
+  const location = useLocation();
+  const [activePanel, setActivePanel] = useState<string | string[]>("");
+  const [activeSubPanel, setActiveSubPanel] = useState<string | string[]>("");
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -82,6 +89,58 @@ export const MedicalRecord: React.FC = () => {
       id: userId,
       recordId: userMedicalRecord?.data.data?.id_historiaclinica,
     });
+
+  // Mapeo de hash a key del Collapse
+  const hashToPanelKey: Record<string, string> = {
+    "#user-info": "user-info",
+    "#medical-services": "medical-services",
+    "#entry-data": "entry-data",
+    "#basic-health-data": "basic-health-data",
+    "#physical-exploration": "physical-exploration",
+    "#medical-treatments": "medical-treatments",
+    "#special-conditions": "special-conditions",
+    "#vaccines": "vaccines",
+    "#biophysical-skills": "biophysical-skills",
+    "#toxicology": "toxicology",
+    "#social-perception": "social-perception",
+    "#dieta": "special-conditions",
+    "#diet": "special-conditions",
+    "#observaciones-dieta": "special-conditions",
+    "#apoyos-tratamientos": "special-conditions",
+    "#discapacidad": "special-conditions",
+    "#limitaciones": "special-conditions",
+    "#tratamientos": "special-conditions",
+    "#surgeries": "special-conditions",
+    "#otherAlergies": "special-conditions",
+  };
+
+  // Mapeo de hash a key del sub-panel del Collapse anidado
+  const hashToSubPanelKey: Record<string, string> = {
+    "#discapacidad": "disability",
+    "#limitaciones": "limitations",
+    "#dieta": "diet",
+    "#tratamientos": "alergies", // Asumiendo que tratamientos se refiere a alergias a medicamentos
+    "#surgeries": "surgeries",
+    "#otherAlergies": "otherAlergies",
+  };
+
+  useEffect(() => {
+    if (location.hash && hashToPanelKey[location.hash]) {
+      setActivePanel(hashToPanelKey[location.hash]);
+      
+      // Si es un hash que corresponde a un sub-panel, también abrir ese sub-panel
+      if (hashToSubPanelKey[location.hash]) {
+        setActiveSubPanel(hashToSubPanelKey[location.hash]);
+      }
+      
+      setTimeout(() => {
+        const el = document.getElementById(location.hash.replace('#', ''));
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200);
+    }
+  }, [location.hash]);
 
   const onSubmit = (data: FormValues) => {
     const record: MedicalRecordType = {
@@ -366,61 +425,44 @@ export const MedicalRecord: React.FC = () => {
             items={[{ title: "Inicio" }, { title: "Historia clínica" }]}
             style={{ margin: "16px 0" }}
           />
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
+          <Collapse accordion style={{ width: "100%", background: "transparent" }} activeKey={activePanel} onChange={setActivePanel}>
+            <Panel header="Datos del usuario" key="user-info">
               <UserInfo />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Servicio externo para emergencias médicas" key="medical-services">
               <MedicalServices />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Datos básicos de ingreso" key="entry-data">
               <EntryData />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Datos básicos de salud" key="basic-health-data">
               <BasicHealthData />
-            </Col>
-          </Row>
-          {/*<Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Exploración física inicial" key="physical-exploration">
               <PhysicalExploration />
-            </Col>
-          </Row>*/}
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Tratamientos o medicamentos" key="medical-treatments">
               <MedicalTreatments />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
-              <SpecialConditions />
-            </Col>
-          </Row>
-          {/*<Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Condiciones especiales" key="special-conditions">
+              <SpecialConditions 
+                activeSubPanel={activeSubPanel}
+                setActiveSubPanel={setActiveSubPanel}
+              />
+            </Panel>
+            <Panel header="Esquema de vacunación" key="vaccines">
               <Vaccines />
-            </Col>
-          </Row> */}
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Habilidades biofísicas" key="biophysical-skills">
               <BiophysicalSkills />
-            </Col>
-          </Row>
-          <Row style={{ margin: "8px 0" }}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Hábitos o antecedentes toxicológicos" key="toxicology">
               <Toxicology />
-            </Col>
-          </Row>
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
+            </Panel>
+            <Panel header="Habilidades de percepción social" key="social-perception">
               <SocialPerception />
-            </Col>
-          </Row>
+            </Panel>
+          </Collapse>
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
@@ -447,64 +489,6 @@ export const MedicalRecord: React.FC = () => {
               </Card>
             </Col>
           </Row>
-          {/*<Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Card
-                bordered
-                extra={
-                  <Button icon={<PlusOutlined />} className="main-button-white">
-                    Nuevo
-                  </Button>
-                }
-                title={
-                  <Title level={4} style={{ margin: 0 }}>
-                    Pruebas y Test
-                  </Title>
-                }
-                style={{ marginBottom: 8 }}
-              >
-                <Table
-                  columns={[
-                    {
-                      title: "Profesional",
-                      dataIndex: "profesional",
-                      key: "profesional",
-                      align: "center",
-                    },
-                    {
-                      title: "Tipo de prueba",
-                      dataIndex: "tipoPrueba",
-                      key: "tipoPrueba",
-                      align: "center",
-                    },
-                    {
-                      title: "Fecha",
-                      dataIndex: "fecha",
-                      key: "fecha",
-                      align: "center",
-                    },
-                    {
-                      title: "Acciones",
-                      key: "acciones",
-                      align: "center",
-                      render: () => (
-                        <Space>
-                          <Button type="link" style={{ color: "#1890ff" }}>
-                            Ver
-                          </Button>
-                          <Button type="link" style={{ color: "#faad14" }}>
-                            Editar
-                          </Button>
-                        </Space>
-                      ),
-                    },
-                  ]}
-                  dataSource={[]}
-                  pagination={false}
-                />
-              </Card>
-            </Col>
-          </Row>*/}
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
