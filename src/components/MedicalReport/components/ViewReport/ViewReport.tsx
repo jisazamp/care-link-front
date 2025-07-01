@@ -139,160 +139,143 @@ export const ViewReport: React.FC = () => {
           {user?.nombres} {user?.apellidos}
         </h1>
       </div>
-      <Card className="main-frame" style={{ border: "none", backgroundColor: "transparent" }}>
-        <Card className="inner-frame" style={{ margin: "auto 16px auto", borderRadius: "8px", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)", backgroundColor: "#fff" }}>
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}>
-                <Row align="middle" gutter={24}>
-                  <Col>
-                    <Avatar src={patientImage} size={96} />
-                  </Col>
-                  <Col flex="auto">
-                    <Title level={5} style={{ margin: 0, fontWeight: 600 }}>{user?.nombres} {user?.apellidos}</Title>
-                    <Descriptions
-                      column={3}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Documento">{user?.n_documento}</Descriptions.Item>
-                      <Descriptions.Item label="Edad">{user?.fecha_nacimiento ? dayjs().diff(dayjs(user?.fecha_nacimiento), "years") + " años" : "-"}</Descriptions.Item>
-                      <Descriptions.Item label="Género">{user?.genero}</Descriptions.Item>
-                      <Descriptions.Item label="Dirección">{user?.direccion}</Descriptions.Item>
-                      <Descriptions.Item label="Teléfono">{user?.telefono}</Descriptions.Item>
-                      <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
-                      <Descriptions.Item label="Tipo de Sangre">{record?.tipo_sangre}</Descriptions.Item>
-                      <Descriptions.Item label="Estado Civil">{user?.estado_civil}</Descriptions.Item>
-                      <Descriptions.Item label="EPS">{record?.eps}</Descriptions.Item>
-                      <Descriptions.Item label="N° Afiliación">{record?.telefono_emermedica}</Descriptions.Item> {/* No existe campo de afiliación, se deja teléfono emergencia */}
-                      <Descriptions.Item label="Fecha de Ingreso">{user?.fecha_registro ? dayjs(user?.fecha_registro).format("DD-MM-YYYY") : "-"}</Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-
-            {/* Segunda tarjeta: Detalles del Reporte Clínico */}
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF" }}>
-                <Row justify="space-between" align="middle">
-                  <Col>
-                    <Title level={5} style={{ fontWeight: "bold", color: "#333333", margin: 0 }}>
-                      {encabezadoReporte}
-                    </Title>
-                  </Col>
-                  <Col>
-                    <Button type="text" icon={<EditOutlined />} />
-                    <Button type="text" icon={<DeleteOutlined />} />
-                  </Col>
-                </Row>
-                <Divider style={{ margin: "12px 0" }} />
-                <Row gutter={32}>
-                  <Col span={12}>
-                    <Descriptions
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Tipo de Reporte">{report?.tipo_reporte}</Descriptions.Item>
-                      <Descriptions.Item label="Motivo de Consulta">{report?.motivo_consulta}</Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                  <Col span={12}>
-                    <Descriptions
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Exploración física">
-                        <div>
-                          <div>Peso: {exploracion.peso}</div>
-                          <div>Presión arterial: {exploracion.presion}</div>
-                          <div>Frecuencia cardíaca: {exploracion.frecuencia}</div>
-                          <div>Temperatura corporal: {exploracion.temperatura}</div>
-                          <div>Pulsioximetría: {exploracion.pulsioximetria}</div>
-                        </div>
-                      </Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={24}>
-                    <Descriptions
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                      contentStyle={{ color: "#333333", fontSize: 14 }}
-                      style={{ width: "100%" }}
-                    >
-                      <Descriptions.Item label="Diagnóstico">{report?.diagnostico}</Descriptions.Item>
-                      <Descriptions.Item label="Observaciones">{report?.observaciones}</Descriptions.Item>
-                      <Descriptions.Item label="Remisión">{report?.remision}</Descriptions.Item>
-                    </Descriptions>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-
-            {/* Tercera tarjeta: Tratamiento y recomendaciones */}
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF" }}>
-                <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
-                  Tratamiento y recomendaciones
+      <Row gutter={[0, 24]} style={{ width: '100%', margin: 0 }}>
+        <Col span={24} style={{ width: '100%' }}>
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "32px 48px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", width: '100%', minHeight: 120 }}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%' }}>
+              <Avatar src={patientImage} size={72} style={{ marginRight: 32, flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'row', gap: 48, width: '100%' }}>
+                {/* Columna izquierda: datos personales */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 320, textAlign: 'left' }}>
+                  <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 4 }}>{user?.nombres} {user?.apellidos}</div>
+                  <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 2 }}>{user?.n_documento}</div>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>
+                    {user?.genero} - {user?.fecha_nacimiento ? dayjs(user?.fecha_nacimiento).format('YYYY/MM/DD') : '-'} - <span style={{ fontWeight: 700 }}>{user?.fecha_nacimiento ? dayjs().diff(dayjs(user?.fecha_nacimiento), 'years') + ' años' : '-'}</span>
+                  </div>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>{user?.estado_civil}{user?.profesion ? ` - ${user?.profesion}` : ''}</div>
+                </div>
+                {/* Columna derecha: datos de contacto, más cerca y alineados a la izquierda */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 220, textAlign: 'left' }}>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>{user?.direccion}</div>
+                  <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>{user?.telefono}{user?.email ? ` - ${user?.email}` : ''}</div>
+                  {record?.eps && <div style={{ fontSize: 15, color: '#222', marginBottom: 2 }}>EPS: {record?.eps}</div>}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col span={24} style={{ width: '100%' }}>
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "16px 32px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF", width: '100%' }}>
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Title level={5} style={{ fontWeight: "bold", color: "#333333", margin: 0 }}>
+                  {encabezadoReporte}
                 </Title>
-                <Divider style={{ margin: "12px 0" }} />
-                <Row>
-                  <Col span={6} style={{ display: "flex", alignItems: "flex-start" }}>
-                    <Title level={4} style={{ fontWeight: "bold", fontSize: "16px", color: "#495057" }}>
-                      Recomendaciones
-                    </Title>
-                  </Col>
-                  <Col span={18}>
-                    <ul style={{ paddingLeft: "20px", color: "#333333", fontSize: "14px", lineHeight: "1.6" }}>
-                      {recomendaciones.map((rec, idx) => (
-                        <li key={idx}>{rec}</li>
-                      ))}
-                    </ul>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-
-            {/* Cuarta tarjeta: Reportes de Evolución Clínica */}
-            <Col span={24}>
-              <Card className="card-legacy" style={{ marginBottom: "16px", padding: "16px 24px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF" }}>
-                <Row justify="space-between" align="middle">
-                  <Col>
-                    <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
-                      Reportes de Evolución Clínica
-                    </Title>
-                  </Col>
-                  <Col>
-                    <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(`/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`)}>
-                      Agregar
-                    </Button>
-                  </Col>
-                </Row>
-                <Divider style={{ margin: "12px 0" }} />
-                <Table
-                  rowKey="id_TipoReporte"
-                  columns={columns}
-                  dataSource={evolutions}
-                  pagination={false}
-                  locale={{ emptyText: "No hay reportes clínicos registrados" }}
-                  style={{ marginBottom: 0 }}
-                />
-              </Card>
-            </Col>
-          </Row>
-        </Card>
-      </Card>
+              </Col>
+              <Col>
+                <Button type="text" icon={<EditOutlined />} />
+                <Button type="text" icon={<DeleteOutlined />} />
+              </Col>
+            </Row>
+            <Divider style={{ margin: "12px 0" }} />
+            <Row gutter={32}>
+              <Col span={12}>
+                <Descriptions
+                  column={1}
+                  size="small"
+                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
+                  contentStyle={{ color: "#333333", fontSize: 14 }}
+                  style={{ width: "100%" }}
+                >
+                  <Descriptions.Item label="Tipo de Reporte">{report?.tipo_reporte}</Descriptions.Item>
+                  <Descriptions.Item label="Motivo de Consulta">{report?.motivo_consulta}</Descriptions.Item>
+                </Descriptions>
+              </Col>
+              <Col span={12}>
+                <Descriptions
+                  column={1}
+                  size="small"
+                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
+                  contentStyle={{ color: "#333333", fontSize: 14 }}
+                  style={{ width: "100%" }}
+                >
+                  <Descriptions.Item label="Exploración física">
+                    <div>
+                      <div>Peso: {exploracion.peso}</div>
+                      <div>Presión arterial: {exploracion.presion}</div>
+                      <div>Frecuencia cardíaca: {exploracion.frecuencia}</div>
+                      <div>Temperatura corporal: {exploracion.temperatura}</div>
+                      <div>Pulsioximetría: {exploracion.pulsioximetria}</div>
+                    </div>
+                  </Descriptions.Item>
+                </Descriptions>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={24}>
+                <Descriptions
+                  column={1}
+                  size="small"
+                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
+                  contentStyle={{ color: "#333333", fontSize: 14 }}
+                  style={{ width: "100%" }}
+                >
+                  <Descriptions.Item label="Diagnóstico">{report?.diagnosticos}</Descriptions.Item>
+                  <Descriptions.Item label="Observaciones">{report?.observaciones}</Descriptions.Item>
+                  <Descriptions.Item label="Remisión">{report?.remision}</Descriptions.Item>
+                </Descriptions>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+        <Col span={24} style={{ width: '100%' }}>
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "16px 32px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF", width: '100%' }}>
+            <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
+              Tratamiento y recomendaciones
+            </Title>
+            <Divider style={{ margin: "12px 0" }} />
+            <Row>
+              <Col span={6} style={{ display: "flex", alignItems: "flex-start" }}>
+                <Title level={4} style={{ fontWeight: "bold", fontSize: "16px", color: "#495057" }}>
+                  Recomendaciones
+                </Title>
+              </Col>
+              <Col span={18}>
+                <ul style={{ paddingLeft: "20px", color: "#333333", fontSize: "14px", lineHeight: "1.6" }}>
+                  {recomendaciones.map((rec, idx) => (
+                    <li key={idx}>{rec}</li>
+                  ))}
+                </ul>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+        <Col span={24} style={{ width: '100%' }}>
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "16px 32px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF", width: '100%' }}>
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
+                  Reportes de Evolución Clínica
+                </Title>
+              </Col>
+              <Col>
+                <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(`/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`)}>
+                  Agregar
+                </Button>
+              </Col>
+            </Row>
+            <Divider style={{ margin: "12px 0" }} />
+            <Table
+              rowKey="id_TipoReporte"
+              columns={columns}
+              dataSource={evolutions}
+              pagination={false}
+              locale={{ emptyText: "No hay reportes clínicos registrados" }}
+              style={{ marginBottom: 0 }}
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

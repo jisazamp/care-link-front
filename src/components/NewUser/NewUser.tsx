@@ -239,7 +239,7 @@ export const NewUser: React.FC = () => {
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
         <Row gutter={[16, 16]}>
           <Col span={24}>
-            <Card title="Información básica" bordered={false}>
+            <Card title="Datos básicos" bordered={false}>
               <Row gutter={24}>
                 <Col span={8}>
                   <Form.Item
