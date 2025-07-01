@@ -105,14 +105,6 @@ export const App = () => {
           <Route path="/login" element={<Login />} />
           <Route element={<MainLayout />}>
             <Route
-              path="/inicio"
-              element={
-                <PrivateRoute>
-                  <Home />
-                </PrivateRoute>
-              }
-            />
-            <Route
               path="/usuarios"
               element={
                 <PrivateRoute>
@@ -281,7 +273,7 @@ export const App = () => {
               }
             />
           </Route>
-          <Route path="*" element={<Navigate to="/inicio" replace />} />
+          <Route path="*" element={<Navigate to="/usuarios" replace />} />
         </Routes>
       </Router>
     </ConfigProvider>

@@ -1,28 +1,26 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-
   Breadcrumb,
   Button,
   Card,
-  
+  Collapse,
   Divider,
   Flex,
   Modal,
-  
   Space,
   Spin,
   Table,
   type TableProps,
   Tooltip,
   Typography,
-  Collapse,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDeleteContract } from "../../hooks/useDeleteContract";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 /* import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
- */import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
+ */ import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
@@ -30,7 +28,6 @@ import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/use
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { queryClient } from "../../main";
 import type { Contract, FamilyMember } from "../../types";
-import { useDeleteContract } from "../../hooks/useDeleteContract";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -51,8 +48,8 @@ export const UserDetails: React.FC = () => {
     useGetUserMedicalRecord(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
   const { data: userContracts } = useGetUserContracts(userId);
-/*   const deleteReportMutation = useDeleteMedicalReport();
- */
+  /*   const deleteReportMutation = useDeleteMedicalReport();
+   */
   const records = record?.data.data;
 
   const acudientesColumns: TableProps<{ acudiente: FamilyMember }>["columns"] =
@@ -145,7 +142,7 @@ export const UserDetails: React.FC = () => {
     });
   };
 
-/*   const handleDeleteReport = (reportId: number) => {
+  /*   const handleDeleteReport = (reportId: number) => {
     confirm({
       title: "¿Estás seguro de que deseas eliminar este reporte clínico?",
       content: "Esta acción no se puede deshacer.",
@@ -286,22 +283,34 @@ export const UserDetails: React.FC = () => {
           <Title level={3} className="page-title">
             {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
           </Title>
-          <Collapse accordion style={{ background: "transparent", width: "100%" }}>
+          <Collapse
+            accordion
+            style={{ background: "transparent", width: "100%" }}
+          >
             <Panel header="Datos básicos y de localización" key="1">
               <div className="user-details-card" style={{ width: "100%" }}>
                 <div className="user-details-head">
                   <div className="user-details-title-wrapper">
-                    <span className="user-details-title">Datos básicos y de localización</span>
+                    <span className="user-details-title">
+                      Datos básicos y de localización
+                    </span>
                   </div>
                   <div className="user-details-actions">
                     <Link to={`/usuarios/${userId}/editar`}>
-                      <button className="user-details-btn">
-                        <span className="user-details-btn-icon"><EditOutlined /></span>
+                      <button type="button" className="user-details-btn">
+                        <span className="user-details-btn-icon">
+                          <EditOutlined />
+                        </span>
                         Editar
                       </button>
                     </Link>
-                    <button className="user-details-btn user-details-btn-danger">
-                      <span className="user-details-btn-icon"><DeleteOutlined /></span>
+                    <button
+                      type="button"
+                      className="user-details-btn user-details-btn-danger"
+                    >
+                      <span className="user-details-btn-icon">
+                        <DeleteOutlined />
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -314,34 +323,102 @@ export const UserDetails: React.FC = () => {
                         className="user-details-avatar-img"
                       />
                     ) : (
-                      <div className="user-details-avatar-img" style={{ background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: '#bbb' }}>
-                        {user?.data.data.nombres?.[0] ?? 'U'}
+                      <div
+                        className="user-details-avatar-img"
+                        style={{
+                          background: "#f0f0f0",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 32,
+                          color: "#bbb",
+                        }}
+                      >
+                        {user?.data.data.nombres?.[0] ?? "U"}
                       </div>
                     )}
                   </div>
-                  <div className="user-details-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 0 }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 40, marginBottom: 4 }}>
-                      <div className="user-details-info-name" style={{ fontWeight: 500, fontSize: 18, minWidth: 260 }}>
+                  <div
+                    className="user-details-info"
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      gap: 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 40,
+                        marginBottom: 4,
+                      }}
+                    >
+                      <div
+                        className="user-details-info-name"
+                        style={{ fontWeight: 500, fontSize: 18, minWidth: 260 }}
+                      >
                         {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
                       </div>
-                      <div style={{ color: '#222', fontSize: 15, minWidth: 220 }}>
-                        <span className="user-details-info-bold">{user?.data.data.n_documento}</span>
+                      <div
+                        style={{ color: "#222", fontSize: 15, minWidth: 220 }}
+                      >
+                        <span className="user-details-info-bold">
+                          {user?.data.data.n_documento}
+                        </span>
                         <span> - {user?.data.data.genero}</span>
-                        <span> - {dayjs(user?.data.data.fecha_nacimiento).format("YYYY/MM/DD")}</span>
-                        <span> - <span className="user-details-info-bold">{dayjs().diff(dayjs(user?.data.data.fecha_nacimiento), "years")} años</span></span>
+                        <span>
+                          {" "}
+                          -{" "}
+                          {dayjs(user?.data.data.fecha_nacimiento).format(
+                            "YYYY/MM/DD",
+                          )}
+                        </span>
+                        <span>
+                          {" "}
+                          -{" "}
+                          <span className="user-details-info-bold">
+                            {dayjs().diff(
+                              dayjs(user?.data.data.fecha_nacimiento),
+                              "years",
+                            )}{" "}
+                            años
+                          </span>
+                        </span>
                       </div>
-                      <div style={{ color: '#222', fontSize: 15, minWidth: 220 }}>
+                      <div
+                        style={{ color: "#222", fontSize: 15, minWidth: 220 }}
+                      >
                         {user?.data.data.direccion}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 40, marginBottom: 4 }}>
-                      <div style={{ color: '#222', fontSize: 15, minWidth: 260 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 40,
+                        marginBottom: 4,
+                      }}
+                    >
+                      <div
+                        style={{ color: "#222", fontSize: 15, minWidth: 260 }}
+                      >
                         {user?.data.data.estado_civil}
-                        {user?.data.data.profesion && <span> - {user?.data.data.profesion}</span>}
+                        {user?.data.data.profesion && (
+                          <span> - {user?.data.data.profesion}</span>
+                        )}
                       </div>
-                      <div style={{ color: '#222', fontSize: 15, minWidth: 220 }}>
+                      <div
+                        style={{ color: "#222", fontSize: 15, minWidth: 220 }}
+                      >
                         {user?.data.data.telefono}
-                        {user?.data.data.email && <span> - {user?.data.data.email}</span>}
+                        {user?.data.data.email && (
+                          <span> - {user?.data.data.email}</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -454,76 +531,119 @@ export const UserDetails: React.FC = () => {
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Discapacidad: <Typography.Text style={{ fontWeight: 400 }}>{records.discapacidades ? "Sí" : "No"}</Typography.Text>
+                          Discapacidad:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.discapacidades ? "Sí" : "No"}
+                          </Typography.Text>
                           {records.discapacidades && (
-                            <Link to={`/usuarios/${userId}/historia#discapacidad`} style={{ marginLeft: 12 }}>
-                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            <Link
+                              to={`/usuarios/${userId}/historia#discapacidad`}
+                              style={{ marginLeft: 12 }}
+                            >
+                              <Typography.Text
+                                style={{ color: "#9957C2", cursor: "pointer" }}
+                              >
+                                Ver
+                              </Typography.Text>
                             </Link>
                           )}
-                          {records.discapacidades?.split(",").filter((a) => !!a).map((e) => (
-                            <Typography.Text
-                              key={e}
-                              style={{
-                                backgroundColor: "#F1E6F5",
-                                borderRadius: 20,
-                                fontWeight: 500,
-                                marginLeft: 5,
-                                paddingBottom: 4,
-                                paddingLeft: 8,
-                                paddingRight: 8,
-                                paddingTop: 4,
-                              }}
-                            >
-                              {e}
-                            </Typography.Text>
-                          ))}
+                          {records.discapacidades
+                            ?.split(",")
+                            .filter((a) => !!a)
+                            .map((e) => (
+                              <Typography.Text
+                                key={e}
+                                style={{
+                                  backgroundColor: "#F1E6F5",
+                                  borderRadius: 20,
+                                  fontWeight: 500,
+                                  marginLeft: 5,
+                                  paddingBottom: 4,
+                                  paddingLeft: 8,
+                                  paddingRight: 8,
+                                  paddingTop: 4,
+                                }}
+                              >
+                                {e}
+                              </Typography.Text>
+                            ))}
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Limitaciones: <Typography.Text style={{ fontWeight: 400 }}>{records.limitaciones ? "Sí" : "No"}</Typography.Text>
+                          Limitaciones:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.limitaciones ? "Sí" : "No"}
+                          </Typography.Text>
                           {records.limitaciones && (
-                            <Link to={`/usuarios/${userId}/historia#limitaciones`} style={{ marginLeft: 12 }}>
-                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            <Link
+                              to={`/usuarios/${userId}/historia#limitaciones`}
+                              style={{ marginLeft: 12 }}
+                            >
+                              <Typography.Text
+                                style={{ color: "#9957C2", cursor: "pointer" }}
+                              >
+                                Ver
+                              </Typography.Text>
                             </Link>
                           )}
-                          {records.limitaciones?.split(",").filter((a) => !!a).map((e) => (
-                            <Typography.Text
-                              key={e}
-                              style={{
-                                backgroundColor: "#F1E6F5",
-                                borderRadius: 20,
-                                fontWeight: 500,
-                                marginLeft: 5,
-                                paddingBottom: 4,
-                                paddingLeft: 8,
-                                paddingRight: 8,
-                                paddingTop: 4,
-                              }}
-                            >
-                              {e}
-                            </Typography.Text>
-                          ))}
+                          {records.limitaciones
+                            ?.split(",")
+                            .filter((a) => !!a)
+                            .map((e) => (
+                              <Typography.Text
+                                key={e}
+                                style={{
+                                  backgroundColor: "#F1E6F5",
+                                  borderRadius: 20,
+                                  fontWeight: 500,
+                                  marginLeft: 5,
+                                  paddingBottom: 4,
+                                  paddingLeft: 8,
+                                  paddingRight: 8,
+                                  paddingTop: 4,
+                                }}
+                              >
+                                {e}
+                              </Typography.Text>
+                            ))}
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Dieta Especial: <Typography.Text style={{ fontWeight: 400 }}>{records.dieta_especial ? "Sí" : "No"}</Typography.Text>
+                          Dieta Especial:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.dieta_especial ? "Sí" : "No"}
+                          </Typography.Text>
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
                           Observaciones Dieta:
-                          <Link to={`/usuarios/${userId}/historia#dieta`} style={{ marginLeft: 12 }}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                          <Link
+                            to={`/usuarios/${userId}/historia#dieta`}
+                            style={{ marginLeft: 12 }}
+                          >
+                            <Typography.Text
+                              style={{ color: "#9957C2", cursor: "pointer" }}
+                            >
+                              Ver
+                            </Typography.Text>
                           </Link>
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
                           Apoyos y tratamientos:
-                          <Link to={`/usuarios/${userId}/historia#medical-treatments`} style={{ marginLeft: 12 }}>
-                            <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                          <Link
+                            to={`/usuarios/${userId}/historia#medical-treatments`}
+                            style={{ marginLeft: 12 }}
+                          >
+                            <Typography.Text
+                              style={{ color: "#9957C2", cursor: "pointer" }}
+                            >
+                              Ver
+                            </Typography.Text>
                           </Link>
                         </Typography.Text>
                       </Flex>
@@ -542,32 +662,58 @@ export const UserDetails: React.FC = () => {
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Cirugias: <Typography.Text style={{ fontWeight: 400 }}>{records.cirugias ? "Sí" : "No"}</Typography.Text>
+                          Cirugias:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.cirugias ? "Sí" : "No"}
+                          </Typography.Text>
                           {records.cirugias && (
-                            <Link to={`/usuarios/${userId}/historia#surgeries`} style={{ marginLeft: 12 }}>
-                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            <Link
+                              to={`/usuarios/${userId}/historia#surgeries`}
+                              style={{ marginLeft: 12 }}
+                            >
+                              <Typography.Text
+                                style={{ color: "#9957C2", cursor: "pointer" }}
+                              >
+                                Ver
+                              </Typography.Text>
                             </Link>
                           )}
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Alergias a medicamentos: <Typography.Text style={{ fontWeight: 400 }}>{records.alergico_medicamento ? "Sí" : "No"}</Typography.Text>
+                          Alergias a medicamentos:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.alergico_medicamento ? "Sí" : "No"}
+                          </Typography.Text>
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Otras alergias: <Typography.Text style={{ fontWeight: 400 }}>{records.otras_alergias ? "Sí" : "No"}</Typography.Text>
+                          Otras alergias:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.otras_alergias ? "Sí" : "No"}
+                          </Typography.Text>
                           {records.otras_alergias && (
-                            <Link to={`/usuarios/${userId}/historia#otherAlergies`} style={{ marginLeft: 12 }}>
-                              <Typography.Text style={{ color: "#9957C2", cursor: "pointer" }}>Ver</Typography.Text>
+                            <Link
+                              to={`/usuarios/${userId}/historia#otherAlergies`}
+                              style={{ marginLeft: 12 }}
+                            >
+                              <Typography.Text
+                                style={{ color: "#9957C2", cursor: "pointer" }}
+                              >
+                                Ver
+                              </Typography.Text>
                             </Link>
                           )}
                         </Typography.Text>
                         <Typography.Text
                           style={{ fontWeight: 500, marginRight: 5 }}
                         >
-                          Condiciones especiales: <Typography.Text style={{ fontWeight: 400 }}>{records.otras_alergias ? "Sí" : "No"}</Typography.Text>
+                          Condiciones especiales:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {records.otras_alergias ? "Sí" : "No"}
+                          </Typography.Text>
                         </Typography.Text>
                       </Flex>
                     </Flex>
@@ -704,7 +850,7 @@ export const UserDetails: React.FC = () => {
                             </Button>
                           </Link>
                           <Divider type="vertical" />
-{/*                           <Button
+                          {/*                           <Button
                             className="main-button-link"
                             size="small"
                             type="link"

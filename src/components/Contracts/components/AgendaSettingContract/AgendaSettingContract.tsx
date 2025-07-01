@@ -1,5 +1,5 @@
 import { Button, Calendar, Card, Typography } from "antd";
-import dayjs, { type Dayjs } from "dayjs";
+import type { Dayjs } from "dayjs";
 import { useCallback, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import type { FormValues } from "../FormContracts";
@@ -17,21 +17,24 @@ export const AgendaSettingsContract = ({
   const services = watch("services");
   const selectedDatesService = watch("selectedDatesService") || [];
   const selectedDatesTransport = watch("selectedDatesTransport") || [];
+  const selectedDateDay = watch("selectedDateDay") ?? null;
 
-  const { maxServiceDays, maxTransportDays } = useMemo(() => {
+  const { maxServiceDays, maxTransportDays, maxDayService } = useMemo(() => {
     const service = services.find((s) => s.serviceType.includes("Tiquetera"));
     const transport = services.find((s) =>
       s.serviceType.includes("Transporte"),
     );
+    const day = services.find((s) => s.serviceType.includes("Servicio"));
 
     return {
       maxServiceDays: service?.quantity ?? 0,
       maxTransportDays: transport?.quantity ?? 0,
+      maxDayService: day?.quantity ?? 0,
     };
   }, [services]);
 
   const handleSelectDate = useCallback(
-    (date: Dayjs, type: "service" | "transport") => {
+    (date: Dayjs, type: "service" | "transport" | "day") => {
       const formattedDate = date.format("YYYY-MM-DD");
 
       if (type === "service") {
@@ -43,6 +46,8 @@ export const AgendaSettingsContract = ({
             : current;
 
         setValue("selectedDatesService", updated);
+      } else if (type === "day") {
+        setValue("selectedDateDay", formattedDate);
       } else {
         const current = selectedDatesTransport;
         const updated = current.includes(formattedDate)
@@ -98,13 +103,13 @@ export const AgendaSettingsContract = ({
   }; */
 
   return (
-    <Card bordered>
+    <Card variant="borderless">
       <Title level={4}>Configuración y Agenda</Title>
 
       {maxServiceDays > 0 && (
         <Card
           title={`Servicios de atención - (${selectedDatesService.length} de ${maxServiceDays} disponibles)`}
-          bordered
+          variant="borderless"
           style={{ marginBottom: 16 }}
         >
           <Calendar
@@ -125,7 +130,7 @@ export const AgendaSettingsContract = ({
       {maxTransportDays > 0 && (
         <Card
           title={`Servicios de Transporte - (${selectedDatesTransport.length} de ${maxTransportDays} disponibles)`}
-          bordered
+          variant="borderless"
         >
           <Calendar
             fullscreen={false}
@@ -142,7 +147,24 @@ export const AgendaSettingsContract = ({
         </Card>
       )}
 
-      <Card bordered style={{ marginTop: 24, textAlign: "right" }}>
+      {maxDayService > 0 && (
+        <Card title={"Servicios de día"} variant="borderless">
+          <Calendar
+            fullscreen={false}
+            onSelect={(date, info) => {
+              if (info.source === "date") {
+                handleSelectDate(date, "day");
+              }
+            }}
+            fullCellRender={(date) =>
+              renderDateCell(date, selectedDateDay ? [selectedDateDay] : [])
+            }
+            style={{ width: "300px", margin: "auto" }}
+          />
+        </Card>
+      )}
+
+      <Card variant="borderless" style={{ marginTop: 24, textAlign: "right" }}>
         {onBack && (
           <Button onClick={onBack} style={{ marginRight: 8 }}>
             Atrás
