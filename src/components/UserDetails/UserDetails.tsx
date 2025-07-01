@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Col,
+  Collapse,
   Divider,
   Flex,
   Modal,
@@ -15,11 +16,11 @@ import {
   type TableProps,
   Tooltip,
   Typography,
-  Collapse,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDeleteContract } from "../../hooks/useDeleteContract";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
 import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
@@ -30,7 +31,6 @@ import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/use
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { queryClient } from "../../main";
 import type { Contract, FamilyMember } from "../../types";
-import { useDeleteContract } from "../../hooks/useDeleteContract";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -363,7 +363,9 @@ export const UserDetails: React.FC = () => {
                           {user?.data.data.telefono}
                         </Typography.Text>
                         <Typography.Text>-</Typography.Text>
-                        <Typography.Text>{user?.data.data.email}</Typography.Text>
+                        <Typography.Text>
+                          {user?.data.data.email}
+                        </Typography.Text>
                       </Flex>
                     </Flex>
                   </Col>

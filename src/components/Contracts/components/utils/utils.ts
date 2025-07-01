@@ -7,6 +7,25 @@ import type {
 } from "../../../../types";
 import type { FormValues, Service } from "../FormContracts";
 
+const getServiceType = (serviceId: number, length?: number) => {
+  switch (serviceId) {
+    case 1:
+      return length ? `Tiquetera ${length / 4}` : null;
+    case 2:
+      return length ? `Transporte ${length / 4}` : null;
+    case 3:
+      return "Servicio dia";
+    default:
+      return "";
+  }
+};
+
+const getServiceId = (serviceType: string) => {
+  if (serviceType.includes("Transporte")) return 2;
+  if (serviceType.includes("Tiquetera")) return 1;
+  return 3;
+};
+
 export const convertServicesData = (
   services: ContractService[],
   startingServices: Service[],
@@ -18,10 +37,7 @@ export const convertServicesData = (
     price: s.precio_por_dia,
     quantity: s.fechas_servicio.length,
     selected: !!s.fechas_servicio.length,
-    serviceType:
-      s.id_servicio === 1
-        ? `Tiquetera ${s.fechas_servicio.length / 4}`
-        : `Transporte ${s.fechas_servicio.length / 4}`,
+    serviceType: getServiceType(s.id_servicio, s.fechas_servicio.length),
     startDate: dayjs(s.fecha),
   }));
 
@@ -44,7 +60,7 @@ export const convertSelectedDates = (dates: { fecha: string }[]): string[] =>
 export const convertContractData = (
   contract: Contract & { servicios: ContractService[] },
   startingServices: Service[],
-): FormValues => {
+): Omit<FormValues, "payments"> => {
   const {
     tipo_contrato,
     facturar_contrato,
@@ -62,11 +78,14 @@ export const convertContractData = (
     endDate: dayjs(fecha_fin),
     services,
     selectedDatesService: convertSelectedDates(
-      servicios[0]?.fechas_servicio ?? [],
+      servicios.find((e) => e.id_servicio === 1)?.fechas_servicio ?? [],
     ),
     selectedDatesTransport: convertSelectedDates(
-      servicios[1]?.fechas_servicio ?? [],
+      servicios.find((e) => e.id_servicio === 2)?.fechas_servicio ?? [],
     ),
+    selectedDateDay:
+      servicios.find((e) => e.id_servicio === 3)?.fechas_servicio?.[0]?.fecha ??
+      null,
   };
 };
 
@@ -101,7 +120,7 @@ export const buildContractData = (
     servicios: data.services
       .filter((s) => !!s.quantity)
       .map((s) => ({
-        id_servicio: s.serviceType.includes("Transporte") ? 2 : 1,
+        id_servicio: getServiceId(s.serviceType),
         fecha:
           s.startDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
         descripcion: s.description,
@@ -110,9 +129,13 @@ export const buildContractData = (
           ? getValues("selectedDatesTransport").map((f: string) => ({
               fecha: f,
             }))
-          : getValues("selectedDatesService").map((f: string) => ({
-              fecha: f,
-            })),
+          : s.serviceType.includes("Tiquetera")
+            ? getValues("selectedDatesService").map((f: string) => ({
+                fecha: f,
+              }))
+            : getValues("selectedDateDay")
+              ? [{ fecha: getValues("selectedDateDay") }]
+              : [],
       })),
   };
 };

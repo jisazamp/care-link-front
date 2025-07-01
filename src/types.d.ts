@@ -237,6 +237,10 @@ export type CreateContractRequest = {
   }[];
 };
 
+export type UpdateContractRequest = {
+  id_contrato: number;
+} & CreateContractRequest;
+
 export type Contract = {
   id_contrato: number;
   id_usuario: number;

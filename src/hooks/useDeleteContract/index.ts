@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
 
-const deleteContractById = (contractId: number) =>
-  client.delete(`/api/contratos/${contractId}`);
+const deleteContractById = (contractId: number) => {
+  return client.delete(`/api/contratos/${contractId}`);
+};
 
 const useDeleteContract = () => {
   const { mutate: deleteContractFn, isPending: deleteContractPending } =
