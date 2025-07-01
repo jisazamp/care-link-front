@@ -11,7 +11,7 @@ import {
   Row,
   Table,
   Typography,
-  Descriptions,
+
   Avatar,
   Checkbox,
 } from "antd";
@@ -141,6 +141,7 @@ export const ViewReport: React.FC = () => {
       </div>
       <Row gutter={[0, 24]} style={{ width: '100%', margin: 0 }}>
         <Col span={24} style={{ width: '100%' }}>
+          {/* Tarjeta de información básica del paciente */}
           <Card className="card-legacy" style={{ marginBottom: "24px", padding: "32px 48px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", width: '100%', minHeight: 120 }}>
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%' }}>
               <Avatar src={patientImage} size={72} style={{ marginRight: 32, flexShrink: 0 }} />
@@ -165,67 +166,62 @@ export const ViewReport: React.FC = () => {
           </Card>
         </Col>
         <Col span={24} style={{ width: '100%' }}>
-          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "16px 32px", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#FFFFFF", width: '100%' }}>
-            <Row justify="space-between" align="middle">
-              <Col>
-                <Title level={5} style={{ fontWeight: "bold", color: "#333333", margin: 0 }}>
-                  {encabezadoReporte}
-                </Title>
-              </Col>
-              <Col>
-                <Button type="text" icon={<EditOutlined />} />
-                <Button type="text" icon={<DeleteOutlined />} />
-              </Col>
-            </Row>
-            <Divider style={{ margin: "12px 0" }} />
-            <Row gutter={32}>
-              <Col span={12}>
-                <Descriptions
-                  column={1}
-                  size="small"
-                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                  contentStyle={{ color: "#333333", fontSize: 14 }}
-                  style={{ width: "100%" }}
-                >
-                  <Descriptions.Item label="Tipo de Reporte">{report?.tipo_reporte}</Descriptions.Item>
-                  <Descriptions.Item label="Motivo de Consulta">{report?.motivo_consulta}</Descriptions.Item>
-                </Descriptions>
-              </Col>
-              <Col span={12}>
-                <Descriptions
-                  column={1}
-                  size="small"
-                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                  contentStyle={{ color: "#333333", fontSize: 14 }}
-                  style={{ width: "100%" }}
-                >
-                  <Descriptions.Item label="Exploración física">
-                    <div>
-                      <div>Peso: {exploracion.peso}</div>
-                      <div>Presión arterial: {exploracion.presion}</div>
-                      <div>Frecuencia cardíaca: {exploracion.frecuencia}</div>
-                      <div>Temperatura corporal: {exploracion.temperatura}</div>
-                      <div>Pulsioximetría: {exploracion.pulsioximetria}</div>
-                    </div>
-                  </Descriptions.Item>
-                </Descriptions>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24}>
-                <Descriptions
-                  column={1}
-                  size="small"
-                  labelStyle={{ fontWeight: 500, color: "#495057", fontSize: 14 }}
-                  contentStyle={{ color: "#333333", fontSize: 14 }}
-                  style={{ width: "100%" }}
-                >
-                  <Descriptions.Item label="Diagnóstico">{report?.diagnosticos}</Descriptions.Item>
-                  <Descriptions.Item label="Observaciones">{report?.observaciones}</Descriptions.Item>
-                  <Descriptions.Item label="Remisión">{report?.remision}</Descriptions.Item>
-                </Descriptions>
-              </Col>
-            </Row>
+          {/* Tarjeta de Reporte clínico */}
+          <Card className="card-legacy" style={{ marginBottom: "24px", padding: "0 0 32px 0", borderRadius: 0, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", width: '100%' }}>
+            {/* Encabezado */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px 48px 0 48px' }}>
+              <div style={{ fontWeight: 500, fontSize: 18, color: '#222' }}>
+                {`Reporte clínico - ${report?.id_reporteclinico ?? ''} ${report?.fecha_registro ? new Date(report.fecha_registro).toLocaleDateString() : ''} - Realizado por: `}
+                <span style={{ fontWeight: 700 }}>{report?.profesional?.nombres} {report?.profesional?.apellidos}</span>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Button type="default" icon={<EditOutlined />} style={{ display: 'flex', alignItems: 'center', fontWeight: 500, color: '#7f34b4', borderColor: '#7f34b4', borderRadius: 2, background: '#fff', padding: '0 16px', height: 32 }}>
+                  Editar
+                </Button>
+                <Button type="default" shape="circle" icon={<DeleteOutlined />} style={{ color: '#f32013', borderColor: '#f32013', background: '#fff', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
+              </div>
+            </div>
+            {/* Divisor horizontal */}
+            <div style={{ borderBottom: '2px solid #f0f0f0', margin: '24px 0 0 0', width: '100%' }} />
+            {/* Cuerpo de la tarjeta */}
+            <div style={{ padding: '32px 48px 0 48px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+              {/* Tipo de Reporte */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
+                <div style={{ minWidth: 180, fontWeight: 600, color: '#222' }}>Tipo de Reporte</div>
+                <div style={{ color: '#595959', fontSize: 15 }}>{report?.tipo_reporte ?? '-'}</div>
+              </div>
+              {/* Motivo de Consulta */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
+                <div style={{ minWidth: 180, fontWeight: 600, color: '#222' }}>Motivo de Consulta</div>
+                <div style={{ color: '#595959', fontSize: 15 }}>{report?.motivo_consulta || <span style={{ color: '#bbb' }}>Agregar motivo de consulta</span>}</div>
+              </div>
+              {/* Exploración física */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
+                <div style={{ minWidth: 180, fontWeight: 600, color: '#222' }}>Exploración física</div>
+                <div style={{ borderLeft: '3px solid #e0e0e0', paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div>Peso: {report?.peso ? `${report.peso} kg` : '-'}</div>
+                  <div>Presión arterial: {report?.presion_arterial ? `${report.presion_arterial} mmHg` : '-'}</div>
+                  <div>Frecuencia cardíaca: {report?.Frecuencia_cardiaca ?? '-'}</div>
+                  <div>Temperatura corporal: {report?.temperatura_corporal ? `${report.temperatura_corporal}°C` : '-'}</div>
+                  <div>Pulsioximetría: {report?.saturacionOxigeno ? `${report.saturacionOxigeno}%` : '-'}</div>
+                </div>
+              </div>
+              {/* Diagnóstico */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
+                <div style={{ minWidth: 180, fontWeight: 600, color: '#222' }}>Diagnóstico</div>
+                <div style={{ color: '#595959', fontSize: 15 }}>{report?.diagnosticos || '-'}</div>
+              </div>
+              {/* Observaciones */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
+                <div style={{ minWidth: 180, fontWeight: 600, color: '#222' }}>Observaciones</div>
+                <div style={{ color: '#595959', fontSize: 15 }}>{report?.observaciones || <span style={{ color: '#bbb' }}>Campo para agregar observaciones internas</span>}</div>
+              </div>
+              {/* Remisión */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32 }}>
+                <div style={{ minWidth: 180, fontWeight: 600, color: '#222' }}>Remisión</div>
+                <div style={{ color: '#595959', fontSize: 15 }}>{report?.remision || '-'}</div>
+              </div>
+            </div>
           </Card>
         </Col>
         <Col span={24} style={{ width: '100%' }}>
