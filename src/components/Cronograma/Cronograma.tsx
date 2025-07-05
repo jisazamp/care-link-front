@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Card, Typography, Badge, Modal, Table, Button, Tag, Space, message } from 'antd';
+import { Calendar, Card, Typography, Badge, Modal, Table, Button, Tag, Space, message, notification } from 'antd';
 import type { BadgeProps, CalendarProps } from 'antd';
 import { CalendarOutlined, UserOutlined } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
@@ -9,6 +9,7 @@ import { useReagendarPaciente } from '../../hooks/useReagendarPaciente';
 import type { PacientePorFecha, EventoCalendario, CronogramaAsistencia, CronogramaAsistenciaPaciente } from '../../types';
 import { CronogramaBreadcrumb } from './components/CronogramaBreadcrumb';
 import { CronogramaStats } from './components/CronogramaStats';
+import { JustificacionModal } from './components/JustificacionModal';
 
 const { Title, Text } = Typography;
 
@@ -16,15 +17,18 @@ export const Cronograma: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPacientes, setSelectedPacientes] = useState<PacientePorFecha[]>([]);
+  const [justificacionModalVisible, setJustificacionModalVisible] = useState(false);
+  const [selectedPaciente, setSelectedPaciente] = useState<CronogramaAsistenciaPaciente | null>(null);
+  const [loadingAction, setLoadingAction] = useState(false);
 
   // Obtener cronogramas del mes actual
   const currentMonth = dayjs();
   const startOfMonth = currentMonth.startOf('month').format('YYYY-MM-DD');
   const endOfMonth = currentMonth.endOf('month').format('YYYY-MM-DD');
 
-  const { data: cronogramas, isLoading } = useGetCronogramasPorRango(startOfMonth, endOfMonth);
-  const { mutate: updateEstado } = useUpdateEstadoAsistencia();
-  const { mutate: reagendarPaciente } = useReagendarPaciente();
+  const { data: cronogramas, isLoading, refetch } = useGetCronogramasPorRango(startOfMonth, endOfMonth);
+  const { mutate: updateEstado, isPending: updateLoading } = useUpdateEstadoAsistencia();
+  const { mutate: reagendarPaciente, isPending: reagendarLoading } = useReagendarPaciente();
 
   const getEstadoBadgeType = (estado: string): BadgeProps['status'] => {
     switch (estado) {
@@ -91,18 +95,101 @@ export const Cronograma: React.FC = () => {
   };
 
   const handleEstadoChange = (pacienteId: number, nuevoEstado: string) => {
+    if (nuevoEstado === 'NO_ASISTIO') {
+      // Abrir modal de justificación para "No asistió"
+      const paciente = selectedPacientes.find(p => p.id_cronograma_paciente === pacienteId);
+      if (paciente) {
+        setSelectedPaciente(paciente as CronogramaAsistenciaPaciente);
+        setJustificacionModalVisible(true);
+      }
+    } else {
+      // Para otros estados, actualizar directamente
+      updateEstado({
+        id_cronograma_paciente: pacienteId,
+        data: {
+          estado_asistencia: nuevoEstado as 'PENDIENTE' | 'ASISTIO' | 'NO_ASISTIO' | 'CANCELADO',
+        }
+      }, {
+        onSuccess: () => {
+          message.success(`Estado actualizado a "${nuevoEstado}"`);
+          refetch();
+          if (nuevoEstado === 'ASISTIO') {
+            // Mostrar alerta si es necesario (aquí podrías verificar si se agotó la tiquetera)
+            notification.success({
+              message: 'Asistencia registrada',
+              description: 'Se ha descontado un día de la tiquetera del paciente.',
+            });
+          }
+        },
+        onError: (error) => {
+          message.error('Error al actualizar el estado de asistencia');
+          console.error('Error:', error);
+        }
+      });
+    }
+  };
+
+  const handleJustificacionConfirm = (estado: string, observaciones: string) => {
+    if (!selectedPaciente) return;
+
+    setLoadingAction(true);
     updateEstado({
-      id_cronograma_paciente: pacienteId,
-      estado_asistencia: nuevoEstado as 'PENDIENTE' | 'ASISTIO' | 'NO_ASISTIO' | 'CANCELADO',
+      id_cronograma_paciente: selectedPaciente.id_cronograma_paciente,
+      data: {
+        estado_asistencia: estado as 'PENDIENTE' | 'ASISTIO' | 'NO_ASISTIO' | 'CANCELADO',
+        observaciones: observaciones
+      }
+    }, {
+      onSuccess: () => {
+        message.success('Estado actualizado con justificación');
+        setJustificacionModalVisible(false);
+        setSelectedPaciente(null);
+        setLoadingAction(false);
+        refetch();
+      },
+      onError: (error) => {
+        message.error('Error al actualizar el estado');
+        console.error('Error:', error);
+        setLoadingAction(false);
+      }
     });
   };
 
-  const handleReagendar = (pacienteId: number, nuevaFecha: string) => {
-    reagendarPaciente({
-      id_cronograma_paciente: pacienteId,
-      nueva_fecha: nuevaFecha,
+  const handleReagendar = (observaciones: string, nuevaFecha: string) => {
+    console.log('handleReagendar ejecutado', { observaciones, nuevaFecha, selectedPaciente });
+    
+    if (!selectedPaciente) {
+      console.error('No hay paciente seleccionado');
+      return;
+    }
+
+    setLoadingAction(true);
+    const requestData = {
+      id_cronograma_paciente: selectedPaciente.id_cronograma_paciente,
+      data: {
+        estado_asistencia: 'PENDIENTE' as const,
+        observaciones: observaciones,
+        nueva_fecha: nuevaFecha
+      }
+    };
+    
+    console.log('Enviando datos al hook:', requestData);
+    
+    reagendarPaciente(requestData, {
+      onSuccess: () => {
+        console.log('Reagendamiento exitoso');
+        message.success('Paciente reagendado exitosamente');
+        setJustificacionModalVisible(false);
+        setSelectedPaciente(null);
+        setLoadingAction(false);
+        refetch();
+      },
+      onError: (error) => {
+        console.error('Error en reagendamiento:', error);
+        message.error('Error al reagendar el paciente');
+        setLoadingAction(false);
+      }
     });
-    setIsModalVisible(false);
   };
 
   const dateCellRender = (value: Dayjs) => {
@@ -173,7 +260,8 @@ export const Cronograma: React.FC = () => {
             size="small"
             type="primary"
             onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'ASISTIO')}
-            disabled={record.estado_asistencia === 'ASISTIO'}
+            disabled={record.estado_asistencia === 'ASISTIO' || updateLoading}
+            loading={updateLoading}
           >
             Asistió
           </Button>
@@ -181,14 +269,16 @@ export const Cronograma: React.FC = () => {
             size="small"
             danger
             onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
-            disabled={record.estado_asistencia === 'NO_ASISTIO'}
+            disabled={record.estado_asistencia === 'NO_ASISTIO' || updateLoading}
+            loading={updateLoading}
           >
             No Asistió
           </Button>
           <Button
             size="small"
             onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'CANCELADO')}
-            disabled={record.estado_asistencia === 'CANCELADO'}
+            disabled={record.estado_asistencia === 'CANCELADO' || updateLoading}
+            loading={updateLoading}
           >
             Cancelar
           </Button>
@@ -245,6 +335,18 @@ export const Cronograma: React.FC = () => {
             size="small"
           />
         </Modal>
+
+        <JustificacionModal
+          visible={justificacionModalVisible}
+          paciente={selectedPaciente}
+          onCancel={() => {
+            setJustificacionModalVisible(false);
+            setSelectedPaciente(null);
+          }}
+          onConfirm={handleJustificacionConfirm}
+          onReagendar={handleReagendar}
+          loading={loadingAction}
+        />
       </Card>
     </div>
   );

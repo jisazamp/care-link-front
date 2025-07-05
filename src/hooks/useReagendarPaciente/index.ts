@@ -1,9 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../api/client";
-import type { ReagendarPacienteRequest } from "../../types";
+import type { UpdateEstadoAsistenciaRequest } from "../../types";
 
-const reagendarPaciente = (data: ReagendarPacienteRequest) =>
-  client.post("/api/cronograma_asistencia/reagendar", data);
+interface ReagendarPacienteRequest extends UpdateEstadoAsistenciaRequest {
+  nueva_fecha: string; // Formato YYYY-MM-DD
+}
+
+const reagendarPaciente = ({
+  id_cronograma_paciente,
+  data,
+}: {
+  id_cronograma_paciente: number;
+  data: ReagendarPacienteRequest;
+}) =>
+  client.post(
+    `/api/cronograma_asistencia/paciente/${id_cronograma_paciente}/reagendar`,
+    data,
+  );
 
 export const useReagendarPaciente = () => {
   const queryClient = useQueryClient();

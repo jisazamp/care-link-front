@@ -326,8 +326,9 @@ export type ReagendarPacienteRequest = {
 };
 
 export type UpdateEstadoAsistenciaRequest = {
-  id_cronograma_paciente: number;
   estado_asistencia: "PENDIENTE" | "ASISTIO" | "NO_ASISTIO" | "CANCELADO";
+  observaciones?: string;
+  nueva_fecha?: string;
 };
 
 export type PacientePorFecha = {
