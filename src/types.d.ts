@@ -289,3 +289,60 @@ export interface PaymentMethod {
   id_metodo_pago: number;
   nombre: string;
 }
+
+// =============================================================================
+// TIPOS PARA EL MÓDULO DE CRONOGRAMA
+// =============================================================================
+
+export type CronogramaAsistencia = {
+  id_cronograma: number;
+  id_profesional: number;
+  fecha: string;
+  comentario: string;
+  pacientes: CronogramaAsistenciaPaciente[];
+};
+
+export type CronogramaAsistenciaPaciente = {
+  id_cronograma_paciente: number;
+  id_usuario: number;
+  id_contrato: number;
+  estado_asistencia: "PENDIENTE" | "ASISTIO" | "NO_ASISTIO" | "CANCELADO";
+  nombres?: string;
+  apellidos?: string;
+  n_documento?: string;
+  id_profesional?: number;
+};
+
+export type CronogramaCreateRequest = {
+  id_profesional: number;
+  fecha: string;
+  comentario: string;
+  pacientes: number[];
+};
+
+export type ReagendarPacienteRequest = {
+  id_cronograma_paciente: number;
+  nueva_fecha: string;
+};
+
+export type UpdateEstadoAsistenciaRequest = {
+  id_cronograma_paciente: number;
+  estado_asistencia: "PENDIENTE" | "ASISTIO" | "NO_ASISTIO" | "CANCELADO";
+};
+
+export type PacientePorFecha = {
+  id_cronograma_paciente: number;
+  id_usuario: number;
+  id_contrato: number;
+  estado_asistencia: string;
+  nombres: string;
+  apellidos: string;
+  n_documento: string;
+  id_profesional: number;
+};
+
+export type EventoCalendario = {
+  type: "warning" | "success" | "error" | "processing" | "default";
+  content: string;
+  paciente?: CronogramaAsistenciaPaciente;
+};

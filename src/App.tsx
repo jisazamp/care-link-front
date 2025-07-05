@@ -13,7 +13,7 @@ import { ContractDetails } from "./components/Contracts/components/ContractDetai
 import { FormContracts } from "./components/Contracts/components/FormContracts";
 import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
-import { Home } from "./components/Home/Home";
+//import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
@@ -29,9 +29,10 @@ import { UsersList } from "./components/UsersList/UsersList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
+import { Cronograma } from "./components/Cronograma/Cronograma";
 import { colors } from "./theme";
 
-const spanishLocale: typeof es = {
+const spanishLocale = {
   ...es,
   lang: {
     ...es.lang,
@@ -39,7 +40,7 @@ const spanishLocale: typeof es = {
   },
 };
 
-const locale: typeof esES = {
+const locale = {
   ...esES,
   DatePicker: esES.DatePicker && {
     ...esES.DatePicker,
@@ -269,6 +270,14 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <YesavageTest />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/cronograma"
+              element={
+                <PrivateRoute>
+                  <Cronograma />
                 </PrivateRoute>
               }
             />
