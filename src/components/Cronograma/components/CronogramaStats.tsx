@@ -9,33 +9,36 @@ interface CronogramaStatsProps {
 
 export const CronogramaStats: React.FC<CronogramaStatsProps> = ({ cronogramas }) => {
   const stats = useMemo(() => {
-    let totalPacientes = 0;
-    let asistieron = 0;
-    let noAsistieron = 0;
-    let pendientes = 0;
+    // Set para almacenar IDs únicos de pacientes
+    const pacientesUnicos = new Set<number>();
+    const pacientesAsistieron = new Set<number>();
+    const pacientesNoAsistieron = new Set<number>();
+    const pacientesPendientes = new Set<number>();
 
     cronogramas.forEach(cronograma => {
       cronograma.pacientes.forEach(paciente => {
-        totalPacientes++;
+        // Agregar paciente al set de pacientes únicos
+        pacientesUnicos.add(paciente.id_usuario);
+        
         switch (paciente.estado_asistencia) {
           case 'ASISTIO':
-            asistieron++;
+            pacientesAsistieron.add(paciente.id_usuario);
             break;
           case 'NO_ASISTIO':
-            noAsistieron++;
+            pacientesNoAsistieron.add(paciente.id_usuario);
             break;
           default:
-            pendientes++;
+            pacientesPendientes.add(paciente.id_usuario);
             break;
         }
       });
     });
 
     return {
-      totalPacientes,
-      asistieron,
-      noAsistieron,
-      pendientes,
+      totalPacientes: pacientesUnicos.size,
+      asistieron: pacientesAsistieron.size,
+      noAsistieron: pacientesNoAsistieron.size,
+      pendientes: pacientesPendientes.size,
     };
   }, [cronogramas]);
 
