@@ -25,46 +25,43 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [observaciones, setObservaciones] = useState('');
-  const [action, setAction] = useState<'no-asistio' | 'reagendar'>('no-asistio');
   const [nuevaFecha, setNuevaFecha] = useState<dayjs.Dayjs | null>(null);
 
   const handleObservacionesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setObservaciones(e.target.value);
+    // Si el usuario empieza a escribir, mostrar el campo de fecha automáticamente
   };
 
-  const handleConfirm = () => {
-    console.log('handleConfirm ejecutado', { action, observaciones, nuevaFecha });
-    
+  const handleReagendar = () => {
     if (!observaciones.trim()) {
       message.error('Debe ingresar una justificación');
       return;
     }
-
-    if (action === 'no-asistio') {
-      console.log('Ejecutando onConfirm con NO_ASISTIO');
-      onConfirm('NO_ASISTIO', observaciones);
-    } else {
-      if (!nuevaFecha) {
-        message.error('Debe seleccionar una nueva fecha para reagendar');
-        return;
-      }
-      console.log('Ejecutando onReagendar con fecha:', nuevaFecha.format('YYYY-MM-DD'));
-      onReagendar(observaciones, nuevaFecha.format('YYYY-MM-DD'));
+    if (!nuevaFecha) {
+      message.error('Debe seleccionar una nueva fecha para reagendar');
+      return;
     }
+    onReagendar(observaciones, nuevaFecha.format('YYYY-MM-DD'));
+  };
+
+  const handleNoAsistio = () => {
+    if (!observaciones.trim()) {
+      message.error('Debe ingresar una justificación');
+      return;
+    }
+    onConfirm('NO_ASISTIO', observaciones);
   };
 
   const handleCancel = () => {
     form.resetFields();
     setObservaciones('');
-    setAction('no-asistio');
     setNuevaFecha(null);
     onCancel();
   };
 
   const canReagendar = observaciones.trim().length > 0 && nuevaFecha !== null;
-
+  const showFecha = observaciones.trim().length > 0;
   const disabledDate = (current: dayjs.Dayjs) => {
-    // Deshabilitar fechas pasadas
     return current && current < dayjs().startOf('day');
   };
 
@@ -89,7 +86,6 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
           <strong>Documento:</strong> {paciente?.n_documento}
         </p>
       </div>
-
       <Form form={form} layout="vertical">
         <Form.Item
           label="Observaciones / Justificación"
@@ -106,8 +102,7 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
             onChange={handleObservacionesChange}
           />
         </Form.Item>
-
-        {action === 'reagendar' && (
+        {showFecha && (
           <Form.Item
             label="Nueva fecha"
             name="nueva_fecha"
@@ -125,37 +120,25 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
             />
           </Form.Item>
         )}
-
         <div style={{ marginTop: 16 }}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Button
-              type={action === 'no-asistio' ? 'primary' : 'default'}
-              danger={action === 'no-asistio'}
-              onClick={() => setAction('no-asistio')}
-              style={{ width: '100%' }}
-            >
-              {action === 'no-asistio' ? '✓ ' : ''}Marcar como "No Asistió"
-            </Button>
-            
-            <Button
-              type={action === 'reagendar' ? 'primary' : 'default'}
-              onClick={() => setAction('reagendar')}
-              disabled={observaciones.trim().length === 0}
-              style={{ width: '100%' }}
-            >
-              {action === 'reagendar' ? '✓ ' : ''}Reagendar Cita
-            </Button>
-            
-            <Button
-              type="primary"
-              onClick={handleConfirm}
-              disabled={!observaciones.trim() || (action === 'reagendar' && !nuevaFecha)}
+              danger
+              onClick={handleNoAsistio}
               style={{ width: '100%' }}
               loading={loading}
             >
-              {action === 'reagendar' ? 'Confirmar Reagendamiento' : 'Confirmar No Asistencia'}
+              Marcar como "No Asistió"
             </Button>
-            
+            <Button
+              type="primary"
+              onClick={handleReagendar}
+              disabled={!canReagendar}
+              style={{ width: '100%' }}
+              loading={loading}
+            >
+              Reagendar Cita
+            </Button>
             <Button
               onClick={handleCancel}
               style={{ width: '100%' }}
