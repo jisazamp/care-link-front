@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Card, Typography, Badge, Modal, Table, Button, Tag, Space, message, notification } from 'antd';
+import { Calendar, Card, Typography, Badge, Modal, Table, Button, Tag, Space, message, notification, Tooltip } from 'antd';
 import type { BadgeProps, CalendarProps } from 'antd';
-import { CalendarOutlined, UserOutlined } from '@ant-design/icons';
+import { CalendarOutlined, UserOutlined, CarOutlined } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useGetCronogramasPorRango } from '../../hooks/useGetCronogramasPorRango';
 import { useUpdateEstadoAsistencia } from '../../hooks/useUpdateEstadoAsistencia';
@@ -288,6 +288,11 @@ export const Cronograma: React.FC = () => {
         <Space>
           <UserOutlined />
           <Text>{`${record.nombres} ${record.apellidos}`}</Text>
+          {record.requiere_transporte && (
+            <Tooltip title="Requiere transporte">
+              <CarOutlined style={{ color: '#1890ff' }} />
+            </Tooltip>
+          )}
         </Space>
       ),
     },

@@ -1,4 +1,4 @@
-import { CheckCircleOutlined, UserOutlined, CalendarOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, UserOutlined, CalendarOutlined, CarOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import { getSelectedKey } from "../../utils/getSelectedKey";
@@ -41,6 +41,17 @@ const menuItems = [
       {
         key: "4.1",
         label: <Link to="/cronograma">Ver Cronograma</Link>,
+      },
+    ],
+  },
+  {
+    key: "5",
+    icon: <CarOutlined />,
+    label: "Gestión de Transporte",
+    children: [
+      {
+        key: "5.1",
+        label: <Link to="/transporte">Rutas de Transporte</Link>,
       },
     ],
   },

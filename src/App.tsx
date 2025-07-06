@@ -30,6 +30,7 @@ import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvo
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { Cronograma } from "./components/Cronograma/Cronograma";
+import { Transporte } from "./components/Transporte";
 import { colors } from "./theme";
 
 const spanishLocale = {
@@ -278,6 +279,14 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <Cronograma />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/transporte"
+              element={
+                <PrivateRoute>
+                  <Transporte />
                 </PrivateRoute>
               }
             />
