@@ -55,15 +55,13 @@ const { Option } = Select;
 
 export const Transporte: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
-  const [selectedProfesional, setSelectedProfesional] = useState<number>(1); // Por defecto
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTransporte, setEditingTransporte] = useState<RutaTransporte | null>(null);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
 
   // Hooks
   const { data: rutaData, isLoading, refetch } = useGetRutaTransporte(
-    selectedDate.format('YYYY-MM-DD'), 
-    selectedProfesional
+    selectedDate.format('YYYY-MM-DD')
   );
   const { mutate: createTransporte, isPending: createLoading } = useCreateTransporte();
   const { mutate: updateTransporte, isPending: updateLoading } = useUpdateTransporte();
@@ -71,8 +69,8 @@ export const Transporte: React.FC = () => {
 
   // Estadísticas calculadas
   const stats = useMemo(() => {
-    if (!rutaData?.data) return null;
-    const data = rutaData.data;
+    if (!rutaData?.data?.data) return null;
+    const data = rutaData.data.data;
     return {
       total: data.total_pacientes,
       pendientes: data.total_pendientes,
@@ -307,6 +305,8 @@ export const Transporte: React.FC = () => {
     },
   ];
 
+  console.log("RUTAS:", rutaData?.data?.data?.rutas);
+
   return (
     <div style={{ padding: '24px' }}>
       {/* Header */}
@@ -344,9 +344,7 @@ export const Transporte: React.FC = () => {
       <Card style={{ marginBottom: '24px' }}>
         <TransporteFilters
           selectedDate={selectedDate}
-          selectedProfesional={selectedProfesional}
           onDateChange={handleDateChange}
-          onProfesionalChange={setSelectedProfesional}
         />
       </Card>
 
@@ -363,9 +361,9 @@ export const Transporte: React.FC = () => {
           <Space>
             <CarOutlined />
             <span>Rutas de Transporte - {selectedDate.format('DD/MM/YYYY')}</span>
-            {rutaData?.data && (
+            {rutaData?.data?.data && (
               <Badge 
-                count={rutaData.data.total_pacientes} 
+                count={rutaData.data.data.total_pacientes} 
                 style={{ backgroundColor: '#52c41a' }}
               />
             )}
@@ -375,7 +373,7 @@ export const Transporte: React.FC = () => {
       >
         <Table
           columns={columns}
-          dataSource={rutaData?.data?.rutas || []}
+          dataSource={rutaData?.data?.data?.rutas || []}
           rowKey="id_transporte"
           pagination={false}
           locale={{

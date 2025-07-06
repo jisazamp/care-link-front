@@ -2,14 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import type { RutaDiaria } from "../../types";
 
-const getRutaTransporte = (fecha: string, idProfesional: number) =>
-  client.get<RutaDiaria>(
-    `/api/transporte/ruta/${fecha}?id_profesional=${idProfesional}`,
+const getRutaTransporte = (fecha: string) =>
+  client.get<{ success: boolean; message: string; data: RutaDiaria }>(
+    `/api/transporte/ruta/${fecha}`,
   );
 
-export const useGetRutaTransporte = (fecha: string, idProfesional: number) =>
+export const useGetRutaTransporte = (fecha: string) =>
   useQuery({
-    queryKey: [`ruta-transporte-${fecha}-${idProfesional}`],
-    queryFn: () => getRutaTransporte(fecha, idProfesional),
-    enabled: !!fecha && !!idProfesional,
+    queryKey: [`ruta-transporte-${fecha}`],
+    queryFn: () => getRutaTransporte(fecha),
+    enabled: !!fecha,
   });

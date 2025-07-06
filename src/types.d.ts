@@ -380,7 +380,6 @@ export type CronogramaTransporte = {
 export type RutaTransporte = {
   id_transporte: number;
   id_cronograma_paciente: number;
-  id_usuario: number;
   nombres: string;
   apellidos: string;
   n_documento: string;
@@ -394,7 +393,6 @@ export type RutaTransporte = {
 
 export type RutaDiaria = {
   fecha: string;
-  id_profesional: number;
   rutas: RutaTransporte[];
   total_pacientes: number;
   total_pendientes: number;
