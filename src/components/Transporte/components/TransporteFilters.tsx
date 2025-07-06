@@ -40,7 +40,7 @@ export const TransporteFilters: React.FC<TransporteFiltersProps> = ({
           borderRadius: '6px'
         }}>
           <Text type="secondary">
-            Mostrando todos los transportes para el {selectedDate.format('DD/MM/YYYY')}
+            Mostrando todos los servicios para el {selectedDate.format('DD/MM/YYYY')}
           </Text>
         </div>
       </Col>

@@ -8,6 +8,7 @@ import {
   Row,
   Select,
   Table,
+  message,
 } from "antd";
 import dayjs from "dayjs";
 import { useFormContext } from "react-hook-form";
@@ -21,7 +22,7 @@ interface ServicesContractProps {
   onBack?: () => void;
 }
 
-const getSelectorOptions = (recordKey: string) => {
+const getSelectorOptions = (recordKey: string, services: Service[]) => {
   switch (recordKey) {
     case "1":
       return Array.from({ length: 5 }, (_, i) => (
@@ -30,7 +31,19 @@ const getSelectorOptions = (recordKey: string) => {
         </Select.Option>
       ));
     case "2":
-      return Array.from({ length: 5 }, (_, i) => (
+      // Obtener la tiquetera seleccionada para filtrar las opciones de transporte
+      const tiqueteraService = services.find(s => s.key === "1");
+      const tiqueteraNumber = tiqueteraService?.serviceType 
+        ? parseInt(tiqueteraService.serviceType.split(" ")[1]) 
+        : 0;
+      
+      // Si no hay tiquetera seleccionada, no mostrar opciones de transporte
+      if (tiqueteraNumber === 0) {
+        return [];
+      }
+      
+      // Filtrar transportes para mostrar solo los que tienen número igual o menor a la tiquetera
+      return Array.from({ length: tiqueteraNumber }, (_, i) => (
         <Select.Option
           key={`Transporte ${i + 1}`}
           value={`Transporte ${i + 1}`}
@@ -57,6 +70,19 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     switch (key) {
       case "1":
         methods.setValue("selectedDatesService", []);
+        // Limpiar transporte si la nueva tiquetera es menor que el transporte seleccionado
+        const transporteService = services.find(s => s.key === "2");
+        if (transporteService?.serviceType && value) {
+          const tiqueteraNumber = parseInt(value.split(" ")[1]);
+          const transporteNumber = parseInt(transporteService.serviceType.split(" ")[1]);
+          if (transporteNumber > tiqueteraNumber) {
+            // Limpiar la selección de transporte
+            const newServices = services.map((s) =>
+              s.key === "2" ? { ...s, serviceType: "", quantity: 0 } : s,
+            );
+            methods.setValue("services", newServices);
+          }
+        }
         break;
       case "2":
         methods.setValue("selectedDatesTransport", []);
@@ -85,6 +111,25 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   };
 
   const handleNext = () => {
+    // Validar que se haya seleccionado al menos una tiquetera
+    const tiqueteraService = services.find(s => s.key === "1");
+    if (!tiqueteraService?.serviceType) {
+      message.error("Debe seleccionar una tiquetera antes de continuar");
+      return;
+    }
+
+    // Validar que si hay transporte seleccionado, sea válido según la tiquetera
+    const transporteService = services.find(s => s.key === "2");
+    if (transporteService?.serviceType) {
+      const tiqueteraNumber = parseInt(tiqueteraService.serviceType.split(" ")[1]);
+      const transporteNumber = parseInt(transporteService.serviceType.split(" ")[1]);
+      
+      if (transporteNumber > tiqueteraNumber) {
+        message.error(`El transporte seleccionado (${transporteService.serviceType}) no es válido para la tiquetera seleccionada (${tiqueteraService.serviceType}). El transporte debe tener un número igual o menor.`);
+        return;
+      }
+    }
+
     if (onNext) {
       onNext(services);
     }
@@ -142,7 +187,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           onChange={(value) => handleServiceChange(record.key, value)}
           allowClear
         >
-          {getSelectorOptions(record.key)}
+          {getSelectorOptions(record.key, services)}
         </Select>
       ),
     },
@@ -192,6 +237,10 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         <Row justify="space-between" align="middle">
           <Col>
             <h3 style={{ margin: 0 }}>Servicios o productos incluidos</h3>
+            <p style={{ margin: "8px 0 0 0", color: "#666", fontSize: "14px" }}>
+              <strong>Nota:</strong> El transporte seleccionado debe tener un número igual o menor al de la tiquetera. 
+              Por ejemplo, si selecciona Tiquetera 3, solo podrá elegir Transporte 1, 2 o 3.
+            </p>
           </Col>
         </Row>
         <Table

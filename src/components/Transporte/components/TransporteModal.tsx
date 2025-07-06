@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, TimePicker, Select, message } from 'antd';
-import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import type { 
   RutaTransporte, 
   CreateTransporteRequest, 
   UpdateTransporteRequest,
-  EstadoTransporte 
 } from '../../../types';
 
 const { Option } = Select;
@@ -71,7 +69,7 @@ export const TransporteModal: React.FC<TransporteModalProps> = ({
 
   return (
     <Modal
-      title={mode === 'create' ? 'Nuevo Transporte' : 'Editar Transporte'}
+      title={mode === 'create' ? 'Nuevo Servicio de Transporte' : 'Editar Transporte'}
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}

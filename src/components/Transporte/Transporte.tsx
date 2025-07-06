@@ -4,34 +4,27 @@ import {
   Typography, 
   Row, 
   Col, 
-  Statistic, 
+
   Button, 
-  DatePicker, 
+
   Table, 
   Tag, 
   Space, 
   Modal, 
-  Form, 
-  Input, 
-  TimePicker, 
   Select, 
   message, 
-  notification,
   Badge,
   Tooltip,
-  Divider
 } from 'antd';
 import { 
   CarOutlined, 
   ClockCircleOutlined, 
   EnvironmentOutlined, 
-  UserOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  ExclamationCircleOutlined,
   ReloadOutlined
 } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
@@ -41,7 +34,6 @@ import { useUpdateTransporte } from '../../hooks/useUpdateTransporte/useUpdateTr
 import { useDeleteTransporte } from '../../hooks/useDeleteTransporte/useDeleteTransporte';
 import type { 
   RutaTransporte, 
-  RutaDiaria, 
   CreateTransporteRequest, 
   UpdateTransporteRequest,
   EstadoTransporte 
@@ -51,7 +43,7 @@ import { TransporteStats } from './components/TransporteStats';
 import { TransporteFilters } from './components/TransporteFilters';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
+const {} = Select;
 
 export const Transporte: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
@@ -334,7 +326,7 @@ export const Transporte: React.FC = () => {
               icon={<PlusOutlined />}
               onClick={handleCreateTransporte}
             >
-              Nuevo Transporte
+              Nuevo Servicio de Transporte
             </Button>
           </Space>
         </Col>

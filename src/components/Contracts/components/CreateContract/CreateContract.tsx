@@ -4,6 +4,7 @@ import type { Dayjs } from "dayjs";
 import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import type { FormValues } from "../FormContracts";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -41,7 +42,7 @@ export const CreateContract = ({
     if (startDate) {
       methods.setValue("endDate", startDate.add(1, "month"));
     }
-  }, [startDate, methods.setValue]);
+  }, [startDate, methods]);
 
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>
@@ -77,7 +78,13 @@ export const CreateContract = ({
               control={methods.control}
               name="startDate"
               render={({ field }) => (
-                <DatePicker {...field} style={{ width: "100%" }} />
+                <DatePicker
+                  {...field}
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => {
+                    return current && current < (typeof dayjs === 'function' ? dayjs().startOf('day') : new Date());
+                  }}
+                />
               )}
             />
           </Form.Item>
