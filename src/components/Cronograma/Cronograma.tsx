@@ -95,9 +95,15 @@ export const Cronograma: React.FC = () => {
   };
 
   const handleEstadoChange = (pacienteId: number, nuevoEstado: string) => {
+    // 🔴 VALIDACIÓN: Solo se puede cambiar estado de registros "PENDIENTE"
+    const paciente = selectedPacientes.find(p => p.id_cronograma_paciente === pacienteId);
+    if (paciente && paciente.estado_asistencia !== 'PENDIENTE') {
+      message.error(`No se puede cambiar el estado de un paciente con estado "${paciente.estado_asistencia}". Solo se puede modificar registros con estado "PENDIENTE".`);
+      return;
+    }
+
     if (nuevoEstado === 'NO_ASISTIO') {
       // Abrir modal de justificación para "No asistió"
-      const paciente = selectedPacientes.find(p => p.id_cronograma_paciente === pacienteId);
       if (paciente) {
         setSelectedPaciente(paciente as CronogramaAsistenciaPaciente);
         setJustificacionModalVisible(true);
@@ -160,6 +166,12 @@ export const Cronograma: React.FC = () => {
     
     if (!selectedPaciente) {
       console.error('No hay paciente seleccionado');
+      return;
+    }
+
+    // 🔴 VALIDACIÓN ADICIONAL: Verificar que el paciente tenga estado PENDIENTE
+    if (selectedPaciente.estado_asistencia !== 'PENDIENTE') {
+      message.error(`No se puede reagendar un paciente con estado "${selectedPaciente.estado_asistencia}". Solo se puede reagendar pacientes con estado "PENDIENTE".`);
       return;
     }
 
@@ -254,36 +266,45 @@ export const Cronograma: React.FC = () => {
     {
       title: 'Acciones',
       key: 'acciones',
-      render: (record: PacientePorFecha) => (
-        <Space>
-          <Button
-            size="small"
-            type="primary"
-            onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'ASISTIO')}
-            disabled={record.estado_asistencia === 'ASISTIO' || updateLoading}
-            loading={updateLoading}
-          >
-            Asistió
-          </Button>
-          <Button
-            size="small"
-            danger
-            onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
-            disabled={record.estado_asistencia === 'NO_ASISTIO' || updateLoading}
-            loading={updateLoading}
-          >
-            No Asistió
-          </Button>
-          <Button
-            size="small"
-            onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'CANCELADO')}
-            disabled={record.estado_asistencia === 'CANCELADO' || updateLoading}
-            loading={updateLoading}
-          >
-            Cancelar
-          </Button>
-        </Space>
-      ),
+      render: (record: PacientePorFecha) => {
+        // 🔴 Los botones se desactivan si el estado no es "PENDIENTE"
+        const isPending = record.estado_asistencia === 'PENDIENTE';
+        const isDisabled = !isPending || updateLoading;
+        
+        return (
+          <Space>
+            <Button
+              size="small"
+              type="primary"
+              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'ASISTIO')}
+              disabled={isDisabled}
+              loading={updateLoading}
+              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
+            >
+              Asistió
+            </Button>
+            <Button
+              size="small"
+              danger
+              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
+              disabled={isDisabled}
+              loading={updateLoading}
+              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
+            >
+              No Asistió
+            </Button>
+            <Button
+              size="small"
+              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'CANCELADO')}
+              disabled={isDisabled}
+              loading={updateLoading}
+              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
+            >
+              Cancelar
+            </Button>
+          </Space>
+        );
+      },
     },
   ];
 

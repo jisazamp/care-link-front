@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Form, Input, Button, message, Space, DatePicker } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Modal, Form, Input, Button, message, Space, DatePicker, Alert } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import type { CronogramaAsistenciaPaciente } from '../../../types';
@@ -27,6 +27,15 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
   const [observaciones, setObservaciones] = useState('');
   const [nuevaFecha, setNuevaFecha] = useState<dayjs.Dayjs | null>(null);
 
+  // 🔴 Resetear campos cada vez que cambia el paciente o se abre el modal
+  useEffect(() => {
+    if (visible) {
+      setObservaciones('');
+      setNuevaFecha(null);
+      form.resetFields();
+    }
+  }, [paciente, visible, form]);
+
   const handleObservacionesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setObservaciones(e.target.value);
     // Si el usuario empieza a escribir, mostrar el campo de fecha automáticamente
@@ -45,10 +54,7 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
   };
 
   const handleNoAsistio = () => {
-    if (!observaciones.trim()) {
-      message.error('Debe ingresar una justificación');
-      return;
-    }
+    // 🔴 Ya no es obligatorio observaciones para "No Asistió"
     onConfirm('NO_ASISTIO', observaciones);
   };
 
@@ -59,11 +65,18 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
     onCancel();
   };
 
-  const canReagendar = observaciones.trim().length > 0 && nuevaFecha !== null;
+  // 🔴 VALIDACIÓN: Solo se puede reagendar si el estado es "PENDIENTE"
+  const canReagendar = paciente?.estado_asistencia === 'PENDIENTE' && 
+                      observaciones.trim().length > 0 && 
+                      nuevaFecha !== null;
+  
   const showFecha = observaciones.trim().length > 0;
   const disabledDate = (current: dayjs.Dayjs) => {
     return current && current < dayjs().startOf('day');
   };
+
+  // 🔴 Mostrar alerta si el paciente no tiene estado PENDIENTE
+  const showEstadoAlert = paciente && paciente.estado_asistencia !== 'PENDIENTE';
 
   return (
     <Modal
@@ -85,15 +98,27 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
         <p>
           <strong>Documento:</strong> {paciente?.n_documento}
         </p>
+        <p>
+          <strong>Estado actual:</strong> {paciente?.estado_asistencia}
+        </p>
       </div>
+
+      {/* 🔴 Alerta si el paciente no tiene estado PENDIENTE */}
+      {showEstadoAlert && (
+        <Alert
+          message="No se puede reagendar"
+          description={`Solo se puede reagendar pacientes con estado "PENDIENTE". El estado actual es "${paciente.estado_asistencia}".`}
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
       <Form form={form} layout="vertical">
         <Form.Item
           label="Observaciones / Justificación"
           name="observaciones"
-          rules={[
-            { required: true, message: 'Debe ingresar una justificación' },
-            { min: 10, message: 'La justificación debe tener al menos 10 caracteres' }
-          ]}
+          rules={[]}
         >
           <TextArea
             rows={4}
@@ -127,6 +152,7 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
               onClick={handleNoAsistio}
               style={{ width: '100%' }}
               loading={loading}
+              disabled={paciente?.estado_asistencia !== 'PENDIENTE'}
             >
               Marcar como "No Asistió"
             </Button>
