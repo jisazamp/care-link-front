@@ -119,31 +119,28 @@ export const Cronograma: React.FC = () => {
           estado_asistencia: nuevoEstado as 'PENDIENTE' | 'ASISTIO' | 'NO_ASISTIO' | 'CANCELADO',
         }
       }, {
-        onSuccess: () => {
-          // Un solo mensaje informativo
-          if (nuevoEstado === 'ASISTIO') {
-            notification.success({
-              message: 'Asistencia registrada',
-              description: 'Se ha descontado un día de la tiquetera del paciente.',
-            });
-          } else if (nuevoEstado === 'NO_ASISTIO') {
-            notification.success({
-              message: 'Inasistencia registrada',
-              description: 'Se ha descontado un día de la tiquetera del paciente.',
-            });
-          } else if (nuevoEstado === 'CANCELADO') {
-            notification.info({
-              message: 'Cita cancelada',
-              description: 'La cita ha sido cancelada correctamente.',
-            });
-          }
-          refetch();
+        onSuccess: (response) => {
+          const updatedPaciente = response.data.data;
+          setSelectedPacientes((prev) =>
+            prev.map((p) =>
+              p.id_cronograma_paciente === updatedPaciente.id_cronograma_paciente
+                ? { ...p, ...updatedPaciente }
+                : p
+            )
+          );
+          setSelectedPaciente((prev) =>
+            prev && prev.id_cronograma_paciente === updatedPaciente.id_cronograma_paciente
+              ? { ...prev, ...updatedPaciente }
+              : prev
+          );
+          setLoadingAction(false);
           setBotonCargando(null);
+          setJustificacionModalVisible(false);
+          setSelectedPaciente(null);
         },
-        onError: (error) => {
-          message.error('Error al actualizar el estado de asistencia');
+        onError: () => {
+          setLoadingAction(false);
           setBotonCargando(null);
-          console.error('Error:', error);
         }
       });
     }
@@ -151,7 +148,6 @@ export const Cronograma: React.FC = () => {
 
   const handleJustificacionConfirm = (estado: string, observaciones: string) => {
     if (!selectedPaciente) return;
-
     setLoadingAction(true);
     updateEstado({
       id_cronograma_paciente: selectedPaciente.id_cronograma_paciente,
@@ -160,46 +156,48 @@ export const Cronograma: React.FC = () => {
         observaciones: observaciones
       }
     }, {
-      onSuccess: () => {
-        // Un solo mensaje informativo
-        if (!observaciones || observaciones.trim() === '') {
-          notification.success({
-            message: 'Inasistencia registrada',
-            description: 'Se ha descontado un día de la tiquetera del paciente.',
-          });
-        } else {
-          notification.success({
-            message: 'Inasistencia justificada',
-            description: 'El paciente fue marcado como NO ASISTIÓ CON justificación.',
-          });
-        }
+      onSuccess: (response) => {
+        const updatedPaciente = response.data.data;
+        setSelectedPacientes((prev) =>
+          prev.map((p) =>
+            p.id_cronograma_paciente === updatedPaciente.id_cronograma_paciente
+              ? { ...p, ...updatedPaciente }
+              : p
+          )
+        );
+        setSelectedPaciente((prev) =>
+          prev && prev.id_cronograma_paciente === updatedPaciente.id_cronograma_paciente
+            ? { ...prev, ...updatedPaciente }
+            : prev
+        );
+        setLoadingAction(false);
+        setBotonCargando(null);
         setJustificacionModalVisible(false);
         setSelectedPaciente(null);
-        setLoadingAction(false);
-        refetch();
+        // Unificar mensaje para reagendamiento
+        if (estado === 'REAGENDADO') {
+          notification.success({
+            message: 'Paciente reagendado exitosamente',
+            description: 'El paciente fue reagendado con justificación. El día NO se descuenta de la tiquetera.',
+          });
+        }
       },
-      onError: (error) => {
-        message.error('Error al actualizar el estado');
-        console.error('Error:', error);
+      onError: () => {
         setLoadingAction(false);
+        setBotonCargando(null);
       }
     });
   };
 
   const handleReagendar = (observaciones: string, nuevaFecha: string) => {
-    console.log('handleReagendar ejecutado', { observaciones, nuevaFecha, selectedPaciente });
-    
     if (!selectedPaciente) {
       console.error('No hay paciente seleccionado');
       return;
     }
-
-    // 🔴 VALIDACIÓN ADICIONAL: Verificar que el paciente tenga estado PENDIENTE
     if (selectedPaciente.estado_asistencia !== 'PENDIENTE') {
       message.error(`No se puede reagendar un paciente con estado "${selectedPaciente.estado_asistencia}". Solo se puede reagendar pacientes con estado "PENDIENTE".`);
       return;
     }
-
     setLoadingAction(true);
     const requestData = {
       id_cronograma_paciente: selectedPaciente.id_cronograma_paciente,
@@ -209,15 +207,28 @@ export const Cronograma: React.FC = () => {
         nueva_fecha: nuevaFecha
       }
     };
-    
-    console.log('Enviando datos al hook:', requestData);
-    
     reagendarPaciente(requestData, {
-      onSuccess: () => {
-        message.success('El paciente fue reagendado con justificación. El día NO se descuenta de la tiquetera.');
+      onSuccess: (response) => {
+        const nuevoPaciente = response.data.data;
+        setSelectedPacientes((prev) =>
+          prev.map((p) =>
+            p.id_cronograma_paciente === selectedPaciente.id_cronograma_paciente
+              ? { ...p, estado_asistencia: 'REAGENDADO' as any, observaciones }
+              : p
+          )
+        );
+        setSelectedPaciente((prev) =>
+          prev && prev.id_cronograma_paciente === selectedPaciente.id_cronograma_paciente
+            ? { ...prev, estado_asistencia: 'REAGENDADO' as any, observaciones }
+            : prev
+        );
         setJustificacionModalVisible(false);
         setSelectedPaciente(null);
         setLoadingAction(false);
+        notification.success({
+          message: 'Paciente reagendado exitosamente',
+          description: 'El paciente fue reagendado con justificación. El día NO se descuenta de la tiquetera.',
+        });
         refetch();
       },
       onError: (error) => {
