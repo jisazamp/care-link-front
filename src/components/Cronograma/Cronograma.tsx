@@ -120,16 +120,25 @@ export const Cronograma: React.FC = () => {
         }
       }, {
         onSuccess: () => {
-          message.success(`Estado actualizado a "${nuevoEstado}"`);
-          refetch();
-          setBotonCargando(null);
+          // Un solo mensaje informativo
           if (nuevoEstado === 'ASISTIO') {
-            // Mostrar alerta si es necesario (aquí podrías verificar si se agotó la tiquetera)
             notification.success({
               message: 'Asistencia registrada',
               description: 'Se ha descontado un día de la tiquetera del paciente.',
             });
+          } else if (nuevoEstado === 'NO_ASISTIO') {
+            notification.success({
+              message: 'Inasistencia registrada',
+              description: 'Se ha descontado un día de la tiquetera del paciente.',
+            });
+          } else if (nuevoEstado === 'CANCELADO') {
+            notification.info({
+              message: 'Cita cancelada',
+              description: 'La cita ha sido cancelada correctamente.',
+            });
           }
+          refetch();
+          setBotonCargando(null);
         },
         onError: (error) => {
           message.error('Error al actualizar el estado de asistencia');
@@ -152,10 +161,17 @@ export const Cronograma: React.FC = () => {
       }
     }, {
       onSuccess: () => {
+        // Un solo mensaje informativo
         if (!observaciones || observaciones.trim() === '') {
-          message.success('El paciente fue marcado como NO ASISTIÓ SIN justificación. El día ha sido descontado de la tiquetera.');
+          notification.success({
+            message: 'Inasistencia registrada',
+            description: 'Se ha descontado un día de la tiquetera del paciente.',
+          });
         } else {
-          message.success('El paciente fue marcado como NO ASISTIÓ CON justificación. El día ha sido descontado de la tiquetera.');
+          notification.success({
+            message: 'Inasistencia justificada',
+            description: 'El paciente fue marcado como NO ASISTIÓ CON justificación.',
+          });
         }
         setJustificacionModalVisible(false);
         setSelectedPaciente(null);
