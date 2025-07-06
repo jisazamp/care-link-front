@@ -20,6 +20,7 @@ export const Cronograma: React.FC = () => {
   const [justificacionModalVisible, setJustificacionModalVisible] = useState(false);
   const [selectedPaciente, setSelectedPaciente] = useState<CronogramaAsistenciaPaciente | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
+  const [botonCargando, setBotonCargando] = useState<null | number | string>(null);
 
   // Obtener cronogramas del mes actual
   const currentMonth = dayjs();
@@ -102,11 +103,13 @@ export const Cronograma: React.FC = () => {
       return;
     }
 
+    setBotonCargando(`${pacienteId}-${nuevoEstado}`);
     if (nuevoEstado === 'NO_ASISTIO') {
       // Abrir modal de justificación para "No asistió"
       if (paciente) {
         setSelectedPaciente(paciente as CronogramaAsistenciaPaciente);
         setJustificacionModalVisible(true);
+        setBotonCargando(null);
       }
     } else {
       // Para otros estados, actualizar directamente
@@ -119,6 +122,7 @@ export const Cronograma: React.FC = () => {
         onSuccess: () => {
           message.success(`Estado actualizado a "${nuevoEstado}"`);
           refetch();
+          setBotonCargando(null);
           if (nuevoEstado === 'ASISTIO') {
             // Mostrar alerta si es necesario (aquí podrías verificar si se agotó la tiquetera)
             notification.success({
@@ -129,6 +133,7 @@ export const Cronograma: React.FC = () => {
         },
         onError: (error) => {
           message.error('Error al actualizar el estado de asistencia');
+          setBotonCargando(null);
           console.error('Error:', error);
         }
       });
@@ -239,6 +244,12 @@ export const Cronograma: React.FC = () => {
     );
   };
 
+  // Función para deshabilitar sábados y domingos
+  const disabledDate = (date: Dayjs) => {
+    const day = date.day(); // 0: domingo, 6: sábado
+    return day === 0 || day === 6;
+  };
+
   const columns = [
     {
       title: 'Paciente',
@@ -270,10 +281,8 @@ export const Cronograma: React.FC = () => {
       title: 'Acciones',
       key: 'acciones',
       render: (record: PacientePorFecha) => {
-        // 🔴 Los botones se desactivan si el estado no es "PENDIENTE"
         const isPending = record.estado_asistencia === 'PENDIENTE';
-        const isDisabled = !isPending || updateLoading;
-        
+        const isDisabled = !isPending || (botonCargando !== null);
         return (
           <Space>
             <Button
@@ -281,7 +290,7 @@ export const Cronograma: React.FC = () => {
               type="primary"
               onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'ASISTIO')}
               disabled={isDisabled}
-              loading={updateLoading}
+              loading={botonCargando === `${record.id_cronograma_paciente}-ASISTIO`}
               title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
             >
               Asistió
@@ -291,7 +300,7 @@ export const Cronograma: React.FC = () => {
               danger
               onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
               disabled={isDisabled}
-              loading={updateLoading}
+              loading={botonCargando === `${record.id_cronograma_paciente}-NO_ASISTIO`}
               title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
             >
               No Asistió
@@ -300,7 +309,7 @@ export const Cronograma: React.FC = () => {
               size="small"
               onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'CANCELADO')}
               disabled={isDisabled}
-              loading={updateLoading}
+              loading={botonCargando === `${record.id_cronograma_paciente}-CANCELADO`}
               title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
             >
               Cancelar
@@ -335,7 +344,14 @@ export const Cronograma: React.FC = () => {
           {isLoading && <div style={{ textAlign: 'center', padding: '20px' }}>Cargando cronograma...</div>}
           <Calendar
             cellRender={dateCellRender as CalendarProps<Dayjs>['cellRender']}
-            onSelect={handleDateSelect}
+            onSelect={(date, info) => {
+              // 🔴 SOLO abrir modal si el usuario hizo click en el día
+              if (info.source === 'date') {
+                handleDateSelect(date);
+              }
+              // Si el source es "month" o "year", NO hacer nada
+            }}
+            disabledDate={disabledDate}
           />
         </div>
 
