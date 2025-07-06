@@ -147,7 +147,11 @@ export const Cronograma: React.FC = () => {
       }
     }, {
       onSuccess: () => {
-        message.success('Estado actualizado con justificación');
+        if (!observaciones || observaciones.trim() === '') {
+          message.success('El paciente fue marcado como NO ASISTIÓ SIN justificación. El día ha sido descontado de la tiquetera.');
+        } else {
+          message.success('El paciente fue marcado como NO ASISTIÓ CON justificación. El día ha sido descontado de la tiquetera.');
+        }
         setJustificacionModalVisible(false);
         setSelectedPaciente(null);
         setLoadingAction(false);
@@ -189,8 +193,7 @@ export const Cronograma: React.FC = () => {
     
     reagendarPaciente(requestData, {
       onSuccess: () => {
-        console.log('Reagendamiento exitoso');
-        message.success('Paciente reagendado exitosamente');
+        message.success('El paciente fue reagendado con justificación. El día NO se descuenta de la tiquetera.');
         setJustificacionModalVisible(false);
         setSelectedPaciente(null);
         setLoadingAction(false);
