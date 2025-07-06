@@ -137,6 +137,7 @@ export const Cronograma: React.FC = () => {
           setBotonCargando(null);
           setJustificacionModalVisible(false);
           setSelectedPaciente(null);
+          refetch();
         },
         onError: () => {
           setLoadingAction(false);
@@ -181,6 +182,7 @@ export const Cronograma: React.FC = () => {
             description: 'El paciente fue reagendado con justificación. El día NO se descuenta de la tiquetera.',
           });
         }
+        refetch();
       },
       onError: () => {
         setLoadingAction(false);
