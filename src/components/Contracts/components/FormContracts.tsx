@@ -6,7 +6,7 @@ import {
   SolutionOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Button, Card, Steps, Typography } from "antd";
+import { Breadcrumb, Button, Card, Steps, Typography, message } from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
@@ -25,6 +25,7 @@ import type {
   Payment,
   UpdateContractRequest,
 } from "../../../types";
+import { handleContractError } from "../../../utils/errorHandler";
 import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 import { BillingContract } from "./BillingContract/BillingContract";
 import { CreateContract } from "./CreateContract/CreateContract";
@@ -152,6 +153,10 @@ export const FormContracts = () => {
             navigate(`/usuarios/${id}/detalles`);
           }
         },
+        onError: (error: any) => {
+          const errorMsg = handleContractError(error);
+          message.error(errorMsg);
+        },
       });
 
       return;
@@ -184,6 +189,10 @@ export const FormContracts = () => {
             navigate(`/usuarios/${id}/detalles`);
           },
         });
+      },
+      onError: (error: any) => {
+        const errorMsg = handleContractError(error);
+        message.error(errorMsg);
       },
     });
   };

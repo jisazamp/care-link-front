@@ -21,8 +21,8 @@ client.interceptors.request.use(
 
 client.interceptors.response.use(
   (response) => {
-    if (response.config.method !== "get") {
-      message.success(response.data.message || "Solicitud exitosa");
+    if (response.config.method !== "get" && response.data?.message) {
+      message.success(response.data.message);
     }
     return response;
   },
@@ -31,12 +31,9 @@ client.interceptors.response.use(
       useAuthStore.setState({
         jwtToken: null,
       });
+      message.error("Sesión expirada. Por favor, inicie sesión nuevamente.");
     }
 
-    message.error(
-      error.response?.data?.message ||
-        "Algo salió mal al intentar procesar la solicitud",
-    );
     return Promise.reject(error);
   },
 );
