@@ -31,6 +31,7 @@ import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { Cronograma } from "./components/Cronograma/Cronograma";
 import { Transporte } from "./components/Transporte";
+import { Billing } from "./components/Billing";
 import { colors } from "./theme";
 
 const spanishLocale = {
@@ -287,6 +288,14 @@ export const App = () => {
               element={
                 <PrivateRoute>
                   <Transporte />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/facturacion"
+              element={
+                <PrivateRoute>
+                  <Billing />
                 </PrivateRoute>
               }
             />

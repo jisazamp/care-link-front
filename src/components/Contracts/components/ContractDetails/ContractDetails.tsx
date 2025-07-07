@@ -4,6 +4,12 @@ import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 import { useGetContractById } from "../../../../hooks/useGetContractById/useGetContractById";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
+import { useGetFacturas } from "../../../../hooks/useGetFacturas";
+import { BillingList, BillingForm } from "../../../Billing";
+import { Modal } from "antd";
+import { useState } from "react";
+import { useCreateFactura } from "../../../../hooks/useCreateFactura";
+import { useUpdateFactura } from "../../../../hooks/useUpdateFactura";
 
 const { Title, Text } = Typography;
 
@@ -13,6 +19,11 @@ export const ContractDetails: React.FC = () => {
   const { data: user, isLoading: isLoadingUser } = useGetUserById(id);
   const { data: contract, isLoading: isLoadingContract } =
     useGetContractById(contractId);
+  const { data: facturas, isLoading: isLoadingFacturas } = useGetFacturas(contractId ? Number(contractId) : undefined);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingFactura, setEditingFactura] = useState<any>(null);
+  const createFactura = useCreateFactura();
+  const updateFactura = useUpdateFactura();
 
   const contractData = {
     contratoId: contract?.data.id_contrato,
@@ -30,23 +41,6 @@ export const ContractDetails: React.FC = () => {
     cantidad: s.fechas_servicio.length,
     descripcion: s.descripcion,
   }));
-
-  const billingData = [
-    {
-      key: "1",
-      fechaEmision: "10/11/2024",
-      facturaId: "2024001",
-      contrato: "15222",
-      total: "$150.000",
-    },
-    {
-      key: "2",
-      fechaEmision: "10/11/2024",
-      facturaId: "2024002",
-      contrato: "15222",
-      total: "$150.000",
-    },
-  ];
 
   return (
     <div className="contract-details-container">
@@ -197,7 +191,6 @@ export const ContractDetails: React.FC = () => {
 
       {/* Tarjeta 4: Facturación */}
       <Card className="full-width-card billing-card">
-        {/* HEAD de la Tarjeta */}
         <div className="billing-header">
           <Title level={5} className="billing-title">
             Facturas Generadas
@@ -205,33 +198,45 @@ export const ContractDetails: React.FC = () => {
           <Button
             className="main-button billing-add-button"
             icon={<PlusCircleOutlined />}
+            onClick={() => {
+              setEditingFactura({ id_contrato: contractData.contratoId });
+              setModalVisible(true);
+            }}
           >
             Nueva Factura
           </Button>
         </div>
-
-        {/* BODY de la Tarjeta */}
-        <Table
-          columns={[
-            { title: "Fecha de emisión", dataIndex: "fechaEmision" },
-            { title: "N° Factura", dataIndex: "facturaId" },
-            { title: "Contrato", dataIndex: "contrato" },
-            { title: "Total", dataIndex: "total" },
-            {
-              title: "Acciones",
-              render: () => (
-                <>
-                  <Button type="link" className="main-button-link">
-                    Editar
-                  </Button>
-                  <Button type="link">Eliminar</Button>
-                </>
-              ),
-            },
-          ]}
-          dataSource={billingData}
-          pagination={false}
+        <BillingList
+          facturas={facturas?.data?.data || []}
+          loading={isLoadingFacturas}
+          onView={(id) => {
+            setEditingFactura(facturas?.data?.data.find((f: any) => f.id_factura === id));
+            setModalVisible(true);
+          }}
+          onDelete={() => {}}
         />
+        <Modal
+          open={modalVisible}
+          onCancel={() => setModalVisible(false)}
+          footer={null}
+          title={editingFactura ? "Editar Factura" : "Nueva Factura"}
+        >
+          <BillingForm
+            initialValues={editingFactura}
+            onSubmit={(values) => {
+              if (editingFactura) {
+                updateFactura.mutate({ id: editingFactura.id_factura, data: values }, {
+                  onSuccess: () => setModalVisible(false),
+                });
+              } else {
+                createFactura.mutate(values, {
+                  onSuccess: () => setModalVisible(false),
+                });
+              }
+            }}
+            loading={createFactura.isPending || updateFactura.isPending}
+          />
+        </Modal>
       </Card>
     </div>
   );
