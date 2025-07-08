@@ -87,7 +87,7 @@ export interface FormValues {
   selectedDateDay: string | null;
   services: Service[];
   startDate: Dayjs | null;
-  payments: { paymentMethod: number; paymentDate: string; amount: number }[];
+  payments: { paymentMethod: number; paymentDate: string; amount: number; id_tipo_pago?: number }[];
 }
 
 export const FormContracts = () => {

@@ -1,37 +1,40 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { message } from "antd";
+import { useMutation } from "@tanstack/react-query";
 import { client } from "../../api/client";
-import { handleScheduleError } from "../../utils/errorHandler";
-import type { UpdateEstadoAsistenciaRequest } from "../../types";
+import { queryClient } from "../../main";
+import { message } from "antd";
 
-interface ReagendarPacienteRequest extends UpdateEstadoAsistenciaRequest {
-  nueva_fecha: string; // Formato YYYY-MM-DD
+interface ReagendarPacienteData {
+  estado_asistencia: string;
+  observaciones: string;
+  nueva_fecha: string;
 }
 
-const reagendarPaciente = ({
-  id_cronograma_paciente,
-  data,
-}: {
-  id_cronograma_paciente: number;
-  data: ReagendarPacienteRequest;
-}) =>
+const reagendarPaciente = (
+  id_cronograma_paciente: number,
+  data: ReagendarPacienteData,
+) =>
   client.post(
     `/api/cronograma_asistencia/paciente/${id_cronograma_paciente}/reagendar`,
     data,
   );
 
-export const useReagendarPaciente = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: reagendarPaciente,
+export const useReagendarPaciente = () =>
+  useMutation({
+    mutationFn: ({
+      id_cronograma_paciente,
+      data,
+    }: {
+      id_cronograma_paciente: number;
+      data: ReagendarPacienteData;
+    }) => reagendarPaciente(id_cronograma_paciente, data),
     onSuccess: () => {
-      // Invalidar queries relacionadas con cronogramas
-      queryClient.invalidateQueries({ queryKey: ["cronograma"] });
+      queryClient.invalidateQueries({ queryKey: ["cronogramas"] });
+      message.success("Paciente reagendado exitosamente");
     },
     onError: (error: any) => {
-      const errorMsg = handleScheduleError(error);
-      message.error(errorMsg);
+      message.error(
+        "Error al reagendar paciente: " +
+          (error?.response?.data?.detail || error.message),
+      );
     },
   });
-};

@@ -5,7 +5,15 @@ import { handleContractError } from "../utils/errorHandler";
 import { message } from "antd";
 import type { Bill } from "../types";
 
-const updateFactura = ({ id, data }: { id: number; data: any }) =>
+interface UpdateFacturaData {
+  fecha_emision?: string;
+  fecha_vencimiento?: string;
+  total?: number;
+  estado_factura?: string;
+  observaciones?: string;
+}
+
+const updateFactura = ({ id, data }: { id: number; data: UpdateFacturaData }) =>
   client.patch<{ data: Bill }>(`/api/facturas/${id}`, data);
 
 export const useUpdateFactura = () =>

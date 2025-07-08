@@ -28,8 +28,8 @@ export const Cronograma: React.FC = () => {
   const endOfMonth = currentMonth.endOf('month').format('YYYY-MM-DD');
 
   const { data: cronogramas, isLoading, refetch } = useGetCronogramasPorRango(startOfMonth, endOfMonth);
-  const { mutate: updateEstado, isPending: updateLoading } = useUpdateEstadoAsistencia();
-  const { mutate: reagendarPaciente, isPending: reagendarLoading } = useReagendarPaciente();
+  const { mutate: updateEstado } = useUpdateEstadoAsistencia();
+  const { mutate: reagendarPaciente } = useReagendarPaciente();
 
   const getEstadoBadgeType = (estado: string): BadgeProps['status'] => {
     switch (estado) {
@@ -201,17 +201,17 @@ export const Cronograma: React.FC = () => {
       return;
     }
     setLoadingAction(true);
-    const requestData = {
+    
+    reagendarPaciente({
       id_cronograma_paciente: selectedPaciente.id_cronograma_paciente,
       data: {
-        estado_asistencia: 'PENDIENTE' as const,
+        estado_asistencia: 'PENDIENTE',
         observaciones: observaciones,
         nueva_fecha: nuevaFecha
       }
-    };
-    reagendarPaciente(requestData, {
-      onSuccess: (response) => {
-        const nuevoPaciente = response.data.data;
+    }, {
+      onSuccess: (response: any) => {
+        // const nuevoPaciente = response.data.data; // No se usa actualmente
         setSelectedPacientes((prev) =>
           prev.map((p) =>
             p.id_cronograma_paciente === selectedPaciente.id_cronograma_paciente
@@ -233,7 +233,7 @@ export const Cronograma: React.FC = () => {
         });
         refetch();
       },
-      onError: (error) => {
+      onError: (error: any) => {
         console.error('Error en reagendamiento:', error);
         message.error('Error al reagendar el paciente');
         setLoadingAction(false);

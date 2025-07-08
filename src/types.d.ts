@@ -263,10 +263,10 @@ export interface UserContractsResponse extends Contract {
   servicios: Service[];
 }
 
-export type Bill = {
+export interface Bill {
   id_factura: number;
+  numero_factura: string | null;
   id_contrato: number;
-  numero_factura?: string;
   fecha_emision: string;
   fecha_vencimiento?: string;
   total_factura: number;
@@ -275,11 +275,8 @@ export type Bill = {
   descuentos?: number;
   estado_factura?: string;
   observaciones?: string;
-  fecha_creacion?: string;
-  fecha_actualizacion?: string;
-  detalles?: BillDetail[];
   pagos?: Payment[];
-};
+}
 
 export type BillDetail = {
   id_detalle_factura: number;
@@ -300,6 +297,14 @@ export type Payment = {
   id_tipo_pago: number;
   fecha_pago: string;
   valor: number;
+  metodo_pago?: {
+    id_metodo_pago: number;
+    nombre: string;
+  };
+  tipo_pago?: {
+    id_tipo_pago: number;
+    nombre: string;
+  };
 };
 
 interface CalculateBillBody {
