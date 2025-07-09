@@ -39,7 +39,13 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       const impuestos = Number(initialValues.impuestos) || 0;
       const descuentos = Number(initialValues.descuentos) || 0;
       setTotal(subtotal + impuestos - descuentos);
-      setPayments(initialValues.pagos || []);
+      
+      // Procesar pagos para asegurar que las fechas estén en el formato correcto
+      const processedPayments = (initialValues.pagos || []).map((pago: any) => ({
+        ...pago,
+        fecha_pago: pago.fecha_pago || ""
+      }));
+      setPayments(processedPayments);
     } else {
       form.resetFields();
       setTotal(0);

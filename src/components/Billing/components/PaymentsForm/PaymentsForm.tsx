@@ -1,6 +1,7 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Form, InputNumber, DatePicker, Button, Select, Card, Row, Col, Space } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
 import { useGetPaymentTypes } from "../../../../hooks/useGetPaymentTypes";
 import { usePayments } from "../../../../hooks/usePayments";
@@ -26,6 +27,14 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   const { paymentMethodsData, paymentMethodsLoading } = useGetPaymentMethods();
   const { data: paymentTypesData, isLoading: paymentTypesLoading } = useGetPaymentTypes();
   
+  // Procesar pagos iniciales para convertir fechas a objetos dayjs
+  const processedInitialPayments = useMemo(() => {
+    return initialPayments.map(payment => ({
+      ...payment,
+      fecha_pago: payment.fecha_pago || ""
+    }));
+  }, [initialPayments]);
+  
   // Hook centralizado de pagos - ÚNICA fuente de verdad
   const {
     payments,
@@ -38,7 +47,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     updatePayment
   } = usePayments({
     totalFactura,
-    initialPayments,
+    initialPayments: processedInitialPayments,
     onPaymentsChange: onChange
   });
 
@@ -63,7 +72,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
         const updatedPayment: PaymentFormData = {
           id_metodo_pago: pago.id_metodo_pago || undefined,
           id_tipo_pago: pago.id_tipo_pago || undefined,
-          fecha_pago: pago.fecha_pago || "",
+          fecha_pago: pago.fecha_pago ? (typeof pago.fecha_pago === 'string' ? pago.fecha_pago : pago.fecha_pago.format('YYYY-MM-DD')) : "",
           valor: pago.valor || 0,
           saved: existingPayment.saved || false,
         };
@@ -81,6 +90,14 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     }
   }, [savePayments]);
 
+  // Preparar pagos para el formulario (convertir fechas a dayjs)
+  const formPayments = useMemo(() => {
+    return payments.map(payment => ({
+      ...payment,
+      fecha_pago: payment.fecha_pago ? dayjs(payment.fecha_pago) : undefined
+    }));
+  }, [payments]);
+
   return (
     <div>
       {/* Resumen de pagos usando componente centralizado */}
@@ -97,7 +114,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
         <Form
           form={form}
           onValuesChange={handleFormChange}
-          initialValues={{ pagos: payments }}
+          initialValues={{ pagos: formPayments }}
         >
           <Form.List name="pagos">
             {(fields, { add, remove }) => {
