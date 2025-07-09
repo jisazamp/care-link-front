@@ -51,6 +51,7 @@ import {
 } from "./schema/schema";
 import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
 import { Vaccines } from "./components/Vaccines/Vaccines";
+import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 
 const { Title } = Typography;
 const { Panel } = Collapse;
@@ -70,6 +71,8 @@ export const MedicalRecord: React.FC = () => {
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
     useCreateUserMedicalRecord(userId);
+
+  const { data: user } = useGetUserById(userId);
 
   const { data: userMedicalRecord, isLoading: loadingUserMedicalRecord } =
     useGetUserMedicalRecord(userId);
@@ -127,14 +130,14 @@ export const MedicalRecord: React.FC = () => {
   useEffect(() => {
     if (location.hash && hashToPanelKey[location.hash]) {
       setActivePanel(hashToPanelKey[location.hash]);
-      
+
       // Si es un hash que corresponde a un sub-panel, también abrir ese sub-panel
       if (hashToSubPanelKey[location.hash]) {
         setActiveSubPanel(hashToSubPanelKey[location.hash]);
       }
-      
+
       setTimeout(() => {
-        const el = document.getElementById(location.hash.replace('#', ''));
+        const el = document.getElementById(location.hash.replace("#", ""));
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
@@ -425,11 +428,19 @@ export const MedicalRecord: React.FC = () => {
             items={[{ title: "Inicio" }, { title: "Historia clínica" }]}
             style={{ margin: "16px 0" }}
           />
-          <Collapse accordion style={{ width: "100%", background: "transparent" }} activeKey={activePanel} onChange={setActivePanel}>
+          <Collapse
+            accordion
+            style={{ width: "100%", background: "transparent" }}
+            activeKey={activePanel}
+            onChange={setActivePanel}
+          >
             <Panel header="Datos del usuario" key="user-info">
               <UserInfo />
             </Panel>
-            <Panel header="Servicio externo para emergencias médicas" key="medical-services">
+            <Panel
+              header="Servicio externo para emergencias médicas"
+              key="medical-services"
+            >
               <MedicalServices />
             </Panel>
             <Panel header="Datos básicos de ingreso" key="entry-data">
@@ -438,14 +449,20 @@ export const MedicalRecord: React.FC = () => {
             <Panel header="Datos básicos de salud" key="basic-health-data">
               <BasicHealthData />
             </Panel>
-            <Panel header="Exploración física inicial" key="physical-exploration">
+            <Panel
+              header="Exploración física inicial"
+              key="physical-exploration"
+            >
               <PhysicalExploration />
             </Panel>
-            <Panel header="Tratamientos o medicamentos" key="medical-treatments">
+            <Panel
+              header="Tratamientos o medicamentos"
+              key="medical-treatments"
+            >
               <MedicalTreatments />
             </Panel>
             <Panel header="Condiciones especiales" key="special-conditions">
-              <SpecialConditions 
+              <SpecialConditions
                 activeSubPanel={activeSubPanel}
                 setActiveSubPanel={setActiveSubPanel}
               />
@@ -456,10 +473,16 @@ export const MedicalRecord: React.FC = () => {
             <Panel header="Habilidades biofísicas" key="biophysical-skills">
               <BiophysicalSkills />
             </Panel>
-            <Panel header="Hábitos o antecedentes toxicológicos" key="toxicology">
+            <Panel
+              header="Hábitos o antecedentes toxicológicos"
+              key="toxicology"
+            >
               <Toxicology />
             </Panel>
-            <Panel header="Habilidades de percepción social" key="social-perception">
+            <Panel
+              header="Habilidades de percepción social"
+              key="social-perception"
+            >
               <SocialPerception />
             </Panel>
           </Collapse>

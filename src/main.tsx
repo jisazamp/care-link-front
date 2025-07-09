@@ -1,4 +1,4 @@
-// import '../wdyr.js';
+//import "../wdrj.ts";
 import "antd/dist/reset.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import dayjs from "dayjs";
