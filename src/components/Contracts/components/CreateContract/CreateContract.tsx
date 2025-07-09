@@ -42,14 +42,13 @@ export const CreateContract = ({
     }
   };
 
-  // useEffect optimizado para evitar ciclos infinitos
+  // useEffect optimizado para sugerir fecha fin solo si el usuario no la ha cambiado
   useEffect(() => {
     if (startDate && startDate.isValid()) {
       const newEndDate = startDate.add(1, "month");
       const currentEndDate = methods.getValues("endDate");
-      
-      // Solo actualizar si la fecha de finalización es diferente
-      if (!currentEndDate || !newEndDate.isSame(currentEndDate, 'day')) {
+      // Solo sugerir si el usuario no ha cambiado la fecha
+      if (!currentEndDate || currentEndDate.isSame(startDate, 'day') || currentEndDate.isBefore(startDate, 'day')) {
         methods.setValue("endDate", newEndDate);
       }
     }
@@ -100,7 +99,22 @@ export const CreateContract = ({
             />
           </Form.Item>
 
-          <Form.Item label="Fecha de finalización">
+          <Form.Item
+            label="Fecha de finalización"
+            name="endDate"
+            rules={[
+              { required: true, message: "Seleccione la fecha de finalización" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = methods.getValues("startDate");
+                  if (!value || !start || value.isSameOrAfter(start, 'day')) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("La fecha de finalización debe ser igual o posterior a la de inicio"));
+                },
+              }),
+            ]}
+          >
             <Controller
               control={methods.control}
               name="endDate"
@@ -108,8 +122,12 @@ export const CreateContract = ({
                 <DatePicker
                   {...field}
                   style={{ width: "100%" }}
-                  disabled
-                  inputReadOnly
+                  disabledDate={current => {
+                    const start = methods.getValues("startDate");
+                    if (!current) return false;
+                    if (!start) return false;
+                    return current.isBefore(start, 'day');
+                  }}
                 />
               )}
             />
