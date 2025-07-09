@@ -8,6 +8,8 @@ import {
   Descriptions,
   Tag,
   Alert,
+  InputNumber,
+  Form,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -16,11 +18,11 @@ import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBi
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
 import type { FormValues } from "../FormContracts";
-import { useGetContractBill } from "../../../../hooks/useGetContractBill";
+//import { useGetContractBill } from "../../../../hooks/useGetContractBill";
 import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
 import dayjs from "dayjs";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface BillingContractProps {
   onNext?: () => void;
@@ -34,7 +36,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const { contractId } = useParams();
   const { watch, setValue } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
-  const { data: payments } = useGetBillPayments(
+  const {  } = useGetBillPayments(
     Number(bills?.data[0]?.id_factura),
   );
 
@@ -64,6 +66,9 @@ export const BillingContract: React.FC<BillingContractProps> = ({
 
   // Estado local de pagos, siempre array
   const [localPayments, setLocalPayments] = useState<any[]>([]);
+  const [form] = Form.useForm();
+  const [impuestos, setImpuestos] = useState<number>(0);
+  const [descuentos, setDescuentos] = useState<number>(0);
 
   // Si recibes pagos iniciales, asegúrate de que sea array y filtra nulos
   useEffect(() => {
@@ -122,6 +127,10 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     }
     return dayjs().add(30, 'days');
   }, [contractStartDate]);
+
+  // Cálculo del total en tiempo real
+  const subtotal = partialBill?.data?.data ?? 0;
+  const total = subtotal + (impuestos || 0) - (descuentos || 0);
 
   return (
     <div style={{ padding: "24px", minHeight: "100vh" }}>
@@ -245,6 +254,39 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 style={{ marginTop: 16 }}
               />
             )}
+
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={(values) => {
+                // Incluir impuestos y descuentos en el payload
+                if (onNext) {
+                  onNext();
+                }
+              }}
+            >
+              <Form.Item label="Impuestos" name="impuestos">
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  placeholder="0"
+                  value={impuestos}
+                  onChange={(v) => setImpuestos(Number(v) || 0)}
+                />
+              </Form.Item>
+              <Form.Item label="Descuentos" name="descuentos">
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  placeholder="0"
+                  value={descuentos}
+                  onChange={(v) => setDescuentos(Number(v) || 0)}
+                />
+              </Form.Item>
+              <div style={{ margin: '16px 0', fontWeight: 'bold' }}>
+                Total calculado: $ {total.toLocaleString()}
+              </div>
+            </Form>
           </Card>
         </Col>
       </Row>

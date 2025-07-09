@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Divider, Card, Alert } from "antd";
+import React, { useEffect,  useState } from "react";
+import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Divider, Card, Select } from "antd";
 import dayjs from "dayjs";
 import type { Bill } from "../../types";
 import { PaymentsForm } from "./components/PaymentsForm";
@@ -19,33 +19,31 @@ export const BillingForm: React.FC<BillingFormProps> = ({
   const [total, setTotal] = useState<number>(0);
   const [payments, setPayments] = useState<any[]>([]);
 
-  // Convertir fechas string a objetos dayjs para los valores iniciales
-  const processedInitialValues = useMemo(() => {
-    if (!initialValues) return undefined;
-    return {
-      ...initialValues,
-      fecha_emision: initialValues.fecha_emision && initialValues.fecha_emision !== 'null' && initialValues.fecha_emision !== ''
-        ? dayjs(initialValues.fecha_emision) 
-        : dayjs(),
-      fecha_vencimiento: initialValues.fecha_vencimiento && initialValues.fecha_vencimiento !== 'null' && initialValues.fecha_vencimiento !== ''
-        ? dayjs(initialValues.fecha_vencimiento) 
-        : undefined,
-    };
-  }, [initialValues]);
+  // Preprocesar valores iniciales para fechas
+  const initialFormValues = {
+    ...initialValues,
+    fecha_emision: initialValues?.fecha_emision ? dayjs(initialValues.fecha_emision) : undefined,
+    fecha_vencimiento: initialValues?.fecha_vencimiento ? dayjs(initialValues.fecha_vencimiento) : undefined,
+    subtotal: initialValues?.subtotal ?? 0,
+    impuestos: initialValues?.impuestos ?? 0,
+    descuentos: initialValues?.descuentos ?? 0,
+    observaciones: initialValues?.observaciones ?? "",
+    estado_factura: initialValues?.estado_factura ?? "PENDIENTE",
+  };
 
   useEffect(() => {
-    if (processedInitialValues) {
-      form.setFieldsValue(processedInitialValues);
+    if (initialValues) {
+      form.setFieldsValue(initialFormValues);
       // Calcular total inicial
-      const subtotal = Number(processedInitialValues.subtotal) || 0;
-      const impuestos = Number(processedInitialValues.impuestos) || 0;
-      const descuentos = Number(processedInitialValues.descuentos) || 0;
+      const subtotal = Number(initialValues.subtotal) || 0;
+      const impuestos = Number(initialValues.impuestos) || 0;
+      const descuentos = Number(initialValues.descuentos) || 0;
       setTotal(subtotal + impuestos - descuentos);
     } else {
       form.resetFields();
       setTotal(0);
     }
-  }, [processedInitialValues, form]);
+  }, [initialValues, form, initialFormValues]);
 
   // Calcular total en tiempo real
   const handleValuesChange = (_changed: any, all: any) => {
@@ -57,19 +55,15 @@ export const BillingForm: React.FC<BillingFormProps> = ({
   };
 
   const handleSubmit = (values: any) => {
-    const data = {
+    // Convertir fechas a string
+    const payload = {
       ...values,
-      id_contrato: initialValues?.id_contrato || values.id_contrato,
-      fecha_emision: values.fecha_emision && values.fecha_emision.format
-        ? values.fecha_emision.format("YYYY-MM-DD")
-        : values.fecha_emision,
-      fecha_vencimiento: values.fecha_vencimiento && values.fecha_vencimiento.format
-        ? values.fecha_vencimiento.format("YYYY-MM-DD")
-        : values.fecha_vencimiento,
+      fecha_emision: values.fecha_emision ? values.fecha_emision.format("YYYY-MM-DD") : undefined,
+      fecha_vencimiento: values.fecha_vencimiento ? values.fecha_vencimiento.format("YYYY-MM-DD") : undefined,
       total_factura: total,
       pagos: payments,
     };
-    onSubmit(data);
+    onSubmit(payload);
   };
 
   return (
@@ -108,115 +102,43 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       <Form
         form={form}
         layout="vertical"
+        initialValues={initialFormValues}
         onFinish={handleSubmit}
         onValuesChange={handleValuesChange}
       >
-        {/* Fechas - Solo lectura */}
-        <Card title="Fechas" style={{ marginBottom: 16 }}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Fecha de emisión"
-                name="fecha_emision"
-                rules={[{ required: true, message: "La fecha de emisión es obligatoria" }]}
-              >
-                <DatePicker 
-                  style={{ width: "100%" }} 
-                  format="YYYY-MM-DD" 
-                  disabled 
-                  inputReadOnly 
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Fecha de vencimiento"
-                name="fecha_vencimiento"
-              >
-                <DatePicker 
-                  style={{ width: "100%" }} 
-                  format="YYYY-MM-DD" 
-                  disabled 
-                  inputReadOnly 
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
-
-        {/* Valores de la factura */}
-        <Card title="Valores de la Factura" style={{ marginBottom: 16 }}>
-          <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item
-                label="Subtotal"
-                name="subtotal"
-                rules={[{ required: true, message: "El subtotal es obligatorio" }]}
-              >
-                <InputNumber 
-                  style={{ width: "100%" }} 
-                  min={0} 
-                  placeholder="0.00"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Impuestos"
-                name="impuestos"
-                rules={[{ required: true, message: "Los impuestos son obligatorios" }]}
-              >
-                <InputNumber 
-                  style={{ width: "100%" }} 
-                  min={0} 
-                  placeholder="0.00"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Descuentos"
-                name="descuentos"
-                rules={[{ required: true, message: "Los descuentos son obligatorios" }]}
-              >
-                <InputNumber 
-                  style={{ width: "100%" }} 
-                  min={0} 
-                  placeholder="0.00"
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          
-          {/* Total calculado */}
-          <Row>
-            <Col span={24}>
-              <Form.Item label="Total de la Factura">
-                <Typography.Text strong style={{ fontSize: 20, color: '#1890ff' }}>
-                  $ {total.toLocaleString()}
-                </Typography.Text>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {/* Alertas de validación */}
-          {total < 0 && (
-            <Alert
-              message="Error en el cálculo"
-              description="El total no puede ser negativo. Revise los valores de descuentos."
-              type="error"
-              showIcon
-              style={{ marginTop: 8 }}
-            />
-          )}
-        </Card>
-
-        {/* Observaciones */}
-        <Card title="Observaciones" style={{ marginBottom: 16 }}>
-          <Form.Item name="observaciones">
-            <Input.TextArea rows={3} placeholder="Ingrese observaciones adicionales..." />
-          </Form.Item>
-        </Card>
+        <Form.Item label="Número de Factura" name="numero_factura">
+          <Input disabled placeholder="Se genera automáticamente" />
+        </Form.Item>
+        <Form.Item label="Fecha de Emisión" name="fecha_emision" rules={[{ required: true, message: "Seleccione la fecha de emisión" }]}> 
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+        </Form.Item>
+        <Form.Item label="Fecha de Vencimiento" name="fecha_vencimiento">
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+        </Form.Item>
+        <Form.Item label="Subtotal" name="subtotal">
+          <InputNumber min={0} style={{ width: "100%" }} disabled />
+        </Form.Item>
+        <Form.Item label="Impuestos" name="impuestos">
+          <InputNumber min={0} style={{ width: "100%" }} />
+        </Form.Item>
+        <Form.Item label="Descuentos" name="descuentos">
+          <InputNumber min={0} style={{ width: "100%" }} />
+        </Form.Item>
+        <Form.Item label="Total" name="total_factura">
+          <InputNumber min={0} style={{ width: "100%" }} disabled />
+        </Form.Item>
+        <Form.Item label="Estado" name="estado_factura">
+          <Select>
+            <Select.Option value="PENDIENTE">Pendiente</Select.Option>
+            <Select.Option value="PAGADA">Pagada</Select.Option>
+            <Select.Option value="VENCIDA">Vencida</Select.Option>
+            <Select.Option value="CANCELADA">Cancelada</Select.Option>
+            <Select.Option value="ANULADA">Anulada</Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.Item label="Observaciones" name="observaciones">
+          <Input.TextArea rows={3} />
+        </Form.Item>
         
         <Divider />
         

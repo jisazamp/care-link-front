@@ -1,10 +1,10 @@
-import React from "react";
-import { Table, Tag, Button, Space, Typography, Badge, Tooltip } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Table, Tag, Button, Space, Tooltip, Input, Select } from "antd";
 import type { Bill } from "../../types";
 import dayjs from "dayjs";
 
-const { Text } = Typography;
+const { Search } = Input;
+const { Option } = Select;
 
 interface BillingListProps {
   bills: Bill[];
@@ -21,224 +21,132 @@ export const BillingList: React.FC<BillingListProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const getEstadoColor = (estado: string) => {
-    switch (estado) {
-      case 'PAGADA':
-        return { color: 'success', text: 'PAGADA' };
-      case 'VENCIDA':
-        return { color: 'error', text: 'VENCIDA' };
-      case 'PENDIENTE':
-        return { color: 'warning', text: 'PENDIENTE' };
-      default:
-        return { color: 'default', text: 'PENDIENTE' };
-    }
-  };
+  const [search, setSearch] = useState("");
+  const [estado, setEstado] = useState<string | undefined>(undefined);
 
-  const getEstadoBadge = (estado: string) => {
-    switch (estado) {
-      case 'PAGADA':
-        return 'success';
-      case 'VENCIDA':
-        return 'error';
-      case 'PENDIENTE':
-        return 'processing';
-      default:
-        return 'default';
-    }
-  };
+  const filteredBills = bills.filter((bill) => {
+    const matchSearch = bill.numero_factura?.toLowerCase().includes(search.toLowerCase()) || String(bill.id_factura).includes(search);
+    const matchEstado = estado ? bill.estado_factura === estado : true;
+    return matchSearch && matchEstado;
+  });
 
   const columns = [
     {
-      title: "Número",
+      title: "# Factura",
       dataIndex: "numero_factura",
       key: "numero_factura",
-      width: 120,
-      render: (numero: string) => (
-        <Space>
-          <FileTextOutlined style={{ color: '#1890ff' }} />
-          <Text strong style={{ color: '#1890ff' }}>
-            {numero || 'N/A'}
-          </Text>
-        </Space>
-      ),
-    },
-    {
-      title: "Estado",
-      dataIndex: "estado_factura",
-      key: "estado_factura",
-      width: 120,
-      render: (estado: string) => {
-        const estadoInfo = getEstadoColor(estado || 'PENDIENTE');
-        return (
-          <Badge 
-            status={getEstadoBadge(estado || 'PENDIENTE') as any} 
-            text={
-              <Tag color={estadoInfo.color}>
-                {estadoInfo.text}
-              </Tag>
-            }
-          />
-        );
-      },
+      render: (text: string) => text || "-",
     },
     {
       title: "Fecha Emisión",
       dataIndex: "fecha_emision",
       key: "fecha_emision",
-      width: 120,
-      render: (fecha: string) => (
-        <Text>
-          {fecha ? dayjs(fecha).format('DD/MM/YYYY') : 'N/A'}
-        </Text>
-      ),
+      render: (date: string) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
       title: "Fecha Vencimiento",
       dataIndex: "fecha_vencimiento",
       key: "fecha_vencimiento",
-      width: 120,
-      render: (fecha: string) => (
-        <Text>
-          {fecha ? dayjs(fecha).format('DD/MM/YYYY') : 'N/A'}
-        </Text>
-      ),
+      render: (date: string) => date ? dayjs(date).format("DD/MM/YYYY") : "-",
     },
     {
       title: "Subtotal",
       dataIndex: "subtotal",
       key: "subtotal",
-      width: 100,
-      render: (subtotal: number) => (
-        <Text>
-          $ {Number(subtotal || 0).toLocaleString()}
-        </Text>
-      ),
+      render: (v: number) => `$ ${v?.toLocaleString()}`,
     },
     {
       title: "Impuestos",
       dataIndex: "impuestos",
       key: "impuestos",
-      width: 100,
-      render: (impuestos: number) => (
-        <Text style={{ color: '#52c41a' }}>
-          + $ {Number(impuestos || 0).toLocaleString()}
-        </Text>
-      ),
+      render: (v: number) => `$ ${v?.toLocaleString()}`,
     },
     {
       title: "Descuentos",
       dataIndex: "descuentos",
       key: "descuentos",
-      width: 100,
-      render: (descuentos: number) => (
-        <Text style={{ color: '#ff4d4f' }}>
-          - $ {Number(descuentos || 0).toLocaleString()}
-        </Text>
-      ),
+      render: (v: number) => `$ ${v?.toLocaleString()}`,
     },
     {
       title: "Total",
       dataIndex: "total_factura",
       key: "total_factura",
-      width: 120,
-      render: (total: number) => (
-        <Text strong style={{ fontSize: 14, color: '#1890ff' }}>
-          $ {Number(total || 0).toLocaleString()}
-        </Text>
-      ),
+      render: (v: number) => `$ ${v?.toLocaleString()}`,
     },
     {
-      title: "Pagos",
-      key: "pagos",
-      width: 120,
-      render: (record: Bill) => {
-        const totalPagado = record.pagos?.reduce((acc, pago) => acc + (Number(pago.valor) || 0), 0) || 0;
-        const totalFactura = Number(record.total_factura) || 0;
-        const saldoPendiente = totalFactura - totalPagado;
-        
-        return (
-          <div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Pagado: $ {totalPagado.toLocaleString()}
-            </Text>
-            <br />
-            <Text 
-              type={saldoPendiente > 0 ? "danger" : "success"} 
-              style={{ fontSize: 12 }}
-            >
-              Saldo: $ {saldoPendiente.toLocaleString()}
-            </Text>
-          </div>
-        );
-      },
+      title: "Estado",
+      dataIndex: "estado_factura",
+      key: "estado_factura",
+      render: (estado: string) => <Tag color={getEstadoColor(estado)} style={{ fontWeight: 'bold', fontSize: 14 }}>{estado}</Tag>,
     },
     {
-      title: "Contrato",
-      dataIndex: "id_contrato",
-      key: "id_contrato",
-      width: 80,
-      render: (id: number) => (
-        <Text code>
-          #{id}
-        </Text>
-      ),
+      title: "Observaciones",
+      dataIndex: "observaciones",
+      key: "observaciones",
+      render: (text: string) => text || "-",
     },
     {
       title: "Acciones",
-      key: "actions",
-      width: 120,
-      render: (record: Bill) => (
-        <Space size="small">
-          {onView && (
-            <Tooltip title="Ver detalles">
-              <Button
-                type="text"
-                icon={<EyeOutlined />}
-                onClick={() => onView(record)}
-                size="small"
-              />
-            </Tooltip>
-          )}
-          {onEdit && (
-            <Tooltip title="Editar factura">
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                onClick={() => onEdit(record)}
-                size="small"
-              />
-            </Tooltip>
-          )}
-          {onDelete && (
-            <Tooltip title="Eliminar factura">
-              <Button
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => onDelete(record)}
-                size="small"
-              />
-            </Tooltip>
-          )}
+      key: "acciones",
+      render: (_: any, record: Bill) => (
+        <Space>
+          <Tooltip title="Ver Detalles">
+            <Button type="link" onClick={() => onView && onView(record)}>Ver</Button>
+          </Tooltip>
+          <Tooltip title="Editar">
+            <Button type="link" onClick={() => onEdit && onEdit(record)}>Editar</Button>
+          </Tooltip>
+          <Tooltip title="Eliminar">
+            <Button type="link" danger onClick={() => onDelete && onDelete(record)}>Eliminar</Button>
+          </Tooltip>
         </Space>
       ),
     },
   ];
 
+  function getEstadoColor(estado: string) {
+    switch (estado) {
+      case "PENDIENTE": return "orange";
+      case "PAGADA": return "green";
+      case "VENCIDA": return "red";
+      case "CANCELADA": return "volcano";
+      case "ANULADA": return "gray";
+      default: return "blue";
+    }
+  }
+
   return (
-    <Table
-      columns={columns}
-      dataSource={bills}
-      loading={loading}
-      rowKey="id_factura"
-      pagination={{
-        pageSize: 10,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) =>
-          `${range[0]}-${range[1]} de ${total} facturas`,
-      }}
-      scroll={{ x: 1200 }}
-    />
+    <>
+      <Space style={{ marginBottom: 16 }}>
+        <Search
+          placeholder="Buscar por número de factura o ID"
+          allowClear
+          onSearch={setSearch}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: 220 }}
+        />
+        <Select
+          placeholder="Filtrar por estado"
+          allowClear
+          style={{ width: 180 }}
+          value={estado}
+          onChange={setEstado}
+        >
+          <Option value="PENDIENTE">Pendiente</Option>
+          <Option value="PAGADA">Pagada</Option>
+          <Option value="VENCIDA">Vencida</Option>
+          <Option value="CANCELADA">Cancelada</Option>
+          <Option value="ANULADA">Anulada</Option>
+        </Select>
+      </Space>
+      <Table
+        columns={columns}
+        dataSource={filteredBills}
+        loading={loading}
+        rowKey="id_factura"
+        pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10, 20, 50] }}
+        locale={{ emptyText: "No hay facturas registradas" }}
+      />
+    </>
   );
 }; 
