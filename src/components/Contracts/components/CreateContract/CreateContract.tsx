@@ -104,7 +104,7 @@ export const CreateContract = ({
             name="endDate"
             rules={[
               { required: true, message: "Seleccione la fecha de finalización" },
-              ({ getFieldValue }) => ({
+              {
                 validator(_, value) {
                   const start = methods.getValues("startDate");
                   if (!value || !start || value.isSameOrAfter(start, 'day')) {
@@ -112,7 +112,7 @@ export const CreateContract = ({
                   }
                   return Promise.reject(new Error("La fecha de finalización debe ser igual o posterior a la de inicio"));
                 },
-              }),
+              },
             ]}
           >
             <Controller
