@@ -12,11 +12,13 @@ export const UserInfo = () => {
   const { data: user, isLoading: loadingUser } = useGetUserById(userId);
 
   return (
-    <Card bordered loading={loadingUser}>
+    <Card variant="borderless" loading={loadingUser}>
       <Row align="middle" gutter={16}>
-        <Col span={4}>
-          <Avatar alt="Avatar" size={72} src="https://via.placeholder.com/72" />
-        </Col>
+        {user?.data.data.url_imagen && (
+          <Col span={4}>
+            <Avatar alt="Avatar" size={72} src={user.data.data.url_imagen} />
+          </Col>
+        )}
         <Col span={20}>
           <Title
             level={5}

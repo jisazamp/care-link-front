@@ -95,6 +95,7 @@ export const NewUser: React.FC = () => {
     formState: { errors },
     handleSubmit,
     reset,
+    setValue,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -196,11 +197,8 @@ export const NewUser: React.FC = () => {
       },
     ];
 
-    reset((prev) => ({
-      ...prev,
-      photo: { fileList },
-    }));
-  }, [data?.data.data, imageFile, isLoadingFile, isErrorFile, reset]);
+    setValue("photo", { fileList });
+  }, [data?.data.data, imageFile, isLoadingFile, isErrorFile, setValue]);
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
@@ -230,6 +228,7 @@ export const NewUser: React.FC = () => {
   return (
     <>
       <Breadcrumb
+        key={Date.now().toString()}
         items={[
           { title: "Inicio" },
           { title: userId ? "Editar usuario" : "Nuevo usuario" },
