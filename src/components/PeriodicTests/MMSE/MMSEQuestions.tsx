@@ -4,7 +4,7 @@ import { MMSEQuestionsProps } from "./types";
 import { mmseQuestions } from "./questions";
 
 const { Option } = Select;
-const { Text, Title } = Typography;
+const { Title } = Typography;
 
 export const MMSEQuestions: React.FC<MMSEQuestionsProps> = ({ onNext, onChange, answers }) => {
   const [form] = Form.useForm();

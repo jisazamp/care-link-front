@@ -210,7 +210,7 @@ export const Cronograma: React.FC = () => {
         nueva_fecha: nuevaFecha
       }
     }, {
-      onSuccess: (response: any) => {
+      onSuccess: () => {
         // const nuevoPaciente = response.data.data; // No se usa actualmente
         setSelectedPacientes((prev) =>
           prev.map((p) =>

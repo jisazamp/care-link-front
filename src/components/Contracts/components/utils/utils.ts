@@ -37,7 +37,7 @@ export const convertServicesData = (
     price: s.precio_por_dia,
     quantity: s.fechas_servicio.length,
     selected: !!s.fechas_servicio.length,
-    serviceType: getServiceType(s.id_servicio, s.fechas_servicio.length),
+    serviceType: getServiceType(s.id_servicio, s.fechas_servicio.length) || "",
     startDate: dayjs(s.fecha),
   }));
 
@@ -126,15 +126,25 @@ export const buildContractData = (
         descripcion: s.description,
         precio_por_dia: s.price,
         fechas_servicio: s.serviceType.includes("Transporte")
-          ? getValues("selectedDatesTransport").map((f: string) => ({
-              fecha: f,
-            }))
-          : s.serviceType.includes("Tiquetera")
-            ? getValues("selectedDatesService").map((f: string) => ({
+          ? getValues("selectedDatesTransport")
+              .filter(
+                (f: string | null): f is string =>
+                  f !== null && f !== undefined,
+              )
+              .map((f: string) => ({
                 fecha: f,
               }))
+          : s.serviceType.includes("Tiquetera")
+            ? getValues("selectedDatesService")
+                .filter(
+                  (f: string | null): f is string =>
+                    f !== null && f !== undefined,
+                )
+                .map((f: string) => ({
+                  fecha: f,
+                }))
             : getValues("selectedDateDay")
-              ? [{ fecha: getValues("selectedDateDay") }]
+              ? [{ fecha: getValues("selectedDateDay") as string }]
               : [],
       })),
   };

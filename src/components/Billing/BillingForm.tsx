@@ -17,7 +17,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [total, setTotal] = useState<number>(0);
-  const [payments, setPayments] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>(initialValues?.pagos || []);
 
   // Preprocesar valores iniciales para fechas
   const initialFormValues = {
@@ -39,11 +39,13 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       const impuestos = Number(initialValues.impuestos) || 0;
       const descuentos = Number(initialValues.descuentos) || 0;
       setTotal(subtotal + impuestos - descuentos);
+      setPayments(initialValues.pagos || []);
     } else {
       form.resetFields();
       setTotal(0);
+      setPayments([]);
     }
-  }, [initialValues, form, initialFormValues]);
+  }, [initialValues]); // Solo depende de initialValues
 
   // Calcular total en tiempo real
   const handleValuesChange = (_changed: any, all: any) => {
@@ -112,7 +114,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
         <Form.Item label="Fecha de Emisión" name="fecha_emision" rules={[{ required: true, message: "Seleccione la fecha de emisión" }]}> 
           <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
         </Form.Item>
-        <Form.Item label="Fecha de Vencimiento" name="fecha_vencimiento">
+        <Form.Item label="Fecha de Finalización" name="fecha_vencimiento">
           <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
         </Form.Item>
         <Form.Item label="Subtotal" name="subtotal">
@@ -145,7 +147,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
         {/* Formulario de pagos */}
         <PaymentsForm
           totalFactura={total}
-          initialPayments={initialValues?.pagos || []}
+          initialPayments={payments}
           onChange={setPayments}
           disabled={loading}
         />

@@ -170,7 +170,7 @@ export const EditReport: React.FC = () => {
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Diagnóstico:</Text>
-                  <p>{report?.diagnostico}</p>
+                  <p>{report?.diagnosticos}</p>
                 </Col>
               </Row>
               <Row gutter={16}>

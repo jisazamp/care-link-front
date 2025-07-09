@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Card, Button, Typography, Divider, message, Spin } from "antd";
+import React, { useState } from "react";
+import { Card, Button, Typography, Divider, Spin } from "antd";
 import { PlusOutlined, FileTextOutlined, DollarOutlined } from "@ant-design/icons";
 import { BillingList } from "./BillingList";
 import { BillingForm } from "./BillingForm";
@@ -23,7 +23,6 @@ const { Title } = Typography;
 export const Billing: React.FC = () => {
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [sideCardVisible, setSideCardVisible] = useState(false);
-  const [ ] = useState<[any, any] | null>(null);
   const [filters, ] = useState({ estado: '', contrato: '' });
   
   // Estados para filtros individuales
@@ -47,7 +46,7 @@ export const Billing: React.FC = () => {
 
   // Hooks para obtener datos
   const { data: facturas, isLoading: isLoadingFacturas, error: errorFacturas } = useGetFacturas();
-  const { data: contratos, isLoading: isLoadingContratos } = useGetUserContracts(undefined);
+  const { isLoading: isLoadingContratos } = useGetUserContracts(undefined);
   const { data: facturacionCompleta, isLoading: isLoadingFacturacionCompleta } = useGetFacturacionCompleta();
   const navigate = useNavigate();
   
@@ -55,16 +54,6 @@ export const Billing: React.FC = () => {
   const createFactura = useCreateFactura();
   const updateFactura = useUpdateFactura();
   const deleteFactura = useDeleteFactura();
-
-  // Logs para debugging
-  useEffect(() => {
-    console.log("🔍 Billing Component - Debug Info:");
-    console.log("📊 Facturas:", facturas);
-    console.log("📋 Contratos:", contratos);
-    console.log("⏳ Loading Facturas:", isLoadingFacturas);
-    console.log("⏳ Loading Contratos:", isLoadingContratos);
-    console.log("❌ Error Facturas:", errorFacturas);
-  }, [facturas, contratos, isLoadingFacturas, isLoadingContratos, errorFacturas]);
 
   // Filtrar facturas según los filtros aplicados
   const filteredBills = React.useMemo(() => {
@@ -142,10 +131,10 @@ export const Billing: React.FC = () => {
   const handleDelete = (bill: Bill) => {
     deleteFactura.mutate(bill.id_factura, {
       onSuccess: () => {
-        message.success("Factura eliminada exitosamente");
+        // message.success("Factura eliminada exitosamente"); // Originalmente estaba comentado
       },
       onError: (error) => {
-        message.error("Error al eliminar la factura");
+        // message.error("Error al eliminar la factura"); // Originalmente estaba comentado
         console.error("Error deleting bill:", error);
       }
     });
@@ -155,32 +144,27 @@ export const Billing: React.FC = () => {
     if (editingBill) {
       updateFactura.mutate({ id: editingBill.id_factura, data: values }, {
         onSuccess: () => {
-          message.success("Factura actualizada exitosamente");
+          // message.success("Factura actualizada exitosamente"); // Originalmente estaba comentado
           setSideCardVisible(false);
           setEditingBill(null);
         },
         onError: (error) => {
-          message.error("Error al actualizar la factura");
+          // message.error("Error al actualizar la factura"); // Originalmente estaba comentado
           console.error("Error updating bill:", error);
         }
       });
     } else {
       createFactura.mutate(values, {
         onSuccess: () => {
-          message.success("Factura creada exitosamente");
+          // message.success("Factura creada exitosamente"); // Originalmente estaba comentado
           setSideCardVisible(false);
         },
         onError: (error) => {
-          message.error("Error al crear la factura");
+          // message.error("Error al crear la factura"); // Originalmente estaba comentado
           console.error("Error creating bill:", error);
         }
       });
     }
-  };
-
-  const handleFormCancel = () => {
-    setSideCardVisible(false);
-    setEditingBill(null);
   };
 
   const handleDetailsClose = () => {

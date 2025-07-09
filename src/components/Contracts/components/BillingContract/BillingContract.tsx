@@ -11,14 +11,15 @@ import {
   InputNumber,
   Form,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
+import { usePayments } from "../../../../hooks/usePayments";
+import { formatCurrency, PaymentFormData } from "../../../../utils/paymentUtils";
 import type { FormValues } from "../FormContracts";
-//import { useGetContractBill } from "../../../../hooks/useGetContractBill";
 import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
 import dayjs from "dayjs";
 
@@ -27,16 +28,18 @@ const { Text } = Typography;
 interface BillingContractProps {
   onNext?: () => void;
   onBack?: () => void;
+  onValidPaymentsChange?: (isValid: boolean) => void;
 }
 
 export const BillingContract: React.FC<BillingContractProps> = ({
   onNext,
   onBack,
+  onValidPaymentsChange,
 }) => {
   const { contractId } = useParams();
   const { watch, setValue } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
-  const {  } = useGetBillPayments(
+  const { } = useGetBillPayments(
     Number(bills?.data[0]?.id_factura),
   );
 
@@ -59,27 +62,43 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     [contractStartDate]
   );
 
-  const partialBillFormatted = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-  }).format(partialBill?.data?.data ?? 0);
+  const partialBillFormatted = formatCurrency(partialBill?.data?.data ?? 0);
 
-  // Estado local de pagos, siempre array
-  const [localPayments, setLocalPayments] = useState<any[]>([]);
+  // Hook centralizado de pagos
+  const {
+    payments,
+    hasValidPayments,
+
+  } = usePayments({
+    totalFactura: partialBill?.data?.data ?? 0,
+    onPaymentsChange: useCallback((newPayments: PaymentFormData[]) => {
+      // Solo actualiza el formulario si los pagos realmente cambiaron
+      setValue("payments", newPayments.map((p: PaymentFormData) => ({
+        paymentMethod: p.id_metodo_pago,
+        paymentDate: p.fecha_pago,
+        amount: p.valor,
+        id_tipo_pago: p.id_tipo_pago
+      })));
+    }, [setValue])
+  });
+
+  // Eliminar referencias a funciones eliminadas
+  // Eliminar logs de debug
+  // Eliminar props y lógica residual no usada
+
+  // Usar useRef para mantener referencias estables
+  const setValueRef = useRef(setValue);
+  setValueRef.current = setValue;
+
+  // Estados necesarios para el formulario de impuestos y descuentos
   const [form] = Form.useForm();
   const [impuestos, setImpuestos] = useState<number>(0);
   const [descuentos, setDescuentos] = useState<number>(0);
 
-  // Si recibes pagos iniciales, asegúrate de que sea array y filtra nulos
-  useEffect(() => {
-    setLocalPayments([]); // Inicializa vacío o con datos válidos si los tienes
-  }, []);
+  // Eliminar estados y lógica residual no usada
 
-  // Memoiza los pagos para evitar renders innecesarios
-  const pagosMemo = useMemo(() => (localPayments || []).filter(Boolean), [localPayments]);
-
-  // Calcular factura parcial solo cuando cambien los servicios o año
-  useEffect(() => {
+  // Función memoizada para calcular factura parcial
+  const calculateBill = useCallback(() => {
     if (
       startingContractYear &&
       selectedServicesIds.length > 0 &&
@@ -93,29 +112,30 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     }
   }, [startingContractYear, selectedServicesIds, selectedServicesQuantities, calculatePartialBillFn]);
 
-  const handlePaymentsChange = (newPayments: any[]) => {
-    const formattedPayments = newPayments.map(p => ({
-      paymentMethod: p.id_metodo_pago,
-      paymentDate: p.fecha_pago,
-      amount: p.valor,
-      id_tipo_pago: p.id_tipo_pago
-    }));
-    setValue("payments", formattedPayments);
-    setLocalPayments(newPayments);
-  };
+  // Calcular factura parcial solo cuando cambien los servicios o año
+  useEffect(() => {
+    calculateBill();
+  }, [calculateBill]);
+
+  // Función memoizada para manejar cambios en pagos
+  const handlePaymentsChange = useCallback((newPayments: any[]) => {
+    const formattedPayments = (newPayments || [])
+      .filter((p): p is any => p !== undefined && p !== null)
+      .map(p => ({
+        paymentMethod: p.id_metodo_pago,
+        paymentDate: p.fecha_pago,
+        amount: p.valor,
+        id_tipo_pago: p.id_tipo_pago
+      }));
+    setValueRef.current("payments", formattedPayments);
+  }, []);
 
   const handleNext = () => {
-    // Validar que se hayan configurado los pagos
-    if (pagosMemo.length === 0) {
-      // Usar message en lugar de Alert.error
-      return;
-    }
     onNext?.();
   };
 
   // Generar número de factura temporal
   const numeroFacturaTemporal = useMemo(() => {
-    const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
     return `FACT-${startingContractYear}-${String(random).padStart(6, '0')}`;
   }, [startingContractYear]);
@@ -131,6 +151,12 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   // Cálculo del total en tiempo real
   const subtotal = partialBill?.data?.data ?? 0;
   const total = subtotal + (impuestos || 0) - (descuentos || 0);
+
+  useEffect(() => {
+    if (onValidPaymentsChange) {
+      onValidPaymentsChange(hasValidPayments);
+    }
+  }, [hasValidPayments, onValidPaymentsChange]);
 
   return (
     <div style={{ padding: "24px", minHeight: "100vh" }}>
@@ -194,7 +220,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             {/* Formulario de pagos */}
             <PaymentsForm
               totalFactura={partialBill?.data?.data ?? 0}
-              initialPayments={pagosMemo}
+              initialPayments={payments}
               onChange={handlePaymentsChange}
               disabled={false}
             />
@@ -205,7 +231,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 <Button 
                   type="default" 
                   icon={<DownloadOutlined />} 
-                  disabled={pagosMemo.length === 0}
+                  disabled={!hasValidPayments}
                 >
                   Descargar Factura
                 </Button>
@@ -224,7 +250,6 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                       <Button 
                         type="primary" 
                         onClick={handleNext}
-                        disabled={pagosMemo.length === 0}
                       >
                         Siguiente
                       </Button>
@@ -235,21 +260,11 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             </Row>
 
             {/* Alertas informativas */}
-            {pagosMemo.length === 0 && (
+            {(partialBill?.data?.data ?? 0) > 0 && (
               <Alert
-                message="Configuración de Pagos Requerida"
-                description="Debe configurar al menos un pago para poder finalizar el contrato."
+                message="Información de Facturación"
+                description="Los pagos son opcionales. Puede configurarlos ahora o más tarde."
                 type="info"
-                showIcon
-                style={{ marginTop: 16 }}
-              />
-            )}
-
-            {(partialBill?.data?.data ?? 0) > 0 && pagosMemo.length > 0 && (
-              <Alert
-                message="Contrato Listo"
-                description="El contrato está configurado correctamente. Puede proceder a finalizarlo."
-                type="success"
                 showIcon
                 style={{ marginTop: 16 }}
               />
@@ -258,8 +273,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             <Form
               form={form}
               layout="vertical"
-              onFinish={(values) => {
-                // Incluir impuestos y descuentos en el payload
+              onFinish={() => {
                 if (onNext) {
                   onNext();
                 }
@@ -284,7 +298,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 />
               </Form.Item>
               <div style={{ margin: '16px 0', fontWeight: 'bold' }}>
-                Total calculado: $ {total.toLocaleString()}
+                Total calculado: {formatCurrency(total)}
               </div>
             </Form>
           </Card>

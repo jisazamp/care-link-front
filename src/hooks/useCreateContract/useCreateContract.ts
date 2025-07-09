@@ -4,7 +4,7 @@ import { queryClient } from "../../main";
 import type { Contract, CreateContractRequest } from "../../types";
 
 const createContract = (data: CreateContractRequest) =>
-  client.post<{ data: Contract }>("/api/contratos", data);
+  client.post<{ data: Contract }>("/api/contratos/", data);
 
 export const useCreateContract = (id: string | number | undefined) => {
   return useMutation({

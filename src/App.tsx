@@ -1,5 +1,5 @@
 import "./index.css";
-import { ConfigProvider } from "antd";
+import { App as AntApp, ConfigProvider } from "antd";
 import es from "antd/es/date-picker/locale/es_ES";
 import esES from "antd/es/locale/es_ES";
 import {
@@ -103,206 +103,208 @@ export const App = () => {
         },
       }}
     >
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<MainLayout />}>
-            <Route
-              path="/usuarios"
-              element={
-                <PrivateRoute>
-                  <UsersList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/crear"
-              element={
-                <PrivateRoute>
-                  <NewUser />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/editar"
-              element={
-                <PrivateRoute>
-                  <NewUser />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/detalles"
-              element={
-                <PrivateRoute>
-                  <UserDetails />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/familiar"
-              element={
-                <PrivateRoute>
-                  <CreateFamilyMember />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/familiar/:familyMemberId"
-              element={
-                <PrivateRoute>
-                  <CreateFamilyMember />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/historia"
-              element={
-                <PrivateRoute>
-                  <MedicalRecord />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/nuevo-reporte"
-              element={
-                <PrivateRoute>
-                  <NewReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/reportes/:reportId"
-              element={
-                <PrivateRoute>
-                  <EditReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/reportes/:reportId/detalles"
-              element={
-                <PrivateRoute>
-                  <ViewReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
-              element={
-                <PrivateRoute>
-                  <NewEvolutionReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/ShowMedicalReport"
-              element={
-                <PrivateRoute>
-                  <ShowMedicalReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/UserList"
-              element={
-                <PrivateRoute>
-                  <UserList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/contrato"
-              element={
-                <PrivateRoute>
-                  <FormContracts />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/contrato/:contractId/editar"
-              element={
-                <PrivateRoute>
-                  <FormContracts />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/contrato/:contractId"
-              element={
-                <PrivateRoute>
-                  <ContractDetails />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/actividades"
-              element={
-                <PrivateRoute>
-                  <ActivitiesList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/actividades/crear"
-              element={
-                <PrivateRoute>
-                  <CreateActivityForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/actividades/:id/editar"
-              element={
-                <PrivateRoute>
-                  <CreateActivityForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/pruebas/mmse"
-              element={
-                <PrivateRoute>
-                  <MMSETest />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/pruebas/yesavage"
-              element={
-                <PrivateRoute>
-                  <YesavageTest />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/cronograma"
-              element={
-                <PrivateRoute>
-                  <Cronograma />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/transporte"
-              element={
-                <PrivateRoute>
-                  <Transporte />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/facturacion"
-              element={
-                <PrivateRoute>
-                  <Billing />
-                </PrivateRoute>
-              }
-            />
-          </Route>
-          <Route path="*" element={<Navigate to="/usuarios" replace />} />
-        </Routes>
-      </Router>
+      <AntApp>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<MainLayout />}>
+              <Route
+                path="/usuarios"
+                element={
+                  <PrivateRoute>
+                    <UsersList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/crear"
+                element={
+                  <PrivateRoute>
+                    <NewUser />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/editar"
+                element={
+                  <PrivateRoute>
+                    <NewUser />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/detalles"
+                element={
+                  <PrivateRoute>
+                    <UserDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/familiar"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/familiar/:familyMemberId"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/historia"
+                element={
+                  <PrivateRoute>
+                    <MedicalRecord />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/nuevo-reporte"
+                element={
+                  <PrivateRoute>
+                    <NewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId"
+                element={
+                  <PrivateRoute>
+                    <EditReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles"
+                element={
+                  <PrivateRoute>
+                    <ViewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/ShowMedicalReport"
+                element={
+                  <PrivateRoute>
+                    <ShowMedicalReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/UserList"
+                element={
+                  <PrivateRoute>
+                    <UserList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/contrato"
+                element={
+                  <PrivateRoute>
+                    <FormContracts />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/contrato/:contractId/editar"
+                element={
+                  <PrivateRoute>
+                    <FormContracts />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/contrato/:contractId"
+                element={
+                  <PrivateRoute>
+                    <ContractDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/actividades"
+                element={
+                  <PrivateRoute>
+                    <ActivitiesList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/actividades/crear"
+                element={
+                  <PrivateRoute>
+                    <CreateActivityForm />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/actividades/:id/editar"
+                element={
+                  <PrivateRoute>
+                    <CreateActivityForm />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/pruebas/mmse"
+                element={
+                  <PrivateRoute>
+                    <MMSETest />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/pruebas/yesavage"
+                element={
+                  <PrivateRoute>
+                    <YesavageTest />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/cronograma"
+                element={
+                  <PrivateRoute>
+                    <Cronograma />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/transporte"
+                element={
+                  <PrivateRoute>
+                    <Transporte />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/facturacion"
+                element={
+                  <PrivateRoute>
+                    <Billing />
+                  </PrivateRoute>
+                }
+              />
+            </Route>
+            <Route path="*" element={<Navigate to="/usuarios" replace />} />
+          </Routes>
+        </Router>
+      </AntApp>
     </ConfigProvider>
   );
 };

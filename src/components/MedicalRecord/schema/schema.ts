@@ -122,6 +122,7 @@ export const formSchema = z.object({
   otherAlergies: z.array(otherAlergies).default([]),
   diagnostic: z.array(diagnosticSchema).default([]),
   surgeries: z.array(surgeriesSchema).default([]),
+  vaccines: z.array(vaccineSchema).default([]),
   temperature: z.number({ coerce: true }).nullable().default(null),
   weight: z.number({ coerce: true }).nullable().default(null),
   feeding: z.string().nullable().default(null),

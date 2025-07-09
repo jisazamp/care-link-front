@@ -78,7 +78,7 @@ export const NewEvolutionReport: React.FC = () => {
           <Divider style={{ margin: "16px 0" }} />
           <Row gutter={32}>
             <Col span={8}><Text strong>Motivo de consulta:</Text><br />{report?.motivo_consulta}</Col>
-            <Col span={8}><Text strong>Diagnóstico:</Text><br />{report?.diagnostico}</Col>
+            <Col span={8}><Text strong>Diagnóstico:</Text><br />{report?.diagnosticos}</Col>
             <Col span={8}><Text strong>Remisión:</Text><br />{report?.remision}</Col>
           </Row>
           <Row style={{ marginTop: 12 }}>

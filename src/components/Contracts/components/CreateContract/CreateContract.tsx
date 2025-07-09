@@ -1,7 +1,7 @@
 import { FileDoneOutlined } from "@ant-design/icons";
 import { Button, Card, DatePicker, Form, Layout, Select } from "antd";
 import type { Dayjs } from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import type { FormValues } from "../FormContracts";
 import dayjs from "dayjs";
@@ -26,6 +26,10 @@ export const CreateContract = ({
   const contractType = methods.watch("contractType");
   const billed = methods.watch("billed");
 
+  // Usar useRef para mantener referencias estables
+  const methodsRef = useRef(methods);
+  methodsRef.current = methods;
+
   const handleNext = () => {
     if (startDate && endDate && contractType && billed) {
       const contractData: ContractData = {
@@ -38,9 +42,16 @@ export const CreateContract = ({
     }
   };
 
+  // useEffect optimizado para evitar ciclos infinitos
   useEffect(() => {
-    if (startDate) {
-      methods.setValue("endDate", startDate.add(1, "month"));
+    if (startDate && startDate.isValid()) {
+      const newEndDate = startDate.add(1, "month");
+      const currentEndDate = methods.getValues("endDate");
+      
+      // Solo actualizar si la fecha de finalización es diferente
+      if (!currentEndDate || !newEndDate.isSame(currentEndDate, 'day')) {
+        methods.setValue("endDate", newEndDate);
+      }
     }
   }, [startDate, methods]);
 
@@ -82,7 +93,7 @@ export const CreateContract = ({
                   {...field}
                   style={{ width: "100%" }}
                   disabledDate={(current) => {
-                    return current && current < (typeof dayjs === 'function' ? dayjs().startOf('day') : new Date());
+                    return current && current < dayjs().startOf('day');
                   }}
                 />
               )}
