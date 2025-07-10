@@ -180,16 +180,34 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     {
       title: "Servicio",
       dataIndex: "serviceType",
-      render: (_: unknown, record: Service) => (
-        <Select
-          style={{ width: "100%", minWidth: 200 }}
-          value={record.serviceType || undefined}
-          onChange={(value) => handleServiceChange(record.key, value)}
-          allowClear
-        >
-          {getSelectorOptions(record.key, services)}
-        </Select>
-      ),
+      render: (_: unknown, record: Service) => {
+        // Lógica para deshabilitar según selección cruzada
+        const tiqueteraSeleccionada = services.find(s => s.key === "1" && s.serviceType);
+        const diaSeleccionado = services.find(s => s.key === "3" && s.serviceType);
+        const isTiquetera = record.key === "1";
+        const isDia = record.key === "3";
+        return (
+          <Select
+            style={{ width: "100%", minWidth: 200 }}
+            value={record.serviceType || undefined}
+            onChange={(value) => handleServiceChange(record.key, value)}
+            allowClear
+            placeholder={
+              record.key === "1"
+                ? "Elija un paquete de tiquetera"
+                : record.key === "2"
+                ? "Elija el servicio de transporte"
+                : "Servicio de día"
+            }
+            disabled={
+              (isTiquetera && !!diaSeleccionado?.serviceType) ||
+              (isDia && !!tiqueteraSeleccionada?.serviceType)
+            }
+          >
+            {getSelectorOptions(record.key, services)}
+          </Select>
+        );
+      },
     },
     {
       title: "Cantidad Disponible",
