@@ -211,17 +211,19 @@ export const BillingContract: React.FC<BillingContractProps> = ({
               size="small"
             >
               <Row gutter={16}>
-                {services?.map((service: any, index: number) => (
-                  <Col span={12} key={index}>
-                    <Card size="small" style={{ marginBottom: 8 }}>
-                      <Text strong>{service.serviceType}</Text>
-                      <br />
-                      <Text type="secondary">
-                        Cantidad: {service.quantity} días
-                      </Text>
-                    </Card>
-                  </Col>
-                ))}
+                {services
+                  ?.filter((service: any) => service.serviceType && service.quantity > 0)
+                  .map((service: any, index: number) => (
+                    <Col span={12} key={index}>
+                      <Card size="small" style={{ marginBottom: 8 }}>
+                        <Text strong>{service.serviceType}</Text>
+                        <br />
+                        <Text type="secondary">
+                          Cantidad: {service.quantity} días
+                        </Text>
+                      </Card>
+                    </Col>
+                  ))}
               </Row>
             </Card>
 
