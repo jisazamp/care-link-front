@@ -18,6 +18,7 @@ import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBi
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
 import { usePayments } from "../../../../hooks/usePayments";
+import { useGetNextInvoiceNumber } from "../../../../hooks/useGetNextInvoiceNumber";
 import { formatCurrency, PaymentFormData } from "../../../../utils/paymentUtils";
 import type { FormValues } from "../FormContracts";
 import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
@@ -42,6 +43,9 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const { } = useGetBillPayments(
     Number(bills?.data[0]?.id_factura),
   );
+  
+  // Hook para obtener el próximo número de factura del backend
+  const { data: nextInvoiceData, isLoading: isLoadingNextInvoice } = useGetNextInvoiceNumber();
 
   const { calculatePartialBillFn, partialBill, calculatePartialBillPending } =
     useCalculatePartialBill();
@@ -134,11 +138,15 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     onNext?.();
   };
 
-  // Generar número de factura temporal
-  const numeroFacturaTemporal = useMemo(() => {
+  // Obtener el número de factura real del backend o usar temporal como fallback
+  const numeroFacturaReal = useMemo(() => {
+    if (nextInvoiceData?.data?.next_invoice_number) {
+      return nextInvoiceData.data.next_invoice_number;
+    }
+    // Fallback temporal si no se puede obtener del backend
     const random = Math.floor(Math.random() * 1000);
     return `FACT-${startingContractYear}-${String(random).padStart(6, '0')}`;
-  }, [startingContractYear]);
+  }, [nextInvoiceData, startingContractYear]);
 
   // Calcular fecha de vencimiento (30 días después de la emisión)
   const fechaVencimiento = useMemo(() => {
@@ -162,7 +170,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     <div style={{ padding: "24px", minHeight: "100vh" }}>
       <Row justify="center">
         <Col span={20}>
-          <Card loading={calculatePartialBillPending}>
+          <Card loading={calculatePartialBillPending || isLoadingNextInvoice}>
             {/* Información de la factura */}
             <Card 
               title={
@@ -176,7 +184,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
               <Descriptions bordered column={2}>
                 <Descriptions.Item label="Número de Factura" span={1}>
                   <Text strong style={{ color: '#1890ff' }}>
-                    {numeroFacturaTemporal}
+                    {numeroFacturaReal}
                   </Text>
                 </Descriptions.Item>
                 <Descriptions.Item label="Estado" span={1}>
