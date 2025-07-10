@@ -100,15 +100,6 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
 
   return (
     <div>
-      {/* Resumen de pagos usando componente centralizado */}
-      <PaymentSummary
-        totalFactura={totalFactura}
-        totalPayments={totalPayments}
-        pendingBalance={pendingBalance}
-        showStatus={true}
-        title="Resumen de Pagos"
-      />
-
       {/* Formulario de pagos */}
       <Card title="Gestión de Pagos">
         <Form

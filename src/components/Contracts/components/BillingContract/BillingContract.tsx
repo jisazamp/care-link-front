@@ -23,6 +23,7 @@ import { formatCurrency, PaymentFormData } from "../../../../utils/paymentUtils"
 import type { FormValues } from "../FormContracts";
 import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
 import dayjs from "dayjs";
+import { PaymentSummary } from "../../../Billing/components/PaymentSummary/PaymentSummary";
 
 const { Text } = Typography;
 
@@ -227,9 +228,43 @@ export const BillingContract: React.FC<BillingContractProps> = ({
               </Row>
             </Card>
 
-            {/* Formulario de pagos */}
+            {/* Inputs de Impuestos y Descuentos */}
+            <Row gutter={16} style={{ marginBottom: 24 }}>
+              <Col span={12}>
+                <Form.Item label="Impuestos">
+                  <InputNumber
+                    min={0}
+                    value={impuestos}
+                    onChange={(v) => setImpuestos(typeof v === 'number' ? v : 0)}
+                    style={{ width: "100%" }}
+                    placeholder="0"
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Descuentos">
+                  <InputNumber
+                    min={0}
+                    value={descuentos}
+                    onChange={(v) => setDescuentos(typeof v === 'number' ? v : 0)}
+                    style={{ width: "100%" }}
+                    placeholder="0"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            {/* Único Resumen de Pagos */}
+            <PaymentSummary
+              subtotal={subtotal}
+              totalFactura={total}
+              totalPayments={payments.reduce((acc, p) => acc + (p.valor || 0), 0)}
+              pendingBalance={Math.max(0, total - payments.reduce((acc, p) => acc + (p.valor || 0), 0))}
+            />
+
+            {/* Gestión de Pagos */}
             <PaymentsForm
-              totalFactura={partialBill?.data?.data ?? 0}
+              totalFactura={total}
               initialPayments={payments}
               onChange={handlePaymentsChange}
               disabled={false}
