@@ -4,9 +4,8 @@ import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
 import { useGetPaymentTypes } from "../../../../hooks/useGetPaymentTypes";
-import { usePayments } from "../../../../hooks/usePayments";
 import { PaymentFormData } from "../../../../utils/paymentUtils";
-import { PaymentSummary } from "../PaymentSummary/PaymentSummary";
+
 
 interface PaymentsFormProps {
   totalFactura: number;
@@ -16,7 +15,6 @@ interface PaymentsFormProps {
 }
 
 export const PaymentsForm: React.FC<PaymentsFormProps> = ({
-  totalFactura,
   initialPayments = [],
   onChange,
   disabled,
@@ -37,8 +35,6 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   
   // Usar los pagos directamente desde props
   const payments = processedInitialPayments;
-  const totalPayments = payments.reduce((acc, p) => acc + (p.valor || 0), 0);
-  const pendingBalance = Math.max(0, totalFactura - totalPayments);
   const hasValidPayments = payments.length > 0 && payments.every(p => p.valor > 0);
   // Las funciones addPayment, removePayment, savePayments, updatePayment deben ser reemplazadas por versiones que usen onChange
 

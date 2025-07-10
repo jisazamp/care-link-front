@@ -71,7 +71,6 @@ export const BillingContract: React.FC<BillingContractProps> = ({
 
   // Hook centralizado de pagos
   const {
-    payments,
     hasValidPayments,
 
   } = usePayments({
@@ -123,18 +122,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
     calculateBill();
   }, [calculateBill]);
 
-  // Función memoizada para manejar cambios en pagos
-  const handlePaymentsChange = useCallback((newPayments: any[]) => {
-    const formattedPayments = (newPayments || [])
-      .filter((p): p is any => p !== undefined && p !== null)
-      .map(p => ({
-        paymentMethod: p.id_metodo_pago,
-        paymentDate: p.fecha_pago,
-        amount: p.valor,
-        id_tipo_pago: p.id_tipo_pago
-      }));
-    setValueRef.current("payments", formattedPayments);
-  }, []);
+
 
   const handleNext = () => {
     onNext?.();
@@ -309,7 +297,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             {(partialBill?.data?.data ?? 0) > 0 && (
               <Alert
                 message="Información de Facturación"
-                description="Los pagos son opcionales. Puede configurarlos ahora o más tarde."
+                description="Los pagos son opcionales. Puede configurarlos ahora o más tarde desde el módulo de facturación y contratos."
                 type="info"
                 showIcon
                 style={{ marginTop: 16 }}
@@ -325,27 +313,6 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 }
               }}
             >
-              <Form.Item label="Impuestos" name="impuestos">
-                <InputNumber
-                  min={0}
-                  style={{ width: "100%" }}
-                  placeholder="0"
-                  value={impuestos}
-                  onChange={(v) => setImpuestos(Number(v) || 0)}
-                />
-              </Form.Item>
-              <Form.Item label="Descuentos" name="descuentos">
-                <InputNumber
-                  min={0}
-                  style={{ width: "100%" }}
-                  placeholder="0"
-                  value={descuentos}
-                  onChange={(v) => setDescuentos(Number(v) || 0)}
-                />
-              </Form.Item>
-              <div style={{ margin: '16px 0', fontWeight: 'bold' }}>
-                Total calculado: {formatCurrency(total)}
-              </div>
             </Form>
           </Card>
         </Col>
