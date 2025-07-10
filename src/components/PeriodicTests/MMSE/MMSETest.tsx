@@ -37,7 +37,6 @@ export const MMSETest: React.FC = () => {
       maxScore += criterion.points;
     });
 
-    const percentage = (totalScore / maxScore) * 100;
     setScore(totalScore);
 
     // Interpretación según el puntaje
@@ -86,7 +85,7 @@ export const MMSETest: React.FC = () => {
             <Progress
               type="circle"
               percent={score ? (score / 30) * 100 : 0}
-              format={(percent) => `${score}/30`}
+              format={() => `${score}/30`}
             />
             <Alert
               message="Interpretación"

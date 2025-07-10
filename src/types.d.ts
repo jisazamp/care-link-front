@@ -263,11 +263,31 @@ export interface UserContractsResponse extends Contract {
   servicios: Service[];
 }
 
-export type Bill = {
+export interface Bill {
   id_factura: number;
+  numero_factura: string | null;
   id_contrato: number;
   fecha_emision: string;
+  fecha_vencimiento?: string;
   total_factura: number;
+  subtotal?: number;
+  impuestos?: number;
+  descuentos?: number;
+  estado_factura?: string;
+  observaciones?: string;
+  pagos?: Payment[];
+}
+
+export type BillDetail = {
+  id_detalle_factura: number;
+  id_factura: number;
+  id_servicio_contratado: number;
+  cantidad: number;
+  valor_unitario: number;
+  subtotal_linea: number;
+  impuestos_linea: number;
+  descuentos_linea: number;
+  descripcion_servicio?: string;
 };
 
 export type Payment = {
@@ -277,6 +297,14 @@ export type Payment = {
   id_tipo_pago: number;
   fecha_pago: string;
   valor: number;
+  metodo_pago?: {
+    id_metodo_pago: number;
+    nombre: string;
+  };
+  tipo_pago?: {
+    id_tipo_pago: number;
+    nombre: string;
+  };
 };
 
 interface CalculateBillBody {
@@ -289,3 +317,170 @@ export interface PaymentMethod {
   id_metodo_pago: number;
   nombre: string;
 }
+
+// =============================================================================
+// TIPOS PARA EL MÓDULO DE CRONOGRAMA
+// =============================================================================
+
+export type CronogramaAsistencia = {
+  id_cronograma: number;
+  id_profesional: number;
+  fecha: string;
+  comentario: string;
+  pacientes: CronogramaAsistenciaPaciente[];
+};
+
+export type CronogramaAsistenciaPaciente = {
+  id_cronograma_paciente: number;
+  id_usuario: number;
+  id_contrato: number;
+  estado_asistencia:
+    | "PENDIENTE"
+    | "ASISTIO"
+    | "NO_ASISTIO"
+    | "CANCELADO"
+    | "REAGENDADO";
+  requiere_transporte: boolean;
+  observaciones?: string;
+  nombres?: string;
+  apellidos?: string;
+  n_documento?: string;
+  id_profesional?: number;
+  transporte_info?: TransporteInfo;
+};
+
+export type CronogramaCreateRequest = {
+  id_profesional: number;
+  fecha: string;
+  comentario: string;
+  pacientes: number[];
+};
+
+export type ReagendarPacienteRequest = {
+  id_cronograma_paciente: number;
+  nueva_fecha: string;
+};
+
+export type UpdateEstadoAsistenciaRequest = {
+  estado_asistencia: "PENDIENTE" | "ASISTIO" | "NO_ASISTIO" | "CANCELADO";
+  observaciones?: string;
+  nueva_fecha?: string;
+};
+
+export type PacientePorFecha = {
+  id_cronograma_paciente: number;
+  id_usuario: number;
+  id_contrato: number;
+  estado_asistencia: string;
+  requiere_transporte: boolean;
+  nombres: string;
+  apellidos: string;
+  n_documento: string;
+  id_profesional: number;
+  transporte_info?: TransporteInfo;
+};
+
+export type EventoCalendario = {
+  type: "warning" | "success" | "error" | "processing" | "default";
+  content: string;
+  paciente?: CronogramaAsistenciaPaciente;
+};
+
+// ============================================================================
+// TIPOS PARA EL SISTEMA DE TRANSPORTE
+// ============================================================================
+
+export type EstadoTransporte = "PENDIENTE" | "REALIZADO" | "CANCELADO";
+
+export type CronogramaTransporte = {
+  id_transporte: number;
+  id_cronograma_paciente: number;
+  direccion_recogida?: string;
+  direccion_entrega?: string;
+  hora_recogida?: string;
+  hora_entrega?: string;
+  estado: EstadoTransporte;
+  observaciones?: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+};
+
+export type RutaTransporte = {
+  id_transporte: number;
+  id_cronograma_paciente: number;
+  nombres: string;
+  apellidos: string;
+  n_documento: string;
+  direccion_recogida?: string;
+  direccion_entrega?: string;
+  hora_recogida?: string;
+  hora_entrega?: string;
+  estado: EstadoTransporte;
+  observaciones?: string;
+};
+
+export type RutaDiaria = {
+  fecha: string;
+  rutas: RutaTransporte[];
+  total_pacientes: number;
+  total_pendientes: number;
+  total_realizados: number;
+  total_cancelados: number;
+};
+
+export type CreateTransporteRequest = {
+  id_cronograma_paciente: number;
+  direccion_recogida?: string;
+  direccion_entrega?: string;
+  hora_recogida?: string;
+  hora_entrega?: string;
+  observaciones?: string;
+};
+
+export type UpdateTransporteRequest = {
+  direccion_recogida?: string;
+  direccion_entrega?: string;
+  hora_recogida?: string;
+  hora_entrega?: string;
+  estado?: EstadoTransporte;
+  observaciones?: string;
+};
+
+export type TransporteInfo = {
+  id_transporte: number;
+  direccion_recogida?: string;
+  direccion_entrega?: string;
+  hora_recogida?: string;
+  hora_entrega?: string;
+  estado: EstadoTransporte;
+  observaciones?: string;
+};
+
+// Tipos para estadísticas de transporte
+export type EstadisticasTransporte = {
+  total_rutas: number;
+  pendientes: number;
+  realizadas: number;
+  canceladas: number;
+  porcentaje_completado: number;
+};
+
+// Tipos para filtros de transporte
+export type FiltrosTransporte = {
+  fecha?: string;
+  estado?: EstadoTransporte;
+  id_profesional?: number;
+  requiere_transporte?: boolean;
+};
+
+// Tipos para notificaciones de transporte
+export type NotificacionTransporte = {
+  id: number;
+  tipo: "info" | "warning" | "error" | "success";
+  titulo: string;
+  mensaje: string;
+  fecha: string;
+  leida: boolean;
+  id_transporte?: number;
+  id_usuario?: number;
+};

@@ -100,7 +100,7 @@ export const ViewReport: React.FC = () => {
         return (
           <span>
             {"No"} |
-            <a href="#" style={{ color: '#9957C2', marginLeft: 4 }}>Ver</a>
+            <a href="#" style={{ color: '#9957C2', marginLeft: 4 }} onClick={() => console.log('Ver tratamientos de:', record)}>Ver</a>
           </span>
         );
       },
@@ -111,8 +111,8 @@ export const ViewReport: React.FC = () => {
       key: "actions",
       render: (_: any, record: any) => (
         <span>
-          <a style={{ marginRight: 8, color: '#9957C2' }} href="#">Ver</a>
-          <a style={{ color: '#9957C2' }} href="#">Editar</a>
+          <a style={{ marginRight: 8, color: '#9957C2' }} href="#" onClick={() => console.log('Ver registro:', record)}>Ver</a>
+          <a style={{ color: '#9957C2' }} href="#" onClick={() => console.log('Editar registro:', record)}>Editar</a>
         </span>
       ),
     },
@@ -171,8 +171,7 @@ export const ViewReport: React.FC = () => {
             {/* Encabezado con acciones */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px 48px 0 48px' }}>
               <div style={{ fontWeight: 500, fontSize: 18, color: '#222', textAlign: 'left' }}>
-                {`Reporte clínico - ${report?.id_reporteclinico ?? ''} ${report?.fecha_registro ? new Date(report.fecha_registro).toLocaleDateString() : ''} - Realizado por: `}
-                <span style={{ fontWeight: 700 }}>{report?.profesional?.nombres} {report?.profesional?.apellidos}</span>
+                {encabezadoReporte}
               </div>
               <div style={{ display: 'flex', gap: 12 }}>
                 <Button
@@ -210,11 +209,11 @@ export const ViewReport: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Exploración física</div>
                 <div style={{ color: '#222', fontSize: 15, flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
-                  <div><span style={{ fontWeight: 600 }}>Peso:</span> {report?.peso ? `${report.peso} kg` : '-'}</div>
-                  <div><span style={{ fontWeight: 600 }}>Presión arterial:</span> {report?.presion_arterial ? `${report.presion_arterial} mmHg` : '-'}</div>
-                  <div><span style={{ fontWeight: 600 }}>Frecuencia cardíaca:</span> {report?.Frecuencia_cardiaca ?? '-'}</div>
-                  <div><span style={{ fontWeight: 600 }}>Temperatura corporal:</span> {report?.temperatura_corporal ? `${report.temperatura_corporal}°C` : '-'}</div>
-                  <div><span style={{ fontWeight: 600 }}>Pulsioximetría:</span> {report?.saturacionOxigeno ? `${report.saturacionOxigeno}%` : '-'}</div>
+                  <div><span style={{ fontWeight: 600 }}>Peso:</span> {exploracion.peso}</div>
+                  <div><span style={{ fontWeight: 600 }}>Presión arterial:</span> {exploracion.presion}</div>
+                  <div><span style={{ fontWeight: 600 }}>Frecuencia cardíaca:</span> {exploracion.frecuencia}</div>
+                  <div><span style={{ fontWeight: 600 }}>Temperatura corporal:</span> {exploracion.temperatura}</div>
+                  <div><span style={{ fontWeight: 600 }}>Pulsioximetría:</span> {exploracion.pulsioximetria}</div>
                 </div>
               </div>
               {/* Fila: Diagnóstico */}

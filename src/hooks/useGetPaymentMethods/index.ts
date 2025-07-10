@@ -15,4 +15,15 @@ const useGetPaymentMethods = () => {
   return { paymentMethodsData, paymentMethodsLoading };
 };
 
+const getTipoPago = () =>
+  client.get<{ data: { id_tipo_pago: number; nombre: string }[] }>(
+    "/api/tipo_pago",
+  );
+
+export const useGetTipoPago = () =>
+  useQuery({
+    queryKey: ["tipo_pago"],
+    queryFn: getTipoPago,
+  });
+
 export { useGetPaymentMethods };

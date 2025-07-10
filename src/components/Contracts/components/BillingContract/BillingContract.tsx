@@ -1,268 +1,108 @@
-import { DownloadOutlined } from "@ant-design/icons";
-import { PlusOutlined } from "@ant-design/icons";
+import { DownloadOutlined, FileTextOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
   Col,
-  DatePicker,
-  Form,
-  type FormInstance,
-  InputNumber,
-  Modal,
   Row,
-  Select,
   Typography,
-  message,
+  Descriptions,
+  Tag,
+  Alert,
+  InputNumber,
+  Form,
 } from "antd";
-import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
-import { useDeletePayment } from "../../../../hooks/useDeletePayment";
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
-import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
+import { usePayments } from "../../../../hooks/usePayments";
+import { formatCurrency, PaymentFormData } from "../../../../utils/paymentUtils";
 import type { FormValues } from "../FormContracts";
-import { queryClient } from "../../../../main";
-import { useGetContractBill } from "../../../../hooks/useGetContractBill";
+import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
+import dayjs from "dayjs";
+
+const { Text } = Typography;
 
 interface BillingContractProps {
   onNext?: () => void;
   onBack?: () => void;
+  onValidPaymentsChange?: (isValid: boolean) => void;
 }
-
-interface PaymentFormProps {
-  form: FormInstance<unknown>;
-}
-
-const PaymentForm: React.FC<PaymentFormProps> = () => {
-  const { contractId } = useParams();
-  const { deletePaymentFn, deletePaymentPending } = useDeletePayment();
-  const { paymentMethodsLoading, paymentMethodsData } = useGetPaymentMethods();
-  const form = Form.useFormInstance();
-  const payments = Form.useWatch("payments", form);
-  const { contractBillData } = useGetContractBill(Number(contractId));
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [paymentIndexToDelete, setPaymentIndexToDelete] = useState<
-    number | null
-  >(null);
-
-  const handleDelete = async (index: number) => {
-    const paymentToDelete = payments?.[index];
-
-    if (paymentToDelete?.existing && paymentToDelete?.id) {
-      try {
-        deletePaymentFn(paymentToDelete.id, {
-          onSuccess: () => {
-            const updatedPayments = [...payments];
-            queryClient.invalidateQueries({
-              queryKey: [
-                `bill-${contractBillData?.data.data.id_factura ?? 0}-payments`,
-              ],
-            });
-            updatedPayments.splice(index, 1);
-            form.setFieldsValue({ payments: updatedPayments });
-          },
-        });
-      } catch (err) {
-        message.error("Error eliminando el pago");
-      }
-    } else {
-      const updatedPayments = [...payments];
-      updatedPayments.splice(index, 1);
-      form.setFieldsValue({ payments: updatedPayments });
-    }
-
-    setIsModalVisible(false);
-    setPaymentIndexToDelete(null);
-  };
-
-  return (
-    <>
-      <Card title="Formulario de pago" style={{ marginTop: 16 }}>
-        <Form.List name="payments">
-          {(fields, { add }) => {
-            return (
-              <>
-                {!fields.length && (
-                  <Typography style={{ textAlign: "center" }}>
-                    No hay pagos registrados
-                  </Typography>
-                )}
-                {fields.map(({ key, name, ...restField }, index) => {
-                  const isExisting = payments?.[index]?.existing;
-
-                  return (
-                    <Card
-                      key={key}
-                      type="inner"
-                      title={`Pago ${name + 1}`}
-                      style={{
-                        marginBottom: 16,
-                        paddingBottom: 40,
-                      }}
-                      extra={
-                        <Button
-                          danger
-                          type="link"
-                          loading={
-                            deletePaymentPending &&
-                            paymentIndexToDelete === index
-                          }
-                          onClick={() => {
-                            setIsModalVisible(true);
-                            setPaymentIndexToDelete(index);
-                          }}
-                        >
-                          Eliminar
-                        </Button>
-                      }
-                    >
-                      <Form.Item
-                        {...restField}
-                        label="Método de pago"
-                        name={[name, "paymentMethod"]}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Ingresa un método de pago",
-                          },
-                        ]}
-                        style={{ marginBottom: 40 }}
-                      >
-                        <Select
-                          disabled={isExisting}
-                          options={paymentMethodsData?.data.data.map((m) => ({
-                            value: m.id_metodo_pago,
-                            label: m.nombre,
-                          }))}
-                          loading={paymentMethodsLoading}
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        {...restField}
-                        label="Fecha de pago"
-                        name={[name, "paymentDate"]}
-                        rules={[
-                          { required: true, message: "Selecciona una fecha" },
-                        ]}
-                        style={{ marginBottom: 40 }}
-                      >
-                        <DatePicker
-                          style={{ width: "100%" }}
-                          disabled={isExisting}
-                        />
-                      </Form.Item>
-
-                      <Form.Item
-                        {...restField}
-                        label="Monto"
-                        name={[name, "amount"]}
-                        rules={[
-                          { required: true, message: "Ingresa el monto" },
-                        ]}
-                        style={{ marginBottom: 40 }}
-                      >
-                        <InputNumber
-                          disabled={isExisting}
-                          style={{ width: "100%" }}
-                          min={0}
-                          formatter={(value) =>
-                            `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                          }
-                          placeholder="0.00"
-                        />
-                      </Form.Item>
-                    </Card>
-                  );
-                })}
-
-                <Form.Item style={{ marginBottom: 40, marginTop: 40 }}>
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    Agregar pago
-                  </Button>
-                </Form.Item>
-              </>
-            );
-          }}
-        </Form.List>
-      </Card>
-
-      <Modal
-        title="Confirmar eliminación"
-        open={isModalVisible}
-        onOk={() => {
-          if (paymentIndexToDelete !== null) {
-            handleDelete(paymentIndexToDelete);
-          }
-        }}
-        onCancel={() => {
-          setIsModalVisible(false);
-          setPaymentIndexToDelete(null);
-        }}
-        confirmLoading={deletePaymentPending}
-        okText="Eliminar"
-        okButtonProps={{ danger: true }}
-        cancelText="Cancelar"
-      >
-        <p>¿Estás seguro de que deseas eliminar este pago?</p>
-      </Modal>
-    </>
-  );
-};
 
 export const BillingContract: React.FC<BillingContractProps> = ({
   onNext,
   onBack,
+  onValidPaymentsChange,
 }) => {
   const { contractId } = useParams();
   const { watch, setValue } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
-  const { data: payments } = useGetBillPayments(
-    Number(bills?.data[0].id_factura),
+  const { } = useGetBillPayments(
+    Number(bills?.data[0]?.id_factura),
   );
-  const [form] = Form.useForm();
 
   const { calculatePartialBillFn, partialBill, calculatePartialBillPending } =
     useCalculatePartialBill();
   const services = watch("services");
   const contractStartDate = watch("startDate");
-  const selectedServicesIds = services.map((s) => Number(s.key));
-  const selectedServicesQuantities = services.map((s) => s.quantity);
-  const startingContractYear = contractStartDate?.year();
+  
+  // Memoizar arrays para evitar recreaciones constantes
+  const selectedServicesIds = useMemo(() => 
+    services?.map((s: any) => Number(s.key)) || [], 
+    [services]
+  );
+  const selectedServicesQuantities = useMemo(() => 
+    services?.map((s: any) => s.quantity) || [], 
+    [services]
+  );
+  const startingContractYear = useMemo(() => 
+    contractStartDate?.year(), 
+    [contractStartDate]
+  );
 
-  const partialBillFormatted = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-  }).format(partialBill?.data.data ?? 0);
+  const partialBillFormatted = formatCurrency(partialBill?.data?.data ?? 0);
 
-  useEffect(() => {
-    if (payments?.data?.length) {
-      form.setFieldsValue({
-        payments: payments.data.map((payment) => ({
-          id: payment.id_pago,
-          existing: true,
-          paymentMethod: "Efectivo",
-          paymentDate: dayjs(payment.fecha_pago),
-          amount: payment.valor,
-        })),
-      });
-    }
-  }, [payments, form.setFieldsValue]);
+  // Hook centralizado de pagos
+  const {
+    payments,
+    hasValidPayments,
 
-  useEffect(() => {
+  } = usePayments({
+    totalFactura: partialBill?.data?.data ?? 0,
+    onPaymentsChange: useCallback((newPayments: PaymentFormData[]) => {
+      // Solo actualiza el formulario si los pagos realmente cambiaron
+      setValue("payments", newPayments.map((p: PaymentFormData) => ({
+        paymentMethod: p.id_metodo_pago,
+        paymentDate: p.fecha_pago,
+        amount: p.valor,
+        id_tipo_pago: p.id_tipo_pago
+      })));
+    }, [setValue])
+  });
+
+  // Eliminar referencias a funciones eliminadas
+  // Eliminar logs de debug
+  // Eliminar props y lógica residual no usada
+
+  // Usar useRef para mantener referencias estables
+  const setValueRef = useRef(setValue);
+  setValueRef.current = setValue;
+
+  // Estados necesarios para el formulario de impuestos y descuentos
+  const [form] = Form.useForm();
+  const [impuestos, setImpuestos] = useState<number>(0);
+  const [descuentos, setDescuentos] = useState<number>(0);
+
+  // Eliminar estados y lógica residual no usada
+
+  // Función memoizada para calcular factura parcial
+  const calculateBill = useCallback(() => {
     if (
       startingContractYear &&
-      selectedServicesIds &&
-      selectedServicesQuantities
+      selectedServicesIds.length > 0 &&
+      selectedServicesQuantities.length > 0
     ) {
       calculatePartialBillFn({
         service_ids: selectedServicesIds,
@@ -270,55 +110,200 @@ export const BillingContract: React.FC<BillingContractProps> = ({
         year: startingContractYear,
       });
     }
+  }, [startingContractYear, selectedServicesIds, selectedServicesQuantities, calculatePartialBillFn]);
+
+  // Calcular factura parcial solo cuando cambien los servicios o año
+  useEffect(() => {
+    calculateBill();
+  }, [calculateBill]);
+
+  // Función memoizada para manejar cambios en pagos
+  const handlePaymentsChange = useCallback((newPayments: any[]) => {
+    const formattedPayments = (newPayments || [])
+      .filter((p): p is any => p !== undefined && p !== null)
+      .map(p => ({
+        paymentMethod: p.id_metodo_pago,
+        paymentDate: p.fecha_pago,
+        amount: p.valor,
+        id_tipo_pago: p.id_tipo_pago
+      }));
+    setValueRef.current("payments", formattedPayments);
   }, []);
 
+  const handleNext = () => {
+    onNext?.();
+  };
+
+  // Generar número de factura temporal
+  const numeroFacturaTemporal = useMemo(() => {
+    const random = Math.floor(Math.random() * 1000);
+    return `FACT-${startingContractYear}-${String(random).padStart(6, '0')}`;
+  }, [startingContractYear]);
+
+  // Calcular fecha de vencimiento (30 días después de la emisión)
+  const fechaVencimiento = useMemo(() => {
+    if (contractStartDate) {
+      return dayjs(contractStartDate).add(30, 'days');
+    }
+    return dayjs().add(30, 'days');
+  }, [contractStartDate]);
+
+  // Cálculo del total en tiempo real
+  const subtotal = partialBill?.data?.data ?? 0;
+  const total = subtotal + (impuestos || 0) - (descuentos || 0);
+
+  useEffect(() => {
+    if (onValidPaymentsChange) {
+      onValidPaymentsChange(hasValidPayments);
+    }
+  }, [hasValidPayments, onValidPaymentsChange]);
+
   return (
-    <Form
-      layout="vertical"
-      form={form}
-      style={{ padding: "24px", minHeight: "100vh" }}
-      onFinish={(values) => {
-        setValue("payments", values.payments);
-        onNext?.();
-      }}
-    >
+    <div style={{ padding: "24px", minHeight: "100vh" }}>
       <Row justify="center">
-        <Col span={18}>
+        <Col span={20}>
           <Card loading={calculatePartialBillPending}>
-            <Card>
-              <Row justify="space-between" align="middle">
-                <Col>
-                  <h3 style={{ margin: 0 }}>
-                    Descargar factura ({partialBillFormatted})
-                  </h3>
-                </Col>
-                <Col>
-                  <Button type="primary" icon={<DownloadOutlined />} disabled>
-                    Descargar
-                  </Button>
-                </Col>
+            {/* Información de la factura */}
+            <Card 
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <FileTextOutlined style={{ color: '#1890ff' }} />
+                  <span>Información de la Factura</span>
+                </div>
+              }
+              style={{ marginBottom: 16 }}
+            >
+              <Descriptions bordered column={2}>
+                <Descriptions.Item label="Número de Factura" span={1}>
+                  <Text strong style={{ color: '#1890ff' }}>
+                    {numeroFacturaTemporal}
+                  </Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Estado" span={1}>
+                  <Tag color="processing">PENDIENTE</Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Fecha de Emisión" span={1}>
+                  {contractStartDate ? dayjs(contractStartDate).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY')}
+                </Descriptions.Item>
+                <Descriptions.Item label="Fecha de Vencimiento" span={1}>
+                  {fechaVencimiento.format('DD/MM/YYYY')}
+                </Descriptions.Item>
+                <Descriptions.Item label="Total Calculado" span={2}>
+                  <Text strong style={{ fontSize: 18, color: '#1890ff' }}>
+                    {partialBillFormatted}
+                  </Text>
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+
+            {/* Servicios incluidos */}
+            <Card 
+              title="Servicios Incluidos" 
+              style={{ marginBottom: 16 }}
+              size="small"
+            >
+              <Row gutter={16}>
+                {services?.map((service: any, index: number) => (
+                  <Col span={12} key={index}>
+                    <Card size="small" style={{ marginBottom: 8 }}>
+                      <Text strong>{service.serviceType}</Text>
+                      <br />
+                      <Text type="secondary">
+                        Cantidad: {service.quantity} días
+                      </Text>
+                    </Card>
+                  </Col>
+                ))}
               </Row>
             </Card>
 
-            <PaymentForm form={form} />
-          </Card>
+            {/* Formulario de pagos */}
+            <PaymentsForm
+              totalFactura={partialBill?.data?.data ?? 0}
+              initialPayments={payments}
+              onChange={handlePaymentsChange}
+              disabled={false}
+            />
 
-          <Row justify="end" style={{ marginTop: 24 }}>
-            {onBack && (
-              <Button onClick={onBack} style={{ marginRight: 8 }}>
-                Atrás
-              </Button>
-            )}
-            {onNext && (
-              <Form.Item label={null}>
-                <Button type="primary" htmlType="submit">
-                  Siguiente
+            {/* Botones de acción */}
+            <Row justify="space-between" style={{ marginTop: 24 }}>
+              <Col>
+                <Button 
+                  type="default" 
+                  icon={<DownloadOutlined />} 
+                  disabled={!hasValidPayments}
+                >
+                  Descargar Factura
                 </Button>
-              </Form.Item>
+              </Col>
+              <Col>
+                <Row gutter={8}>
+                  {onBack && (
+                    <Col>
+                      <Button onClick={onBack}>
+                        Atrás
+                      </Button>
+                    </Col>
+                  )}
+                  {onNext && (
+                    <Col>
+                      <Button 
+                        type="primary" 
+                        onClick={handleNext}
+                      >
+                        Siguiente
+                      </Button>
+                    </Col>
+                  )}
+                </Row>
+              </Col>
+            </Row>
+
+            {/* Alertas informativas */}
+            {(partialBill?.data?.data ?? 0) > 0 && (
+              <Alert
+                message="Información de Facturación"
+                description="Los pagos son opcionales. Puede configurarlos ahora o más tarde."
+                type="info"
+                showIcon
+                style={{ marginTop: 16 }}
+              />
             )}
-          </Row>
+
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={() => {
+                if (onNext) {
+                  onNext();
+                }
+              }}
+            >
+              <Form.Item label="Impuestos" name="impuestos">
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  placeholder="0"
+                  value={impuestos}
+                  onChange={(v) => setImpuestos(Number(v) || 0)}
+                />
+              </Form.Item>
+              <Form.Item label="Descuentos" name="descuentos">
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  placeholder="0"
+                  value={descuentos}
+                  onChange={(v) => setDescuentos(Number(v) || 0)}
+                />
+              </Form.Item>
+              <div style={{ margin: '16px 0', fontWeight: 'bold' }}>
+                Total calculado: {formatCurrency(total)}
+              </div>
+            </Form>
+          </Card>
         </Col>
       </Row>
-    </Form>
+    </div>
   );
 };
