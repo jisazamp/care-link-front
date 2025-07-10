@@ -235,6 +235,8 @@ export type CreateContractRequest = {
     id_servicio: number;
     precio_por_dia: number;
   }[];
+  impuestos?: number;
+  descuentos?: number;
 };
 
 export type UpdateContractRequest = {

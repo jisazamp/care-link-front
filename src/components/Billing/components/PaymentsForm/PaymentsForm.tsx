@@ -24,7 +24,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   const [form] = Form.useForm();
   
   // Hooks centralizados
-  const { paymentMethodsData, paymentMethodsLoading } = useGetPaymentMethods();
+  const { data: paymentMethodsData, isLoading: paymentMethodsLoading } = useGetPaymentMethods();
   const { data: paymentTypesData, isLoading: paymentTypesLoading } = useGetPaymentTypes();
   
   // Procesar pagos iniciales para convertir fechas a objetos dayjs
@@ -52,8 +52,8 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   });
 
   // Cargar datos de métodos y tipos de pago
-  const paymentMethods = paymentMethodsData?.data?.data || [];
-  const paymentTypes = paymentTypesData?.data?.data || [];
+  const paymentMethods = paymentMethodsData || [];
+  const paymentTypes = paymentTypesData || [];
 
   // Función para verificar si hay pagos guardados
   const hasSavedPayments = useCallback(() => {

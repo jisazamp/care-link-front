@@ -1,31 +1,61 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import type { Payment } from "../../types";
 
-const createPayment = (data: Omit<Payment, "id_pago">) =>
-  client.post("/api/pagos/", data);
+interface CreatePaymentRequest {
+  id_factura: number;
+  id_metodo_pago: number;
+  id_tipo_pago: number;
+  fecha_pago: string;
+  valor: number;
+}
+
+interface CreatePaymentResponse {
+  data: Payment;
+  message: string;
+  success: boolean;
+}
+
+const createPayment = (data: CreatePaymentRequest) =>
+  client.post<CreatePaymentResponse>("/api/pagos/registrar", data);
 
 const addPaymentsToFactura = (
   facturaId: number,
   payments: Omit<Payment, "id_pago" | "id_factura">[],
 ) => client.post(`/api/facturas/${facturaId}/pagos/`, payments);
 
-const useCreatePayment = () => {
-  const {
-    mutate: createPaymentFn,
-    mutateAsync: createPaymentFnAsync,
-    isPending: createPaymentPending,
-    data: createPaymentData,
-  } = useMutation({
+export const useCreatePayment = () => {
+  const queryClient = useQueryClient();
+
+  const createPaymentMutation = useMutation({
     mutationKey: ["create-payment"],
     mutationFn: createPayment,
+    onSuccess: (response) => {
+      // Invalidar queries relacionadas con pagos
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["bill-payments"] });
+      queryClient.invalidateQueries({ queryKey: ["facturas"] });
+
+      const data = response.data;
+      if (data.success) {
+        console.log("✅ Pago registrado exitosamente:", data.message);
+      } else {
+        console.error("❌ Error al registrar pago:", data.message);
+      }
+    },
+    onError: (error: any) => {
+      // Manejar errores específicos de pagos
+      if (error.response?.status === 400) {
+        const errorMessage =
+          error.response.data?.message || "Error de validación en pago";
+        console.error("❌ Error de validación:", errorMessage);
+      } else {
+        console.error("❌ Error inesperado al registrar pago:", error);
+      }
+    },
   });
 
-  const {
-    mutate: addPaymentsToFacturaFn,
-    mutateAsync: addPaymentsToFacturaFnAsync,
-    isPending: addPaymentsToFacturaPending,
-  } = useMutation({
+  const addPaymentsToFacturaMutation = useMutation({
     mutationKey: ["add-payments-to-factura"],
     mutationFn: ({
       facturaId,
@@ -34,17 +64,25 @@ const useCreatePayment = () => {
       facturaId: number;
       payments: Omit<Payment, "id_pago" | "id_factura">[];
     }) => addPaymentsToFactura(facturaId, payments),
+    onSuccess: () => {
+      // Invalidar queries relacionadas con pagos y facturas
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["bill-payments"] });
+      queryClient.invalidateQueries({ queryKey: ["facturas"] });
+      console.log("✅ Pagos agregados a factura exitosamente");
+    },
+    onError: (error: any) => {
+      console.error("❌ Error al agregar pagos a factura:", error);
+    },
   });
 
   return {
-    createPaymentFn,
-    createPaymentFnAsync,
-    createPaymentData,
-    createPaymentPending,
-    addPaymentsToFacturaFn,
-    addPaymentsToFacturaFnAsync,
-    addPaymentsToFacturaPending,
+    createPaymentFn: createPaymentMutation.mutate,
+    createPaymentFnAsync: createPaymentMutation.mutateAsync,
+    createPaymentData: createPaymentMutation.data,
+    createPaymentPending: createPaymentMutation.isPending,
+    addPaymentsToFacturaFn: addPaymentsToFacturaMutation.mutate,
+    addPaymentsToFacturaFnAsync: addPaymentsToFacturaMutation.mutateAsync,
+    addPaymentsToFacturaPending: addPaymentsToFacturaMutation.isPending,
   };
 };
-
-export { useCreatePayment };

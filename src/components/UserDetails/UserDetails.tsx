@@ -909,7 +909,7 @@ export const UserDetails: React.FC = () => {
               >
                 <Table
                   columns={contractsColumns}
-                  dataSource={userContracts?.data}
+                  dataSource={userContracts || []}
                   pagination={false}
                   rowKey="id_contrato"
                 />

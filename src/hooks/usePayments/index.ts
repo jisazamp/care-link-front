@@ -1,12 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import {
-  PaymentFormData,
-  validatePayment,
-  validatePayments,
-  calculateTotalPayments,
-  calculatePendingBalance,
-  hasValidPayment,
-} from "../../utils/paymentUtils";
+import { PaymentFormData } from "../../utils/paymentUtils";
 
 interface UsePaymentsProps {
   totalFactura: number;
@@ -21,38 +14,42 @@ export const usePayments = ({
 }: UsePaymentsProps) => {
   const [payments, setPayments] = useState<PaymentFormData[]>(initialPayments);
 
-  // Calcular totales usando utilidades centralizadas
-  const totalPayments = useMemo(
-    () => calculateTotalPayments(payments),
-    [payments],
-  );
-
-  const pendingBalance = useMemo(
-    () => calculatePendingBalance(totalFactura, payments),
-    [totalFactura, payments],
-  );
-
-  const hasValidPayments = useMemo(() => {
-    const result = hasValidPayment(payments);
-    return result;
+  // Calcular total de pagos
+  const totalPayments = useMemo(() => {
+    return payments.reduce((total, payment) => total + (payment.valor || 0), 0);
   }, [payments]);
 
-  // Función centralizada para agregar pago
+  // Calcular saldo pendiente
+  const pendingBalance = useMemo(() => {
+    return Math.max(0, totalFactura - totalPayments);
+  }, [totalFactura, totalPayments]);
+
+  // Verificar si hay pagos válidos
+  const hasValidPayments = useMemo(() => {
+    return payments.some(
+      (payment) =>
+        payment.id_metodo_pago &&
+        payment.id_tipo_pago &&
+        payment.fecha_pago &&
+        payment.valor > 0,
+    );
+  }, [payments]);
+
+  // Agregar pago
   const addPayment = useCallback(() => {
     const newPayment: PaymentFormData = {
-      id_metodo_pago: undefined as any, // Usar undefined en lugar de 0
-      id_tipo_pago: undefined as any, // Usar undefined en lugar de 0
+      id_metodo_pago: undefined,
+      id_tipo_pago: undefined,
       fecha_pago: "",
       valor: 0,
       saved: false,
     };
-
     const updatedPayments = [...payments, newPayment];
     setPayments(updatedPayments);
     onPaymentsChange?.(updatedPayments);
   }, [payments, onPaymentsChange]);
 
-  // Función centralizada para eliminar pago
+  // Remover pago
   const removePayment = useCallback(
     (index: number) => {
       const updatedPayments = payments.filter((_, i) => i !== index);
@@ -62,75 +59,59 @@ export const usePayments = ({
     [payments, onPaymentsChange],
   );
 
-  // Función centralizada para actualizar pago
+  // Actualizar pago
   const updatePayment = useCallback(
     (index: number, payment: PaymentFormData) => {
-      const updatedPayments = payments.map((p, i) =>
-        i === index ? payment : p,
-      );
+      const updatedPayments = [...payments];
+      updatedPayments[index] = payment;
       setPayments(updatedPayments);
       onPaymentsChange?.(updatedPayments);
     },
     [payments, onPaymentsChange],
   );
 
-  // Función centralizada para validar todos los pagos
-  const validateAllPayments = useCallback(() => {
-    return validatePayments(payments);
-  }, [payments]);
-
-  // Función centralizada para guardar pagos
+  // Guardar pagos (simulado por ahora)
   const savePayments = useCallback(async () => {
-    const validation = validateAllPayments();
-
-    if (!validation.isValid) {
-      console.error("Error de validación:", validation.errors[0]);
-      return false;
-    }
-
     try {
-      // Aquí se enviarían los pagos al backend
-      console.log("Pagos guardados exitosamente");
+      const validPayments = payments.filter(
+        (payment) =>
+          payment.id_metodo_pago &&
+          payment.id_tipo_pago &&
+          payment.fecha_pago &&
+          payment.valor > 0,
+      );
 
-      // Actualizar el estado para reflejar que los pagos están guardados
-      setPayments((prevPayments) => {
-        const updatedPayments = prevPayments.map((payment) =>
-          validatePayment(payment).isValid
-            ? { ...payment, saved: true }
-            : payment,
-        );
-        onPaymentsChange?.(updatedPayments);
-        return updatedPayments;
-      });
+      if (validPayments.length === 0) {
+        console.error("❌ No hay pagos válidos para guardar");
+        return false;
+      }
+
+      // Simular guardado exitoso
+      console.log("✅ Pagos preparados para guardar:", validPayments);
+
+      // Marcar pagos como guardados
+      const updatedPayments = payments.map((payment) => ({
+        ...payment,
+        saved: true,
+      }));
+      setPayments(updatedPayments);
+      onPaymentsChange?.(updatedPayments);
 
       return true;
     } catch (error) {
-      console.error("Error al guardar los pagos:", error);
+      console.error("❌ Error al guardar pagos:", error);
       return false;
     }
-  }, [payments, validateAllPayments, onPaymentsChange]);
-
-  // Función centralizada para resetear pagos
-  const resetPayments = useCallback(() => {
-    setPayments([]);
-    onPaymentsChange?.([]);
-  }, [onPaymentsChange]);
+  }, [payments, onPaymentsChange]);
 
   return {
-    // Estado
     payments,
     totalPayments,
     pendingBalance,
     hasValidPayments,
-
-    // Acciones
     addPayment,
     removePayment,
     updatePayment,
     savePayments,
-    resetPayments,
-
-    // Validaciones
-    validateAllPayments,
   };
 };

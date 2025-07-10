@@ -51,7 +51,7 @@ import {
 } from "./schema/schema";
 import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
 import { Vaccines } from "./components/Vaccines/Vaccines";
-import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+//import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 
 const { Title } = Typography;
 const { Panel } = Collapse;
@@ -72,7 +72,8 @@ export const MedicalRecord: React.FC = () => {
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
     useCreateUserMedicalRecord(userId);
 
-  const { data: user } = useGetUserById(userId);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //const { data: user } = useGetUserById(userId);
 
   const { data: userMedicalRecord, isLoading: loadingUserMedicalRecord } =
     useGetUserMedicalRecord(userId);

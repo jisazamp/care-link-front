@@ -113,11 +113,11 @@ export const FormContracts = () => {
 
   const startDate = watch("startDate");
   const [currentStep, setCurrentStep] = useState(0);
-  const createContractMutation = useCreateContract(id);
+  const createContractMutation = useCreateContract();
   const { createContractBillFn, createContractPending } = useCreateBill();
   const { createPaymentPending, addPaymentsToFacturaFnAsync, addPaymentsToFacturaPending } = useCreatePayment();
   const { contractBillData } = useGetContractBill(Number(contractId));
-  const { paymentMethodsData } = useGetPaymentMethods();
+  const { data: paymentMethodsData } = useGetPaymentMethods();
   const { data: billPayments } = useGetBillPayments(
     Number(contractBillData?.data.data.id_factura),
   );
@@ -266,8 +266,8 @@ export const FormContracts = () => {
             );
             
             const paymentData: Omit<Payment, "id_pago">[] = validPayments.map((p) => {
-              const metodoPago = paymentMethodsData?.data.data.find(
-                (m) => m.nombre === `${p.paymentMethod}`,
+              const metodoPago = paymentMethodsData?.find(
+                (m: { id_metodo_pago: number; nombre: string }) => m.nombre === `${p.paymentMethod}`,
               );
               
               return {
@@ -314,7 +314,12 @@ export const FormContracts = () => {
     createContractMutation.mutate(contractData, {
       onSuccess: (data) => {
         const contract = data.data.data;
-        createContractBillFn(contract.id_contrato, {
+        createContractBillFn({
+          contractId: contract.id_contrato,
+          impuestos: 0,
+          descuentos: 0,
+          observaciones: "Factura generada automáticamente desde el contrato"
+        }, {
           onSuccess: async (data) => {
             const billId = data.data.data.id_factura;
             const validPayments = getValues("payments").filter(p => 
