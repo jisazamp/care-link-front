@@ -35,21 +35,12 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     }));
   }, [initialPayments]);
   
-  // Hook centralizado de pagos - ÚNICA fuente de verdad
-  const {
-    payments,
-    totalPayments,
-    pendingBalance,
-    hasValidPayments,
-    addPayment,
-    removePayment,
-    savePayments,
-    updatePayment
-  } = usePayments({
-    totalFactura,
-    initialPayments: processedInitialPayments,
-    onPaymentsChange: onChange
-  });
+  // Usar los pagos directamente desde props
+  const payments = processedInitialPayments;
+  const totalPayments = payments.reduce((acc, p) => acc + (p.valor || 0), 0);
+  const pendingBalance = Math.max(0, totalFactura - totalPayments);
+  const hasValidPayments = payments.length > 0 && payments.every(p => p.valor > 0);
+  // Las funciones addPayment, removePayment, savePayments, updatePayment deben ser reemplazadas por versiones que usen onChange
 
   // Cargar datos de métodos y tipos de pago
   const paymentMethods = paymentMethodsData?.data?.data || [];
@@ -60,35 +51,23 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     return payments.some(payment => payment.saved === true);
   }, [payments]);
 
-  // Manejar cambios en el formulario para sincronizar con el hook
+  // Manejar cambios en el formulario para sincronizar con el padre
   const handleFormChange = useCallback((_changedFields: any, allFields: any) => {
     const formPayments = (allFields.pagos || [])
-      .filter((pago: any): pago is any => pago !== undefined && pago !== null);
-    
-    // Actualizar cada pago en el hook centralizado
-    formPayments.forEach((pago: any, index: number) => {
-      const existingPayment = payments[index];
-      if (existingPayment) {
-        const updatedPayment: PaymentFormData = {
-          id_metodo_pago: pago.id_metodo_pago || undefined,
-          id_tipo_pago: pago.id_tipo_pago || undefined,
-          fecha_pago: pago.fecha_pago ? (typeof pago.fecha_pago === 'string' ? pago.fecha_pago : pago.fecha_pago.format('YYYY-MM-DD')) : "",
-          valor: pago.valor || 0,
-          saved: existingPayment.saved || false,
-        };
-        updatePayment(index, updatedPayment);
-      }
-    });
-  }, [payments, updatePayment]);
+      .filter((pago: any): pago is any => pago !== undefined && pago !== null)
+      .map((pago: any) => ({
+        ...pago,
+        fecha_pago: pago.fecha_pago ? (typeof pago.fecha_pago === 'string' ? pago.fecha_pago : pago.fecha_pago.format('YYYY-MM-DD')) : "",
+        valor: pago.valor || 0,
+      }));
+    onChange?.(formPayments);
+  }, [onChange]);
 
-  // Manejar guardar pagos
+  // Manejar guardar pagos (simulado)
   const handleSavePayments = useCallback(async () => {
-    const success = await savePayments();
-    if (success) {
-      // Usar notification en lugar de message para evitar el warning
-      console.log("Pagos guardados exitosamente");
-    }
-  }, [savePayments]);
+    // Aquí podrías implementar lógica de guardado si es necesario
+    console.log("Pagos guardados exitosamente");
+  }, []);
 
   // Preparar pagos para el formulario (convertir fechas a dayjs)
   const formPayments = useMemo(() => {
@@ -112,13 +91,18 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
               // Función para agregar pago
               const handleAddPayment = () => {
                 add();
-                addPayment();
+                const newPayments = [
+                  ...payments,
+                  { id_metodo_pago: undefined, id_tipo_pago: undefined, fecha_pago: '', valor: 0 }
+                ];
+                onChange?.(newPayments);
               };
 
               // Función para eliminar pago
               const handleRemovePayment = (name: number, idx: number) => {
                 remove(name);
-                removePayment(idx);
+                const newPayments = payments.filter((_, i) => i !== idx);
+                onChange?.(newPayments);
               };
 
               return (

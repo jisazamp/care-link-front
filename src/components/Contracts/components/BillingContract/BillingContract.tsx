@@ -99,6 +99,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const [form] = Form.useForm();
   const [impuestos, setImpuestos] = useState<number>(0);
   const [descuentos, setDescuentos] = useState<number>(0);
+  const [pagos, setPagos] = useState<PaymentFormData[]>([]);
 
   // Eliminar estados y lógica residual no usada
 
@@ -258,15 +259,15 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             <PaymentSummary
               subtotal={subtotal}
               totalFactura={total}
-              totalPayments={payments.reduce((acc, p) => acc + (p.valor || 0), 0)}
-              pendingBalance={Math.max(0, total - payments.reduce((acc, p) => acc + (p.valor || 0), 0))}
+              totalPayments={pagos.reduce((acc, p) => acc + (p.valor || 0), 0)}
+              pendingBalance={Math.max(0, total - pagos.reduce((acc, p) => acc + (p.valor || 0), 0))}
             />
 
             {/* Gestión de Pagos */}
             <PaymentsForm
               totalFactura={total}
-              initialPayments={payments}
-              onChange={handlePaymentsChange}
+              initialPayments={pagos}
+              onChange={setPagos}
               disabled={false}
             />
 
