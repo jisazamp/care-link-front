@@ -6,7 +6,6 @@ import { PaymentsForm } from "./components/PaymentsForm";
 import { useGetBillPaymentsTotal } from "../../hooks/useGetBillPayments/useGetBillPayments";
 import { useGetBillPayments } from "../../hooks/useGetBillPayments/useGetBillPayments";
 import { formatCurrency } from "../../utils/paymentUtils";
-import { useCreatePayment } from "../../hooks/useCreatePayment/useCreatePayment";
 
 interface BillingFormProps {
   initialValues?: Partial<Bill>;
@@ -28,9 +27,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
   // Hook para obtener el total pagado desde el backend
   const { data: pagosTotal, isLoading: loadingPagosTotal } = useGetBillPaymentsTotal(initialValues?.id_factura);
   // Hook para obtener los pagos consolidados desde el backend
-  const { data: pagosConsolidados, isLoading: loadingPagosConsolidados } = useGetBillPayments(initialValues?.id_factura);
-  const { createPaymentFnAsync } = useCreatePayment();
-
+const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura);
   // Determinar si es edición de factura existente
   const isEdit = Boolean(initialValues?.id_factura);
 
