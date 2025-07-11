@@ -21,3 +21,25 @@ export const useGetBillPayments = (billId: number | undefined) => {
     select: (response: any) => response.data?.data || [],
   });
 };
+
+interface BillPaymentsTotalResponse {
+  id_factura: number;
+  total_pagado: number;
+}
+
+const getBillPaymentsTotal = async (billId: number | undefined) => {
+  if (!billId) return { id_factura: 0, total_pagado: 0 };
+  const res = await client.get<BillPaymentsTotalResponse>(
+    `/api/facturas/${billId}/pagos/total`,
+  );
+  return res.data;
+};
+
+export const useGetBillPaymentsTotal = (billId: number | undefined) => {
+  return useQuery({
+    queryKey: ["bill-payments-total", billId],
+    queryFn: () => getBillPaymentsTotal(billId),
+    enabled: !!billId,
+    select: (data) => data,
+  });
+};

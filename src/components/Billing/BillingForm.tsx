@@ -3,21 +3,28 @@ import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Div
 import dayjs from "dayjs";
 import type { Bill } from "../../types";
 import { PaymentsForm } from "./components/PaymentsForm";
+import { useGetBillPaymentsTotal } from "../../hooks/useGetBillPayments/useGetBillPayments";
+import { formatCurrency } from "../../utils/paymentUtils";
 
 interface BillingFormProps {
   initialValues?: Partial<Bill>;
   onSubmit: (values: any) => void;
   loading?: boolean;
+  readOnly?: boolean;
 }
 
 export const BillingForm: React.FC<BillingFormProps> = ({
   initialValues,
   onSubmit,
   loading,
+  readOnly = false,
 }) => {
   const [form] = Form.useForm();
   const [total, setTotal] = useState<number>(0);
   const [payments, setPayments] = useState<any[]>(initialValues?.pagos || []);
+
+  // Hook para obtener el total pagado desde el backend
+  const { data: pagosTotal, isLoading: loadingPagosTotal } = useGetBillPaymentsTotal(initialValues?.id_factura);
 
   // Preprocesar valores iniciales para fechas
   const initialFormValues = {
@@ -105,6 +112,17 @@ export const BillingForm: React.FC<BillingFormProps> = ({
             </Form.Item>
           </Col>
         </Row>
+        {/* Mostrar el total pagado real desde backend */}
+        {initialValues?.id_factura && (
+          <Row gutter={16} style={{ marginTop: 8 }}>
+            <Col span={24}>
+              <Typography.Text strong style={{ color: '#52c41a', fontSize: 16 }}>
+                Valor Total Pagado:&nbsp;
+                {loadingPagosTotal ? 'Cargando...' : formatCurrency(pagosTotal?.total_pagado || 0)}
+              </Typography.Text>
+            </Col>
+          </Row>
+        )}
       </Card>
 
       <Form
@@ -113,30 +131,31 @@ export const BillingForm: React.FC<BillingFormProps> = ({
         initialValues={initialFormValues}
         onFinish={handleSubmit}
         onValuesChange={handleValuesChange}
+        disabled={readOnly}
       >
         <Form.Item label="Número de Factura" name="numero_factura">
           <Input disabled placeholder="Se genera automáticamente" />
         </Form.Item>
         <Form.Item label="Fecha de Emisión" name="fecha_emision" rules={[{ required: true, message: "Seleccione la fecha de emisión" }]}> 
-          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabled={readOnly} />
         </Form.Item>
         <Form.Item label="Fecha de Finalización" name="fecha_vencimiento">
-          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabled={readOnly} />
         </Form.Item>
         <Form.Item label="Subtotal" name="subtotal">
           <InputNumber min={0} style={{ width: "100%" }} disabled />
         </Form.Item>
         <Form.Item label="Impuestos" name="impuestos">
-          <InputNumber min={0} style={{ width: "100%" }} />
+          <InputNumber min={0} style={{ width: "100%" }} disabled={readOnly} />
         </Form.Item>
         <Form.Item label="Descuentos" name="descuentos">
-          <InputNumber min={0} style={{ width: "100%" }} />
+          <InputNumber min={0} style={{ width: "100%" }} disabled={readOnly} />
         </Form.Item>
         <Form.Item label="Total" name="total_factura">
           <InputNumber min={0} style={{ width: "100%" }} disabled />
         </Form.Item>
         <Form.Item label="Estado" name="estado_factura">
-          <Select>
+          <Select disabled={readOnly}>
             <Select.Option value="PENDIENTE">Pendiente</Select.Option>
             <Select.Option value="PAGADA">Pagada</Select.Option>
             <Select.Option value="VENCIDA">Vencida</Select.Option>
@@ -145,7 +164,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
           </Select>
         </Form.Item>
         <Form.Item label="Observaciones" name="observaciones">
-          <Input.TextArea rows={3} />
+          <Input.TextArea rows={3} disabled={readOnly} />
         </Form.Item>
         
         <Divider />
@@ -157,14 +176,16 @@ export const BillingForm: React.FC<BillingFormProps> = ({
           subtotal={form.getFieldValue("subtotal") || 0}
           totalFactura={total}
           onChange={setPayments}
-          disabled={loading}
+          disabled={readOnly || loading}
         />
         
-        <Form.Item style={{ textAlign: "right", marginTop: 24 }}>
-          <Button type="primary" htmlType="submit" loading={loading} size="large">
-            {initialValues?.id_factura ? 'Actualizar Factura' : 'Crear Factura'}
-          </Button>
-        </Form.Item>
+        {!readOnly && (
+          <Form.Item style={{ textAlign: "right", marginTop: 24 }}>
+            <Button type="primary" htmlType="submit" loading={loading} size="large">
+              {initialValues?.id_factura ? 'Actualizar Factura' : 'Crear Factura'}
+            </Button>
+          </Form.Item>
+        )}
       </Form>
     </div>
   );
