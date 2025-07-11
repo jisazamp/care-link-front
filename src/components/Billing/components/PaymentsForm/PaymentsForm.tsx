@@ -181,8 +181,9 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                         </div>
                       }
                       style={{ 
-                        marginBottom: 16,
-                        borderColor: payments[idx]?.saved ? '#52c41a' : undefined
+                        marginBottom: 32, // Más separación entre pagos
+                        borderColor: payments[idx]?.saved ? '#52c41a' : undefined,
+                        padding: '24px 16px' // Padding profesional
                       }}
                       extra={
                         <Space>
@@ -197,18 +198,20 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                         </Space>
                       }
                     >
-                      <Row gutter={16}>
-                        <Col span={12}>
+                      <Row gutter={[24, 24]}>
+                        <Col xs={24} md={12}>
                           <Form.Item
                             {...restField}
                             name={[name, "id_metodo_pago"]}
                             label="Método de Pago"
                             rules={[{ required: true, message: "Seleccione el método de pago" }]}
+                            style={{ marginBottom: 24 }}
                           >
                             <Select
                               placeholder="Seleccione método de pago"
                               loading={paymentMethodsLoading}
                               disabled={disabled}
+                              size="large"
                             >
                               {paymentMethods.map((method: any) => (
                                 <Select.Option key={method.id_metodo_pago} value={method.id_metodo_pago}>
@@ -218,17 +221,19 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                             </Select>
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} md={12}>
                           <Form.Item
                             {...restField}
                             name={[name, "id_tipo_pago"]}
                             label="Tipo de Pago"
                             rules={[{ required: true, message: "Seleccione el tipo de pago" }]}
+                            style={{ marginBottom: 24 }}
                           >
                             <Select
                               placeholder="Seleccione tipo de pago"
                               loading={paymentTypesLoading}
                               disabled={disabled}
+                              size="large"
                             >
                               {paymentTypes.map((type: any) => (
                                 <Select.Option key={type.id_tipo_pago} value={type.id_tipo_pago}>
@@ -238,23 +243,23 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                             </Select>
                           </Form.Item>
                         </Col>
-                      </Row>
-                      <Row gutter={16}>
-                        <Col span={12}>
+                        <Col xs={24} md={12}>
                           <Form.Item
                             {...restField}
                             name={[name, "fecha_pago"]}
                             label="Fecha de Pago"
                             rules={[{ required: true, message: "Seleccione la fecha de pago" }]}
+                            style={{ marginBottom: 24 }}
                           >
                             <DatePicker
                               style={{ width: "100%" }}
                               format="YYYY-MM-DD"
                               disabled={disabled}
+                              size="large"
                             />
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} md={12}>
                           <Form.Item
                             {...restField}
                             name={[name, "valor"]}
@@ -263,6 +268,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               { required: true, message: "Ingrese el valor del pago" },
                               { type: "number", min: 0.01, message: "El valor debe ser mayor a 0" }
                             ]}
+                            style={{ marginBottom: 24 }}
                           >
                             <InputNumber
                               style={{ width: "100%" }}
@@ -271,6 +277,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                               disabled={disabled}
                               placeholder="0.00"
+                              size="large"
                             />
                           </Form.Item>
                         </Col>
