@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Divider, Card, Select, message } from "antd";
+import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Divider, Card, Select, message, Space } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Bill } from "../../types";
 import { PaymentsForm } from "./components/PaymentsForm";
 import { useGetBillPaymentsTotal } from "../../hooks/useGetBillPayments/useGetBillPayments";
 import { useGetBillPayments } from "../../hooks/useGetBillPayments/useGetBillPayments";
 import { formatCurrency } from "../../utils/paymentUtils";
+import { useDownloadPDF } from "../../hooks/useDownloadPDF";
 
 interface BillingFormProps {
   initialValues?: Partial<Bill>;
@@ -23,6 +25,9 @@ export const BillingForm: React.FC<BillingFormProps> = ({
   const [form] = Form.useForm();
   const [total, setTotal] = useState<number>(0);
   const [payments, setPayments] = useState<any[]>(initialValues?.pagos || []);
+  
+  // Hook para descargar PDF
+  const { downloadPDF, isDownloading: isDownloadingPDF } = useDownloadPDF();
 
   // Hook para obtener el total pagado desde el backend
   const { data: pagosTotal, isLoading: loadingPagosTotal } = useGetBillPaymentsTotal(initialValues?.id_factura);
@@ -98,6 +103,23 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
     } catch (error) {
       console.error("❌ Error al actualizar la factura:", error);
       message.error("Error al actualizar la factura");
+    }
+  };
+
+  // Función para descargar PDF
+  const handleDownloadPDF = async () => {
+    if (!initialValues?.id_factura) {
+      message.warning("No se puede descargar PDF de una factura nueva");
+      return;
+    }
+
+    try {
+      await downloadPDF(initialValues.id_factura);
+      message.success("PDF descargado correctamente");
+    } catch (error) {
+      console.error("Error descargando PDF:", error);
+      const errorMessage = error instanceof Error ? error.message : "Error al descargar el PDF";
+      message.error(errorMessage);
     }
   };
 
@@ -202,9 +224,22 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
         
         {!readOnly && (
           <Form.Item style={{ textAlign: "right", marginTop: 24 }}>
-            <Button type="primary" htmlType="submit" loading={loading} size="large">
-              {initialValues?.id_factura ? 'Actualizar Factura' : 'Crear Factura'}
-            </Button>
+            <Space>
+              {initialValues?.id_factura && (
+                <Button 
+                  type="default" 
+                  icon={<DownloadOutlined />} 
+                  onClick={handleDownloadPDF}
+                  loading={isDownloadingPDF}
+                  size="large"
+                >
+                  {isDownloadingPDF ? "Descargando..." : "Descargar PDF"}
+                </Button>
+              )}
+              <Button type="primary" htmlType="submit" loading={loading} size="large">
+                {initialValues?.id_factura ? 'Actualizar Factura' : 'Crear Factura'}
+              </Button>
+            </Space>
           </Form.Item>
         )}
       </Form>
