@@ -1,10 +1,12 @@
-import React, { useEffect,  useState } from "react";
-import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Divider, Card, Select } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Divider, Card, Select, message } from "antd";
 import dayjs from "dayjs";
 import type { Bill } from "../../types";
 import { PaymentsForm } from "./components/PaymentsForm";
 import { useGetBillPaymentsTotal } from "../../hooks/useGetBillPayments/useGetBillPayments";
+import { useGetBillPayments } from "../../hooks/useGetBillPayments/useGetBillPayments";
 import { formatCurrency } from "../../utils/paymentUtils";
+import { useCreatePayment } from "../../hooks/useCreatePayment/useCreatePayment";
 
 interface BillingFormProps {
   initialValues?: Partial<Bill>;
@@ -25,6 +27,9 @@ export const BillingForm: React.FC<BillingFormProps> = ({
 
   // Hook para obtener el total pagado desde el backend
   const { data: pagosTotal, isLoading: loadingPagosTotal } = useGetBillPaymentsTotal(initialValues?.id_factura);
+  // Hook para obtener los pagos consolidados desde el backend
+  const { data: pagosConsolidados, isLoading: loadingPagosConsolidados } = useGetBillPayments(initialValues?.id_factura);
+  const { createPaymentFnAsync } = useCreatePayment();
 
   // Preprocesar valores iniciales para fechas
   const initialFormValues = {
@@ -46,19 +51,21 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       const impuestos = Number(initialValues.impuestos) || 0;
       const descuentos = Number(initialValues.descuentos) || 0;
       setTotal(subtotal + impuestos - descuentos);
-      
-      // Procesar pagos para asegurar que las fechas estén en el formato correcto
-      const processedPayments = (initialValues.pagos || []).map((pago: any) => ({
+      // Procesar pagos consolidados del backend
+      let pagosBackend = (pagosConsolidados || []).map((pago: any) => ({
         ...pago,
-        fecha_pago: pago.fecha_pago || ""
+        fecha_pago: pago.fecha_pago || "",
+        saved: true // Marcar como consolidados
       }));
-      setPayments(processedPayments);
+      // Procesar pagos locales (no guardados aún)
+      let pagosLocales = (initialValues.pagos || []).filter((p: any) => !pagosBackend.some((pb: any) => pb.id_pago === p.id_pago));
+      setPayments([...pagosBackend, ...pagosLocales]);
     } else {
       form.resetFields();
       setTotal(0);
       setPayments([]);
     }
-  }, [initialValues]); // Solo depende de initialValues
+  }, [initialValues, pagosConsolidados]);
 
   // Calcular total en tiempo real
   const handleValuesChange = (_changed: any, all: any) => {
@@ -69,7 +76,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
     setTotal(newTotal);
   };
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = async (values: any) => {
     // Convertir fechas a string
     const payload = {
       ...values,
@@ -78,7 +85,20 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       total_factura: total,
       pagos: payments,
     };
-    onSubmit(payload);
+    
+    console.log("🚀 Actualizando factura...");
+    console.log("📊 Estado actual de pagos:", payments);
+    
+    try {
+      // Solo actualizar la factura - los pagos se registran individualmente
+      await onSubmit(payload);
+      console.log("✅ Factura actualizada exitosamente");
+      message.success("Factura actualizada correctamente");
+      
+    } catch (error) {
+      console.error("❌ Error al actualizar la factura:", error);
+      message.error("Error al actualizar la factura");
+    }
   };
 
   return (
@@ -177,6 +197,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
           totalFactura={total}
           onChange={setPayments}
           disabled={readOnly || loading}
+          facturaId={initialValues?.id_factura}
         />
         
         {!readOnly && (

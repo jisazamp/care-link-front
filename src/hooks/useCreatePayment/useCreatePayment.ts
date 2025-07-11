@@ -55,6 +55,22 @@ export const useCreatePayment = () => {
     },
   });
 
+  // Nueva función para registrar pago individual inmediatamente
+  const registerIndividualPayment = useMutation({
+    mutationKey: ["register-individual-payment"],
+    mutationFn: createPayment,
+    onSuccess: (response) => {
+      // Invalidar queries relacionadas con pagos
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["bill-payments"] });
+      queryClient.invalidateQueries({ queryKey: ["facturas"] });
+      console.log("✅ Pago individual registrado exitosamente:", response.data);
+    },
+    onError: (error: any) => {
+      console.error("❌ Error al registrar pago individual:", error);
+    },
+  });
+
   const addPaymentsToFacturaMutation = useMutation({
     mutationKey: ["add-payments-to-factura"],
     mutationFn: ({
@@ -81,6 +97,9 @@ export const useCreatePayment = () => {
     createPaymentFnAsync: createPaymentMutation.mutateAsync,
     createPaymentData: createPaymentMutation.data,
     createPaymentPending: createPaymentMutation.isPending,
+    registerIndividualPaymentFn: registerIndividualPayment.mutate,
+    registerIndividualPaymentFnAsync: registerIndividualPayment.mutateAsync,
+    registerIndividualPaymentPending: registerIndividualPayment.isPending,
     addPaymentsToFacturaFn: addPaymentsToFacturaMutation.mutate,
     addPaymentsToFacturaFnAsync: addPaymentsToFacturaMutation.mutateAsync,
     addPaymentsToFacturaPending: addPaymentsToFacturaMutation.isPending,
