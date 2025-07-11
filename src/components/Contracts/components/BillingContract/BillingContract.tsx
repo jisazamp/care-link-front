@@ -43,9 +43,12 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const { contractId } = useParams();
   const { watch, setValue } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
-  const { } = useGetBillPayments(
-    Number(bills?.data[0]?.id_factura),
-  );
+
+  // Programación defensiva: solo si hay facturas
+  const idFactura = bills?.data && bills.data.length > 0 ? bills.data[0].id_factura : undefined;
+
+  // Si necesitas los pagos:
+  const { data: pagos } = useGetBillPayments(idFactura ? Number(idFactura) : undefined);
 
   const { calculatePartialBillFn, partialBill, calculatePartialBillPending } =
     useCalculatePartialBill();
@@ -248,6 +251,20 @@ export const BillingContract: React.FC<BillingContractProps> = ({
               onChange={handlePaymentsChange}
               disabled={false}
             />
+
+            {/* Mostrar pagos obtenidos del backend */}
+            {pagos && Array.isArray(pagos) && pagos.length > 0 && (
+              <Card size="small" style={{ margin: '16px 0', background: '#fafafa' }}>
+                <Typography.Title level={5} style={{ margin: 0, color: '#1890ff' }}>Pagos registrados en el sistema</Typography.Title>
+                <ul style={{ margin: 0, paddingLeft: 20 }}>
+                  {pagos.map((pago, idx) => (
+                    <li key={pago.id_pago || idx}>
+                      <span><b>Fecha:</b> {pago.fecha_pago} | <b>Método:</b> {pago.metodo_pago || pago.id_metodo_pago} | <b>Valor:</b> {formatCurrency(pago.valor)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
 
             {/* Botones de acción */}
             <Row justify="space-between" style={{ marginTop: 24 }}>
