@@ -234,7 +234,8 @@ export const BillingContract: React.FC<BillingContractProps> = ({
 
             {/* Formulario de pagos */}
             <PaymentsForm
-              totalFactura={partialBill?.data?.data ?? 0}
+              subtotal={subtotal}
+              totalFactura={total}
               initialPayments={payments}
               onChange={handlePaymentsChange}
               disabled={false}
@@ -312,9 +313,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                   onChange={(v) => setDescuentos(Number(v) || 0)}
                 />
               </Form.Item>
-              <div style={{ margin: '16px 0', fontWeight: 'bold' }}>
-                Total calculado: {formatCurrency(total)}
-              </div>
+              {/* Eliminado: Total calculado: {formatCurrency(total)} */}
             </Form>
           </Card>
         </Col>

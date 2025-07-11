@@ -9,6 +9,7 @@ import { PaymentFormData } from "../../../../utils/paymentUtils";
 import { PaymentSummary } from "../PaymentSummary/PaymentSummary";
 
 interface PaymentsFormProps {
+  subtotal: number; // Nuevo prop para el subtotal
   totalFactura: number;
   initialPayments?: PaymentFormData[];
   onChange?: (payments: PaymentFormData[]) => void;
@@ -16,6 +17,7 @@ interface PaymentsFormProps {
 }
 
 export const PaymentsForm: React.FC<PaymentsFormProps> = ({
+  subtotal,
   totalFactura,
   initialPayments = [],
   onChange,
@@ -102,6 +104,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     <div>
       {/* Resumen de pagos usando componente centralizado */}
       <PaymentSummary
+        subtotal={subtotal}
         totalFactura={totalFactura}
         totalPayments={totalPayments}
         pendingBalance={pendingBalance}
