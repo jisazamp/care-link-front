@@ -2,6 +2,8 @@ import dayjs from "dayjs";
 
 // Tipos centralizados
 export interface PaymentFormData {
+  id_pago?: number;
+  id_factura?: number; // Agregado para registro individual
   id_metodo_pago: number | undefined;
   id_tipo_pago: number | undefined;
   fecha_pago: string;

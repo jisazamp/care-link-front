@@ -20,8 +20,7 @@ import { useGetContractBill } from "../../../hooks/useGetContractBill";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useGetPaymentMethods } from "../../../hooks/useGetPaymentMethods";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
-import { usePayments } from "../../../hooks/usePayments";
-//import { preparePaymentsForSubmission } from "../../../utils/paymentUtils";
+import type { PaymentFormData } from "../../../utils/paymentUtils";
 import type {
   CreateContractRequest,
   Payment,
@@ -90,6 +89,8 @@ export interface FormValues {
   services: Service[];
   startDate: Dayjs | null;
   payments: { paymentMethod: number | undefined; paymentDate: string; amount: number; id_tipo_pago?: number | undefined }[];
+  impuestos?: number;
+  descuentos?: number; 
 }
 
 export const FormContracts = () => {
@@ -98,6 +99,9 @@ export const FormContracts = () => {
 
   const { data: contract } = useGetContractById(contractId);
   const { mutate: updateContract } = useUpdateContract(contractId);
+
+  // ESTADO CENTRALIZADO DE PAGOS
+  const [payments, setPayments] = useState<PaymentFormData[]>([]);
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -113,32 +117,25 @@ export const FormContracts = () => {
 
   const startDate = watch("startDate");
   const [currentStep, setCurrentStep] = useState(0);
-  const createContractMutation = useCreateContract(id);
+  const createContractMutation = useCreateContract();
   const { createContractBillFn, createContractPending } = useCreateBill();
   const { createPaymentPending, addPaymentsToFacturaFnAsync, addPaymentsToFacturaPending } = useCreatePayment();
   const { contractBillData } = useGetContractBill(Number(contractId));
-  const { paymentMethodsData } = useGetPaymentMethods();
+  const { data: paymentMethodsData } = useGetPaymentMethods();
   const { data: billPayments } = useGetBillPayments(
     Number(contractBillData?.data.data.id_factura),
   );
 
-  // Hook centralizado de pagos para el formulario
-  const {
-    hasValidPayments
-  } = usePayments({
-    totalFactura: 0, // Se actualizará cuando se calcule la factura
-    onPaymentsChange: (newPayments) => {
-      const formattedPayments = newPayments.map(p => ({
-        paymentMethod: p.id_metodo_pago,
-        paymentDate: p.fecha_pago,
-        amount: p.valor,
-        id_tipo_pago: p.id_tipo_pago
-      }));
-      setValue("payments", formattedPayments);
-    }
-  });
-
-  // Eliminar estados y lógica residual de pagosValidados
+  // Sincronizar pagos centralizados con el formulario
+  useEffect(() => {
+    const formattedPayments = payments.map(p => ({
+      paymentMethod: p.id_metodo_pago,
+      paymentDate: p.fecha_pago,
+      amount: p.valor,
+      id_tipo_pago: p.id_tipo_pago
+    }));
+    setValue("payments", formattedPayments);
+  }, [payments, setValue]);
 
   // Usar useRef para mantener referencias estables
   const setValueRef = useRef(setValue);
@@ -246,6 +243,15 @@ export const FormContracts = () => {
     setCurrentStep(2);
   }, []);
 
+  // Verificar si hay pagos válidos (lógica centralizada)
+  const hasValidPayments = payments.some(
+    (payment) =>
+      payment.id_metodo_pago &&
+      payment.id_tipo_pago &&
+      payment.fecha_pago &&
+      payment.valor > 0,
+  );
+
   const onSubmit = async (data: FormValues) => {
     if (contractId) {
       const newContract: UpdateContractRequest = buildContractData(
@@ -266,8 +272,8 @@ export const FormContracts = () => {
             );
             
             const paymentData: Omit<Payment, "id_pago">[] = validPayments.map((p) => {
-              const metodoPago = paymentMethodsData?.data.data.find(
-                (m) => m.nombre === `${p.paymentMethod}`,
+              const metodoPago = paymentMethodsData?.find(
+                (m: { id_metodo_pago: number; nombre: string }) => m.nombre === `${p.paymentMethod}`,
               );
               
               return {
@@ -314,7 +320,15 @@ export const FormContracts = () => {
     createContractMutation.mutate(contractData, {
       onSuccess: (data) => {
         const contract = data.data.data;
-        createContractBillFn(contract.id_contrato, {
+        // Obtener los valores actuales del formulario
+        const impuestos = getValues("impuestos") ?? 0;
+        const descuentos = getValues("descuentos") ?? 0;
+        createContractBillFn({
+          contractId: contract.id_contrato,
+          impuestos,
+          descuentos,
+          observaciones: "Factura generada automáticamente desde el contrato"
+        }, {
           onSuccess: async (data) => {
             const billId = data.data.data.id_factura;
             const validPayments = getValues("payments").filter(p => 
@@ -379,6 +393,8 @@ export const FormContracts = () => {
       icon: <DollarOutlined />,
       content: (
         <BillingContract
+          payments={payments}
+          setPayments={setPayments}
           onNext={handleBillingContractNext}
           onBack={handleBillingContractBack}
           onValidPaymentsChange={() => {
@@ -397,6 +413,7 @@ export const FormContracts = () => {
   const resetAll = () => {
     reset();
     setCurrentStep(0);
+    setPayments([]); // Resetear pagos centralizados
   };
 
   return (

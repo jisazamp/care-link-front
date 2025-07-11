@@ -5,6 +5,7 @@ import { formatCurrency } from '../../../../utils/paymentUtils';
 const { Text, Title } = Typography;
 
 interface PaymentSummaryProps {
+  subtotal: number; // Nuevo prop para el subtotal
   totalFactura: number;
   totalPayments: number;
   pendingBalance: number;
@@ -12,7 +13,13 @@ interface PaymentSummaryProps {
   title?: string;
 }
 
+// Exportar función para obtener el estado visual de la factura de forma centralizada
+export const getEstadoFactura = (pendingBalance: number) => {
+  return pendingBalance === 0 ? "PAGADA" : "PENDIENTE";
+};
+
 export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
+  subtotal,
   totalFactura,
   totalPayments,
   pendingBalance,
@@ -46,7 +53,17 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   return (
     <Card title={title} style={{ marginBottom: 16 }}>
       <Row gutter={16}>
-        <Col span={8}>
+        <Col span={6}>
+          <div style={{ textAlign: "center" }}>
+            <Title level={4} type="secondary">
+              Subtotal
+            </Title>
+            <Text strong style={{ fontSize: 18, color: "#595959" }}>
+              {formatCurrency(subtotal)}
+            </Text>
+          </div>
+        </Col>
+        <Col span={6}>
           <div style={{ textAlign: "center" }}>
             <Title level={4} type="secondary">
               Total Factura
@@ -56,7 +73,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
             </Text>
           </div>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <div style={{ textAlign: "center" }}>
             <Title level={4} type="secondary">
               Total Pagado
@@ -66,7 +83,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
             </Text>
           </div>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <div style={{ textAlign: "center" }}>
             <Title level={4} type="secondary">
               Saldo Pendiente
@@ -77,7 +94,6 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
           </div>
         </Col>
       </Row>
-      
       {showStatus && (
         <>
           <Divider />

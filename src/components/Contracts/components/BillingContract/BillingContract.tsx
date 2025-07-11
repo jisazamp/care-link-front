@@ -17,21 +17,25 @@ import { useParams } from "react-router-dom";
 import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
-import { usePayments } from "../../../../hooks/usePayments";
 import { formatCurrency, PaymentFormData } from "../../../../utils/paymentUtils";
 import type { FormValues } from "../FormContracts";
 import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
 import dayjs from "dayjs";
+import { getEstadoFactura } from '../../../Billing/components/PaymentSummary/PaymentSummary';
 
 const { Text } = Typography;
 
 interface BillingContractProps {
+  payments: PaymentFormData[];
+  setPayments: React.Dispatch<React.SetStateAction<PaymentFormData[]>>;
   onNext?: () => void;
   onBack?: () => void;
   onValidPaymentsChange?: (isValid: boolean) => void;
 }
 
 export const BillingContract: React.FC<BillingContractProps> = ({
+  payments,
+  setPayments,
   onNext,
   onBack,
   onValidPaymentsChange,
@@ -64,28 +68,6 @@ export const BillingContract: React.FC<BillingContractProps> = ({
 
   const partialBillFormatted = formatCurrency(partialBill?.data?.data ?? 0);
 
-  // Hook centralizado de pagos
-  const {
-    payments,
-    hasValidPayments,
-
-  } = usePayments({
-    totalFactura: partialBill?.data?.data ?? 0,
-    onPaymentsChange: useCallback((newPayments: PaymentFormData[]) => {
-      // Solo actualiza el formulario si los pagos realmente cambiaron
-      setValue("payments", newPayments.map((p: PaymentFormData) => ({
-        paymentMethod: p.id_metodo_pago,
-        paymentDate: p.fecha_pago,
-        amount: p.valor,
-        id_tipo_pago: p.id_tipo_pago
-      })));
-    }, [setValue])
-  });
-
-  // Eliminar referencias a funciones eliminadas
-  // Eliminar logs de debug
-  // Eliminar props y lógica residual no usada
-
   // Usar useRef para mantener referencias estables
   const setValueRef = useRef(setValue);
   setValueRef.current = setValue;
@@ -95,7 +77,22 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const [impuestos, setImpuestos] = useState<number>(0);
   const [descuentos, setDescuentos] = useState<number>(0);
 
-  // Eliminar estados y lógica residual no usada
+  // Sincronizar con el formulario principal de React Hook Form
+  useEffect(() => {
+    setValue("impuestos", impuestos);
+  }, [impuestos, setValue]);
+
+  useEffect(() => {
+    setValue("descuentos", descuentos);
+  }, [descuentos, setValue]);
+
+  // Cargar valores iniciales desde el formulario principal
+  useEffect(() => {
+    const currentImpuestos = watch("impuestos") ?? 0;
+    const currentDescuentos = watch("descuentos") ?? 0;
+    setImpuestos(currentImpuestos);
+    setDescuentos(currentDescuentos);
+  }, [watch]);
 
   // Función memoizada para calcular factura parcial
   const calculateBill = useCallback(() => {
@@ -152,6 +149,29 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const subtotal = partialBill?.data?.data ?? 0;
   const total = subtotal + (impuestos || 0) - (descuentos || 0);
 
+  // Calcular pagos y saldo pendiente usando el estado centralizado
+  const totalPagado = useMemo(() => {
+    return payments.reduce((total, payment) => total + (payment.valor || 0), 0);
+  }, [payments]);
+
+  const saldoPendiente = useMemo(() => {
+    return Math.max(0, total - totalPagado);
+  }, [total, totalPagado]);
+
+  // Calcular estado visual de la factura
+  const estadoFactura = getEstadoFactura(saldoPendiente);
+
+  // Verificar si hay pagos válidos
+  const hasValidPayments = useMemo(() => {
+    return payments.some(
+      (payment) =>
+        payment.id_metodo_pago &&
+        payment.id_tipo_pago &&
+        payment.fecha_pago &&
+        payment.valor > 0,
+    );
+  }, [payments]);
+
   useEffect(() => {
     if (onValidPaymentsChange) {
       onValidPaymentsChange(hasValidPayments);
@@ -180,7 +200,9 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                   </Text>
                 </Descriptions.Item>
                 <Descriptions.Item label="Estado" span={1}>
-                  <Tag color="processing">PENDIENTE</Tag>
+                  <Tag color={estadoFactura === "PAGADA" ? "green" : "orange"}>
+                    {estadoFactura}
+                  </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Fecha de Emisión" span={1}>
                   {contractStartDate ? dayjs(contractStartDate).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY')}
@@ -219,8 +241,10 @@ export const BillingContract: React.FC<BillingContractProps> = ({
 
             {/* Formulario de pagos */}
             <PaymentsForm
-              totalFactura={partialBill?.data?.data ?? 0}
-              initialPayments={payments}
+              payments={payments}
+              setPayments={setPayments}
+              subtotal={subtotal}
+              totalFactura={total}
               onChange={handlePaymentsChange}
               disabled={false}
             />
@@ -283,23 +307,25 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 <InputNumber
                   min={0}
                   style={{ width: "100%" }}
-                  placeholder="0"
+                  placeholder="0.00"
                   value={impuestos}
                   onChange={(v) => setImpuestos(Number(v) || 0)}
+                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
                 />
               </Form.Item>
               <Form.Item label="Descuentos" name="descuentos">
                 <InputNumber
                   min={0}
                   style={{ width: "100%" }}
-                  placeholder="0"
+                  placeholder="0.00"
                   value={descuentos}
                   onChange={(v) => setDescuentos(Number(v) || 0)}
+                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
                 />
               </Form.Item>
-              <div style={{ margin: '16px 0', fontWeight: 'bold' }}>
-                Total calculado: {formatCurrency(total)}
-              </div>
+              {/* Eliminado: Total calculado: {formatCurrency(total)} */}
             </Form>
           </Card>
         </Col>

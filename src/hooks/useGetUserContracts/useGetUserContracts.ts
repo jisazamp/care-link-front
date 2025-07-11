@@ -1,17 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { client } from "../../api/client";
-import type { UserContractsResponse } from "../../types";
+import type { Contract } from "../../types";
 
-const getUserContractsById = (id: number | string | undefined) => {
-  if (id) {
-    return client.get<UserContractsResponse[]>(`/api/contratos/${id}`);
-  }
-  // Si no hay ID, obtener todos los contratos
-  return client.get<UserContractsResponse[]>("/api/contratos");
+const getUserContractsById = async (id: number | string | undefined) => {
+  if (!id) return [];
+  // El endpoint devuelve directamente un array de contratos
+  const response = await client.get<Contract[]>(`/api/contratos/${id}`);
+  return response.data;
 };
 
 export const useGetUserContracts = (id: number | string | undefined) =>
   useQuery({
-    queryKey: id ? [`user-${id}-contracts`] : ["all-contracts"],
+    queryKey: ["user-contracts", id],
     queryFn: () => getUserContractsById(id),
+    enabled: !!id,
   });

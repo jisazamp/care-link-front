@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Button, Typography, Divider, Spin } from "antd";
+import { Card, Button, Typography, Divider, Spin, Modal } from "antd";
 import { PlusOutlined, FileTextOutlined, DollarOutlined } from "@ant-design/icons";
 import { BillingList } from "./BillingList";
 import { BillingForm } from "./BillingForm";
@@ -7,6 +7,7 @@ import { BillingForm } from "./BillingForm";
 import { BillingStats } from "./components/BillingStats";
 import { ContractFilters, InvoiceFilters } from "./components/BillingFilters";
 import { BillingBreadcrumb } from "./components/BillingBreadcrumb";
+import { ServiceRatesEditor } from "./components/ServiceRatesEditor/ServiceRatesEditor";
 import { useGetFacturas } from "../../hooks/useGetFacturas";
 import { useCreateFactura } from "../../hooks/useCreateFactura";
 import { useUpdateFactura } from "../../hooks/useUpdateFactura";
@@ -23,7 +24,9 @@ const { Title } = Typography;
 export const Billing: React.FC = () => {
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [sideCardVisible, setSideCardVisible] = useState(false);
+  const [showServiceRates, setShowServiceRates] = useState(false);
   const [filters, ] = useState({ estado: '', contrato: '' });
+  const [modalReadOnly, setModalReadOnly] = useState(false);
   
   // Estados para filtros individuales
   const [contractFilters, setContractFilters] = useState({
@@ -113,18 +116,21 @@ export const Billing: React.FC = () => {
   // Handler para crear nueva factura
   const handleCreate = () => {
     setEditingBill(null); // Modo creación
+    setModalReadOnly(false);
     setSideCardVisible(true);
   };
 
   // Handler para editar factura
   const handleEdit = (bill: Bill) => {
     setEditingBill(bill);
+    setModalReadOnly(false);
     setSideCardVisible(true);
   };
 
-  // Handler para ver factura (puede ser igual a editar, o mostrar solo detalles si lo deseas)
+  // Handler para ver factura (solo lectura)
   const handleView = (bill: Bill) => {
     setEditingBill(bill);
+    setModalReadOnly(true);
     setSideCardVisible(true);
   };
 
@@ -288,6 +294,26 @@ export const Billing: React.FC = () => {
       {/* Breadcrumb */}
       <BillingBreadcrumb />
       <Divider />
+      
+      {/* Botón para mostrar/ocultar editor de tarifas */}
+      <div style={{ marginBottom: 16 }}>
+        <Button 
+          type="dashed" 
+          onClick={() => setShowServiceRates(!showServiceRates)}
+          icon={<DollarOutlined />}
+        >
+          {showServiceRates ? 'Ocultar' : 'Mostrar'} Configuración de Tarifas
+        </Button>
+      </div>
+      
+      {/* Editor de tarifas */}
+      {showServiceRates && (
+        <div style={{ marginBottom: 24 }}>
+          <ServiceRatesEditor />
+        </div>
+      )}
+      
+      <Divider />
       {/* Estadísticas */}
       <BillingStats stats={stats} />
       <Divider />
@@ -299,7 +325,7 @@ export const Billing: React.FC = () => {
         />
       </Card>
       {/* Tabla de facturación completa */}
-      <Card title="Facturación Completa (Usuarios, Contratos, Facturas, Pagos)">
+      <Card title="Gestión de Contratos">
         <Table
           columns={columnsFacturacion}
           dataSource={filteredFacturacionCompleta}
@@ -309,9 +335,9 @@ export const Billing: React.FC = () => {
         />
       </Card>
       <Divider />
-      <div style={{ display: 'flex', gap: 24 }}>
+      <div className="billing-table-container" style={{ display: 'flex', gap: 24 }}>
         {/* Card de facturas */}
-        <div style={{ flex: sideCardVisible ? 0.6 : 1, transition: 'flex 0.3s' }}>
+        <div style={{ flex: 1 }}>
           {/* Filtros de Facturas encima de la lista de facturas */}
           <Card title="Filtros de Facturas" style={{ marginBottom: 16 }}>
             <InvoiceFilters 
@@ -367,30 +393,27 @@ export const Billing: React.FC = () => {
             )}
           </Card>
         </div>
-        {/* Card lateral para crear/editar */}
-        {sideCardVisible && (
-          <div style={{ flex: 0.4, minWidth: 380, maxWidth: 520 }}>
-            <Card
-              title={
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <DollarOutlined style={{ color: '#52c41a' }} />
-                  <span>{editingBill ? 'Editar Factura' : 'Nueva Factura'}</span>
-                </div>
-              }
-              extra={
-                <Button onClick={handleDetailsClose}>
-                  Cerrar
-                </Button>
-              }
-            >
-              <BillingForm
-                initialValues={editingBill || undefined}
-                onSubmit={handleFormSubmit}
-                loading={createFactura.isPending || updateFactura.isPending}
-              />
-            </Card>
-          </div>
-        )}
+        {/* Modal para crear/editar factura */}
+        <Modal
+          open={sideCardVisible}
+          onCancel={handleDetailsClose}
+          footer={null}
+          width={900}
+          title={
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <DollarOutlined style={{ color: '#52c41a' }} />
+              <span>{editingBill ? (modalReadOnly ? 'Ver Factura' : 'Editar Factura') : 'Nueva Factura'}</span>
+            </div>
+          }
+          destroyOnClose
+        >
+          <BillingForm
+            initialValues={editingBill || undefined}
+            onSubmit={handleFormSubmit}
+            loading={createFactura.isPending || updateFactura.isPending}
+            readOnly={modalReadOnly}
+          />
+        </Modal>
       </div>
     </div>
   );

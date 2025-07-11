@@ -1,35 +1,47 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../api/client";
-import { queryClient } from "../main";
-import { handleContractError } from "../utils/errorHandler";
-import { message } from "antd";
 import type { Bill } from "../types";
 
 interface CreateFacturaData {
   id_contrato: number;
   fecha_emision: string;
   fecha_vencimiento: string;
-  total: number;
-  pagos: Array<{
-    id_metodo_pago: number;
-    id_tipo_pago: number;
-    fecha_pago: string;
-    valor: number;
-  }>;
+  subtotal: number;
+  impuestos: number;
+  descuentos: number;
+  total_factura: number;
+  observaciones?: string;
+}
+
+interface CreateFacturaResponse {
+  data: Bill;
+  message: string;
+  success: boolean;
 }
 
 const createFactura = (data: CreateFacturaData) =>
-  client.post<{ data: Bill }>("/api/facturas", data);
+  client.post<CreateFacturaResponse>("/api/facturas", data);
 
-export const useCreateFactura = () =>
-  useMutation({
+export const useCreateFactura = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["create-factura"],
     mutationFn: createFactura,
-    onSuccess: () => {
+    onSuccess: (response) => {
+      // Invalidar queries relacionadas con facturas
       queryClient.invalidateQueries({ queryKey: ["facturas"] });
-      message.success("Factura creada exitosamente");
+      queryClient.invalidateQueries({ queryKey: ["contract-bills"] });
+
+      const data = response.data;
+      if (data.success) {
+        console.log("✅ Factura creada exitosamente:", data.message);
+      } else {
+        console.error("❌ Error al crear factura:", data.message);
+      }
     },
     onError: (error: any) => {
-      const errorMsg = handleContractError(error);
-      message.error(errorMsg);
+      console.error("❌ Error al crear factura:", error);
     },
   });
+};
