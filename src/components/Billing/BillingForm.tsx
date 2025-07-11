@@ -31,6 +31,9 @@ export const BillingForm: React.FC<BillingFormProps> = ({
   const { data: pagosConsolidados, isLoading: loadingPagosConsolidados } = useGetBillPayments(initialValues?.id_factura);
   const { createPaymentFnAsync } = useCreatePayment();
 
+  // Determinar si es edición de factura existente
+  const isEdit = Boolean(initialValues?.id_factura);
+
   // Preprocesar valores iniciales para fechas
   const initialFormValues = {
     ...initialValues,
@@ -157,25 +160,25 @@ export const BillingForm: React.FC<BillingFormProps> = ({
           <Input disabled placeholder="Se genera automáticamente" />
         </Form.Item>
         <Form.Item label="Fecha de Emisión" name="fecha_emision" rules={[{ required: true, message: "Seleccione la fecha de emisión" }]}> 
-          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabled={readOnly} />
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabled />
         </Form.Item>
         <Form.Item label="Fecha de Finalización" name="fecha_vencimiento">
-          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabled={readOnly} />
+          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabled />
         </Form.Item>
         <Form.Item label="Subtotal" name="subtotal">
           <InputNumber min={0} style={{ width: "100%" }} disabled />
         </Form.Item>
         <Form.Item label="Impuestos" name="impuestos">
-          <InputNumber min={0} style={{ width: "100%" }} disabled={readOnly} />
+          <InputNumber min={0} style={{ width: "100%" }} disabled />
         </Form.Item>
         <Form.Item label="Descuentos" name="descuentos">
-          <InputNumber min={0} style={{ width: "100%" }} disabled={readOnly} />
+          <InputNumber min={0} style={{ width: "100%" }} disabled={!isEdit ? readOnly : false} />
         </Form.Item>
         <Form.Item label="Total" name="total_factura">
           <InputNumber min={0} style={{ width: "100%" }} disabled />
         </Form.Item>
         <Form.Item label="Estado" name="estado_factura">
-          <Select disabled={readOnly}>
+          <Select disabled={!isEdit ? readOnly : false}>
             <Select.Option value="PENDIENTE">Pendiente</Select.Option>
             <Select.Option value="PAGADA">Pagada</Select.Option>
             <Select.Option value="VENCIDA">Vencida</Select.Option>
@@ -184,7 +187,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
           </Select>
         </Form.Item>
         <Form.Item label="Observaciones" name="observaciones">
-          <Input.TextArea rows={3} disabled={readOnly} />
+          <Input.TextArea rows={3} disabled={!isEdit ? readOnly : false} />
         </Form.Item>
         
         <Divider />
