@@ -20,8 +20,7 @@ import { useGetContractBill } from "../../../hooks/useGetContractBill";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useGetPaymentMethods } from "../../../hooks/useGetPaymentMethods";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
-import { usePayments } from "../../../hooks/usePayments";
-//import { preparePaymentsForSubmission } from "../../../utils/paymentUtils";
+import type { PaymentFormData } from "../../../utils/paymentUtils";
 import type {
   CreateContractRequest,
   Payment,
@@ -101,6 +100,9 @@ export const FormContracts = () => {
   const { data: contract } = useGetContractById(contractId);
   const { mutate: updateContract } = useUpdateContract(contractId);
 
+  // ESTADO CENTRALIZADO DE PAGOS
+  const [payments, setPayments] = useState<PaymentFormData[]>([]);
+
   const methods = useForm<FormValues>({
     defaultValues: {
       endDate: null,
@@ -124,23 +126,16 @@ export const FormContracts = () => {
     Number(contractBillData?.data.data.id_factura),
   );
 
-  // Hook centralizado de pagos para el formulario
-  const {
-    hasValidPayments
-  } = usePayments({
-    totalFactura: 0, // Se actualizará cuando se calcule la factura
-    onPaymentsChange: (newPayments) => {
-      const formattedPayments = newPayments.map(p => ({
-        paymentMethod: p.id_metodo_pago,
-        paymentDate: p.fecha_pago,
-        amount: p.valor,
-        id_tipo_pago: p.id_tipo_pago
-      }));
-      setValue("payments", formattedPayments);
-    }
-  });
-
-  // Eliminar estados y lógica residual de pagosValidados
+  // Sincronizar pagos centralizados con el formulario
+  useEffect(() => {
+    const formattedPayments = payments.map(p => ({
+      paymentMethod: p.id_metodo_pago,
+      paymentDate: p.fecha_pago,
+      amount: p.valor,
+      id_tipo_pago: p.id_tipo_pago
+    }));
+    setValue("payments", formattedPayments);
+  }, [payments, setValue]);
 
   // Usar useRef para mantener referencias estables
   const setValueRef = useRef(setValue);
@@ -247,6 +242,15 @@ export const FormContracts = () => {
   const handleAgendaSettingsContractBack = useCallback(() => {
     setCurrentStep(2);
   }, []);
+
+  // Verificar si hay pagos válidos (lógica centralizada)
+  const hasValidPayments = payments.some(
+    (payment) =>
+      payment.id_metodo_pago &&
+      payment.id_tipo_pago &&
+      payment.fecha_pago &&
+      payment.valor > 0,
+  );
 
   const onSubmit = async (data: FormValues) => {
     if (contractId) {
@@ -389,6 +393,8 @@ export const FormContracts = () => {
       icon: <DollarOutlined />,
       content: (
         <BillingContract
+          payments={payments}
+          setPayments={setPayments}
           onNext={handleBillingContractNext}
           onBack={handleBillingContractBack}
           onValidPaymentsChange={() => {
@@ -407,6 +413,7 @@ export const FormContracts = () => {
   const resetAll = () => {
     reset();
     setCurrentStep(0);
+    setPayments([]); // Resetear pagos centralizados
   };
 
   return (

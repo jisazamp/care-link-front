@@ -13,6 +13,11 @@ interface PaymentSummaryProps {
   title?: string;
 }
 
+// Exportar función para obtener el estado visual de la factura de forma centralizada
+export const getEstadoFactura = (pendingBalance: number) => {
+  return pendingBalance === 0 ? "PAGADA" : "PENDIENTE";
+};
+
 export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   subtotal,
   totalFactura,

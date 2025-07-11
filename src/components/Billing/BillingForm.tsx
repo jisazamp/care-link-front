@@ -152,9 +152,10 @@ export const BillingForm: React.FC<BillingFormProps> = ({
         
         {/* Formulario de pagos */}
         <PaymentsForm
+          payments={payments}
+          setPayments={setPayments}
           subtotal={form.getFieldValue("subtotal") || 0}
           totalFactura={total}
-          initialPayments={payments}
           onChange={setPayments}
           disabled={loading}
         />

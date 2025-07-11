@@ -4,22 +4,23 @@ import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
 import { useGetPaymentTypes } from "../../../../hooks/useGetPaymentTypes";
-import { usePayments } from "../../../../hooks/usePayments";
 import { PaymentFormData } from "../../../../utils/paymentUtils";
 import { PaymentSummary } from "../PaymentSummary/PaymentSummary";
 
 interface PaymentsFormProps {
+  payments: PaymentFormData[];
+  setPayments: React.Dispatch<React.SetStateAction<PaymentFormData[]>>;
   subtotal: number; // Nuevo prop para el subtotal
   totalFactura: number;
-  initialPayments?: PaymentFormData[];
   onChange?: (payments: PaymentFormData[]) => void;
   disabled?: boolean;
 }
 
 export const PaymentsForm: React.FC<PaymentsFormProps> = ({
+  payments,
+  setPayments,
   subtotal,
   totalFactura,
-  initialPayments = [],
   onChange,
   disabled,
 }) => {
@@ -28,30 +29,27 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   // Hooks centralizados
   const { data: paymentMethodsData, isLoading: paymentMethodsLoading } = useGetPaymentMethods();
   const { data: paymentTypesData, isLoading: paymentTypesLoading } = useGetPaymentTypes();
-  
-  // Procesar pagos iniciales para convertir fechas a objetos dayjs
-  const processedInitialPayments = useMemo(() => {
-    return initialPayments.map(payment => ({
-      ...payment,
-      fecha_pago: payment.fecha_pago || ""
-    }));
-  }, [initialPayments]);
-  
-  // Hook centralizado de pagos - ÚNICA fuente de verdad
-  const {
-    payments,
-    totalPayments,
-    pendingBalance,
-    hasValidPayments,
-    addPayment,
-    removePayment,
-    savePayments,
-    updatePayment
-  } = usePayments({
-    totalFactura,
-    initialPayments: processedInitialPayments,
-    onPaymentsChange: onChange
-  });
+
+  // Calcular total de pagos usando el estado centralizado
+  const totalPayments = useMemo(() => {
+    return payments.reduce((total, payment) => total + (payment.valor || 0), 0);
+  }, [payments]);
+
+  // Calcular saldo pendiente
+  const pendingBalance = useMemo(() => {
+    return Math.max(0, totalFactura - totalPayments);
+  }, [totalFactura, totalPayments]);
+
+  // Verificar si hay pagos válidos
+  const hasValidPayments = useMemo(() => {
+    return payments.some(
+      (payment) =>
+        payment.id_metodo_pago &&
+        payment.id_tipo_pago &&
+        payment.fecha_pago &&
+        payment.valor > 0,
+    );
+  }, [payments]);
 
   // Cargar datos de métodos y tipos de pago
   const paymentMethods = paymentMethodsData || [];
@@ -62,35 +60,60 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     return payments.some(payment => payment.saved === true);
   }, [payments]);
 
-  // Manejar cambios en el formulario para sincronizar con el hook
+  // Manejar cambios en el formulario para sincronizar con el estado centralizado
   const handleFormChange = useCallback((_changedFields: any, allFields: any) => {
     const formPayments = (allFields.pagos || [])
       .filter((pago: any): pago is any => pago !== undefined && pago !== null);
     
-    // Actualizar cada pago en el hook centralizado
-    formPayments.forEach((pago: any, index: number) => {
+    // Actualizar cada pago en el estado centralizado
+    const updatedPayments = formPayments.map((pago: any, index: number) => {
       const existingPayment = payments[index];
-      if (existingPayment) {
-        const updatedPayment: PaymentFormData = {
-          id_metodo_pago: pago.id_metodo_pago || undefined,
-          id_tipo_pago: pago.id_tipo_pago || undefined,
-          fecha_pago: pago.fecha_pago ? (typeof pago.fecha_pago === 'string' ? pago.fecha_pago : pago.fecha_pago.format('YYYY-MM-DD')) : "",
-          valor: pago.valor || 0,
-          saved: existingPayment.saved || false,
-        };
-        updatePayment(index, updatedPayment);
-      }
+      return {
+        id_metodo_pago: pago.id_metodo_pago || undefined,
+        id_tipo_pago: pago.id_tipo_pago || undefined,
+        fecha_pago: pago.fecha_pago ? (typeof pago.fecha_pago === 'string' ? pago.fecha_pago : pago.fecha_pago.format('YYYY-MM-DD')) : "",
+        valor: pago.valor || 0,
+        saved: existingPayment?.saved || false,
+      };
     });
-  }, [payments, updatePayment]);
+    
+    setPayments(updatedPayments);
+    onChange?.(updatedPayments);
+  }, [payments, setPayments, onChange]);
 
   // Manejar guardar pagos
   const handleSavePayments = useCallback(async () => {
-    const success = await savePayments();
-    if (success) {
-      // Usar notification en lugar de message para evitar el warning
-      console.log("Pagos guardados exitosamente");
+    try {
+      const validPayments = payments.filter(
+        (payment) =>
+          payment.id_metodo_pago &&
+          payment.id_tipo_pago &&
+          payment.fecha_pago &&
+          payment.valor > 0,
+      );
+
+      if (validPayments.length === 0) {
+        console.error("❌ No hay pagos válidos para guardar");
+        return false;
+      }
+
+      // Simular guardado exitoso
+      console.log("✅ Pagos preparados para guardar:", validPayments);
+
+      // Marcar pagos como guardados
+      const updatedPayments = payments.map((payment) => ({
+        ...payment,
+        saved: true,
+      }));
+      setPayments(updatedPayments);
+      onChange?.(updatedPayments);
+
+      return true;
+    } catch (error) {
+      console.error("❌ Error al guardar pagos:", error);
+      return false;
     }
-  }, [savePayments]);
+  }, [payments, setPayments, onChange]);
 
   // Preparar pagos para el formulario (convertir fechas a dayjs)
   const formPayments = useMemo(() => {
@@ -124,13 +147,21 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
               // Función para agregar pago
               const handleAddPayment = () => {
                 add();
-                addPayment();
+                const newPayment: PaymentFormData = {
+                  id_metodo_pago: undefined,
+                  id_tipo_pago: undefined,
+                  fecha_pago: "",
+                  valor: 0,
+                  saved: false,
+                };
+                setPayments([...payments, newPayment]);
               };
 
               // Función para eliminar pago
               const handleRemovePayment = (name: number, idx: number) => {
                 remove(name);
-                removePayment(idx);
+                const updatedPayments = payments.filter((_, i) => i !== idx);
+                setPayments(updatedPayments);
               };
 
               return (
