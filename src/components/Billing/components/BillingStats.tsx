@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Statistic, Progress } from 'antd';
+import { Row, Col, Statistic, Progress, Tooltip, Typography } from 'antd';
 import {
   DollarOutlined,
   ClockCircleOutlined,
@@ -7,6 +7,8 @@ import {
   CloseCircleOutlined,
   FileTextOutlined,
 } from '@ant-design/icons';
+
+const { Text } = Typography;
 
 interface BillingStatsProps {
   stats: {
@@ -101,10 +103,15 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
           />
         </Col>
       </Row>
-      {/* Barras de progreso */}
+      {/* Barras de progreso con explicación */}
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <div style={{ marginTop: 8 }}>
+            <Tooltip title="Porcentaje de facturas que han sido completamente pagadas respecto al total de facturas.">
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                Progreso de Facturas Pagadas: Indica el % de facturas saldadas en su totalidad.
+              </Text>
+            </Tooltip>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <span>Progreso de Facturas Pagadas</span>
               <span>{porcentajePagadas}%</span>
@@ -118,6 +125,11 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
         </Col>
         <Col xs={24} md={12}>
           <div style={{ marginTop: 8 }}>
+            <Tooltip title="Porcentaje del valor total facturado que ya ha sido pagado (incluye pagos parciales y totales).">
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                Progreso de Valor Pagado: Indica el % del dinero total facturado que ya fue cobrado.
+              </Text>
+            </Tooltip>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <span>Progreso de Valor Pagado</span>
               <span>{porcentajeValorPagado}%</span>
