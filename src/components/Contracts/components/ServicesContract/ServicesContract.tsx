@@ -22,11 +22,32 @@ interface ServicesContractProps {
   onBack?: () => void;
 }
 
+const getPlaceholder = (recordKey: string) => {
+  switch (recordKey) {
+    case "1":
+      return "Elija un paquete de tiquetera";
+    case "2":
+      return "Elija un paquete de transporte";
+    case "3":
+      return "Servicio de día";
+    default:
+      return "Seleccione un servicio";
+  }
+};
+
 const getSelectorOptions = (recordKey: string, services: Service[]) => {
   switch (recordKey) {
     case "1":
+      // Verificar si hay servicio de día seleccionado para deshabilitar tiqueteras
+      const diaService = services.find(s => s.key === "3");
+      const isDiaSelected = diaService?.serviceType === "Servicio dia";
+      
       return Array.from({ length: 5 }, (_, i) => (
-        <Select.Option key={`Tiquetera ${i + 1}`} value={`Tiquetera ${i + 1}`}>
+        <Select.Option 
+          key={`Tiquetera ${i + 1}`} 
+          value={`Tiquetera ${i + 1}`}
+          disabled={isDiaSelected}
+        >
           Tiquetera {i + 1}
         </Select.Option>
       ));
@@ -52,8 +73,16 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
         </Select.Option>
       ));
     case "3":
+      // Verificar si hay tiquetera seleccionada para deshabilitar servicio de día
+      const tiqueteraSelected = services.find(s => s.key === "1");
+      const isTiqueteraSelected = tiqueteraSelected?.serviceType && tiqueteraSelected.serviceType.includes("Tiquetera");
+      
       return (
-        <Select.Option key="Servicio dia" value="Servicio dia">
+        <Select.Option 
+          key="Servicio dia" 
+          value="Servicio dia"
+          disabled={isTiqueteraSelected}
+        >
           Servicio día
         </Select.Option>
       );
@@ -83,12 +112,27 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
             methods.setValue("services", newServices);
           }
         }
+        
+        // Si se selecciona una tiquetera, limpiar el servicio de día
+        if (value) {
+          const newServices = services.map((s) =>
+            s.key === "3" ? { ...s, serviceType: "", quantity: 0 } : s,
+          );
+          methods.setValue("services", newServices);
+        }
         break;
       case "2":
         methods.setValue("selectedDatesTransport", []);
         break;
       case "3":
         methods.setValue("selectedDateDay", null);
+        // Si se selecciona el servicio de día, limpiar la tiquetera
+        if (value) {
+          const newServices = services.map((s) =>
+            s.key === "1" ? { ...s, serviceType: "", quantity: 0 } : s,
+          );
+          methods.setValue("services", newServices);
+        }
         break;
     }
 
@@ -180,16 +224,33 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     {
       title: "Servicio",
       dataIndex: "serviceType",
-      render: (_: unknown, record: Service) => (
-        <Select
-          style={{ width: "100%", minWidth: 200 }}
-          value={record.serviceType || undefined}
-          onChange={(value) => handleServiceChange(record.key, value)}
-          allowClear
-        >
-          {getSelectorOptions(record.key, services)}
-        </Select>
-      ),
+      render: (_: unknown, record: Service) => {
+        // Verificar si el campo debe estar deshabilitado
+        let isDisabled = false;
+        
+        if (record.key === "1") {
+          // Deshabilitar tiquetera si hay servicio de día seleccionado
+          const diaService = services.find(s => s.key === "3");
+          isDisabled = diaService?.serviceType === "Servicio dia";
+        } else if (record.key === "3") {
+          // Deshabilitar servicio de día si hay tiquetera seleccionada
+          const tiqueteraService = services.find(s => s.key === "1");
+          isDisabled = !!(tiqueteraService?.serviceType && tiqueteraService.serviceType.includes("Tiquetera"));
+        }
+        
+        return (
+          <Select
+            style={{ width: "100%", minWidth: 200 }}
+            value={record.serviceType || undefined}
+            onChange={(value) => handleServiceChange(record.key, value)}
+            allowClear
+            placeholder={getPlaceholder(record.key)}
+            disabled={isDisabled}
+          >
+            {getSelectorOptions(record.key, services)}
+          </Select>
+        );
+      },
     },
     {
       title: "Cantidad Disponible",
@@ -240,6 +301,9 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
             <p style={{ margin: "8px 0 0 0", color: "#666", fontSize: "14px" }}>
               <strong>Nota:</strong> El transporte seleccionado debe tener un número igual o menor al de la tiquetera. 
               Por ejemplo, si selecciona Tiquetera 3, solo podrá elegir Transporte 1, 2 o 3.
+              <br />
+              <strong>Importante:</strong> La tiquetera y el servicio de día son mutuamente excluyentes. 
+              Si selecciona una tiquetera, el servicio de día se deshabilitará y viceversa.
             </p>
           </Col>
         </Row>
