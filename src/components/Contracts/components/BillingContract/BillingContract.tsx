@@ -307,18 +307,22 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 <InputNumber
                   min={0}
                   style={{ width: "100%" }}
-                  placeholder="0"
+                  placeholder="0.00"
                   value={impuestos}
                   onChange={(v) => setImpuestos(Number(v) || 0)}
+                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
                 />
               </Form.Item>
               <Form.Item label="Descuentos" name="descuentos">
                 <InputNumber
                   min={0}
                   style={{ width: "100%" }}
-                  placeholder="0"
+                  placeholder="0.00"
                   value={descuentos}
                   onChange={(v) => setDescuentos(Number(v) || 0)}
+                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
                 />
               </Form.Item>
               {/* Eliminado: Total calculado: {formatCurrency(total)} */}
