@@ -7,6 +7,7 @@ import { BillingForm } from "./BillingForm";
 import { BillingStats } from "./components/BillingStats";
 import { ContractFilters, InvoiceFilters } from "./components/BillingFilters";
 import { BillingBreadcrumb } from "./components/BillingBreadcrumb";
+import { ServiceRatesEditor } from "./components/ServiceRatesEditor/ServiceRatesEditor";
 import { useGetFacturas } from "../../hooks/useGetFacturas";
 import { useCreateFactura } from "../../hooks/useCreateFactura";
 import { useUpdateFactura } from "../../hooks/useUpdateFactura";
@@ -23,6 +24,7 @@ const { Title } = Typography;
 export const Billing: React.FC = () => {
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [sideCardVisible, setSideCardVisible] = useState(false);
+  const [showServiceRates, setShowServiceRates] = useState(false);
   const [filters, ] = useState({ estado: '', contrato: '' });
   
   // Estados para filtros individuales
@@ -287,6 +289,26 @@ export const Billing: React.FC = () => {
     <div style={{ padding: '24px' }}>
       {/* Breadcrumb */}
       <BillingBreadcrumb />
+      <Divider />
+      
+      {/* Botón para mostrar/ocultar editor de tarifas */}
+      <div style={{ marginBottom: 16 }}>
+        <Button 
+          type="dashed" 
+          onClick={() => setShowServiceRates(!showServiceRates)}
+          icon={<DollarOutlined />}
+        >
+          {showServiceRates ? 'Ocultar' : 'Mostrar'} Configuración de Tarifas
+        </Button>
+      </div>
+      
+      {/* Editor de tarifas */}
+      {showServiceRates && (
+        <div style={{ marginBottom: 24 }}>
+          <ServiceRatesEditor />
+        </div>
+      )}
+      
       <Divider />
       {/* Estadísticas */}
       <BillingStats stats={stats} />

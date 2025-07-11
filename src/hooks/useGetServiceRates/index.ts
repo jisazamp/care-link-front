@@ -1,0 +1,1 @@
+export { useGetServiceRates } from "./useGetServiceRates";
