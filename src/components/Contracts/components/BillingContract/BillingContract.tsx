@@ -95,7 +95,22 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const [impuestos, setImpuestos] = useState<number>(0);
   const [descuentos, setDescuentos] = useState<number>(0);
 
-  // Eliminar estados y lógica residual no usada
+  // Sincronizar con el formulario principal de React Hook Form
+  useEffect(() => {
+    setValue("impuestos", impuestos);
+  }, [impuestos, setValue]);
+
+  useEffect(() => {
+    setValue("descuentos", descuentos);
+  }, [descuentos, setValue]);
+
+  // Cargar valores iniciales desde el formulario principal
+  useEffect(() => {
+    const currentImpuestos = watch("impuestos") ?? 0;
+    const currentDescuentos = watch("descuentos") ?? 0;
+    setImpuestos(currentImpuestos);
+    setDescuentos(currentDescuentos);
+  }, [watch]);
 
   // Función memoizada para calcular factura parcial
   const calculateBill = useCallback(() => {

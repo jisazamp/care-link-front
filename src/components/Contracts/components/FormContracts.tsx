@@ -90,6 +90,8 @@ export interface FormValues {
   services: Service[];
   startDate: Dayjs | null;
   payments: { paymentMethod: number | undefined; paymentDate: string; amount: number; id_tipo_pago?: number | undefined }[];
+  impuestos?: number;
+  descuentos?: number; 
 }
 
 export const FormContracts = () => {
@@ -314,10 +316,13 @@ export const FormContracts = () => {
     createContractMutation.mutate(contractData, {
       onSuccess: (data) => {
         const contract = data.data.data;
+        // Obtener los valores actuales del formulario
+        const impuestos = getValues("impuestos") ?? 0;
+        const descuentos = getValues("descuentos") ?? 0;
         createContractBillFn({
           contractId: contract.id_contrato,
-          impuestos: 0,
-          descuentos: 0,
+          impuestos,
+          descuentos,
           observaciones: "Factura generada automáticamente desde el contrato"
         }, {
           onSuccess: async (data) => {
