@@ -286,36 +286,37 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                   ))}
                   
                   {!disabled && (
-                    <Form.Item>
-                      <Button
-                        type="dashed"
-                        onClick={handleAddPayment}
-                        block
-                        icon={<PlusOutlined />}
-                      >
-                        Agregar Pago
-                      </Button>
-                    </Form.Item>
+                    <Row gutter={16} style={{ marginTop: 8 }}>
+                      <Col xs={24} md={16}>
+                        <Button
+                          type="dashed"
+                          onClick={handleAddPayment}
+                          block
+                          icon={<PlusOutlined />}
+                          size="large"
+                        >
+                          Agregar Pago
+                        </Button>
+                      </Col>
+                      <Col xs={24} md={8} style={{ textAlign: 'right', marginTop: 0 }}>
+                        <Button
+                          type="primary"
+                          size="large"
+                          onClick={handleSavePayments}
+                          disabled={!hasValidPayments || hasSavedPayments()}
+                          loading={false}
+                        >
+                          {hasSavedPayments() ? "Pagos Guardados ✓" : "Guardar Pagos"}
+                        </Button>
+                      </Col>
+                    </Row>
                   )}
                 </>
               );
             }}
           </Form.List>
           
-          {/* Botón para guardar pagos */}
-          {!disabled && (
-            <Form.Item style={{ textAlign: "right", marginTop: 24 }}>
-              <Button
-                type="primary"
-                size="large"
-                onClick={handleSavePayments}
-                disabled={!hasValidPayments || hasSavedPayments()}
-                loading={false}
-              >
-                {hasSavedPayments() ? "Pagos Guardados ✓" : "Guardar Pagos"}
-              </Button>
-            </Form.Item>
-          )}
+          {/* Eliminar cualquier otro Form.Item de 'Guardar Pagos' fuera de este bloque */}
         </Form>
       </Card>
     </div>
