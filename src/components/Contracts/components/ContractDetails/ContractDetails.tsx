@@ -1,4 +1,3 @@
-import { PlusCircleOutlined } from "@ant-design/icons";
 import { Avatar, Button, Card, Col, Flex, Row, Table, Typography, Spin, Alert } from "antd";
 import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
@@ -171,7 +170,7 @@ export const ContractDetails: React.FC = () => {
         className="full-width-card contract-card"
         loading={isLoadingContract}
       >
-        <div className="contract-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="contract-header" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
           <div className="title-wrapper">
             <Title level={5} className="contract-title" style={{ marginBottom: 0 }}>
               Contrato <span style={{ color: '#722ED1', fontWeight: 700 }}>#{contractData.contratoId}</span>
@@ -179,14 +178,6 @@ export const ContractDetails: React.FC = () => {
             <Text type="secondary" style={{ fontSize: 16 }}>
               Tipo: <b>{contractData.tipoContrato}</b> | Estado: <b>{contractData.facturado}</b>
             </Text>
-          </div>
-          <div className="contract-actions">
-            <Button type="default" className="edit-button">
-              Editar
-            </Button>
-            <Button type="text" danger className="delete-button">
-              Eliminar
-            </Button>
           </div>
         </div>
         <div className="contract-body" style={{ marginTop: 16 }}>
@@ -237,19 +228,9 @@ export const ContractDetails: React.FC = () => {
       {/* Tarjeta 4: Facturación */}
       <Card className="full-width-card billing-card">
         <div className="billing-header">
-          <Title level={5} className="billing-title">
+          <Title level={5} className="billing-title" style={{ color: 'white' }}>
             Facturas Generadas
           </Title>
-          <Button
-            className="main-button billing-add-button"
-            icon={<PlusCircleOutlined />}
-            onClick={() => {
-              setEditingFactura({ id_contrato: contractData.contratoId });
-              setModalVisible(true);
-            }}
-          >
-            Nueva Factura
-          </Button>
         </div>
         <BillingList
           bills={facturas || []}

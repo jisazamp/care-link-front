@@ -45,9 +45,9 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const { data: bills } = useGetBill(Number(contractId));
 
   // Programación defensiva: solo si hay facturas
-  const idFactura = bills?.data && bills.data.length > 0 ? bills.data[0].id_factura : undefined;
+  const idFactura = bills?.data?.length ? bills.data[0].id_factura : undefined;
 
-  // Si necesitas los pagos:
+  // Si se necesitan los pagos:
   const { data: pagos } = useGetBillPayments(idFactura ? Number(idFactura) : undefined);
 
   const { calculatePartialBillFn, partialBill, calculatePartialBillPending } =
