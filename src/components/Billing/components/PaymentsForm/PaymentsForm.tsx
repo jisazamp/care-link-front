@@ -68,7 +68,34 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     return payments.some(payment => payment.saved === true);
   }, [payments]);
 
+  // NUEVA FUNCIÓN: Verificar si hay algún pago con tipo "Pago Total"
+  const hasTotalPayment = useMemo(() => {
+    return payments.some(payment => payment.id_tipo_pago === 1); // Asumiendo que 1 es "Pago Total"
+  }, [payments]);
 
+  // NUEVA FUNCIÓN: Verificar si el último pago está completo
+  const isLastPaymentComplete = useMemo(() => {
+    if (payments.length === 0) return true; // Si no hay pagos, se puede agregar uno
+    
+    const lastPayment = payments[payments.length - 1];
+    return (
+      lastPayment.id_metodo_pago &&
+      lastPayment.id_tipo_pago &&
+      lastPayment.fecha_pago &&
+      lastPayment.valor > 0
+    );
+  }, [payments]);
+
+  // NUEVA FUNCIÓN: Verificar si se puede agregar un nuevo pago
+  const canAddNewPayment = useMemo(() => {
+    // No se puede agregar si hay un pago total
+    if (hasTotalPayment) return false;
+    
+    // No se puede agregar si el último pago no está completo
+    if (!isLastPaymentComplete) return false;
+    
+    return true;
+  }, [hasTotalPayment, isLastPaymentComplete]);
 
   // Manejar cambios en el formulario para sincronizar con el estado centralizado
   const handleFormChange = useCallback((_changedFields: any, allFields: any) => {
@@ -235,6 +262,16 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
             {(fields, { add, remove }) => {
               // Función para agregar pago
               const handleAddPayment = () => {
+                // NUEVA VALIDACIÓN: Solo agregar si se puede
+                if (!canAddNewPayment) {
+                  if (hasTotalPayment) {
+                    message.warning("No se puede agregar más pagos cuando ya existe un pago total");
+                  } else if (!isLastPaymentComplete) {
+                    message.warning("Complete el formulario del pago anterior antes de agregar uno nuevo");
+                  }
+                  return;
+                }
+                
                 add();
                 const newPayment: PaymentFormData = {
                   id_metodo_pago: undefined,
@@ -258,6 +295,11 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                   {fields.map(({ key, name, ...restField }, idx) => {
                     const pago = payments[idx];
                     const isConsolidated = pago?.id_pago || pago?.saved === true;
+                    
+                    // NUEVA LÓGICA: Determinar si los campos deben estar deshabilitados
+                    const isLastField = idx === fields.length - 1;
+                    const shouldDisableFields = !isLastField && !isConsolidated;
+                    
                     if (isConsolidated) {
                       // Renderizar solo lectura
                       return (
@@ -320,15 +362,24 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                         title={
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <span>Pago #{idx + 1}</span>
+                            {shouldDisableFields && (
+                              <span style={{ color: '#722ed1', fontSize: '12px' }}>
+                                ✓ Completado
+                              </span>
+                            )}
                           </div>
                         }
                         style={{ 
                           marginBottom: 32,
-                          padding: '24px 16px'
+                          padding: '24px 16px',
+                          ...(shouldDisableFields && { 
+                            borderColor: '#722ed1',
+                            background: '#f9f0ff'
+                          })
                         }}
                         extra={
                           <Space>
-                            {!disabled && (
+                            {!disabled && isLastField && (
                               <Button
                                 icon={<DeleteOutlined />}
                                 danger
@@ -351,7 +402,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               <Select
                                 placeholder="Seleccione método de pago"
                                 loading={paymentMethodsLoading}
-                                disabled={disabled}
+                                disabled={disabled || shouldDisableFields}
                                 size="large"
                               >
                                 {paymentMethods.map((method: any) => (
@@ -373,7 +424,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               <Select
                                 placeholder="Seleccione tipo de pago"
                                 loading={paymentTypesLoading}
-                                disabled={disabled}
+                                disabled={disabled || shouldDisableFields}
                                 size="large"
                               >
                                 {paymentTypes.map((type: any) => (
@@ -395,7 +446,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               <DatePicker
                                 style={{ width: "100%" }}
                                 format="YYYY-MM-DD"
-                                disabled={disabled}
+                                disabled={disabled || shouldDisableFields}
                                 size="large"
                               />
                             </Form.Item>
@@ -416,7 +467,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                                 min={0}
                                 step={0.01}
                                 formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                disabled={disabled}
+                                disabled={disabled || shouldDisableFields}
                                 placeholder="0.00"
                                 size="large"
                               />
@@ -433,9 +484,17 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                         <Button
                           type="dashed"
                           onClick={handleAddPayment}
+                          disabled={!canAddNewPayment}
                           block
                           icon={<PlusOutlined />}
                           size="large"
+                          title={
+                            !canAddNewPayment 
+                              ? hasTotalPayment 
+                                ? "No se puede agregar más pagos cuando ya existe un pago total"
+                                : "Complete el formulario del pago anterior antes de agregar uno nuevo"
+                              : "Agregar nuevo pago"
+                          }
                         >
                           Agregar Pago
                         </Button>
