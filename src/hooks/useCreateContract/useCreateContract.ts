@@ -40,6 +40,8 @@ export const useCreateContract = () => {
       // Invalidar queries relacionadas con contratos
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["user-contracts"] });
+      // Invalidar query de facturación completa para actualizar la tabla en tiempo real
+      queryClient.invalidateQueries({ queryKey: ["facturacion-completa"] });
 
       // Mostrar mensaje de éxito o error según la respuesta
       const data = response.data;

@@ -21,6 +21,7 @@ export const useUpdateFactura = () =>
     mutationFn: updateFactura,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["facturas"] });
+      queryClient.invalidateQueries({ queryKey: ["facturacion-completa"] });
       message.success("Factura actualizada exitosamente");
     },
     onError: (error: any) => {

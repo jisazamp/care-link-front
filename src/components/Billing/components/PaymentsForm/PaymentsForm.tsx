@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Form, InputNumber, DatePicker, Button, Select, Card, Row, Col, Space, Modal, message } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
 import { useGetPaymentTypes } from "../../../../hooks/useGetPaymentTypes";
@@ -91,13 +91,18 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
       return true;
     }
     
+    // Si el formulario está en edición, no considerarlo completo hasta que se complete nuevamente
+    if (editingForms.has(lastIndex)) {
+      return false;
+    }
+    
     return (
       lastPayment.id_metodo_pago &&
       lastPayment.id_tipo_pago &&
       lastPayment.fecha_pago &&
       lastPayment.valor > 0
     );
-  }, [payments, autoCompletedForms]);
+  }, [payments, autoCompletedForms, editingForms]);
 
   // NUEVA FUNCIÓN: Verificar si se puede agregar un nuevo pago
   const canAddNewPayment = useMemo(() => {
@@ -107,8 +112,31 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     // No se puede agregar si el último pago no está completo
     if (!isLastPaymentComplete) return false;
     
+    // No se puede agregar si hay algún pago en edición
+    if (editingForms.size > 0) return false;
+    
     return true;
-  }, [hasTotalPayment, isLastPaymentComplete]);
+  }, [hasTotalPayment, isLastPaymentComplete, editingForms]);
+
+  // NUEVA FUNCIÓN: Obtener tipos de pago disponibles según el índice
+  const getAvailablePaymentTypes = useCallback((paymentIndex: number) => {
+    // Si es el primer pago (índice 0), mostrar todos los tipos
+    if (paymentIndex === 0) {
+      return paymentTypes;
+    }
+    
+    // Verificar si el primer pago es "Pago Parcial"
+    const firstPayment = payments[0];
+    const isFirstPaymentPartial = firstPayment?.id_tipo_pago === 2; // Asumiendo que 2 es "Pago Parcial"
+    
+    // Si el primer pago es parcial, filtrar para no mostrar "Pago Total" en pagos siguientes
+    if (isFirstPaymentPartial) {
+      return paymentTypes.filter((type: any) => type.id_tipo_pago !== 1); // Excluir "Pago Total" (id: 1)
+    }
+    
+    // Si el primer pago no es parcial, mostrar todos los tipos
+    return paymentTypes;
+  }, [paymentTypes, payments]);
 
   // Función para verificar si un formulario está completo
   const isFormComplete = useCallback((pago: any) => {
@@ -123,6 +151,24 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   // Función para manejar el auto-completado de formularios
   const handleAutoComplete = useCallback((index: number) => {
     setAutoCompletedForms(prev => new Set([...prev, index]));
+    // Remover del estado de edición si estaba ahí
+    setEditingForms(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(index);
+      return newSet;
+    });
+  }, []);
+  
+  // Función para manejar el inicio de edición de un formulario
+  const handleStartEditing = useCallback((index: number) => {
+    // Remover del auto-completado
+    setAutoCompletedForms(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(index);
+      return newSet;
+    });
+    // Agregar al estado de edición
+    setEditingForms(prev => new Set([...prev, index]));
   }, []);
 
   // Manejar cambios en el formulario para sincronizar con el estado centralizado
@@ -296,6 +342,8 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                     message.warning("No se puede agregar más pagos cuando ya existe un pago total");
                   } else if (!isLastPaymentComplete) {
                     message.warning("Complete el formulario del pago anterior antes de agregar uno nuevo");
+                  } else if (editingForms.size > 0) {
+                    message.warning("Complete la edición del pago actual antes de agregar uno nuevo");
                   }
                   return;
                 }
@@ -334,7 +382,10 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                     // NUEVA LÓGICA: Determinar si los campos deben estar deshabilitados
                     const isLastField = idx === fields.length - 1;
                     const isAutoCompleted = autoCompletedForms.has(idx);
-                    const shouldDisableFields = (!isLastField && !isConsolidated) || isAutoCompleted;
+                    const isBeingEdited = editingForms.has(idx);
+                    // Permitir edición de cualquier pago que esté en modo edición
+                    const shouldDisableFields = (!isLastField && !isConsolidated && !isBeingEdited) || (isAutoCompleted && !isBeingEdited);
+                    const fieldDisabled = disabled || (isAutoCompleted && !isBeingEdited) || (!isLastField && !isConsolidated && !isBeingEdited);
                     
                     if (isConsolidated) {
                       // Renderizar solo lectura
@@ -391,6 +442,183 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                       );
                     }
                     // Si no es consolidado, render editable
+                    if (isAutoCompleted && !isConsolidated) {
+                      return (
+                        <Card
+                          key={`payment-${key}-${idx}`}
+                          type="inner"
+                          title={
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <span>Pago #{idx + 1}</span>
+                              <span style={{ color: '#52c41a', fontSize: '12px' }}>
+                                ✓ Auto-completado
+                              </span>
+                              <Button
+                                icon={<EditOutlined />}
+                                size="small"
+                                onClick={() => handleStartEditing(idx)}
+                                style={{ marginLeft: 8 }}
+                              />
+                              <Button
+                                icon={<DeleteOutlined />}
+                                danger
+                                size="small"
+                                onClick={() => handleRemovePayment(name, idx)}
+                                style={{ marginLeft: 4 }}
+                              />
+                            </div>
+                          }
+                          style={{ 
+                            marginBottom: 32,
+                            borderColor: '#52c41a',
+                            background: '#f6ffed',
+                            padding: '24px 16px'
+                          }}
+                        >
+                          <Row gutter={[24, 24]}>
+                            <Col xs={24} md={12}>
+                              <Form.Item
+                                {...restField}
+                                name={[name, "id_metodo_pago"]}
+                                label="Método de Pago"
+                                rules={[{ required: true, message: "Seleccione el método de pago" }]}
+                                style={{ marginBottom: 24 }}
+                              >
+                                <Select
+                                  placeholder="Seleccione método de pago"
+                                  loading={paymentMethodsLoading}
+                                  disabled={fieldDisabled}
+                                  size="large"
+                                  onBlur={() => {
+                                    // Verificar si el formulario está completo al hacer blur
+                                    const currentValues = form.getFieldValue('pagos');
+                                    const currentPago = currentValues?.[idx];
+                                    if (currentPago && isFormComplete(currentPago) && !autoCompletedForms.has(idx)) {
+                                      handleAutoComplete(idx);
+                                    }
+                                  }}
+                                  onFocus={() => {
+                                    // Iniciar edición cuando se enfoca un campo auto-completado
+                                    if (autoCompletedForms.has(idx)) {
+                                      handleStartEditing(idx);
+                                    }
+                                  }}
+                                >
+                                  {paymentMethods.map((method: any) => (
+                                    <Select.Option key={method.id_metodo_pago} value={method.id_metodo_pago}>
+                                      {method.nombre}
+                                    </Select.Option>
+                                  ))}
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col xs={24} md={12}>
+                              <Form.Item
+                                {...restField}
+                                name={[name, "id_tipo_pago"]}
+                                label="Tipo de Pago"
+                                rules={[{ required: true, message: "Seleccione el tipo de pago" }]}
+                                style={{ marginBottom: 24 }}
+                              >
+                                <Select
+                                  placeholder="Seleccione tipo de pago"
+                                  loading={paymentTypesLoading}
+                                  disabled={fieldDisabled}
+                                  size="large"
+                                  onBlur={() => {
+                                    // Verificar si el formulario está completo al hacer blur
+                                    const currentValues = form.getFieldValue('pagos');
+                                    const currentPago = currentValues?.[idx];
+                                    if (currentPago && isFormComplete(currentPago) && !autoCompletedForms.has(idx)) {
+                                      handleAutoComplete(idx);
+                                    }
+                                  }}
+                                  onFocus={() => {
+                                    // Iniciar edición cuando se enfoca un campo auto-completado
+                                    if (autoCompletedForms.has(idx)) {
+                                      handleStartEditing(idx);
+                                    }
+                                  }}
+                                >
+                                  {getAvailablePaymentTypes(idx).map((type: any) => (
+                                    <Select.Option key={type.id_tipo_pago} value={type.id_tipo_pago}>
+                                      {type.nombre}
+                                    </Select.Option>
+                                  ))}
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col xs={24} md={12}>
+                              <Form.Item
+                                {...restField}
+                                name={[name, "fecha_pago"]}
+                                label="Fecha de Pago"
+                                rules={[{ required: true, message: "Seleccione la fecha de pago" }]}
+                                style={{ marginBottom: 24 }}
+                              >
+                                <DatePicker
+                                  style={{ width: "100%" }}
+                                  format="YYYY-MM-DD"
+                                  disabled={fieldDisabled}
+                                  size="large"
+                                  onBlur={() => {
+                                    // Verificar si el formulario está completo al hacer blur
+                                    const currentValues = form.getFieldValue('pagos');
+                                    const currentPago = currentValues?.[idx];
+                                    if (currentPago && isFormComplete(currentPago) && !autoCompletedForms.has(idx)) {
+                                      handleAutoComplete(idx);
+                                    }
+                                  }}
+                                  onFocus={() => {
+                                    // Iniciar edición cuando se enfoca un campo auto-completado
+                                    if (autoCompletedForms.has(idx)) {
+                                      handleStartEditing(idx);
+                                    }
+                                  }}
+                                />
+                              </Form.Item>
+                            </Col>
+                            <Col xs={24} md={12}>
+                              <Form.Item
+                                {...restField}
+                                name={[name, "valor"]}
+                                label="Valor"
+                                rules={[
+                                  { required: true, message: "Ingrese el valor del pago" },
+                                  { type: "number", min: 0.01, message: "El valor debe ser mayor a 0" }
+                                ]}
+                                style={{ marginBottom: 24 }}
+                              >
+                                <InputNumber
+                                  style={{ width: "100%" }}
+                                  min={0}
+                                  step={0.01}
+                                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                  disabled={fieldDisabled}
+                                  placeholder="0.00"
+                                  size="large"
+                                  onBlur={() => {
+                                    // Verificar si el formulario está completo al hacer blur
+                                    const currentValues = form.getFieldValue('pagos');
+                                    const currentPago = currentValues?.[idx];
+                                    if (currentPago && isFormComplete(currentPago) && !autoCompletedForms.has(idx)) {
+                                      handleAutoComplete(idx);
+                                    }
+                                  }}
+                                  onFocus={() => {
+                                    // Iniciar edición cuando se enfoca un campo auto-completado
+                                    if (autoCompletedForms.has(idx)) {
+                                      handleStartEditing(idx);
+                                    }
+                                  }}
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </Card>
+                      );
+                    }
+                    // Si no es consolidado ni auto-completado, render editable
                     return (
                       <Card
                         key={`payment-${key}-${idx}`}
@@ -398,9 +626,14 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                         title={
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <span>Pago #{idx + 1}</span>
-                            {shouldDisableFields && (
-                              <span style={{ color: '#722ed1', fontSize: '12px' }}>
-                                ✓ {isAutoCompleted ? 'Auto-completado' : 'Completado'}
+                            {isAutoCompleted && !isBeingEdited && (
+                              <span style={{ color: '#52c41a', fontSize: '12px' }}>
+                                ✓ Auto-completado
+                              </span>
+                            )}
+                            {isBeingEdited && (
+                              <span style={{ color: '#faad14', fontSize: '12px' }}>
+                                ✏️ En edición
                               </span>
                             )}
                           </div>
@@ -408,9 +641,13 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                         style={{ 
                           marginBottom: 32,
                           padding: '24px 16px',
-                          ...(shouldDisableFields && { 
-                            borderColor: isAutoCompleted ? '#52c41a' : '#722ed1',
-                            background: isAutoCompleted ? '#f6ffed' : '#f9f0ff'
+                          ...(isAutoCompleted && !isBeingEdited && { 
+                            borderColor: '#52c41a',
+                            background: '#f6ffed'
+                          }),
+                          ...(isBeingEdited && { 
+                            borderColor: '#faad14',
+                            background: '#fffbe6'
                           })
                         }}
                         extra={
@@ -438,7 +675,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               <Select
                                 placeholder="Seleccione método de pago"
                                 loading={paymentMethodsLoading}
-                                disabled={disabled || shouldDisableFields}
+                                disabled={fieldDisabled}
                                 size="large"
                                 onBlur={() => {
                                   // Verificar si el formulario está completo al hacer blur
@@ -449,13 +686,9 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                                   }
                                 }}
                                 onFocus={() => {
-                                  // Asegurar que el formulario esté habilitado cuando se enfoca
+                                  // Iniciar edición cuando se enfoca un campo auto-completado
                                   if (autoCompletedForms.has(idx)) {
-                                    setAutoCompletedForms(prev => {
-                                      const newSet = new Set(prev);
-                                      newSet.delete(idx);
-                                      return newSet;
-                                    });
+                                    handleStartEditing(idx);
                                   }
                                 }}
                               >
@@ -478,7 +711,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               <Select
                                 placeholder="Seleccione tipo de pago"
                                 loading={paymentTypesLoading}
-                                disabled={disabled || shouldDisableFields}
+                                disabled={fieldDisabled}
                                 size="large"
                                 onBlur={() => {
                                   // Verificar si el formulario está completo al hacer blur
@@ -489,17 +722,13 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                                   }
                                 }}
                                 onFocus={() => {
-                                  // Asegurar que el formulario esté habilitado cuando se enfoca
+                                  // Iniciar edición cuando se enfoca un campo auto-completado
                                   if (autoCompletedForms.has(idx)) {
-                                    setAutoCompletedForms(prev => {
-                                      const newSet = new Set(prev);
-                                      newSet.delete(idx);
-                                      return newSet;
-                                    });
+                                    handleStartEditing(idx);
                                   }
                                 }}
                               >
-                                {paymentTypes.map((type: any) => (
+                                {getAvailablePaymentTypes(idx).map((type: any) => (
                                   <Select.Option key={type.id_tipo_pago} value={type.id_tipo_pago}>
                                     {type.nombre}
                                   </Select.Option>
@@ -518,7 +747,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                               <DatePicker
                                 style={{ width: "100%" }}
                                 format="YYYY-MM-DD"
-                                disabled={disabled || shouldDisableFields}
+                                disabled={fieldDisabled}
                                 size="large"
                                 onBlur={() => {
                                   // Verificar si el formulario está completo al hacer blur
@@ -529,13 +758,9 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                                   }
                                 }}
                                 onFocus={() => {
-                                  // Asegurar que el formulario esté habilitado cuando se enfoca
+                                  // Iniciar edición cuando se enfoca un campo auto-completado
                                   if (autoCompletedForms.has(idx)) {
-                                    setAutoCompletedForms(prev => {
-                                      const newSet = new Set(prev);
-                                      newSet.delete(idx);
-                                      return newSet;
-                                    });
+                                    handleStartEditing(idx);
                                   }
                                 }}
                               />
@@ -557,7 +782,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                                 min={0}
                                 step={0.01}
                                 formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                disabled={disabled || shouldDisableFields}
+                                disabled={fieldDisabled}
                                 placeholder="0.00"
                                 size="large"
                                 onBlur={() => {
@@ -569,13 +794,9 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                                   }
                                 }}
                                 onFocus={() => {
-                                  // Asegurar que el formulario esté habilitado cuando se enfoca
+                                  // Iniciar edición cuando se enfoca un campo auto-completado
                                   if (autoCompletedForms.has(idx)) {
-                                    setAutoCompletedForms(prev => {
-                                      const newSet = new Set(prev);
-                                      newSet.delete(idx);
-                                      return newSet;
-                                    });
+                                    handleStartEditing(idx);
                                   }
                                 }}
                               />
@@ -600,7 +821,9 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                             !canAddNewPayment 
                               ? hasTotalPayment 
                                 ? "No se puede agregar más pagos cuando ya existe un pago total"
-                                : "Complete el formulario del pago anterior antes de agregar uno nuevo"
+                                : editingForms.size > 0
+                                  ? "Complete la edición del pago actual antes de agregar uno nuevo"
+                                  : "Complete el formulario del pago anterior antes de agregar uno nuevo"
                               : "Agregar nuevo pago"
                           }
                         >

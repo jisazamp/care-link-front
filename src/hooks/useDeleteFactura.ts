@@ -11,6 +11,7 @@ export const useDeleteFactura = () =>
     mutationFn: deleteFactura,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["facturas"] });
+      queryClient.invalidateQueries({ queryKey: ["facturacion-completa"] });
       message.success("Factura eliminada exitosamente");
     },
     onError: (error: any) => {

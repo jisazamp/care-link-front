@@ -266,6 +266,66 @@ export const BillingContract: React.FC<BillingContractProps> = ({
               </Card>
             )}
 
+            {/* Tarjeta de Impuestos y Descuentos */}
+            <Card 
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span>Configuración de Facturación</span>
+                </div>
+              }
+              style={{ marginBottom: 16 }}
+            >
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={() => {
+                  if (onNext) {
+                    onNext();
+                  }
+                }}
+              >
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item label="Impuestos" name="impuestos">
+                      <InputNumber
+                        min={0}
+                        style={{ width: "100%" }}
+                        placeholder="0.00"
+                        value={impuestos}
+                        onChange={(v) => setImpuestos(Number(v) || 0)}
+                        formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="Descuentos" name="descuentos">
+                      <InputNumber
+                        min={0}
+                        style={{ width: "100%" }}
+                        placeholder="0.00"
+                        value={descuentos}
+                        onChange={(v) => setDescuentos(Number(v) || 0)}
+                        formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Form>
+            </Card>
+
+            {/* Alertas informativas */}
+            {(partialBill?.data?.data ?? 0) > 0 && (
+              <Alert
+                message="Información de Facturación"
+                description="Los pagos son opcionales. Puede configurarlos ahora o más tarde."
+                type="info"
+                showIcon
+                style={{ marginTop: 16 }}
+              />
+            )}
+
             {/* Botones de acción */}
             <Row justify="end" style={{ marginTop: 24 }}>
               <Col>
@@ -290,51 +350,6 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                 </Row>
               </Col>
             </Row>
-
-            {/* Alertas informativas */}
-            {(partialBill?.data?.data ?? 0) > 0 && (
-              <Alert
-                message="Información de Facturación"
-                description="Los pagos son opcionales. Puede configurarlos ahora o más tarde."
-                type="info"
-                showIcon
-                style={{ marginTop: 16 }}
-              />
-            )}
-
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={() => {
-                if (onNext) {
-                  onNext();
-                }
-              }}
-            >
-              <Form.Item label="Impuestos" name="impuestos">
-                <InputNumber
-                  min={0}
-                  style={{ width: "100%" }}
-                  placeholder="0.00"
-                  value={impuestos}
-                  onChange={(v) => setImpuestos(Number(v) || 0)}
-                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
-                />
-              </Form.Item>
-              <Form.Item label="Descuentos" name="descuentos">
-                <InputNumber
-                  min={0}
-                  style={{ width: "100%" }}
-                  placeholder="0.00"
-                  value={descuentos}
-                  onChange={(v) => setDescuentos(Number(v) || 0)}
-                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
-                />
-              </Form.Item>
-              {/* Eliminado: Total calculado: {formatCurrency(total)} */}
-            </Form>
           </Card>
         </Col>
       </Row>
