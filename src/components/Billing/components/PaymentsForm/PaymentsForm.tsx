@@ -384,7 +384,6 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                     const isAutoCompleted = autoCompletedForms.has(idx);
                     const isBeingEdited = editingForms.has(idx);
                     // Permitir edición de cualquier pago que esté en modo edición
-                    const shouldDisableFields = (!isLastField && !isConsolidated && !isBeingEdited) || (isAutoCompleted && !isBeingEdited);
                     const fieldDisabled = disabled || (isAutoCompleted && !isBeingEdited) || (!isLastField && !isConsolidated && !isBeingEdited);
                     
                     if (isConsolidated) {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Calendar, Card, Typography, Badge, Modal, Table, Button, Tag, Space, message, notification, Tooltip } from 'antd';
 import type { BadgeProps, CalendarProps } from 'antd';
 import { CalendarOutlined, UserOutlined, CarOutlined } from '@ant-design/icons';
@@ -21,15 +21,24 @@ export const Cronograma: React.FC = () => {
   const [selectedPaciente, setSelectedPaciente] = useState<CronogramaAsistenciaPaciente | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
   const [botonCargando, setBotonCargando] = useState<null | number | string>(null);
+  
+  // 🔴 NUEVO: Estado para el mes seleccionado en el calendario
+  const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
 
-  // Obtener cronogramas del mes actual
-  const currentMonth = dayjs();
-  const startOfMonth = currentMonth.startOf('month').format('YYYY-MM-DD');
-  const endOfMonth = currentMonth.endOf('month').format('YYYY-MM-DD');
+  // 🔴 NUEVO: Obtener cronogramas del mes seleccionado (no siempre el actual)
+  const startOfMonth = selectedMonth.startOf('month').format('YYYY-MM-DD');
+  const endOfMonth = selectedMonth.endOf('month').format('YYYY-MM-DD');
 
   const { data: cronogramas, isLoading, refetch } = useGetCronogramasPorRango(startOfMonth, endOfMonth);
   const { mutate: updateEstado } = useUpdateEstadoAsistencia();
   const { mutate: reagendarPaciente } = useReagendarPaciente();
+
+  // 🔴 NUEVO: Recargar datos cuando cambie el mes seleccionado
+  useEffect(() => {
+    console.log('📅 Mes seleccionado cambiado:', selectedMonth.format('YYYY-MM'));
+    console.log('📊 Rango de fechas:', startOfMonth, 'a', endOfMonth);
+    refetch();
+  }, [selectedMonth, startOfMonth, endOfMonth, refetch]);
 
   const getEstadoBadgeType = (estado: string): BadgeProps['status'] => {
     switch (estado) {
@@ -189,6 +198,12 @@ export const Cronograma: React.FC = () => {
         setBotonCargando(null);
       }
     });
+  };
+
+  // 🔴 NUEVA FUNCIÓN: Manejar cambio de mes en el calendario
+  const handleMonthChange = (date: Dayjs, mode: 'month' | 'year') => {
+    console.log('🔄 Cambio de mes detectado:', date.format('YYYY-MM'), 'Modo:', mode);
+    setSelectedMonth(date);
   };
 
   const handleReagendar = (observaciones: string, nuevaFecha: string) => {
@@ -366,6 +381,11 @@ export const Cronograma: React.FC = () => {
           <Text type="secondary">
             Gestiona la asistencia de pacientes en cada fecha del calendario
           </Text>
+          <div style={{ marginTop: '8px' }}>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              📅 Mostrando cronogramas de: <strong>{selectedMonth.format('MMMM YYYY')}</strong>
+            </Text>
+          </div>
         </div>
 
         {cronogramas?.data?.data && <CronogramaStats cronogramas={cronogramas.data.data} />}
@@ -385,7 +405,9 @@ export const Cronograma: React.FC = () => {
               }
               // Si el source es "month" o "year", NO hacer nada
             }}
+            onPanelChange={handleMonthChange}
             disabledDate={disabledDate}
+            value={selectedMonth}
           />
         </div>
 
