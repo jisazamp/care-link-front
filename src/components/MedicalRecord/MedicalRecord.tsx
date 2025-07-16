@@ -14,12 +14,13 @@ import {
   Typography,
   Upload,
   Collapse,
+  message,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
 import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
@@ -60,14 +61,16 @@ export const MedicalRecord: React.FC = () => {
   const params = useParams();
   const userId = params.id;
   const location = useLocation();
+  const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState<string | string[]>("");
   const [activeSubPanel, setActiveSubPanel] = useState<string | string[]>("");
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     shouldFocusError: false,
+    mode: "onSubmit",
   });
-  const { reset, getValues } = methods;
+  const { reset, getValues, formState: { errors } } = methods;
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
     useCreateUserMedicalRecord(userId);
@@ -147,120 +150,190 @@ export const MedicalRecord: React.FC = () => {
   }, [location.hash]);
 
   const onSubmit = (data: FormValues) => {
-    const record: MedicalRecordType = {
-      Tiene_OtrasAlergias: !!data.otherAlergies.length,
-      Tienedieta_especial: !!data.diet.length,
-      alcoholismo: data.alcholism,
-      alergico_medicamento: !!data.alergies.length,
-      altura: data.height,
-      apariencia_personal: `${data.personalAppearance}`,
-      cafeina: data.caffeine,
-      cirugias: data.surgeries
-        .map((a) => `${a.observation}:${a.date.format("YYYY-MM-DD")}`)
-        .join(","),
-      diagnosticos: data.diagnostic.map((d) => d.diagnostic).join(","),
-      comunicacion_no_verbal: data.nonVerbalCommunication,
-      comunicacion_verbal: data.verbalCommunication,
-      continencia: data.continence,
-      cuidado_personal: `${data.personalCare}`,
-      dieta_especial: data.diet.map((a) => a.diet).join(","),
-      discapacidades: data.disabilities.map((a) => a.disability).join(","),
-      emer_medica: `${data.externalService}`,
-      eps: `${data.eps}`,
-      estado_de_animo: data.mood,
-      fecha_ingreso: data.entryDate.format("YYYY-MM-DD"),
-      frecuencia_cardiaca: Number(data.bpm),
-      historial_cirugias: "",
-      id_usuario: Number(userId),
-      limitaciones: data.limitations.map((a) => a.limitation).join(","),
-      maltratado: data.abused,
-      maltrato: data.abused,
-      medicamentos_alergia: data.alergies.map((a) => a.medicine).join(","),
-      motivo_ingreso: data.entryReason,
-      observ_dietaEspecial: "",
-      observ_otrasalergias: "",
-      observaciones_iniciales: `${data.initialDiagnosis}`,
-      otras_alergias: data.otherAlergies.map((a) => a.alergy).join(","),
-      peso: Number(data.weight),
-      presion_arterial: Number(data.bloodPressure),
-      sustanciaspsico: data.psycoactive,
-      tabaquismo: data.tabaquism,
-      telefono_emermedica: `${data.externalServicePhone}`,
-      temperatura_corporal: Number(data.temperature),
-      tipo_alimentacion: `${data.feeding}`,
-      tipo_de_movilidad: `${data.mobility}`,
-      tipo_de_sueno: `${data.sleepType}`,
-      tipo_sangre: data.bloodType ?? "O+",
-    };
-
-    const medicines: UserMedicine[] = [];
-    for (const p of data.pharmacotherapeuticRegimen) {
-      const medicine: UserMedicine = {
-        id: p.id ?? "",
-        medicamento: p.medicine,
-        periodicidad: p.frequency,
-        observaciones: p.observations,
+    console.log("🚀 Iniciando envío del formulario...");
+    console.log("📊 Datos del formulario:", data);
+    
+    try {
+      const record: MedicalRecordType = {
+        Tiene_OtrasAlergias: !!data.otherAlergies.length,
+        Tienedieta_especial: !!data.diet.length,
+        alcoholismo: data.alcholism || "",
+        alergico_medicamento: !!data.alergies.length,
+        altura: data.height,
+        apariencia_personal: data.personalAppearance || "",
+        cafeina: data.caffeine || "",
+        cirugias: data.surgeries
+          .map((a) => `${a.observation}:${a.date.format("YYYY-MM-DD")}`)
+          .join(","),
+        diagnosticos: data.diagnostic.map((d) => d.diagnostic).join(","),
+        comunicacion_no_verbal: data.nonVerbalCommunication || "",
+        comunicacion_verbal: data.verbalCommunication || "",
+        continencia: data.continence || "",
+        cuidado_personal: data.personalCare || "",
+        dieta_especial: data.diet.map((a) => a.diet).join(","),
+        discapacidades: data.disabilities.map((a) => a.disability).join(","),
+        emer_medica: data.externalService || "",
+        eps: data.eps || "",
+        estado_de_animo: data.mood || "",
+        fecha_ingreso: data.entryDate.format("YYYY-MM-DD"),
+        frecuencia_cardiaca: Number(data.bpm),
+        historial_cirugias: "",
+        id_usuario: Number(userId),
+        limitaciones: data.limitations.map((a) => a.limitation).join(","),
+        maltratado: data.abused || "",
+        maltrato: data.abused || "",
+        medicamentos_alergia: data.alergies.map((a) => a.medicine).join(","),
+        motivo_ingreso: data.entryReason || "",
+        observ_dietaEspecial: "",
+        observ_otrasalergias: "",
+        observaciones_iniciales: data.initialDiagnosis || "",
+        otras_alergias: data.otherAlergies.map((a) => a.alergy).join(","),
+        peso: Number(data.weight),
+        presion_arterial: Number(data.bloodPressure),
+        sustanciaspsico: data.psycoactive || "",
+        tabaquismo: data.tabaquism || "",
+        telefono_emermedica: data.externalServicePhone || "",
+        temperatura_corporal: Number(data.temperature),
+        tipo_alimentacion: data.feeding || "",
+        tipo_de_movilidad: data.mobility || "",
+        tipo_de_sueno: data.sleepType || "",
+        tipo_sangre: data.bloodType ?? "O+",
       };
-      medicines.push(medicine);
-    }
 
-    const cares: UserCare[] = [];
-    for (const n of data.nursingCarePlan) {
-      const care: UserCare = {
-        id: n.id ?? "",
-        diagnostico: n.diagnosis,
-        frecuencia: n.frequency,
-        intervencion: n.intervention,
-      };
-      cares.push(care);
-    }
+      const medicines: UserMedicine[] = [];
+      for (const p of data.pharmacotherapeuticRegimen) {
+        const medicine: UserMedicine = {
+          id: p.id ?? "",
+          medicamento: p.medicine,
+          periodicidad: p.frequency,
+          observaciones: p.observations || "", // Asegurar que nunca sea null
+        };
+        medicines.push(medicine);
+      }
 
-    const interventions: UserIntervention[] = [];
-    for (const n of data.physioterapeuticRegimen) {
-      const intervention: UserIntervention = {
-        id: n.id ?? "",
-        diagnostico: n.diagnosis,
-        frecuencia: n.frequency,
-        intervencion: n.intervention,
-      };
-      interventions.push(intervention);
-    }
+      const cares: UserCare[] = [];
+      for (const n of data.nursingCarePlan) {
+        const care: UserCare = {
+          id: n.id ?? "",
+          diagnostico: n.diagnosis || "",
+          frecuencia: n.frequency || "",
+          intervencion: n.intervention || "",
+        };
+        cares.push(care);
+      }
 
-    /* const vaccines: UserVaccine[] = [];
-    for (const v of data.vaccines) {
-      const vaccine: UserVaccine = {
-        id: v.id ?? "",
-        efectos_secundarios: v.secondaryEffects,
-        fecha_administracion: v.date?.format("YYYY-MM-DD"),
-        fecha_proxima: v.nextDate?.format("YYYY-MM-DD"),
-        vacuna: v.name,
-      };
-      vaccines.push(vaccine);
-    }*/
+      const interventions: UserIntervention[] = [];
+      for (const n of data.physioterapeuticRegimen) {
+        const intervention: UserIntervention = {
+          id: n.id ?? "",
+          diagnostico: n.diagnosis || "",
+          frecuencia: n.frequency || "",
+          intervencion: n.intervention || "",
+        };
+        interventions.push(intervention);
+      }
 
-    if (!userMedicalRecord?.data.data?.id_historiaclinica) {
-      createUserMedicalRecord({
-        data: {
+      console.log("📋 Record preparado:", record);
+      console.log("💊 Medicamentos:", medicines);
+      console.log("🏥 Cuidados:", cares);
+      console.log("🩺 Intervenciones:", interventions);
+
+      if (!userMedicalRecord?.data.data?.id_historiaclinica) {
+        console.log("🆕 Creando nueva historia clínica...");
+        createUserMedicalRecord({
+          data: {
+            record,
+            medicines,
+            cares,
+            interventions,
+          },
+          files: data.attachedDocuments,
+        }, {
+          onSuccess: () => {
+            console.log("✅ Historia clínica creada exitosamente");
+            message.success("Historia clínica creada exitosamente");
+            // Redirigir al usuario a la página de detalles del paciente
+            setTimeout(() => {
+              navigate(`/usuarios/${userId}/detalles`);
+            }, 1500); // Esperar 1.5 segundos para que el usuario vea el mensaje de éxito
+          },
+          onError: (error) => {
+            console.error("❌ Error al crear la historia clínica:", error);
+            message.error("Error al crear la historia clínica");
+          }
+        });
+        return;
+      }
+
+      console.log("🔄 Actualizando historia clínica existente...");
+      editRecord({
+        id: Number(userId),
+        recordId: Number(userMedicalRecord?.data.data.id_historiaclinica),
+        record: {
           record,
           medicines,
           cares,
           interventions,
         },
-        files: data.attachedDocuments,
+      }, {
+        onSuccess: () => {
+          console.log("✅ Historia clínica actualizada exitosamente");
+          message.success("Historia clínica actualizada exitosamente");
+          // Redirigir al usuario a la página de detalles del paciente
+          setTimeout(() => {
+            navigate(`/usuarios/${userId}/detalles`);
+          }, 1500); // Esperar 1.5 segundos para que el usuario vea el mensaje de éxito
+        },
+        onError: (error) => {
+          console.error("❌ Error al actualizar la historia clínica:", error);
+          message.error("Error al actualizar la historia clínica");
+        }
       });
+    } catch (error) {
+      console.error("❌ Error inesperado en onSubmit:", error);
+      message.error("Error inesperado al procesar el formulario");
+    }
+  };
+
+  const handleSaveClick = () => {
+    console.log("🖱️ Botón 'Guardar y actualizar' clickeado");
+    console.log("📋 Estado del formulario:", methods.formState);
+    console.log("❌ Errores de validación:", errors);
+    console.log("✅ ¿Formulario válido?:", methods.formState.isValid);
+    console.log("📊 Valores actuales del formulario:", methods.getValues());
+    
+    // Verificar campos específicos que podrían estar causando problemas
+    const values = methods.getValues();
+    console.log("🔍 Verificando campos críticos:");
+    console.log("- entryDate:", values.entryDate, "tipo:", typeof values.entryDate);
+    console.log("- entryReason:", values.entryReason, "tipo:", typeof values.entryReason);
+    console.log("- height:", values.height, "tipo:", typeof values.height);
+    console.log("- weight:", values.weight, "tipo:", typeof values.weight);
+    console.log("- bloodPressure:", values.bloodPressure, "tipo:", typeof values.bloodPressure);
+    console.log("- bpm:", values.bpm, "tipo:", typeof values.bpm);
+    console.log("- temperature:", values.temperature, "tipo:", typeof values.temperature);
+    
+    // Verificar si hay errores de validación
+    if (Object.keys(errors).length > 0) {
+      console.error("❌ Errores de validación encontrados:", errors);
+      message.error("Por favor, corrija los errores en el formulario antes de continuar");
       return;
     }
-
-    editRecord({
-      id: Number(userId),
-      recordId: Number(userMedicalRecord?.data.data.id_historiaclinica),
-      record: {
-        record,
-        medicines: medicines.filter((m) => typeof m.id === "string"),
-        cares: cares.filter((m) => typeof m.id === "string"),
-        interventions: interventions.filter((i) => typeof i.id === "string"),
-      },
-    });
+    
+    // Si no hay errores pero el formulario no es válido, intentar forzar la validación
+    console.log("🔄 Intentando validar formulario manualmente...");
+    const isValid = methods.trigger();
+    console.log("✅ Resultado de validación manual:", isValid);
+    
+    // Si no hay errores de validación, proceder con el envío
+    if (Object.keys(errors).length === 0) {
+      console.log("🚀 Procediendo con el envío del formulario...");
+      const formData = methods.getValues();
+      onSubmit(formData);
+    } else {
+      console.error("❌ Errores de validación después de trigger:", errors);
+      message.error("Por favor, corrija los errores en el formulario antes de continuar");
+    }
   };
 
   useEffect(() => {
@@ -551,25 +624,22 @@ export const MedicalRecord: React.FC = () => {
           </Row>
           <Row gutter={[16, 16]} justify="end" style={{ marginTop: 20 }}>
             <Col>
-              {!userMedicalRecord?.data.data?.id_historiaclinica && (
-                <Button
-                  className="main-button-white"
-                  style={{ marginRight: 8 }}
-                >
-                  Restablecer
-                </Button>
-              )}
               <Button
                 type="primary"
+                size="large"
                 style={{
                   backgroundColor: "#722ed1",
                   borderColor: "#722ed1",
+                  padding: "8px 24px",
+                  height: "auto",
+                  fontSize: "16px",
+                  fontWeight: "bold",
                 }}
                 loading={isLoadingCreation || loadingEditing}
-                onClick={methods.handleSubmit(onSubmit)}
+                onClick={handleSaveClick}
               >
                 {userMedicalRecord?.data.data?.id_historiaclinica
-                  ? "Editar"
+                  ? "Guardar y actualizar"
                   : "Guardar y continuar"}
               </Button>
             </Col>

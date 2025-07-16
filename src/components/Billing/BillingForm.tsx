@@ -25,6 +25,8 @@ export const BillingForm: React.FC<BillingFormProps> = ({
   const [form] = Form.useForm();
   const [total, setTotal] = useState<number>(0);
   const [payments, setPayments] = useState<any[]>(initialValues?.pagos || []);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [hasNewPayments, setHasNewPayments] = useState(false);
   
   // Hook para descargar PDF
   const { downloadPDF, isDownloading: isDownloadingPDF } = useDownloadPDF();
@@ -35,6 +37,9 @@ export const BillingForm: React.FC<BillingFormProps> = ({
 const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura);
   // Determinar si es edición de factura existente
   const isEdit = Boolean(initialValues?.id_factura);
+
+  // Verificar si el botón "Actualizar Factura" debe estar habilitado
+  const shouldEnableUpdateButton = isFormDirty || hasNewPayments;
 
   // Preprocesar valores iniciales para fechas
   const initialFormValues = {
@@ -79,6 +84,38 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
     const descuentos = Number(all.descuentos) || 0;
     const newTotal = subtotal + impuestos - descuentos;
     setTotal(newTotal);
+    
+    // Detectar si hay cambios en el formulario (solo para facturas existentes)
+    if (isEdit) {
+      const hasChanges = 
+        all.descuentos !== initialValues?.descuentos ||
+        all.estado_factura !== initialValues?.estado_factura ||
+        all.observaciones !== initialValues?.observaciones;
+      
+      console.log("📝 Cambios detectados en formulario:", {
+        descuentos: { actual: all.descuentos, inicial: initialValues?.descuentos },
+        estado_factura: { actual: all.estado_factura, inicial: initialValues?.estado_factura },
+        observaciones: { actual: all.observaciones, inicial: initialValues?.observaciones },
+        hasChanges
+      });
+      
+      setIsFormDirty(hasChanges);
+    }
+  };
+
+  // Función para manejar cambios en los pagos
+  const handlePaymentsChange = (newPayments: any[]) => {
+    console.log("💳 Cambios en pagos detectados:", newPayments);
+    setPayments(newPayments);
+    
+    // Detectar si hay pagos nuevos (no guardados)
+    if (isEdit) {
+      const hasNewPayments = newPayments.some(payment => 
+        !payment.saved && !payment.id_pago && payment.valor > 0
+      );
+      console.log("🆕 Pagos nuevos detectados:", hasNewPayments);
+      setHasNewPayments(hasNewPayments);
+    }
   };
 
   const handleSubmit = async (values: any) => {
@@ -217,28 +254,50 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
           setPayments={setPayments}
           subtotal={form.getFieldValue("subtotal") || 0}
           totalFactura={total}
-          onChange={setPayments}
+          onChange={handlePaymentsChange}
           disabled={readOnly || loading}
           facturaId={initialValues?.id_factura}
         />
         
         {!readOnly && (
           <Form.Item style={{ textAlign: "right", marginTop: 24 }}>
-            <Space>
-              {initialValues?.id_factura && (
-                <Button 
-                  type="default" 
-                  icon={<DownloadOutlined />} 
-                  onClick={handleDownloadPDF}
-                  loading={isDownloadingPDF}
-                  size="large"
-                >
-                  {isDownloadingPDF ? "Descargando..." : "Descargar PDF"}
-                </Button>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              {isEdit && !shouldEnableUpdateButton && (
+                <div style={{ 
+                  padding: '8px 12px', 
+                  background: '#fff7e6', 
+                  border: '1px solid #ffd591', 
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  color: '#d46b08',
+                  textAlign: 'center'
+                }}>
+                  💡 <strong>Información:</strong> Edita algún campo de la factura o agrega un pago para habilitar el botón "Actualizar Factura".
+                </div>
               )}
-              <Button type="primary" htmlType="submit" loading={loading} size="large">
-                {initialValues?.id_factura ? 'Actualizar Factura' : 'Crear Factura'}
-              </Button>
+              <Space>
+                {initialValues?.id_factura && (
+                  <Button 
+                    type="default" 
+                    icon={<DownloadOutlined />} 
+                    onClick={handleDownloadPDF}
+                    loading={isDownloadingPDF}
+                    size="large"
+                  >
+                    {isDownloadingPDF ? "Descargando..." : "Descargar PDF"}
+                  </Button>
+                )}
+                <Button 
+                  type="primary" 
+                  htmlType="submit" 
+                  loading={loading} 
+                  size="large"
+                  disabled={isEdit && !shouldEnableUpdateButton}
+                  title={isEdit && !shouldEnableUpdateButton ? "Edita algún campo o agrega un pago para habilitar la actualización" : ""}
+                >
+                  {initialValues?.id_factura ? 'Actualizar Factura' : 'Crear Factura'}
+                </Button>
+              </Space>
             </Space>
           </Form.Item>
         )}

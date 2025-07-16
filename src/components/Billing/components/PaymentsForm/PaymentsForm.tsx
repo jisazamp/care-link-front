@@ -39,7 +39,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   // Hooks centralizados
   const { data: paymentMethodsData, isLoading: paymentMethodsLoading } = useGetPaymentMethods();
   const { data: paymentTypesData, isLoading: paymentTypesLoading } = useGetPaymentTypes();
-  const { registerIndividualPaymentFnAsync, registerIndividualPaymentPending } = useCreatePayment();
+  const { registerIndividualPaymentFnAsync, registerIndividualPaymentPending, addPaymentsToFacturaFnAsync, addPaymentsToFacturaPending } = useCreatePayment();
   const { deletePaymentFn, deletePaymentPending } = useDeletePayment();
 
   // Calcular total de pagos usando el estado centralizado
@@ -271,6 +271,84 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
       return false;
     }
   }, [payments, setPayments, onChange, facturaId, registerIndividualPaymentFnAsync]);
+
+  // Función para guardar pagos usando la API correcta
+  const handleSavePaymentsToFactura = useCallback(async () => {
+    console.log("🚀 Iniciando guardado de pagos en factura...");
+    console.log("📋 Factura ID:", facturaId);
+    console.log("💳 Pagos actuales:", payments);
+    
+    try {
+      const validPayments = payments.filter(
+        (payment) =>
+          payment.id_metodo_pago &&
+          payment.id_tipo_pago &&
+          payment.fecha_pago &&
+          payment.valor > 0 &&
+          !payment.saved && // Solo pagos no guardados
+          !payment.id_pago, // Solo pagos nuevos
+      );
+
+      console.log("✅ Pagos válidos encontrados:", validPayments);
+
+      if (validPayments.length === 0) {
+        console.log("ℹ️ No hay pagos nuevos válidos para guardar");
+        message.info("No hay pagos nuevos para guardar");
+        return false;
+      }
+
+      console.log("💳 Guardando pagos en factura:", validPayments);
+
+      // Preparar payload para la API correcta
+      const paymentsPayload = validPayments.map(payment => ({
+        id_metodo_pago: payment.id_metodo_pago!,
+        id_tipo_pago: payment.id_tipo_pago!,
+        fecha_pago: payment.fecha_pago,
+        valor: payment.valor
+      }));
+
+      console.log("📦 Payload para API:", paymentsPayload);
+
+      if (facturaId) {
+        console.log("🌐 Llamando a API:", `/api/facturas/${facturaId}/pagos/`);
+        
+        const response = await addPaymentsToFacturaFnAsync({
+          facturaId: facturaId,
+          payments: paymentsPayload
+        });
+
+        console.log("✅ Pagos guardados exitosamente:", response);
+        message.success("Pagos guardados correctamente");
+
+        // Actualizar el estado local marcando los pagos como guardados
+        const updatedPayments = payments.map(payment => {
+          if (!payment.saved && !payment.id_pago && payment.valor > 0) {
+            return {
+              ...payment,
+              saved: true,
+              id_factura: facturaId
+            };
+          }
+          return payment;
+        });
+
+        setPayments(updatedPayments);
+        onChange?.(updatedPayments);
+
+        console.log("🔄 Estado de pagos actualizado:", updatedPayments);
+        return true;
+      } else {
+        console.error("❌ No se pudo identificar la factura");
+        message.error("No se pudo identificar la factura");
+        return false;
+      }
+      
+    } catch (error) {
+      console.error("❌ Error al guardar pagos:", error);
+      message.error("Error al guardar los pagos");
+      return false;
+    }
+  }, [payments, setPayments, onChange, facturaId, addPaymentsToFacturaFnAsync]);
 
   // Preparar pagos para el formulario (convertir fechas a dayjs)
   const formPayments = useMemo(() => {
@@ -854,12 +932,23 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
                   {!disabled && facturaId && (
                     <Row gutter={16} style={{ marginTop: 8 }}>
                       <Col xs={24} style={{ textAlign: 'right' }}>
+                        <div style={{ 
+                          padding: '8px 12px', 
+                          background: '#e6f7ff', 
+                          border: '1px solid #91d5ff', 
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          color: '#1890ff',
+                          marginBottom: 8
+                        }}>
+                          💡 <strong>Nota:</strong> El botón "Guardar Pagos" creará los pagos asociados a esta factura usando la API correcta.
+                        </div>
                         <Button
                           type="primary"
                           size="large"
-                          onClick={handleSavePayments}
+                          onClick={handleSavePaymentsToFactura}
                           disabled={!hasValidNewPayments || hasSavedPayments()}
-                          loading={registerIndividualPaymentPending}
+                          loading={addPaymentsToFacturaPending}
                         >
                           {hasSavedPayments() ? "Pagos Guardados ✓" : "Guardar Pagos"}
                         </Button>
