@@ -1,4 +1,4 @@
-import { DownloadOutlined, FileTextOutlined } from "@ant-design/icons";
+import { FileTextOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -267,16 +267,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             )}
 
             {/* Botones de acción */}
-            <Row justify="space-between" style={{ marginTop: 24 }}>
-              <Col>
-                <Button 
-                  type="default" 
-                  icon={<DownloadOutlined />} 
-                  disabled={!hasValidPayments}
-                >
-                  Descargar Factura
-                </Button>
-              </Col>
+            <Row justify="end" style={{ marginTop: 24 }}>
               <Col>
                 <Row gutter={8}>
                   {onBack && (
