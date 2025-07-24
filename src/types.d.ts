@@ -29,6 +29,7 @@ export type User = {
   profesion: string | null;
   tipo_usuario: string | null;
   url_imagen?: string | null;
+  visitas_domiciliarias?: boolean;
 };
 
 export interface FamilyMember {

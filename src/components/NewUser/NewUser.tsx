@@ -12,6 +12,7 @@ import {
   Row,
   Select,
   Spin,
+  Switch,
   Typography,
   Upload,
 } from "antd";
@@ -70,6 +71,7 @@ const formSchema = z.object({
   occupation: z.string().optional(),
   address: z.string().optional(),
   phone: z.string().optional(),
+  homeVisit: z.boolean().default(false),
   photo: z
     .any()
     .optional()
@@ -101,6 +103,7 @@ export const NewUser: React.FC = () => {
     defaultValues: {
       gender: "Masculino",
       userId: "0000",
+      homeVisit: false,
     },
   });
 
@@ -147,6 +150,7 @@ export const NewUser: React.FC = () => {
       is_deleted: false,
       profesion: data.occupation ?? "",
       tipo_usuario: data.userType ?? "Nuevo",
+      visitas_domiciliarias: data.homeVisit,
     };
 
     const photoFile = data.photo?.fileList?.[0]?.originFileObj;
@@ -177,6 +181,7 @@ export const NewUser: React.FC = () => {
       address: userData.direccion ?? "",
       occupation: userData.profesion ?? "",
       userType: (userData.tipo_usuario as "Nuevo" | "Recurrente") ?? "Nuevo",
+      homeVisit: userData.visitas_domiciliarias ?? false,
     };
 
     reset(resetValues);
@@ -469,6 +474,31 @@ export const NewUser: React.FC = () => {
                             Subir fotografía
                           </Button>
                         </Upload>
+                      )}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="Visita Domiciliaria"
+                    validateStatus={errors.homeVisit ? "error" : ""}
+                    help={
+                      errors.homeVisit?.message && (
+                        <Text type="danger">{errors.homeVisit.message}</Text>
+                      )
+                    }
+                  >
+                    <Controller
+                      name="homeVisit"
+                      control={control}
+                      render={({ field }) => (
+                        <Switch
+                          {...field}
+                          checked={field.value}
+                          onChange={field.onChange}
+                          checkedChildren="Sí"
+                          unCheckedChildren="No"
+                        />
                       )}
                     />
                   </Form.Item>
