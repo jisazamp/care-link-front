@@ -20,7 +20,7 @@ import request from "axios";
 import dayjs, { type Dayjs } from "dayjs";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
 import {
@@ -91,6 +91,7 @@ type FormValues = z.infer<typeof formSchema>;
 export const NewUser: React.FC = () => {
   const params = useParams();
   const userId = params.id;
+  const location = useLocation();
 
   const {
     control,
@@ -110,6 +111,13 @@ export const NewUser: React.FC = () => {
 
   // Observar el valor del switch para determinar la redirección
   const homeVisitValue = watch("homeVisit");
+
+  // Activar automáticamente el switch si viene desde visitas domiciliarias
+  useEffect(() => {
+    if (location.state?.activateHomeVisit && !userId) {
+      setValue("homeVisit", true);
+    }
+  }, [location.state?.activateHomeVisit, setValue, userId]);
 
   const navigate = useNavigate();
   const { data, isError, isLoading, error } = useGetUserById(userId);

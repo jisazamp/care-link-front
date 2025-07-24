@@ -6,6 +6,7 @@ import {
   SettingOutlined,
   QuestionCircleOutlined,
   SearchOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -24,7 +25,7 @@ import {
 } from "antd";
 import type React from "react";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
 import { useGetUsersWithHomeVisits } from "../../hooks/useGetUsersWithHomeVisits/useGetUsersWithHomeVisits";
 import type { User } from "../../types";
@@ -36,6 +37,7 @@ const { confirm } = Modal;
 export const UsersWithHomeVisitsList: React.FC = () => {
   const { data, isPending, refetch } = useGetUsersWithHomeVisits();
   const { mutate: deleteUser } = useDeleteUserMutation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState<User[] | null>(null);
   const [pagination, setPagination] = useState({
@@ -73,6 +75,15 @@ export const UsersWithHomeVisitsList: React.FC = () => {
     setFiltered(null);
     setPagination((p) => ({ ...p, current: 1 }));
     refetch();
+  };
+
+  const handleCreateNewUser = () => {
+    // Redirigir al formulario de creación con el switch de visitas domiciliarias activado
+    navigate("/usuarios/crear", { 
+      state: { 
+        activateHomeVisit: true 
+      } 
+    });
   };
 
   // Lógica de ordenamiento
@@ -296,41 +307,78 @@ export const UsersWithHomeVisitsList: React.FC = () => {
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <Card className="usuarios-search-card" style={{ width: "100%" }}>
-          <div className="usuarios-search-body" style={{ width: "100%" }}>
-            <div className="usuarios-search-left" style={{ flex: 1, minWidth: 0 }}>
-              <span className="usuarios-search-label">Buscar por</span>
-              <QuestionCircleOutlined style={{ fontSize: 16, color: "rgba(0,0,0,0.65)", marginLeft: 4, marginRight: 4, verticalAlign: "middle" }} />
-              <span className="usuarios-search-colon">:</span>
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 16, 
+            width: "100%",
+            flexWrap: "wrap"
+          }}>
+            {/* Sección de búsqueda por usuario existente */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 300 }}>
+              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)", fontWeight: 500 }}>
+                A partir de usuario existente
+              </span>
+              <QuestionCircleOutlined style={{ fontSize: 16, color: "rgba(0,0,0,0.65)" }} />
+              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)" }}>:</span>
               <Input
-                className="usuarios-search-input"
-                placeholder="Ingrese un valor"
+                placeholder="Digite para buscar"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onPressEnter={handleSearch}
                 allowClear
-                bordered={false}
                 style={{ 
-                  boxShadow: "none", 
-                  height: 32, 
-                  fontSize: 14, 
-                  verticalAlign: "middle",
-                  width: "100%",
                   flex: 1,
-                  minWidth: 200
+                  minWidth: 200,
+                  borderRadius: 6
+                }}
+              />
+              <Button
+                type="primary"
+                icon={<SearchOutlined />}
+                onClick={handleSearch}
+                style={{ 
+                  borderRadius: "50%", 
+                  width: 32, 
+                  height: 32,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
                 }}
               />
             </div>
-            <div className="usuarios-search-right" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Button className="usuarios-btn-secondary" style={{ height: 32, fontWeight: 400 }} onClick={handleReset}>
-                Restablecer
-              </Button>
-              <Button className="usuarios-btn-primary" style={{ height: 32, fontWeight: 400, display: "flex", alignItems: "center" }} onClick={handleSearch} icon={<SearchOutlined style={{ fontSize: 16, marginRight: 4 }} />}>
-                Buscar
-              </Button>
-              <Button type="text" style={{ color: '#7f34b4', height: 32, fontWeight: 400, fontSize: 14, padding: '0 8px' }}>
-                Más Opciones <DownOutlined />
-              </Button>
-            </div>
+
+            {/* Separador */}
+            <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", fontWeight: 400 }}>
+              ó
+            </span>
+
+            {/* Botón para crear nuevo usuario */}
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleCreateNewUser}
+              style={{ 
+                borderRadius: 6,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                height: 32
+              }}
+            >
+              A partir de nuevo usuario
+            </Button>
+
+            {/* Botón de restablecer */}
+            <Button
+              onClick={handleReset}
+              style={{ 
+                borderRadius: 6,
+                height: 32
+              }}
+            >
+              Restablecer
+            </Button>
           </div>
         </Card>
 
