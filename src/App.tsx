@@ -26,6 +26,7 @@ import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalRep
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
+import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
@@ -113,6 +114,14 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <UsersList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios"
+                element={
+                  <PrivateRoute>
+                    <UsersWithHomeVisitsList />
                   </PrivateRoute>
                 }
               />
