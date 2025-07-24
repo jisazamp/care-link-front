@@ -98,6 +98,7 @@ export const NewUser: React.FC = () => {
     handleSubmit,
     reset,
     setValue,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -106,6 +107,9 @@ export const NewUser: React.FC = () => {
       homeVisit: false,
     },
   });
+
+  // Observar el valor del switch para determinar la redirección
+  const homeVisitValue = watch("homeVisit");
 
   const navigate = useNavigate();
   const { data, isError, isLoading, error } = useGetUserById(userId);
@@ -207,9 +211,16 @@ export const NewUser: React.FC = () => {
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
-      navigate("/usuarios");
+      // Redirigir según el valor del switch "Visita Domiciliaria"
+      if (homeVisitValue) {
+        // Si el switch está ON, redirigir al módulo de visitas domiciliarias
+        navigate("/visitas-domiciliarias/usuarios");
+      } else {
+        // Si el switch está OFF, redirigir al módulo de usuarios regular
+        navigate("/usuarios");
+      }
     }
-  }, [isSuccessCreateUser, isSuccessEditUser, navigate]);
+  }, [isSuccessCreateUser, isSuccessEditUser, navigate, homeVisitValue]);
 
   if (isLoading) {
     return (
