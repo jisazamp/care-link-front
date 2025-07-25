@@ -39,7 +39,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   // Hooks centralizados
   const { data: paymentMethodsData, isLoading: paymentMethodsLoading } = useGetPaymentMethods();
   const { data: paymentTypesData, isLoading: paymentTypesLoading } = useGetPaymentTypes();
-  const { registerIndividualPaymentFnAsync, registerIndividualPaymentPending, addPaymentsToFacturaFnAsync, addPaymentsToFacturaPending } = useCreatePayment();
+  const { addPaymentsToFacturaFnAsync, addPaymentsToFacturaPending } = useCreatePayment();
   const { deletePaymentFn, deletePaymentPending } = useDeletePayment();
 
   // Calcular total de pagos usando el estado centralizado
@@ -197,80 +197,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     onChange?.(updatedPayments);
   }, [payments, setPayments, onChange]);
 
-  // Manejar guardar pagos - AHORA registra los pagos individualmente
-  const handleSavePayments = useCallback(async () => {
-    try {
-      const validPayments = payments.filter(
-        (payment) =>
-          payment.id_metodo_pago &&
-          payment.id_tipo_pago &&
-          payment.fecha_pago &&
-          payment.valor > 0 &&
-          !payment.saved && // Solo pagos no guardados
-          !payment.id_pago, // Solo pagos nuevos
-      );
 
-      if (validPayments.length === 0) {
-        console.log("ℹ️ No hay pagos nuevos válidos para guardar");
-        return false;
-      }
-
-      console.log("💳 Registrando pagos individuales:", validPayments);
-
-      // Registrar cada pago individualmente
-      const updatedPayments = [...payments];
-      
-      for (let i = 0; i < validPayments.length; i++) {
-        const payment = validPayments[i];
-        const paymentIndex = payments.findIndex(p => 
-          p.id_metodo_pago === payment.id_metodo_pago &&
-          p.id_tipo_pago === payment.id_tipo_pago &&
-          p.fecha_pago === payment.fecha_pago &&
-          p.valor === payment.valor &&
-          !p.saved &&
-          !p.id_pago
-        );
-
-        if (paymentIndex !== -1 && facturaId) {
-          try {
-            console.log(`💳 Registrando pago ${i + 1}/${validPayments.length}:`, payment);
-            
-            const response = await registerIndividualPaymentFnAsync({
-              id_factura: facturaId,
-              id_metodo_pago: payment.id_metodo_pago!,
-              id_tipo_pago: payment.id_tipo_pago!,
-              fecha_pago: payment.fecha_pago,
-              valor: payment.valor
-            });
-
-            console.log("✅ Pago individual registrado:", response);
-            
-            // Actualizar el estado local marcando el pago como registrado
-            updatedPayments[paymentIndex] = {
-              ...payment,
-              id_pago: response.data?.data?.id_pago,
-              id_factura: facturaId,
-              saved: true
-            };
-            
-          } catch (error) {
-            console.error(`❌ Error al registrar pago ${i + 1}:`, error);
-            // Continuar con el siguiente pago aunque falle uno
-          }
-        }
-      }
-      
-      setPayments(updatedPayments);
-      onChange?.(updatedPayments);
-
-      console.log("✅ Proceso de registro de pagos completado");
-      return true;
-      
-    } catch (error) {
-      console.error("❌ Error al guardar pagos:", error);
-      return false;
-    }
-  }, [payments, setPayments, onChange, facturaId, registerIndividualPaymentFnAsync]);
 
   // Función para guardar pagos usando la API correcta
   const handleSavePaymentsToFactura = useCallback(async () => {

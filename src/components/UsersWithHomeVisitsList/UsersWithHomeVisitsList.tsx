@@ -239,7 +239,7 @@ export const UsersWithHomeVisitsList: React.FC = () => {
         const menu = (
           <Menu>
             <Menu.Item key="details">
-              <Link to={`/usuarios/${user.id_usuario}/detalles`} style={{ color: '#7f34b4' }}>
+              <Link to={`/visitas-domiciliarias/usuarios/${user.id_usuario}/detalles`} style={{ color: '#7f34b4' }}>
                 Ver detalles
               </Link>
             </Menu.Item>

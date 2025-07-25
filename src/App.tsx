@@ -24,6 +24,7 @@ import { NewUser } from "./components/NewUser/NewUser";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
 import { UserDetails } from "./components/UserDetails/UserDetails";
+import { UserHomeVisitDetails } from "./components/UserHomeVisitDetails/UserHomeVisitDetails";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
 import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
@@ -122,6 +123,14 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <UsersWithHomeVisitsList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/detalles"
+                element={
+                  <PrivateRoute>
+                    <UserHomeVisitDetails />
                   </PrivateRoute>
                 }
               />
