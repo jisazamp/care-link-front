@@ -21,6 +21,7 @@ import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
+import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import type { Contract, FamilyMember } from "../../types";
 
 const { Title } = Typography;
@@ -38,6 +39,7 @@ export const UserHomeVisitDetails: React.FC = () => {
   const { mutate: deleteFamilyMember } = useDeleteFamilyMemberMutation(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
   const { data: userContracts } = useGetUserContracts(userId);
+  const { data: record, isLoading: loadingRecord } = useGetUserMedicalRecord(userId);
 
   const acudientesColumns: ColumnsType<FamilyMember> = [
     {
@@ -114,6 +116,25 @@ export const UserHomeVisitDetails: React.FC = () => {
         if (memberId) {
           deleteFamilyMember(memberId);
         }
+      },
+    });
+  };
+
+  const handleDeleteRecord = () => {
+    confirm({
+      title: "¿Estás seguro de que deseas eliminar la historia clínica?",
+      content: "Esta acción no se puede deshacer.",
+      okText: "Eliminar",
+      okType: "danger",
+      cancelText: "Cancelar",
+      cancelButtonProps: {
+        type: "primary",
+        style: { backgroundColor: "#F32013" },
+      },
+      okButtonProps: { type: "link", style: { color: "#000" } },
+      onOk() {
+        // Aquí se implementaría la lógica para eliminar el registro médico
+        console.log("Eliminar registro médico");
       },
     });
   };
@@ -334,13 +355,197 @@ export const UserHomeVisitDetails: React.FC = () => {
                 </div>
               </div>
             </Panel>
-            <Panel header="Reportes Clínicos" key="2">
+            <Panel header="Historia Clínica" key="2">
+              <Card
+                extra={
+                  record?.data.data ? (
+                    <Space>
+                      <Button
+                        icon={<EditOutlined />}
+                        className="main-button-white"
+                        onClick={() => navigate(`/visitas-domiciliarias/usuarios/${userId}/historia`)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        icon={<DeleteOutlined />}
+                        className="main-button-white"
+                        shape="circle"
+                        onClick={handleDeleteRecord}
+                      />
+                    </Space>
+                  ) : (
+                    <Space>
+                      <Button
+                        className="main-button-white"
+                        icon={<PlusOutlined />}
+                        onClick={() => navigate(`/visitas-domiciliarias/usuarios/${userId}/historia`)}
+                      >
+                        Agregar
+                      </Button>
+                    </Space>
+                  )
+                }
+                loading={loadingRecord}
+              >
+                {record?.data.data ? (
+                  <Flex vertical gap={60}>
+                    <Flex gap={60} align="center">
+                      <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                        <Divider
+                          type="vertical"
+                          style={{ height: 70, borderWidth: 2 }}
+                        />
+                        <Typography.Title level={5}>
+                          Datos Esenciales
+                        </Typography.Title>
+                      </Flex>
+                      <Flex vertical gap={10} style={{ flex: 2 }}>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Empresa de salud domiciliaria:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data.emer_medica ? "Sí" : "No"}
+                          </Typography.Text>{" "}
+                          {record.data.data.telefono_emermedica && (
+                            <Typography.Text
+                              style={{
+                                backgroundColor: "#F1E6F5",
+                                borderRadius: 20,
+                                fontWeight: 500,
+                                marginLeft: 5,
+                                paddingBottom: 4,
+                                paddingLeft: 8,
+                                paddingRight: 8,
+                                paddingTop: 4,
+                              }}
+                            >
+                              {record.data.data.telefono_emermedica}
+                            </Typography.Text>
+                          )}
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Tipo de sangre:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data?.tipo_sangre}
+                          </Typography.Text>{" "}
+                          Estatura:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data?.altura}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Motivo ingreso:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data?.motivo_ingreso}
+                          </Typography.Text>{" "}
+                        </Typography.Text>
+                      </Flex>
+                    </Flex>
+                    <Flex gap={60} align="center">
+                      <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                        <Divider
+                          type="vertical"
+                          style={{ height: 70, borderWidth: 2 }}
+                        />
+                        <Typography.Title level={5}>
+                          Habilidades Biofísicas
+                        </Typography.Title>
+                      </Flex>
+                      <Flex vertical gap={10} style={{ flex: 2 }}>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Tipo de alimentación:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data?.tipo_alimentacion}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Continencia:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data?.continencia}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Cuidado personal:{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data?.cuidado_personal}
+                          </Typography.Text>
+                        </Typography.Text>
+                      </Flex>
+                    </Flex>
+                    <Flex gap={60} align="center">
+                      <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                        <Divider
+                          type="vertical"
+                          style={{ height: 70, borderWidth: 2 }}
+                        />
+                        <Typography.Title level={5}>
+                          Hábitos Toxicológicos
+                        </Typography.Title>
+                      </Flex>
+                      <Flex vertical gap={10} style={{ flex: 2 }}>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Tabaquismo{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data.tabaquismo ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Alcoholismo{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data.alcoholismo ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Typography.Text
+                          style={{ fontWeight: 500, marginRight: 5 }}
+                        >
+                          Sustancias Psicoactivas{" "}
+                          <Typography.Text style={{ fontWeight: 400 }}>
+                            {record.data.data.sustanciaspsico ? "Sí" : "No"}
+                          </Typography.Text>
+                        </Typography.Text>
+                        <Flex gap={10} style={{ flex: 2 }}>
+                          <Typography.Text style={{ fontWeight: 500 }}>
+                            Maltratado{" "}
+                            <Typography.Text style={{ fontWeight: 400 }}>
+                              {record.data.data.maltratado ? "Sí" : "No"}
+                            </Typography.Text>
+                          </Typography.Text>
+                        </Flex>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                ) : (
+                  <Flex style={{ height: 50, alignItems: "center" }}>
+                    <Typography.Text>
+                      El usuario no tiene historia clínica registrada
+                    </Typography.Text>
+                  </Flex>
+                )}
+              </Card>
+            </Panel>
+            <Panel header="Reportes Clínicos" key="3">
               <Card
                 extra={
                   <Tooltip
                     title={
-                      !user?.data.data?.id_usuario
-                        ? "No se pueden registrar reportes clínicos si no hay un usuario seleccionado"
+                      !record?.data.data?.id_historiaclinica
+                        ? "No se pueden registrar reportes clínicos si no hay una historia clínica"
                         : null
                     }
                   >
@@ -350,7 +555,7 @@ export const UserHomeVisitDetails: React.FC = () => {
                         navigate(`/visitas-domiciliarias/usuarios/${userId}/nuevo-reporte`)
                       }
                       className="main-button-white"
-                      disabled={!user?.data.data?.id_usuario}
+                      disabled={!record?.data.data?.id_historiaclinica}
                     >
                       Agregar
                     </Button>
