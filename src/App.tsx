@@ -19,6 +19,7 @@ import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
+import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
@@ -140,6 +141,14 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <HomeVisitMedicalRecord />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/nuevo-reporte"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitNewReport />
                   </PrivateRoute>
                 }
               />

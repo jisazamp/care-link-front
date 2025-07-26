@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, FolderOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Breadcrumb,
   Button,
@@ -568,65 +568,77 @@ export const UserHomeVisitDetails: React.FC = () => {
                 }
                 className="detail-card"
               >
-                <Table
-                  rowKey="id_profesional"
-                  columns={[
-                    {
-                      title: "Profesional",
-                      dataIndex: "profesional",
-                      render: (_, record) => {
-                        return `${record.profesional?.nombres} ${record.profesional?.apellidos}`;
+                {medicalReports?.data.data && medicalReports.data.data.length > 0 ? (
+                  <Table
+                    rowKey="id_profesional"
+                    columns={[
+                      {
+                        title: "Profesional",
+                        dataIndex: "profesional",
+                        render: (_, record) => {
+                          return `${record.profesional?.nombres} ${record.profesional?.apellidos}`;
+                        },
                       },
-                    },
-                    {
-                      title: "Fecha registro",
-                      dataIndex: "fecha_registro",
-                      render: (_, record) =>
-                        record.fecha_registro
-                          ? dayjs(record.fecha_registro).format("DD-MM-YYYY")
-                          : "",
-                    },
-                    {
-                      title: "Tipo reporte",
-                      dataIndex: "tipo_reporte",
-                    },
-                    {
-                      title: "Acciones",
-                      dataIndex: "acciones",
-                      key: "acciones",
-                      render: (_, record) => (
-                        <Space>
-                          <Link
-                            to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}/detalles`}
-                          >
-                            <Button
-                              type="link"
-                              className="main-button-link"
-                              size="small"
+                      {
+                        title: "Fecha registro",
+                        dataIndex: "fecha_registro",
+                        render: (_, record) =>
+                          record.fecha_registro
+                            ? dayjs(record.fecha_registro).format("DD-MM-YYYY")
+                            : "",
+                      },
+                      {
+                        title: "Tipo reporte",
+                        dataIndex: "tipo_reporte",
+                      },
+                      {
+                        title: "Acciones",
+                        dataIndex: "acciones",
+                        key: "acciones",
+                        render: (_, record) => (
+                          <Space>
+                            <Link
+                              to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}/detalles`}
                             >
-                              ver
-                            </Button>
-                          </Link>
-                          <Divider type="vertical" />
-                          <Link
-                            to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}`}
-                          >
-                            <Button
-                              type="link"
-                              className="main-button-link"
-                              size="small"
+                              <Button
+                                type="link"
+                                className="main-button-link"
+                                size="small"
+                              >
+                                ver
+                              </Button>
+                            </Link>
+                            <Divider type="vertical" />
+                            <Link
+                              to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}`}
                             >
-                              Editar
-                            </Button>
-                          </Link>
-                          <Divider type="vertical" />
-                        </Space>
-                      ),
-                    },
-                  ]}
-                  dataSource={medicalReports?.data.data}
-                  pagination={false}
-                />
+                              <Button
+                                type="link"
+                                className="main-button-link"
+                                size="small"
+                              >
+                                Editar
+                              </Button>
+                            </Link>
+                            <Divider type="vertical" />
+                          </Space>
+                        ),
+                      },
+                    ]}
+                    dataSource={medicalReports.data.data}
+                    pagination={false}
+                  />
+                ) : (
+                  <Flex
+                    vertical
+                    align="center"
+                    justify="center"
+                    style={{ padding: "40px 0" }}
+                  >
+                    <FolderOutlined style={{ fontSize: 48, color: "#d9d9d9", marginBottom: 16 }} />
+                    <Typography.Text type="secondary">No hay datos</Typography.Text>
+                  </Flex>
+                )}
               </Card>
             </Panel>
             <Panel header="Acudientes" key="4">
