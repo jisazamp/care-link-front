@@ -238,6 +238,11 @@ export const HomeVisitNewVisit: React.FC = () => {
                     message: "Por favor selecciona la fecha de visita",
                   },
                 ]}
+                extra={isEditing && !isViewMode ? (
+                  <Typography.Text type="secondary" style={{ fontSize: "12px" }}>
+                    ⚠️ Cambiar la fecha cambiará automáticamente el estado a "REPROGRAMADA"
+                  </Typography.Text>
+                ) : undefined}
               >
                 <DatePicker
                   style={{ width: "100%" }}
@@ -380,7 +385,20 @@ export const HomeVisitNewVisit: React.FC = () => {
                   </div>
                 </div>
               </Col>
-              <Col span={16}>
+              <Col span={8}>
+                <div style={{ marginBottom: 8 }}>
+                  <strong>Estado actual:</strong>
+                  <div style={{ 
+                    color: isEditing && firstHomeVisit?.estado_visita === 'REPROGRAMADA' ? '#fa8c16' : 
+                           isEditing && firstHomeVisit?.estado_visita === 'REALIZADA' ? '#52c41a' :
+                           isEditing && firstHomeVisit?.estado_visita === 'CANCELADA' ? '#ff4d4f' : '#1890ff',
+                    fontWeight: 500 
+                  }}>
+                    {isEditing && firstHomeVisit ? firstHomeVisit.estado_visita : 'PENDIENTE'}
+                  </div>
+                </div>
+              </Col>
+              <Col span={8}>
                 <div style={{ marginBottom: 8 }}>
                   <strong>Profesional asignado:</strong>
                   <div style={{ color: '#1890ff', fontWeight: 500 }}>

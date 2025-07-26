@@ -5,6 +5,7 @@ import type { HomeVisit } from "../../types";
 export interface UpdateHomeVisitData {
   fecha_visita?: string;
   hora_visita?: string;
+  estado_visita?: string;
   direccion_visita?: string;
   telefono_visita?: string;
   valor_dia?: number;
