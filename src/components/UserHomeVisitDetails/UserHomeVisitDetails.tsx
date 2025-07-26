@@ -15,6 +15,7 @@ import {
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
@@ -40,8 +41,19 @@ export const UserHomeVisitDetails: React.FC = () => {
     useGetUserFamilyMembers(userId);
   const { mutate: deleteFamilyMember } = useDeleteFamilyMemberMutation(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
-  const { data: homeVisits, isLoading: loadingHomeVisits } = useGetUserHomeVisits(userId);
+  const { data: homeVisits, isLoading: loadingHomeVisits, refetch: refetchHomeVisits } = useGetUserHomeVisits(userId);
   const { data: record, isLoading: loadingRecord } = useGetUserMedicalRecord(userId);
+
+  // Forzar actualización de visitas domiciliarias cada 10 segundos para actualizar estados automáticamente
+  useEffect(() => {
+    if (!userId) return;
+
+    const interval = setInterval(() => {
+      refetchHomeVisits();
+    }, 5000); // 10 segundos - más frecuente para mejor experiencia
+
+    return () => clearInterval(interval);
+  }, [userId, refetchHomeVisits]);
 
   const acudientesColumns: ColumnsType<FamilyMember> = [
     {
@@ -148,13 +160,31 @@ export const UserHomeVisitDetails: React.FC = () => {
       title: "Fecha",
       dataIndex: "fecha_visita",
       key: "fecha_visita",
-      render: (date: string) => dayjs(date).format("DD/MM/YYYY"),
+      render: (date: string) => {
+        if (!date) {
+          return (
+            <span style={{ color: '#faad14', fontStyle: 'italic' }}>
+              Pendiente de programación
+            </span>
+          );
+        }
+        return dayjs(date).format("DD/MM/YYYY");
+      },
     },
     {
       title: "Hora",
       dataIndex: "hora_visita",
       key: "hora_visita",
-      render: (time: string) => dayjs(`2000-01-01 ${time}`).format("HH:mm"),
+      render: (time: string) => {
+        if (!time) {
+          return (
+            <span style={{ color: '#faad14', fontStyle: 'italic' }}>
+              Pendiente de programación
+            </span>
+          );
+        }
+        return dayjs(`2000-01-01 ${time}`).format("HH:mm");
+      },
     },
     {
       title: "Estado",
@@ -167,6 +197,29 @@ export const UserHomeVisitDetails: React.FC = () => {
           CANCELADA: { color: "red", text: "Cancelada" },
           REPROGRAMADA: { color: "orange", text: "Reprogramada" },
         };
+        
+        // Si no tiene fecha o hora programada, mostrar como pendiente de programación
+        if (!record.fecha_visita || !record.hora_visita) {
+          return (
+            <Tooltip title="Esta visita necesita ser programada con fecha y hora">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ color: '#faad14', fontStyle: 'italic' }}>
+                  Pendiente de programación
+                </span>
+                <span style={{ 
+                  fontSize: '10px', 
+                  color: '#faad14', 
+                  backgroundColor: '#fff7e6',
+                  padding: '2px 4px',
+                  borderRadius: '4px',
+                  border: '1px solid #ffd591'
+                }}>
+                  PROGRAMAR
+                </span>
+              </div>
+            </Tooltip>
+          );
+        }
         
         const updateDate = record.fecha_actualizacion ? new Date(record.fecha_actualizacion) : null;
         const visitDate = new Date(record.fecha_visita + ' ' + record.hora_visita);

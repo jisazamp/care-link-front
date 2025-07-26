@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Table,
   Card,
@@ -32,6 +32,17 @@ const { Option } = Select;
 export const HomeVisitsList: React.FC = () => {
   const navigate = useNavigate();
   const { data: homeVisitsData, isLoading, error } = useGetAllHomeVisits();
+
+  // Estados para los filtros
+  const [filters, setFilters] = useState({
+    estado: undefined,
+    tipoVisitas: "futuras",
+    fecha: null,
+    paciente: "",
+  });
+
+  // Estado para los datos filtrados
+  const [filteredData, setFilteredData] = useState<any[]>([]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -164,13 +175,83 @@ export const HomeVisitsList: React.FC = () => {
   const calculateStats = () => {
     if (!homeVisitsData?.data.data) return { total: 0, pendientes: 0, realizadas: 0, canceladas: 0 };
 
-    const visitas = homeVisitsData.data.data;
+    // Usar datos filtrados para las estadísticas
+    const visitas = filteredData.length > 0 ? filteredData : homeVisitsData.data.data;
     return {
       total: visitas.length,
       pendientes: visitas.filter((v: any) => v.estado_visita === "PENDIENTE").length,
       realizadas: visitas.filter((v: any) => v.estado_visita === "REALIZADA").length,
       canceladas: visitas.filter((v: any) => v.estado_visita === "CANCELADA").length,
     };
+  };
+
+  // Función para aplicar filtros
+  const applyFilters = useCallback(() => {
+    console.log("🔍 Aplicando filtros:", filters);
+    console.log("🔍 Datos originales:", homeVisitsData?.data.data);
+    
+    if (!homeVisitsData?.data.data) {
+      setFilteredData([]);
+      return;
+    }
+
+    let filtered = [...homeVisitsData.data.data];
+    console.log("🔍 Datos iniciales para filtrar:", filtered.length);
+
+    // Filtrar por estado
+    if (filters.estado) {
+      filtered = filtered.filter((visita: any) => visita.estado_visita === filters.estado);
+    }
+
+    // Filtrar por tipo de visitas (futuras o todas)
+    if (filters.tipoVisitas === "futuras") {
+      const now = dayjs();
+      filtered = filtered.filter((visita: any) => {
+        if (!visita.fecha_visita || !visita.hora_visita) return false;
+        const visitaDateTime = dayjs(`${visita.fecha_visita} ${visita.hora_visita}`);
+        return visitaDateTime.isAfter(now);
+      });
+    }
+
+    // Filtrar por fecha
+    if (filters.fecha) {
+      const filterDate = dayjs(filters.fecha).format("YYYY-MM-DD");
+      filtered = filtered.filter((visita: any) => {
+        if (!visita.fecha_visita) return false;
+        return dayjs(visita.fecha_visita).format("YYYY-MM-DD") === filterDate;
+      });
+    }
+
+    // Filtrar por paciente
+    if (filters.paciente) {
+      filtered = filtered.filter((visita: any) => {
+        const pacienteNombre = visita.paciente_nombre?.toLowerCase() || "";
+        return pacienteNombre.includes(filters.paciente.toLowerCase());
+      });
+    }
+
+    console.log("🔍 Datos finales filtrados:", filtered.length, filtered);
+    setFilteredData(filtered);
+  }, [homeVisitsData, filters]);
+
+  // Aplicar filtros cuando cambien los datos o filtros
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
+
+  // Función para manejar cambios en filtros
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  // Función para limpiar filtros
+  const clearFilters = () => {
+    setFilters({
+      estado: undefined,
+      tipoVisitas: "futuras",
+      fecha: null,
+      paciente: "",
+    });
   };
 
   const stats = calculateStats();
@@ -188,7 +269,7 @@ export const HomeVisitsList: React.FC = () => {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => navigate("/visitas-domiciliarias/nueva")}
+              onClick={() => navigate("/visitas-domiciliarias/usuarios")}
             >
               Nueva Visita
             </Button>
@@ -238,12 +319,28 @@ export const HomeVisitsList: React.FC = () => {
 
       {/* Filtros */}
       <Card style={{ marginBottom: "24px" }}>
+        {/* Indicador de filtros activos */}
+        {(filters.estado || filters.fecha || filters.paciente) && (
+          <div style={{ marginBottom: "16px", padding: "8px 12px", backgroundColor: "#f0f9ff", border: "1px solid #91d5ff", borderRadius: "6px" }}>
+            <div style={{ fontSize: "12px", color: "#1890ff", marginBottom: "4px" }}>
+              🔍 Filtros activos:
+            </div>
+            <div style={{ fontSize: "11px", color: "#666" }}>
+              {filters.estado && <span style={{ marginRight: "8px" }}>Estado: {filters.estado}</span>}
+              {filters.fecha && <span style={{ marginRight: "8px" }}>Fecha: {dayjs(filters.fecha).format("DD/MM/YYYY")}</span>}
+              {filters.paciente && <span style={{ marginRight: "8px" }}>Paciente: {filters.paciente}</span>}
+              <span style={{ marginRight: "8px" }}>Tipo: {filters.tipoVisitas === "futuras" ? "Solo futuras" : "Todas las visitas"}</span>
+            </div>
+          </div>
+        )}
         <Row gutter={16}>
           <Col span={4}>
             <Select
               placeholder="Filtrar por estado"
               style={{ width: "100%" }}
               allowClear
+              value={filters.estado}
+              onChange={(value) => handleFilterChange("estado", value)}
             >
               <Option value="PENDIENTE">Pendiente</Option>
               <Option value="REALIZADA">Realizada</Option>
@@ -255,7 +352,8 @@ export const HomeVisitsList: React.FC = () => {
             <Select
               placeholder="Mostrar visitas"
               style={{ width: "100%" }}
-              defaultValue="futuras"
+              value={filters.tipoVisitas}
+              onChange={(value) => handleFilterChange("tipoVisitas", value)}
             >
               <Option value="futuras">Solo futuras</Option>
               <Option value="todas">Todas las visitas</Option>
@@ -265,17 +363,26 @@ export const HomeVisitsList: React.FC = () => {
             <DatePicker
               placeholder="Filtrar por fecha"
               style={{ width: "100%" }}
+              value={filters.fecha}
+              onChange={(value) => handleFilterChange("fecha", value)}
             />
           </Col>
           <Col span={6}>
             <Input
               placeholder="Buscar por paciente"
               prefix={<SearchOutlined />}
+              value={filters.paciente}
+              onChange={(e) => handleFilterChange("paciente", e.target.value)}
             />
           </Col>
-          <Col span={6}>
-            <Button type="primary" icon={<SearchOutlined />}>
+          <Col span={3}>
+            <Button type="primary" icon={<SearchOutlined />} onClick={applyFilters}>
               Filtrar
+            </Button>
+          </Col>
+          <Col span={3}>
+            <Button onClick={clearFilters}>
+              Limpiar
             </Button>
           </Col>
         </Row>
@@ -285,7 +392,7 @@ export const HomeVisitsList: React.FC = () => {
       <Card>
         <Table
           columns={columns}
-          dataSource={homeVisitsData?.data.data || []}
+          dataSource={filteredData}
           loading={isLoading}
           rowKey="id_visitadomiciliaria"
           pagination={{
@@ -296,6 +403,21 @@ export const HomeVisitsList: React.FC = () => {
               `${range[0]}-${range[1]} de ${total} visitas`,
           }}
           scroll={{ x: 1200 }}
+          locale={{
+            emptyText: (
+              <div style={{ textAlign: "center", padding: "40px 0" }}>
+                <div style={{ fontSize: "48px", color: "#d9d9d9", marginBottom: "16px" }}>
+                  📋
+                </div>
+                <div style={{ color: "#666", marginBottom: "8px" }}>
+                  No hay visitas que coincidan con los filtros
+                </div>
+                <div style={{ fontSize: "12px", color: "#999" }}>
+                  Intenta ajustar los filtros o crear una nueva visita
+                </div>
+              </div>
+            ),
+          }}
         />
       </Card>
     </div>

@@ -46,6 +46,10 @@ export const useUpdateHomeVisit = () => {
       queryClient.invalidateQueries({
         queryKey: ["all-home-visits"],
       });
+      // Invalidar también la query de la primera visita para que se actualice el formulario
+      queryClient.invalidateQueries({
+        queryKey: ["user-first-home-visit", variables.userId],
+      });
     },
   });
 };

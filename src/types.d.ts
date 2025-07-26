@@ -494,8 +494,8 @@ export type HomeVisit = {
   id_visitadomiciliaria: number;
   id_contrato: number | null;
   id_usuario: number | null;
-  fecha_visita: string;
-  hora_visita: string;
+  fecha_visita: string | null;
+  hora_visita: string | null;
   estado_visita: string;
   direccion_visita: string;
   telefono_visita: string | null;
