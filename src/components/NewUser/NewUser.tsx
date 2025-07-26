@@ -143,7 +143,6 @@ export const NewUser: React.FC = () => {
   );
 
   const onSubmit = (data: FormValues) => {
-    console.log("🏠 homeVisit value:", data.homeVisit);
     
     const user: Partial<User> = {
       apellidos: data.lastName,
@@ -222,7 +221,6 @@ export const NewUser: React.FC = () => {
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
-      console.log("🚀 Redirección iniciada - homeVisitValue:", homeVisitValue);
       
       // Redirigir según el valor del switch "Visita Domiciliaria"
       if (homeVisitValue) {
@@ -231,25 +229,20 @@ export const NewUser: React.FC = () => {
           // Para usuarios nuevos, usar el ID de la respuesta de creación
           const userId = (createUserResponse?.data?.data as any)?.user?.id_usuario;
           if (userId) {
-            console.log("📍 Redirigiendo a nueva visita para usuario:", userId);
             navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
           } else {
-            console.log("❌ Error: No se pudo obtener el ID del usuario creado");
             navigate("/visitas-domiciliarias/usuarios");
           }
         } else if (isSuccessEditUser && data?.data.data?.id_usuario) {
           // Para edición, usar el ID del usuario existente
           const userId = data.data.data.id_usuario;
-          console.log("📍 Redirigiendo a nueva visita para usuario editado:", userId);
           navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
         } else {
           // Fallback: redirigir a la lista de usuarios con visitas domiciliarias
-          console.log("📍 Fallback: redirigiendo a lista de usuarios con visitas");
           navigate("/visitas-domiciliarias/usuarios");
         }
       } else {
         // Si el switch está OFF, redirigir al módulo de usuarios regular
-        console.log("📍 Redirigiendo a lista de usuarios regular");
         navigate("/usuarios");
       }
     }

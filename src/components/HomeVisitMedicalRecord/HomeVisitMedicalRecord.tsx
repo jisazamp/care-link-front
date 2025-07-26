@@ -188,18 +188,18 @@ export const HomeVisitMedicalRecord: React.FC = () => {
         medicalRecord,
         {
           onSuccess: () => {
-            console.log("✅ Historia clínica de visita domiciliaria creada exitosamente");
+            console.log(" Historia clínica de visita domiciliaria creada exitosamente");
             message.success("Historia clínica de visita domiciliaria creada exitosamente");
             navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
           },
           onError: (error) => {
-            console.error("❌ Error al crear la historia clínica:", error);
+            console.error(" Error al crear la historia clínica:", error);
             message.error("Error al crear la historia clínica");
           },
         },
       );
     } else {
-      console.log("🔄 Actualizando historia clínica de visita domiciliaria...");
+      console.log(" Actualizando historia clínica de visita domiciliaria...");
       editRecord(
         {
           id: parseInt(userId),
@@ -208,12 +208,12 @@ export const HomeVisitMedicalRecord: React.FC = () => {
         },
         {
           onSuccess: () => {
-            console.log("✅ Historia clínica de visita domiciliaria actualizada exitosamente");
+            console.log(" Historia clínica de visita domiciliaria actualizada exitosamente");
             message.success("Historia clínica de visita domiciliaria actualizada exitosamente");
             navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
           },
           onError: (error) => {
-            console.error("❌ Error al actualizar la historia clínica:", error);
+            console.error(" Error al actualizar la historia clínica:", error);
             message.error("Error al actualizar la historia clínica");
           },
         },

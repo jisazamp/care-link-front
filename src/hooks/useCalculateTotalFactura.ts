@@ -26,13 +26,13 @@ export const useCalculateTotalFactura = () => {
     onSuccess: (response) => {
       const data = response.data;
       if (data.success) {
-        console.log("✅ Total calculado exitosamente:", data.data);
+        console.log(" Total calculado exitosamente:", data.data);
       } else {
-        console.error("❌ Error al calcular total:", data.message);
+        console.error(" Error al calcular total:", data.message);
       }
     },
     onError: (error: any) => {
-      console.error("❌ Error al calcular total de factura:", error);
+      console.error(" Error al calcular total de factura:", error);
     },
   });
 };

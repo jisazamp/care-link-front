@@ -202,7 +202,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
   // Función para guardar pagos usando la API correcta
   const handleSavePaymentsToFactura = useCallback(async () => {
     console.log("🚀 Iniciando guardado de pagos en factura...");
-    console.log("📋 Factura ID:", facturaId);
+    console.log(" Factura ID:", facturaId);
     console.log("💳 Pagos actuales:", payments);
     
     try {
@@ -216,7 +216,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
           !payment.id_pago, // Solo pagos nuevos
       );
 
-      console.log("✅ Pagos válidos encontrados:", validPayments);
+      console.log(" Pagos válidos encontrados:", validPayments);
 
       if (validPayments.length === 0) {
         console.log("ℹ️ No hay pagos nuevos válidos para guardar");
@@ -244,7 +244,7 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
           payments: paymentsPayload
         });
 
-        console.log("✅ Pagos guardados exitosamente:", response);
+        console.log(" Pagos guardados exitosamente:", response);
         message.success("Pagos guardados correctamente");
 
         // Actualizar el estado local marcando los pagos como guardados
@@ -262,16 +262,16 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
         setPayments(updatedPayments);
         onChange?.(updatedPayments);
 
-        console.log("🔄 Estado de pagos actualizado:", updatedPayments);
+        console.log(" Estado de pagos actualizado:", updatedPayments);
         return true;
       } else {
-        console.error("❌ No se pudo identificar la factura");
+        console.error(" No se pudo identificar la factura");
         message.error("No se pudo identificar la factura");
         return false;
       }
       
     } catch (error) {
-      console.error("❌ Error al guardar pagos:", error);
+      console.error(" Error al guardar pagos:", error);
       message.error("Error al guardar los pagos");
       return false;
     }

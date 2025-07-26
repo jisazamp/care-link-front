@@ -3,7 +3,7 @@ import { Card, Col, Row, Typography } from "antd";
 
 const { Title, Text } = Typography;
 
-// 📊 Datos de ejemplo para gráficos
+//  Datos de ejemplo para gráficos
 const dataVisits = [
   { date: "Enero", value: 30 },
   { date: "Febrero", value: 45 },
@@ -31,7 +31,7 @@ const dataEfficiency = [
   { date: "Junio", value: 82 },
 ];
 
-// 📊 Configuración de gráficos con colores y estilos corregidos
+//  Configuración de gráficos con colores y estilos corregidos
 const configVisits = {
   data: dataVisits,
   xField: "date",

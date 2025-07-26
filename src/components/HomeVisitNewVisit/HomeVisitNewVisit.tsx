@@ -47,7 +47,7 @@ export const HomeVisitNewVisit: React.FC = () => {
 
   // Debug logs (solo cuando hay problemas)
   if (loadingUser || loadingFirstVisit || loadingProfessionals || loadingServiceRate) {
-    console.log("🔍 HomeVisitNewVisit Debug - Loading states:");
+    console.log(" HomeVisitNewVisit Debug - Loading states:");
     console.log("userId:", userId);
     console.log("loadingUser:", loadingUser);
     console.log("loadingFirstVisit:", loadingFirstVisit);
@@ -76,7 +76,7 @@ export const HomeVisitNewVisit: React.FC = () => {
           visitaId: firstHomeVisit.id_visitadomiciliaria,
           data: updateData,
         });
-        message.success("✅ Visita domiciliaria actualizada exitosamente");
+        message.success(" Visita domiciliaria actualizada exitosamente");
       } else {
         // Crear nueva visita
         const visitaData: CreateHomeVisitData = {
@@ -91,12 +91,12 @@ export const HomeVisitNewVisit: React.FC = () => {
         };
 
         await createHomeVisitMutation.mutateAsync(visitaData);
-        message.success("✅ Visita domiciliaria creada exitosamente");
+        message.success(" Visita domiciliaria creada exitosamente");
       }
       
       navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
     } catch (error) {
-      message.error(`❌ Error al ${isEditing ? 'actualizar' : 'crear'} la visita domiciliaria`);
+      message.error(` Error al ${isEditing ? 'actualizar' : 'crear'} la visita domiciliaria`);
     }
   };
 

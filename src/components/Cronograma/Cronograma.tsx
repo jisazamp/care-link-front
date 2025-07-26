@@ -36,7 +36,7 @@ export const Cronograma: React.FC = () => {
   // 🔴 NUEVO: Recargar datos cuando cambie el mes seleccionado
   useEffect(() => {
     console.log('📅 Mes seleccionado cambiado:', selectedMonth.format('YYYY-MM'));
-    console.log('📊 Rango de fechas:', startOfMonth, 'a', endOfMonth);
+    console.log(' Rango de fechas:', startOfMonth, 'a', endOfMonth);
     refetch();
   }, [selectedMonth, startOfMonth, endOfMonth, refetch]);
 
@@ -202,7 +202,7 @@ export const Cronograma: React.FC = () => {
 
   // 🔴 NUEVA FUNCIÓN: Manejar cambio de mes en el calendario
   const handleMonthChange = (date: Dayjs, mode: 'month' | 'year') => {
-    console.log('🔄 Cambio de mes detectado:', date.format('YYYY-MM'), 'Modo:', mode);
+    console.log(' Cambio de mes detectado:', date.format('YYYY-MM'), 'Modo:', mode);
     setSelectedMonth(date);
   };
 

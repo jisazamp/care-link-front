@@ -92,7 +92,7 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
         all.estado_factura !== initialValues?.estado_factura ||
         all.observaciones !== initialValues?.observaciones;
       
-      console.log("📝 Cambios detectados en formulario:", {
+      console.log(" Cambios detectados en formulario:", {
         descuentos: { actual: all.descuentos, inicial: initialValues?.descuentos },
         estado_factura: { actual: all.estado_factura, inicial: initialValues?.estado_factura },
         observaciones: { actual: all.observaciones, inicial: initialValues?.observaciones },
@@ -129,16 +129,16 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
     };
     
     console.log("🚀 Actualizando factura...");
-    console.log("📊 Estado actual de pagos:", payments);
+    console.log(" Estado actual de pagos:", payments);
     
     try {
       // Solo actualizar la factura - los pagos se registran individualmente
       await onSubmit(payload);
-      console.log("✅ Factura actualizada exitosamente");
+      console.log(" Factura actualizada exitosamente");
       message.success("Factura actualizada correctamente");
       
     } catch (error) {
-      console.error("❌ Error al actualizar la factura:", error);
+      console.error(" Error al actualizar la factura:", error);
       message.error("Error al actualizar la factura");
     }
   };

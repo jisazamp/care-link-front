@@ -62,10 +62,10 @@ export const ServiceRatesEditor: React.FC = () => {
         }))
       });
       
-      message.success("✅ Tarifas actualizadas exitosamente");
+      message.success(" Tarifas actualizadas exitosamente");
       setHasChanges(false);
     } catch (error) {
-      message.error("❌ Error al actualizar las tarifas");
+      message.error(" Error al actualizar las tarifas");
     }
   };
 

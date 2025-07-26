@@ -150,7 +150,7 @@ export const MedicalRecord: React.FC = () => {
 
   const onSubmit = (data: FormValues) => {
     console.log("🚀 Iniciando envío del formulario...");
-    console.log("📊 Datos del formulario:", data);
+    console.log(" Datos del formulario:", data);
     
     try {
       const record: MedicalRecordType = {
@@ -232,7 +232,7 @@ export const MedicalRecord: React.FC = () => {
         interventions.push(intervention);
       }
 
-      console.log("📋 Record preparado:", record);
+      console.log(" Record preparado:", record);
       console.log("💊 Medicamentos:", medicines);
       console.log("🏥 Cuidados:", cares);
       console.log("🩺 Intervenciones:", interventions);
@@ -249,7 +249,7 @@ export const MedicalRecord: React.FC = () => {
           files: data.attachedDocuments,
         }, {
           onSuccess: () => {
-            console.log("✅ Historia clínica creada exitosamente");
+            console.log(" Historia clínica creada exitosamente");
             message.success("Historia clínica creada exitosamente");
             // Redirigir al usuario a la página de detalles del paciente
             setTimeout(() => {
@@ -257,14 +257,14 @@ export const MedicalRecord: React.FC = () => {
             }, 1500); // Esperar 1.5 segundos para que el usuario vea el mensaje de éxito
           },
           onError: (error) => {
-            console.error("❌ Error al crear la historia clínica:", error);
+            console.error(" Error al crear la historia clínica:", error);
             message.error("Error al crear la historia clínica");
           }
         });
         return;
       }
 
-      console.log("🔄 Actualizando historia clínica existente...");
+      console.log(" Actualizando historia clínica existente...");
       editRecord({
         id: Number(userId),
         recordId: Number(userMedicalRecord?.data.data.id_historiaclinica),
@@ -276,7 +276,7 @@ export const MedicalRecord: React.FC = () => {
         },
       }, {
         onSuccess: () => {
-          console.log("✅ Historia clínica actualizada exitosamente");
+          console.log(" Historia clínica actualizada exitosamente");
           message.success("Historia clínica actualizada exitosamente");
           // Redirigir al usuario a la página de detalles del paciente
           setTimeout(() => {
@@ -284,26 +284,26 @@ export const MedicalRecord: React.FC = () => {
           }, 1500); // Esperar 1.5 segundos para que el usuario vea el mensaje de éxito
         },
         onError: (error) => {
-          console.error("❌ Error al actualizar la historia clínica:", error);
+          console.error(" Error al actualizar la historia clínica:", error);
           message.error("Error al actualizar la historia clínica");
         }
       });
     } catch (error) {
-      console.error("❌ Error inesperado en onSubmit:", error);
+      console.error(" Error inesperado en onSubmit:", error);
       message.error("Error inesperado al procesar el formulario");
     }
   };
 
   const handleSaveClick = () => {
     console.log("🖱️ Botón 'Guardar y actualizar' clickeado");
-    console.log("📋 Estado del formulario:", methods.formState);
-    console.log("❌ Errores de validación:", errors);
-    console.log("✅ ¿Formulario válido?:", methods.formState.isValid);
-    console.log("📊 Valores actuales del formulario:", methods.getValues());
+    console.log(" Estado del formulario:", methods.formState);
+    console.log(" Errores de validación:", errors);
+    console.log(" ¿Formulario válido?:", methods.formState.isValid);
+    console.log(" Valores actuales del formulario:", methods.getValues());
     
     // Verificar campos específicos que podrían estar causando problemas
     const values = methods.getValues();
-    console.log("🔍 Verificando campos críticos:");
+    console.log(" Verificando campos críticos:");
     console.log("- entryDate:", values.entryDate, "tipo:", typeof values.entryDate);
     console.log("- entryReason:", values.entryReason, "tipo:", typeof values.entryReason);
     console.log("- height:", values.height, "tipo:", typeof values.height);
@@ -312,15 +312,15 @@ export const MedicalRecord: React.FC = () => {
     
     // Verificar si hay errores de validación
     if (Object.keys(errors).length > 0) {
-      console.error("❌ Errores de validación encontrados:", errors);
+      console.error(" Errores de validación encontrados:", errors);
       message.error("Por favor, corrija los errores en el formulario antes de continuar");
       return;
     }
     
     // Si no hay errores pero el formulario no es válido, intentar forzar la validación
-    console.log("🔄 Intentando validar formulario manualmente...");
+    console.log(" Intentando validar formulario manualmente...");
     const isValid = methods.trigger();
-    console.log("✅ Resultado de validación manual:", isValid);
+    console.log(" Resultado de validación manual:", isValid);
     
     // Si no hay errores de validación, proceder con el envío
     if (Object.keys(errors).length === 0) {
@@ -328,7 +328,7 @@ export const MedicalRecord: React.FC = () => {
       const formData = methods.getValues();
       onSubmit(formData);
     } else {
-      console.error("❌ Errores de validación después de trigger:", errors);
+      console.error(" Errores de validación después de trigger:", errors);
       message.error("Por favor, corrija los errores en el formulario antes de continuar");
     }
   };

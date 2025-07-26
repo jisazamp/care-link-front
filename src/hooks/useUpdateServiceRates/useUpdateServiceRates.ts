@@ -37,10 +37,10 @@ export const useUpdateServiceRates = () => {
     onSuccess: () => {
       // Invalidar la query de tarifas para refrescar los datos
       queryClient.invalidateQueries({ queryKey: ["service-rates"] });
-      console.log("✅ Tarifas de servicios actualizadas exitosamente");
+      console.log(" Tarifas de servicios actualizadas exitosamente");
     },
     onError: (error: any) => {
-      console.error("❌ Error al actualizar tarifas de servicios:", error);
+      console.error(" Error al actualizar tarifas de servicios:", error);
     },
   });
 };

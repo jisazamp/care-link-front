@@ -166,18 +166,18 @@ export const ContractDetails: React.FC = () => {
 
   // Logs para debugging
   useEffect(() => {
-    console.log("🔍 ContractDetails Component - Debug Info:");
+    console.log(" ContractDetails Component - Debug Info:");
     console.log("👤 User ID:", id);
-    console.log("📋 Contract ID:", contractId);
+    console.log(" Contract ID:", contractId);
     console.log("👤 User Data:", user);
-    console.log("📋 Contract Data:", contract);
-    console.log("📊 Facturas:", facturas);
+    console.log(" Contract Data:", contract);
+    console.log(" Facturas:", facturas);
     console.log("⏳ Loading User:", isLoadingUser);
     console.log("⏳ Loading Contract:", isLoadingContract);
     console.log("⏳ Loading Facturas:", isLoadingFacturas);
-    console.log("❌ Error User:", errorUser);
-    console.log("❌ Error Contract:", errorContract);
-    console.log("❌ Error Facturas:", errorFacturas);
+    console.log(" Error User:", errorUser);
+    console.log(" Error Contract:", errorContract);
+    console.log(" Error Facturas:", errorFacturas);
   }, [id, contractId, user, contract, facturas, isLoadingUser, isLoadingContract, isLoadingFacturas, errorUser, errorContract, errorFacturas]);
 
   const contractData = {
