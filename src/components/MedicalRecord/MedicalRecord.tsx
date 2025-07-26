@@ -501,79 +501,85 @@ export const MedicalRecord: React.FC = () => {
             items={[{ title: "Inicio" }, { title: "Historia clínica" }]}
             style={{ margin: "16px 0" }}
           />
-          <Collapse
-            accordion
-            style={{ width: "100%", background: "transparent" }}
-            activeKey={activePanel}
-            onChange={setActivePanel}
+          <Card
+            title={<Title level={4}>Historia Clínica</Title>}
+            style={{ marginBottom: 16 }}
+            bordered
           >
-            <Panel header="Datos del usuario" key="user-info">
-              <UserInfo />
-            </Panel>
-            <Panel
-              header="Servicio externo para emergencias médicas"
-              key="medical-services"
+            <Collapse
+              accordion
+              style={{ width: "100%", background: "transparent" }}
+              activeKey={activePanel}
+              onChange={setActivePanel}
             >
-              <MedicalServices />
-            </Panel>
-            <Panel header="Datos básicos de ingreso" key="entry-data">
-              <EntryData />
-            </Panel>
-            <Panel header="Datos básicos de salud" key="basic-health-data">
-              <BasicHealthData />
-            </Panel>
-            <Panel
-              header="Exploración física inicial"
-              key="physical-exploration"
-            >
-              <PhysicalExploration />
-            </Panel>
-            <Panel
-              header="Tratamientos o medicamentos"
-              key="medical-treatments"
-            >
-              <MedicalTreatments />
-            </Panel>
-            <Panel header="Condiciones especiales" key="special-conditions">
-              <SpecialConditions
-                activeSubPanel={activeSubPanel}
-                setActiveSubPanel={setActiveSubPanel}
-              />
-            </Panel>
-            <Panel header="Habilidades biofísicas" key="biophysical-skills">
-              <BiophysicalSkills />
-            </Panel>
-            <Panel
-              header="Hábitos o antecedentes toxicológicos"
-              key="toxicology"
-            >
-              <Toxicology />
-            </Panel>
-            <Panel
-              header="Habilidades de percepción social"
-              key="social-perception"
-            >
-              <SocialPerception />
-            </Panel>
-            <Panel header="Diagnóstico inicial" key="initial-diagnosis">
-              <Form.Item
-                label="Observaciones"
-                name="observacionesDiagnostico"
+              <Panel header="Datos del usuario" key="user-info">
+                <UserInfo />
+              </Panel>
+              <Panel
+                header="Servicio externo para emergencias médicas"
+                key="medical-services"
               >
-                <Controller
-                  control={methods.control}
-                  name="initialDiagnosis"
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      multiple
-                      placeholder="Ingrese las observaciones del diagnóstico inicial"
-                    />
-                  )}
+                <MedicalServices />
+              </Panel>
+              <Panel header="Datos básicos de ingreso" key="entry-data">
+                <EntryData />
+              </Panel>
+              <Panel header="Datos básicos de salud" key="basic-health-data">
+                <BasicHealthData />
+              </Panel>
+              <Panel
+                header="Exploración física inicial"
+                key="physical-exploration"
+              >
+                <PhysicalExploration />
+              </Panel>
+              <Panel
+                header="Tratamientos o medicamentos"
+                key="medical-treatments"
+              >
+                <MedicalTreatments />
+              </Panel>
+              <Panel header="Condiciones especiales" key="special-conditions">
+                <SpecialConditions
+                  activeSubPanel={activeSubPanel}
+                  setActiveSubPanel={setActiveSubPanel}
                 />
-              </Form.Item>
-            </Panel>
-          </Collapse>
+              </Panel>
+              <Panel header="Habilidades biofísicas" key="biophysical-skills">
+                <BiophysicalSkills />
+              </Panel>
+              <Panel
+                header="Hábitos o antecedentes toxicológicos"
+                key="toxicology"
+              >
+                <Toxicology />
+              </Panel>
+              <Panel
+                header="Habilidades de percepción social"
+                key="social-perception"
+              >
+                <SocialPerception />
+              </Panel>
+              <Panel header="Diagnóstico inicial" key="initial-diagnosis">
+                <Form.Item
+                  label="Observaciones"
+                  name="observacionesDiagnostico"
+                >
+                  <Controller
+                    control={methods.control}
+                    name="initialDiagnosis"
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        multiple
+                        placeholder="Ingrese las observaciones del diagnóstico inicial"
+                      />
+                    )}
+                  />
+                </Form.Item>
+              </Panel>
+            </Collapse>
+          </Card>
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
