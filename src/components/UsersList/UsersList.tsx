@@ -129,12 +129,12 @@ export const UsersList: React.FC = () => {
     });
   };
 
-  // Función para manejar el clic en la fila
+  // Función para manejar el click en una fila
   const handleRowClick = (user: User) => {
     navigate(`/usuarios/${user.id_usuario}/detalles`);
   };
 
-  // Función para manejar el clic en los botones de acción (evitar propagación)
+  // Función para evitar que los clicks en botones de acción naveguen
   const handleActionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -235,32 +235,34 @@ export const UsersList: React.FC = () => {
       width: 120,
       fixed: "right" as const,
       align: "center" as const,
-      render: (_: unknown, user: User) => (
-        <Space size="small" onClick={handleActionClick}>
-          <Tooltip title="Editar">
-            <Link to={`/usuarios/${user.id_usuario}/editar`}>
+      render: (_: unknown, user: User) => {
+        return (
+          <Space size="small" onClick={handleActionClick}>
+            <Tooltip title="Editar">
+              <Link to={`/usuarios/${user.id_usuario}/editar`}>
+                <Button
+                  type="link"
+                  icon={null}
+                  style={{ color: "#7f34b4" }}
+                >
+                  Editar
+                </Button>
+              </Link>
+            </Tooltip>
+            <Tooltip title="Eliminar">
               <Button
                 type="link"
                 icon={null}
                 style={{ color: "#7f34b4" }}
+                danger
+                onClick={() => showDeleteConfirm(user)}
               >
-                Editar
+                Eliminar
               </Button>
-            </Link>
-          </Tooltip>
-          <Tooltip title="Eliminar">
-            <Button
-              type="link"
-              icon={null}
-              style={{ color: "#7f34b4" }}
-              danger
-              onClick={() => showDeleteConfirm(user)}
-            >
-              Eliminar
-            </Button>
-          </Tooltip>
-        </Space>
-      ),
+            </Tooltip>
+          </Space>
+        );
+      },
     },
   ];
 
