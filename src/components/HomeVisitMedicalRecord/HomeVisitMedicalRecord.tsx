@@ -8,7 +8,6 @@ import {
   Flex,
   Form,
   Input,
-  Layout,
   Row,
   Spin,
   Typography,
@@ -24,9 +23,8 @@ import { useEffect, useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
-import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
+import { useCreateSimplifiedMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
+import { useEditSimplifiedRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetProfessionals } from "../../hooks/useGetProfessionals/useGetProfessionals";
 import type { MedicalRecord as MedicalRecordType } from "../../types";
@@ -106,16 +104,16 @@ export const HomeVisitMedicalRecord: React.FC = () => {
     },
   });
   
-  const { reset, getValues, formState: { errors } } = methods;
+  const { getValues, formState: { errors } } = methods;
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
-    useCreateUserMedicalRecord(userId);
+    useCreateSimplifiedMedicalRecord(userId);
 
   const { data: userMedicalRecord, isLoading: loadingUserMedicalRecord } =
     useGetUserMedicalRecord(userId);
 
   const { mutate: editRecord, isPending: loadingEditing } =
-    useEditRecordMutation({
+    useEditSimplifiedRecordMutation({
       id: userId,
       recordId: userMedicalRecord?.data.data?.id_historiaclinica,
     });
@@ -134,63 +132,57 @@ export const HomeVisitMedicalRecord: React.FC = () => {
     if (!userId) return;
 
     // Crear un registro médico simplificado basado en el mockup
-    const medicalRecord: MedicalRecordType = {
-      id_historiaclinica: userMedicalRecord?.data.data?.id_historiaclinica || 0,
-      id_usuario: parseInt(userId),
-      Tiene_OtrasAlergias: false,
-      Tienedieta_especial: false,
-      alcoholismo: data.alcoholismo,
-      alergico_medicamento: false,
-      altura: 0,
-      apariencia_personal: data.apariencia_personal,
-      cafeina: data.cafeina,
-      cirugias: "",
-      comunicacion_no_verbal: data.comunicacion_no_verbal,
-      comunicacion_verbal: data.comunicacion_verbal,
-      continencia: data.continencia,
-      cuidado_personal: data.cuidado_personal,
-      dieta_especial: "",
-      discapacidades: "",
-      emer_medica: "",
-      eps: "",
-      estado_de_animo: data.estado_animo,
-      fecha_ingreso: data.fecha_visita?.toDate() || new Date(),
-      frecuencia_cardiaca: 0,
-      historial_cirugias: "",
-      limitaciones: "",
-      maltratado: data.ha_sufrido_maltrato,
-      maltrato: "",
-      medicamentos_alergia: "",
-      motivo_ingreso: data.motivo_consulta,
-      observ_dietaEspecial: "",
-      observ_otrasalergias: "",
-      observaciones_iniciales: data.observaciones || "",
-      otras_alergias: "",
-      peso: 0,
-      presion_arterial: 0,
-      sustanciaspsico: data.sustancias_psicoactivas,
-      tabaquismo: data.tabaquismo,
-      telefono_emermedica: "",
-      temperatura_corporal: 0,
-      tipo_alimentacion: data.tipo_alimentacion,
-      tipo_de_movilidad: data.tipo_movilidad,
-      tipo_de_sueno: data.tipo_sueno,
-      tipo_sangre: "",
-      diagnosticos: data.observaciones || "",
-    };
+            const medicalRecord: MedicalRecordType = {
+          id_historiaclinica: userMedicalRecord?.data.data?.id_historiaclinica || 0,
+          id_usuario: parseInt(userId),
+          id_profesional: data.profesional || null,
+          Tiene_OtrasAlergias: false,
+          Tienedieta_especial: false,
+          alcoholismo: data.alcoholismo,
+          alergico_medicamento: false,
+          altura: 170, // Default height in cm
+          apariencia_personal: data.apariencia_personal,
+          cafeina: data.cafeina,
+          cirugias: "No",
+          comunicacion_no_verbal: data.comunicacion_no_verbal,
+          comunicacion_verbal: data.comunicacion_verbal,
+          continencia: data.continencia,
+          cuidado_personal: data.cuidado_personal,
+          dieta_especial: "No",
+          discapacidades: "No",
+          emer_medica: "No especificado",
+          eps: "No especificado",
+          estado_de_animo: data.estado_animo,
+          fecha_ingreso: data.fecha_visita ? data.fecha_visita.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
+          frecuencia_cardiaca: 80, // Default heart rate
+          historial_cirugias: "No",
+          limitaciones: "No",
+          maltratado: data.ha_sufrido_maltrato,
+          maltrato: "No",
+          medicamentos_alergia: "No",
+          motivo_ingreso: data.motivo_consulta,
+          observ_dietaEspecial: "No",
+          observ_otrasalergias: "No",
+          observaciones_iniciales: data.observaciones || "Sin observaciones",
+          otras_alergias: "No",
+          peso: 70, // Default weight in kg
+          presion_arterial: 120, // Default blood pressure
+          sustanciaspsico: data.sustancias_psicoactivas,
+          tabaquismo: data.tabaquismo,
+          telefono_emermedica: "No especificado",
+          temperatura_corporal: 37, // Default temperature
+          tipo_alimentacion: data.tipo_alimentacion,
+          tipo_de_movilidad: data.tipo_movilidad,
+          tipo_de_sueno: data.tipo_sueno,
+          tipo_sangre: "O+", // Default blood type since it's required
+          diagnosticos: data.observaciones || "Sin diagnóstico",
+          porte_clinico: data.observaciones || "Sin porte clínico",
+        };
 
     if (!userMedicalRecord?.data.data?.id_historiaclinica) {
       console.log("🆕 Creando nueva historia clínica de visita domiciliaria...");
       createUserMedicalRecord(
-        {
-          data: {
-            record: medicalRecord,
-            medicines: [],
-            cares: [],
-            interventions: [],
-          },
-          files: fileList,
-        },
+        medicalRecord,
         {
           onSuccess: () => {
             console.log("✅ Historia clínica de visita domiciliaria creada exitosamente");
@@ -209,13 +201,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
         {
           id: parseInt(userId),
           recordId: userMedicalRecord.data.data.id_historiaclinica,
-          record: {
-            record: medicalRecord,
-            medicines: [],
-            cares: [],
-            interventions: [],
-            vaccines: [],
-          },
+          record: medicalRecord,
         },
         {
           onSuccess: () => {

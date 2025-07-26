@@ -60,6 +60,7 @@ export type AuthorizedUser = {
 
 export type MedicalRecord = {
   id_historiaclinica?: number;
+  id_profesional?: number | null;
   Tiene_OtrasAlergias: boolean;
   Tienedieta_especial: boolean;
   alcoholismo: string | null;
@@ -101,6 +102,7 @@ export type MedicalRecord = {
   tipo_de_movilidad: string | null;
   tipo_de_sueno: string | null;
   tipo_sangre: string;
+  porte_clinico?: string;
 };
 
 export type MedicalReport = {
