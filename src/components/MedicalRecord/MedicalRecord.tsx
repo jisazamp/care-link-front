@@ -51,7 +51,6 @@ import {
   formSchema,
 } from "./schema/schema";
 import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
-import { Vaccines } from "./components/Vaccines/Vaccines";
 //import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 
 const { Title } = Typography;
@@ -106,10 +105,10 @@ export const MedicalRecord: React.FC = () => {
     "#physical-exploration": "physical-exploration",
     "#medical-treatments": "medical-treatments",
     "#special-conditions": "special-conditions",
-    "#vaccines": "vaccines",
     "#biophysical-skills": "biophysical-skills",
     "#toxicology": "toxicology",
     "#social-perception": "social-perception",
+    "#initial-diagnosis": "initial-diagnosis",
     "#dieta": "special-conditions",
     "#diet": "special-conditions",
     "#observaciones-dieta": "special-conditions",
@@ -541,9 +540,6 @@ export const MedicalRecord: React.FC = () => {
                 setActiveSubPanel={setActiveSubPanel}
               />
             </Panel>
-            <Panel header="Esquema de vacunación" key="vaccines">
-              <Vaccines />
-            </Panel>
             <Panel header="Habilidades biofísicas" key="biophysical-skills">
               <BiophysicalSkills />
             </Panel>
@@ -559,33 +555,25 @@ export const MedicalRecord: React.FC = () => {
             >
               <SocialPerception />
             </Panel>
-          </Collapse>
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Card
-                bordered
-                title={<Title level={4}>Diagnóstico inicial</Title>}
-                style={{ marginBottom: 8 }}
+            <Panel header="Diagnóstico inicial" key="initial-diagnosis">
+              <Form.Item
+                label="Observaciones"
+                name="observacionesDiagnostico"
               >
-                <Form.Item
-                  label="Observaciones"
-                  name="observacionesDiagnostico"
-                >
-                  <Controller
-                    control={methods.control}
-                    name="initialDiagnosis"
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        multiple
-                        placeholder="Ingrese las observaciones del diagnóstico inicial"
-                      />
-                    )}
-                  />
-                </Form.Item>
-              </Card>
-            </Col>
-          </Row>
+                <Controller
+                  control={methods.control}
+                  name="initialDiagnosis"
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      multiple
+                      placeholder="Ingrese las observaciones del diagnóstico inicial"
+                    />
+                  )}
+                />
+              </Form.Item>
+            </Panel>
+          </Collapse>
           <Row gutter={[16, 16]}>
             <Col span={24}>
               <Card
