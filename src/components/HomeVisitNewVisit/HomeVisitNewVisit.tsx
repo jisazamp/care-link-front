@@ -33,6 +33,7 @@ export const HomeVisitNewVisit: React.FC = () => {
   const userId = params.id;
   const [form] = Form.useForm();
   const [selectedProfessional, setSelectedProfessional] = React.useState<any>(null);
+  const [isViewMode, setIsViewMode] = React.useState<boolean>(false);
 
   const { data: userData, isLoading: loadingUser } = useGetUserById(userId);
   const { data: firstHomeVisit, isLoading: loadingFirstVisit } = useGetUserFirstHomeVisit(userId);
@@ -44,6 +45,13 @@ export const HomeVisitNewVisit: React.FC = () => {
 
   // Determinar si estamos editando una visita existente o creando una nueva
   const isEditing = firstHomeVisit !== null;
+  
+  // Si estamos editando, por defecto estamos en modo visualización
+  React.useEffect(() => {
+    if (isEditing) {
+      setIsViewMode(true);
+    }
+  }, [isEditing]);
 
   // Debug logs (solo cuando hay problemas)
   if (loadingUser || loadingFirstVisit || loadingProfessionals || loadingServiceRate) {
@@ -58,6 +66,11 @@ export const HomeVisitNewVisit: React.FC = () => {
 
 
   const handleSubmit = async (values: any) => {
+    // No permitir envío en modo visualización
+    if (isViewMode) {
+      return;
+    }
+    
     try {
       if (isEditing && firstHomeVisit) {
         // Actualizar visita existente
@@ -177,9 +190,19 @@ export const HomeVisitNewVisit: React.FC = () => {
         >
           Volver
         </Button>
-        <Title level={3}>
-          {isEditing ? "Editar Visita Domiciliaria" : "Nueva Visita Domiciliaria"}
-        </Title>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Title level={3}>
+            {isViewMode ? "Detalles de Visita Domiciliaria" : isEditing ? "Editar Visita Domiciliaria" : "Nueva Visita Domiciliaria"}
+          </Title>
+          {isViewMode && isEditing && (
+            <Button
+              onClick={() => setIsViewMode(false)}
+              className="main-button-white"
+            >
+              Editar
+            </Button>
+          )}
+        </div>
       </div>
 
       <Card>
@@ -220,6 +243,7 @@ export const HomeVisitNewVisit: React.FC = () => {
                   style={{ width: "100%" }}
                   format="DD/MM/YYYY"
                   placeholder="Seleccionar fecha"
+                  disabled={isViewMode}
                 />
               </Form.Item>
             </Col>
@@ -238,6 +262,7 @@ export const HomeVisitNewVisit: React.FC = () => {
                   style={{ width: "100%" }}
                   format="HH:mm"
                   placeholder="Seleccionar hora"
+                  disabled={isViewMode}
                 />
               </Form.Item>
             </Col>
@@ -260,6 +285,7 @@ export const HomeVisitNewVisit: React.FC = () => {
                   loading={loadingProfessionals}
                   showSearch
                   onChange={handleProfessionalChange}
+                  disabled={isViewMode}
                   filterOption={(input, option) =>
                     (option?.children as unknown as string)
                       ?.toLowerCase()
@@ -283,6 +309,7 @@ export const HomeVisitNewVisit: React.FC = () => {
             <TextArea
               rows={4}
               placeholder="Ingresa observaciones adicionales sobre la visita"
+              disabled={isViewMode}
             />
           </Form.Item>
 
@@ -368,17 +395,19 @@ export const HomeVisitNewVisit: React.FC = () => {
           </Card>
 
           <Form.Item>
-                         <Button
-               type="primary"
-               htmlType="submit"
-               icon={<SaveOutlined />}
-               loading={createHomeVisitMutation.isPending || updateHomeVisitMutation.isPending}
-               style={{ marginRight: "8px" }}
-             >
-               {isEditing ? "Actualizar Visita" : "Crear Visita"}
-             </Button>
+            {!isViewMode && (
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SaveOutlined />}
+                loading={createHomeVisitMutation.isPending || updateHomeVisitMutation.isPending}
+                style={{ marginRight: "8px" }}
+              >
+                {isEditing ? "Actualizar Visita" : "Crear Visita"}
+              </Button>
+            )}
             <Button onClick={handleCancel}>
-              Cancelar
+              {isViewMode ? "Cerrar" : "Cancelar"}
             </Button>
           </Form.Item>
         </Form>

@@ -23,7 +23,7 @@ import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGe
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
 import type { HomeVisit } from "../../types";
-import { useDeleteHomeVisit } from "../../hooks/useDeleteHomeVisit/useDeleteHomeVisit";
+
 import type { FamilyMember } from "../../types";
 
 const { Title } = Typography;
@@ -35,13 +35,12 @@ export const UserHomeVisitDetails: React.FC = () => {
   const params = useParams();
   const userId = params.id;
 
-  const { data: user, isLoading: loadingUser } = useGetUserById(userId);
+  const { data: user, isLoading: loadingUser, isError: userError } = useGetUserById(userId);
   const { data: familyMembers, isLoading: loadingFamilyMembers } =
     useGetUserFamilyMembers(userId);
   const { mutate: deleteFamilyMember } = useDeleteFamilyMemberMutation(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
   const { data: homeVisits, isLoading: loadingHomeVisits } = useGetUserHomeVisits(userId);
-  const { mutate: deleteHomeVisit } = useDeleteHomeVisit(userId);
   const { data: record, isLoading: loadingRecord } = useGetUserMedicalRecord(userId);
 
   const acudientesColumns: ColumnsType<FamilyMember> = [
@@ -142,17 +141,7 @@ export const UserHomeVisitDetails: React.FC = () => {
     });
   };
 
-  const handleDeleteHomeVisit = (visitaId: number) => {
-    confirm({
-      title: "¿Estás seguro de que quieres eliminar esta visita?",
-      content: "Esta acción no se puede deshacer.",
-      okText: "Sí",
-      cancelText: "No",
-      onOk() {
-        deleteHomeVisit(visitaId);
-      },
-    });
-  };
+
 
   const homeVisitsColumns: ColumnsType<HomeVisit> = [
     {
@@ -256,14 +245,17 @@ export const UserHomeVisitDetails: React.FC = () => {
       key: "acciones",
       render: (_, record) => (
         <Space>
-          <Button
-            danger
-            size="small"
-            type="link"
-            onClick={() => handleDeleteHomeVisit(record.id_visitadomiciliaria)}
-          >
-            Eliminar
-            </Button>
+          <Tooltip title="Ver detalles de la visita y editarla si es necesario">
+            <Link to={`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`}>
+              <Button
+                type="link"
+                className="main-button-link"
+                size="small"
+              >
+                Ver detalles y editar
+              </Button>
+            </Link>
+          </Tooltip>
         </Space>
       ),
     },
@@ -284,12 +276,33 @@ export const UserHomeVisitDetails: React.FC = () => {
           {
             title: "Usuarios",
           },
-          { title: "Vista detalle" },
+          { 
+            title: user?.data.data ? `Detalles de ${user.data.data.nombres} ${user.data.data.apellidos}` : "Vista detalle" 
+          },
         ]}
       />
       {loadingUser ? (
         <Flex align="center" justify="center" style={{ minHeight: 500 }}>
           <Spin />
+        </Flex>
+      ) : userError ? (
+        <Flex align="center" justify="center" style={{ minHeight: 500 }}>
+          <div style={{ textAlign: "center" }}>
+            <Typography.Title level={4} style={{ color: "#ff4d4f" }}>
+              Usuario no encontrado
+            </Typography.Title>
+            <Typography.Text type="secondary">
+              El usuario con ID {userId} no existe en el sistema.
+            </Typography.Text>
+            <br />
+            <Button 
+              type="primary" 
+              onClick={() => navigate("/visitas-domiciliarias/usuarios")}
+              style={{ marginTop: 16 }}
+            >
+              Volver a la lista de usuarios
+            </Button>
+          </div>
         </Flex>
       ) : (
         <>
@@ -774,23 +787,49 @@ export const UserHomeVisitDetails: React.FC = () => {
             >
               <Card
                 extra={
-                  <Button
-                    icon={<PlusOutlined />}
-                    className="main-button-white"
-                    onClick={() => navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`)}
-                  >
-                    Agregar
-                  </Button>
+                  <Tooltip title="Programar nueva visita domiciliaria para este paciente">
+                    <Button
+                      icon={<PlusOutlined />}
+                      className="main-button-white"
+                      onClick={() => navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`)}
+                    >
+                      Agregar
+                    </Button>
+                  </Tooltip>
                 }
                 className="detail-card"
               >
-                <Table
-                  columns={homeVisitsColumns}
-                  dataSource={homeVisits?.data.data || []}
-                  loading={loadingHomeVisits}
-                  pagination={false}
-                  rowKey="id_visitadomiciliaria"
-                />
+                {loadingHomeVisits ? (
+                  <Flex align="center" justify="center" style={{ padding: "40px 0" }}>
+                    <Spin />
+                    <Typography.Text style={{ marginLeft: 16 }}>
+                      Cargando visitas domiciliarias...
+                    </Typography.Text>
+                  </Flex>
+                ) : homeVisits?.data.data && homeVisits.data.data.length > 0 ? (
+                  <Table
+                    columns={homeVisitsColumns}
+                    dataSource={homeVisits.data.data}
+                    loading={loadingHomeVisits}
+                    pagination={false}
+                    rowKey="id_visitadomiciliaria"
+                  />
+                ) : (
+                  <Flex
+                    vertical
+                    align="center"
+                    justify="center"
+                    style={{ padding: "40px 0" }}
+                  >
+                    <FolderOutlined style={{ fontSize: 48, color: "#d9d9d9", marginBottom: 16 }} />
+                    <Typography.Text type="secondary">
+                      No hay visitas domiciliarias programadas para este paciente
+                    </Typography.Text>
+                    <Typography.Text type="secondary" style={{ fontSize: "12px", marginTop: 8 }}>
+                      Haz clic en "Agregar" para programar la primera visita
+                    </Typography.Text>
+                  </Flex>
+                )}
               </Card>
             </Panel>
           </Collapse>
