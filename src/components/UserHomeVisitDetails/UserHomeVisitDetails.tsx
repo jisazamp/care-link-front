@@ -160,17 +160,47 @@ export const UserHomeVisitDetails: React.FC = () => {
       title: "Estado",
       dataIndex: "estado_visita",
       key: "estado_visita",
-      render: (estado: string) => {
+      render: (estado: string, record: any) => {
         const config = {
           PENDIENTE: { color: "blue", text: "Pendiente" },
           REALIZADA: { color: "green", text: "Realizada" },
           CANCELADA: { color: "red", text: "Cancelada" },
           REPROGRAMADA: { color: "orange", text: "Reprogramada" },
         };
+        
+        const updateDate = record.fecha_actualizacion ? new Date(record.fecha_actualizacion) : null;
+        const visitDate = new Date(record.fecha_visita + ' ' + record.hora_visita);
+        
+        // Una visita se considera auto-completada si:
+        // 1. Está marcada como "REALIZADA"
+        // 2. Tiene fecha de actualización
+        // 3. La fecha de actualización es posterior a la fecha/hora de la visita
+        // 4. No fue reprogramada (no tiene estado anterior "REPROGRAMADA")
+        const isAutoCompleted = estado === "REALIZADA" && 
+                               record.fecha_actualizacion && 
+                               updateDate && 
+                               updateDate > visitDate;
+        
         return (
-          <span style={{ color: config[estado as keyof typeof config]?.color }}>
-            {config[estado as keyof typeof config]?.text || estado}
-          </span>
+          <Tooltip title={isAutoCompleted ? `Actualizada automáticamente el ${updateDate?.toLocaleDateString()} a las ${updateDate?.toLocaleTimeString()}` : undefined}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ color: config[estado as keyof typeof config]?.color }}>
+                {config[estado as keyof typeof config]?.text || estado}
+              </span>
+              {isAutoCompleted && (
+                <span style={{ 
+                  fontSize: '10px', 
+                  color: '#52c41a', 
+                  backgroundColor: '#f6ffed',
+                  padding: '2px 4px',
+                  borderRadius: '4px',
+                  border: '1px solid #b7eb8f'
+                }}>
+                  AUTO
+                </span>
+              )}
+            </div>
+          </Tooltip>
         );
       },
     },
@@ -779,8 +809,21 @@ export const UserHomeVisitDetails: React.FC = () => {
                           • {homeVisits.data.data.filter((v: any) => v.profesional_asignado).length} con profesional asignado
                         </span>
                       )}
+                      {homeVisits.data.data.some((v: any) => v.estado_visita === 'REALIZADA') && (
+                        <span style={{ color: '#52c41a' }}>
+                          • {homeVisits.data.data.filter((v: any) => v.estado_visita === 'REALIZADA').length} realizadas
+                        </span>
+                      )}
                     </div>
                   )}
+                  <div style={{ 
+                    fontSize: '10px', 
+                    color: '#8c8c8c', 
+                    marginLeft: 'auto',
+                    fontStyle: 'italic'
+                  }}>
+                    Las visitas vencidas se marcan automáticamente como "Realizadas". Al reprogramar, el estado cambia a "Reprogramada".
+                  </div>
                 </div>
               } 
               key="5"

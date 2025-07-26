@@ -240,7 +240,7 @@ export const HomeVisitNewVisit: React.FC = () => {
                 ]}
                 extra={isEditing && !isViewMode ? (
                   <Typography.Text type="secondary" style={{ fontSize: "12px" }}>
-                    ⚠️ Cambiar la fecha cambiará automáticamente el estado a "REPROGRAMADA"
+                    ⚠️ Cambiar la fecha cambiará automáticamente el estado a "REPROGRAMADA" (incluso si ya está "REALIZADA")
                   </Typography.Text>
                 ) : undefined}
               >
