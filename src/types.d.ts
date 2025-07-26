@@ -489,3 +489,20 @@ export type NotificacionTransporte = {
   id_transporte?: number;
   id_usuario?: number;
 };
+
+export type HomeVisit = {
+  id_visitadomiciliaria: number;
+  id_contrato: number | null;
+  id_usuario: number | null;
+  fecha_visita: string;
+  hora_visita: string;
+  estado_visita: string;
+  direccion_visita: string;
+  telefono_visita: string | null;
+  valor_dia: number;
+  observaciones: string | null;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+  profesional_asignado: string | null;
+  paciente_nombre?: string;
+};

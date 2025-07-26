@@ -21,8 +21,8 @@ const menuItems = [
     icon: <HomeOutlined />,
     label: "Visitas Domiciliarias",
     children: [
-      { key: "7.1", label: <Link to="visitas-domiciliarias/usuarios">Consultar visitas</Link> },
-      { key: "7.2", label: <Link to="usuarios/crear">Registrar nueva visita</Link> },
+      { key: "7.1", label: <Link to="visitas-domiciliarias">Consultar visitas</Link> },
+      { key: "7.2", label: <Link to="visitas-domiciliarias/usuarios">Registrar nueva visita</Link> },
     ],
   },
   {

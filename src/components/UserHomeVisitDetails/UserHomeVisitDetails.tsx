@@ -18,11 +18,13 @@ import dayjs from "dayjs";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
-import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
-import type { Contract, FamilyMember } from "../../types";
+import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
+import type { HomeVisit } from "../../types";
+import { useDeleteHomeVisit } from "../../hooks/useDeleteHomeVisit/useDeleteHomeVisit";
+import type { FamilyMember } from "../../types";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -38,7 +40,8 @@ export const UserHomeVisitDetails: React.FC = () => {
     useGetUserFamilyMembers(userId);
   const { mutate: deleteFamilyMember } = useDeleteFamilyMemberMutation(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
-  const { data: userContracts } = useGetUserContracts(userId);
+  const { data: homeVisits, isLoading: loadingHomeVisits } = useGetUserHomeVisits(userId);
+  const { mutate: deleteHomeVisit } = useDeleteHomeVisit(userId);
   const { data: record, isLoading: loadingRecord } = useGetUserMedicalRecord(userId);
 
   const acudientesColumns: ColumnsType<FamilyMember> = [
@@ -139,48 +142,128 @@ export const UserHomeVisitDetails: React.FC = () => {
     });
   };
 
-  const contractsColumns: ColumnsType<Contract> = [
+  const handleDeleteHomeVisit = (visitaId: number) => {
+    confirm({
+      title: "¿Estás seguro de que quieres eliminar esta visita?",
+      content: "Esta acción no se puede deshacer.",
+      okText: "Sí",
+      cancelText: "No",
+      onOk() {
+        deleteHomeVisit(visitaId);
+      },
+    });
+  };
+
+  const homeVisitsColumns: ColumnsType<HomeVisit> = [
     {
-      title: "Tipo de Contrato",
-      dataIndex: "tipo_contrato",
-      key: "tipo_contrato",
+      title: "Fecha",
+      dataIndex: "fecha_visita",
+      key: "fecha_visita",
+      render: (date: string) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
-      title: "Fecha Inicio",
-      dataIndex: "fecha_inicio",
-      key: "fecha_inicio",
+      title: "Hora",
+      dataIndex: "hora_visita",
+      key: "hora_visita",
+      render: (time: string) => dayjs(`2000-01-01 ${time}`).format("HH:mm"),
     },
     {
-      title: "Fecha Fin",
-      dataIndex: "fecha_fin",
-      key: "fecha_fin",
+      title: "Estado",
+      dataIndex: "estado_visita",
+      key: "estado_visita",
+      render: (estado: string) => {
+        const config = {
+          PENDIENTE: { color: "blue", text: "Pendiente" },
+          REALIZADA: { color: "green", text: "Realizada" },
+          CANCELADA: { color: "red", text: "Cancelada" },
+          REPROGRAMADA: { color: "orange", text: "Reprogramada" },
+        };
+        return (
+          <span style={{ color: config[estado as keyof typeof config]?.color }}>
+            {config[estado as keyof typeof config]?.text || estado}
+          </span>
+        );
+      },
     },
     {
-      title: "Facturar",
-      dataIndex: "facturar_contrato",
-      key: "facturar_contrato",
-      render: (value: boolean) => (value ? "Sí" : "No"),
+      title: "Valor",
+      dataIndex: "valor_dia",
+      key: "valor_dia",
+      render: (valor: number) => `$${valor.toLocaleString()}`,
+    },
+    {
+      title: "Profesional Asignado",
+      dataIndex: "profesional_asignado",
+      key: "profesional_asignado",
+      render: (profesional: string | null) => {
+        if (profesional) {
+          return (
+            <Tooltip title={`Profesional asignado: ${profesional}`}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ 
+                  width: '8px', 
+                  height: '8px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#52c41a',
+                  flexShrink: 0
+                }} />
+                <span style={{ fontWeight: 500, color: '#1890ff', cursor: 'help' }}>
+                  {profesional}
+                </span>
+              </div>
+            </Tooltip>
+          );
+        } else {
+          return (
+            <Tooltip title="No hay profesional asignado a esta visita">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ 
+                  width: '8px', 
+                  height: '8px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#d9d9d9',
+                  flexShrink: 0
+                }} />
+                <span style={{ color: '#8c8c8c', fontStyle: 'italic', cursor: 'help' }}>
+                  Sin asignar
+                </span>
+              </div>
+            </Tooltip>
+          );
+        }
+      },
+    },
+    {
+      title: "Dirección",
+      dataIndex: "direccion_visita",
+      key: "direccion_visita",
+      render: (direccion: string) => (
+        <Tooltip title={direccion}>
+          <span style={{ 
+            maxWidth: '200px', 
+            display: 'block', 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            whiteSpace: 'nowrap' 
+          }}>
+            {direccion}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       title: "Acciones",
       key: "acciones",
-      render: (_, contract) => (
+      render: (_, record) => (
         <Space>
-          <Link
-            to={`/visitas-domiciliarias/usuarios/${contract.id_usuario}/contrato/${contract.id_contrato}/editar`}
+          <Button
+            danger
+            size="small"
+            type="link"
+            onClick={() => handleDeleteHomeVisit(record.id_visitadomiciliaria)}
           >
-            <Button type="link" className="main-button-link" size="small">
-              Editar
+            Eliminar
             </Button>
-          </Link>
-          <Divider type="vertical" />
-          <Link
-            to={`/visitas-domiciliarias/usuarios/${contract.id_usuario}/contrato/${contract.id_contrato}`}
-          >
-            <Button type="link" className="main-button-link" size="small">
-              Ver
-            </Button>
-          </Link>
         </Space>
       ),
     },
@@ -218,10 +301,10 @@ export const UserHomeVisitDetails: React.FC = () => {
             style={{ marginBottom: 16 }}
             bordered
           >
-            <Collapse
-              accordion
-              style={{ background: "transparent", width: "100%" }}
-            >
+          <Collapse
+            accordion
+            style={{ background: "transparent", width: "100%" }}
+          >
             <Panel header="Datos básicos y de localización" key="1">
               <div className="user-details-card" style={{ width: "100%" }}>
                 <div className="user-details-head">
@@ -569,65 +652,65 @@ export const UserHomeVisitDetails: React.FC = () => {
                 className="detail-card"
               >
                 {medicalReports?.data.data && medicalReports.data.data.length > 0 ? (
-                  <Table
-                    rowKey="id_profesional"
-                    columns={[
-                      {
-                        title: "Profesional",
-                        dataIndex: "profesional",
-                        render: (_, record) => {
-                          return `${record.profesional?.nombres} ${record.profesional?.apellidos}`;
-                        },
+                <Table
+                  rowKey="id_profesional"
+                  columns={[
+                    {
+                      title: "Profesional",
+                      dataIndex: "profesional",
+                      render: (_, record) => {
+                        return `${record.profesional?.nombres} ${record.profesional?.apellidos}`;
                       },
-                      {
-                        title: "Fecha registro",
-                        dataIndex: "fecha_registro",
-                        render: (_, record) =>
-                          record.fecha_registro
-                            ? dayjs(record.fecha_registro).format("DD-MM-YYYY")
-                            : "",
-                      },
-                      {
-                        title: "Tipo reporte",
-                        dataIndex: "tipo_reporte",
-                      },
-                      {
-                        title: "Acciones",
-                        dataIndex: "acciones",
-                        key: "acciones",
-                        render: (_, record) => (
-                          <Space>
-                            <Link
-                              to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}/detalles`}
+                    },
+                    {
+                      title: "Fecha registro",
+                      dataIndex: "fecha_registro",
+                      render: (_, record) =>
+                        record.fecha_registro
+                          ? dayjs(record.fecha_registro).format("DD-MM-YYYY")
+                          : "",
+                    },
+                    {
+                      title: "Tipo reporte",
+                      dataIndex: "tipo_reporte",
+                    },
+                    {
+                      title: "Acciones",
+                      dataIndex: "acciones",
+                      key: "acciones",
+                      render: (_, record) => (
+                        <Space>
+                          <Link
+                            to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}/detalles`}
+                          >
+                            <Button
+                              type="link"
+                              className="main-button-link"
+                              size="small"
                             >
-                              <Button
-                                type="link"
-                                className="main-button-link"
-                                size="small"
-                              >
-                                ver
-                              </Button>
-                            </Link>
-                            <Divider type="vertical" />
-                            <Link
-                              to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}`}
+                              ver
+                            </Button>
+                          </Link>
+                          <Divider type="vertical" />
+                          <Link
+                            to={`/visitas-domiciliarias/usuarios/${userId}/reportes/${record.id_reporteclinico}`}
+                          >
+                            <Button
+                              type="link"
+                              className="main-button-link"
+                              size="small"
                             >
-                              <Button
-                                type="link"
-                                className="main-button-link"
-                                size="small"
-                              >
-                                Editar
-                              </Button>
-                            </Link>
-                            <Divider type="vertical" />
-                          </Space>
-                        ),
-                      },
-                    ]}
+                              Editar
+                            </Button>
+                          </Link>
+                          <Divider type="vertical" />
+                        </Space>
+                      ),
+                    },
+                  ]}
                     dataSource={medicalReports.data.data}
-                    pagination={false}
-                  />
+                  pagination={false}
+                />
                 ) : (
                   <Flex
                     vertical
@@ -664,13 +747,37 @@ export const UserHomeVisitDetails: React.FC = () => {
                 />
               </Card>
             </Panel>
-            <Panel header="Contratos" key="5">
+            <Panel 
+              header={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>Visitas Domiciliarias</span>
+                  {homeVisits?.data.data && homeVisits.data.data.length > 0 && (
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      fontSize: '12px',
+                      color: '#666',
+                      marginLeft: '8px'
+                    }}>
+                      <span>({homeVisits.data.data.length} visita{homeVisits.data.data.length !== 1 ? 's' : ''})</span>
+                      {homeVisits.data.data.some((v: any) => v.profesional_asignado) && (
+                        <span style={{ color: '#52c41a' }}>
+                          • {homeVisits.data.data.filter((v: any) => v.profesional_asignado).length} con profesional asignado
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              } 
+              key="5"
+            >
               <Card
                 extra={
                   <Button
                     icon={<PlusOutlined />}
                     className="main-button-white"
-                    onClick={() => navigate(`/visitas-domiciliarias/usuarios/${userId}/contrato`)}
+                    onClick={() => navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`)}
                   >
                     Agregar
                   </Button>
@@ -678,10 +785,11 @@ export const UserHomeVisitDetails: React.FC = () => {
                 className="detail-card"
               >
                 <Table
-                  columns={contractsColumns}
-                  dataSource={userContracts || []}
+                  columns={homeVisitsColumns}
+                  dataSource={homeVisits?.data.data || []}
+                  loading={loadingHomeVisits}
                   pagination={false}
-                  rowKey="id_contrato"
+                  rowKey="id_visitadomiciliaria"
                 />
               </Card>
             </Panel>

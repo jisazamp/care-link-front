@@ -8,7 +8,8 @@ export const getSelectedKey = (pathname: string): string => {
     pathname.includes("/detalles")
   )
     return "7.1";
-  if (pathname.startsWith("/visitas-domiciliarias")) return "7.1";
+  if (pathname === "/visitas-domiciliarias") return "7.1";
+  if (pathname.startsWith("/visitas-domiciliarias/usuarios")) return "7.2";
   if (pathname.startsWith("/actividades") && pathname !== "/actividades/crear")
     return "3.1";
   if (pathname === "/actividades/crear") return "3.2";

@@ -125,6 +125,7 @@ export const NewUser: React.FC = () => {
     mutate: createUser,
     isSuccess: isSuccessCreateUser,
     isPending: isPendingCreateUser,
+    data: createUserResponse,
   } = useCreateUserMutation();
   const {
     mutate: editUser,
@@ -142,6 +143,8 @@ export const NewUser: React.FC = () => {
   );
 
   const onSubmit = (data: FormValues) => {
+    console.log("🏠 homeVisit value:", data.homeVisit);
+    
     const user: Partial<User> = {
       apellidos: data.lastName,
       direccion: data.address,
@@ -219,16 +222,38 @@ export const NewUser: React.FC = () => {
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
+      console.log("🚀 Redirección iniciada - homeVisitValue:", homeVisitValue);
+      
       // Redirigir según el valor del switch "Visita Domiciliaria"
       if (homeVisitValue) {
-        // Si el switch está ON, redirigir al módulo de visitas domiciliarias
-        navigate("/visitas-domiciliarias/usuarios");
+        // Si el switch está ON, redirigir directamente a la nueva visita del usuario creado
+        if (isSuccessCreateUser) {
+          // Para usuarios nuevos, usar el ID de la respuesta de creación
+          const userId = (createUserResponse?.data?.data as any)?.user?.id_usuario;
+          if (userId) {
+            console.log("📍 Redirigiendo a nueva visita para usuario:", userId);
+            navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+          } else {
+            console.log("❌ Error: No se pudo obtener el ID del usuario creado");
+            navigate("/visitas-domiciliarias/usuarios");
+          }
+        } else if (isSuccessEditUser && data?.data.data?.id_usuario) {
+          // Para edición, usar el ID del usuario existente
+          const userId = data.data.data.id_usuario;
+          console.log("📍 Redirigiendo a nueva visita para usuario editado:", userId);
+          navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+        } else {
+          // Fallback: redirigir a la lista de usuarios con visitas domiciliarias
+          console.log("📍 Fallback: redirigiendo a lista de usuarios con visitas");
+          navigate("/visitas-domiciliarias/usuarios");
+        }
       } else {
         // Si el switch está OFF, redirigir al módulo de usuarios regular
+        console.log("📍 Redirigiendo a lista de usuarios regular");
         navigate("/usuarios");
       }
     }
-  }, [isSuccessCreateUser, isSuccessEditUser, navigate, homeVisitValue]);
+  }, [isSuccessCreateUser, isSuccessEditUser, navigate, homeVisitValue, createUserResponse, data?.data.data?.id_usuario]);
 
   if (isLoading) {
     return (
