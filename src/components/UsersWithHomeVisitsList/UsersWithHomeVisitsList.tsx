@@ -139,6 +139,16 @@ export const UsersWithHomeVisitsList: React.FC = () => {
     });
   };
 
+  // Función para manejar el clic en la fila
+  const handleRowClick = (user: User) => {
+    navigate(`/visitas-domiciliarias/usuarios/${user.id_usuario}/detalles`);
+  };
+
+  // Función para manejar el clic en los botones de acción (evitar propagación)
+  const handleActionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   // Columnas de la tabla
   const columns = [
     {
@@ -232,49 +242,35 @@ export const UsersWithHomeVisitsList: React.FC = () => {
     {
       title: "",
       key: "acciones",
-      width: 180,
+      width: 120,
       fixed: "right" as const,
       align: "center" as const,
-      render: (_: unknown, user: User) => {
-        const menu = (
-          <Menu>
-            <Menu.Item key="details">
-              <Link to={`/visitas-domiciliarias/usuarios/${user.id_usuario}/detalles`} style={{ color: '#7f34b4' }}>
-                Ver detalles
-              </Link>
-            </Menu.Item>
-          </Menu>
-        );
-        return (
-          <Space size="small">
-            <Tooltip title="Editar">
-              <Link to={`/usuarios/${user.id_usuario}/editar`}>
-                <Button
-                  type="link"
-                  icon={null}
-                  style={{ color: "#7f34b4" }}
-                >
-                  Editar
-                </Button>
-              </Link>
-            </Tooltip>
-            <Tooltip title="Eliminar">
+      render: (_: unknown, user: User) => (
+        <Space size="small" onClick={handleActionClick}>
+          <Tooltip title="Editar">
+            <Link to={`/usuarios/${user.id_usuario}/editar`}>
               <Button
                 type="link"
                 icon={null}
                 style={{ color: "#7f34b4" }}
-                danger
-                onClick={() => showDeleteConfirm(user)}
               >
-                Eliminar
+                Editar
               </Button>
-            </Tooltip>
-            <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
-              <Button type="text" style={{ color: '#7f34b4', fontSize: 20, padding: '0 8px' }}>...</Button>
-            </Dropdown>
-          </Space>
-        );
-      },
+            </Link>
+          </Tooltip>
+          <Tooltip title="Eliminar">
+            <Button
+              type="link"
+              icon={null}
+              style={{ color: "#7f34b4" }}
+              danger
+              onClick={() => showDeleteConfirm(user)}
+            >
+              Eliminar
+            </Button>
+          </Tooltip>
+        </Space>
+      ),
     },
   ];
 
@@ -391,6 +387,10 @@ export const UsersWithHomeVisitsList: React.FC = () => {
             showHeader={false}
             style={{ width: "100%" }}
             scroll={{ x: "max-content" }}
+            onRow={(record) => ({
+              onClick: () => handleRowClick(record),
+              style: { cursor: 'pointer' }
+            })}
             pagination={{
               total: (filtered ?? data?.data.data ?? []).length,
               current: pagination.current,

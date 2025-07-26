@@ -213,10 +213,15 @@ export const UserHomeVisitDetails: React.FC = () => {
           <Title level={3} className="page-title">
             {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
           </Title>
-          <Collapse
-            accordion
-            style={{ background: "transparent", width: "100%" }}
+          <Card
+            title={<Title level={4}>Información del Usuario</Title>}
+            style={{ marginBottom: 16 }}
+            bordered
           >
+            <Collapse
+              accordion
+              style={{ background: "transparent", width: "100%" }}
+            >
             <Panel header="Datos básicos y de localización" key="1">
               <div className="user-details-card" style={{ width: "100%" }}>
                 <div className="user-details-head">
@@ -624,7 +629,7 @@ export const UserHomeVisitDetails: React.FC = () => {
                 />
               </Card>
             </Panel>
-            <Panel header="Acudientes" key="3">
+            <Panel header="Acudientes" key="4">
               <Card
                 extra={
                   <Link to={`/visitas-domiciliarias/usuarios/${userId}/familiar`}>
@@ -647,7 +652,7 @@ export const UserHomeVisitDetails: React.FC = () => {
                 />
               </Card>
             </Panel>
-            <Panel header="Contratos" key="4">
+            <Panel header="Contratos" key="5">
               <Card
                 extra={
                   <Button
@@ -669,6 +674,7 @@ export const UserHomeVisitDetails: React.FC = () => {
               </Card>
             </Panel>
           </Collapse>
+          </Card>
           <Divider />
         </>
       )}
