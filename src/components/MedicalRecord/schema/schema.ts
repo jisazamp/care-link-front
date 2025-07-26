@@ -98,9 +98,7 @@ const attachedDocumentsSchema = z
   );
 
 export const formSchema = z.object({
-  bloodPressure: z.number({ coerce: true }).nullable().default(null),
   bloodType: z.string().nullable().default(null),
-  bpm: z.number({ coerce: true }).nullable().default(null),
   entryDate: z.custom<Dayjs>((val) => val instanceof dayjs, "Fecha incorrecta"),
   entryReason: z.string().default(""),
   eps: z.string().nullable().default(null),
@@ -123,7 +121,6 @@ export const formSchema = z.object({
   diagnostic: z.array(diagnosticSchema).default([]),
   surgeries: z.array(surgeriesSchema).default([]),
   vaccines: z.array(vaccineSchema).default([]),
-  temperature: z.number({ coerce: true }).nullable().default(null),
   weight: z.number({ coerce: true }).nullable().default(null),
   feeding: z.string().nullable().default(null),
   sleepType: z.string().nullable().default(null),

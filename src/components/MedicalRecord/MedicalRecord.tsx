@@ -175,7 +175,7 @@ export const MedicalRecord: React.FC = () => {
         eps: data.eps || "",
         estado_de_animo: data.mood || "",
         fecha_ingreso: data.entryDate.format("YYYY-MM-DD"),
-        frecuencia_cardiaca: Number(data.bpm),
+        frecuencia_cardiaca: 80, // Valor por defecto ya que removimos el campo
         historial_cirugias: "",
         id_usuario: Number(userId),
         limitaciones: data.limitations.map((a) => a.limitation).join(","),
@@ -188,11 +188,11 @@ export const MedicalRecord: React.FC = () => {
         observaciones_iniciales: data.initialDiagnosis || "",
         otras_alergias: data.otherAlergies.map((a) => a.alergy).join(","),
         peso: Number(data.weight),
-        presion_arterial: Number(data.bloodPressure),
+        presion_arterial: 120, // Valor por defecto ya que removimos el campo
         sustanciaspsico: data.psycoactive || "",
         tabaquismo: data.tabaquism || "",
         telefono_emermedica: data.externalServicePhone || "",
-        temperatura_corporal: Number(data.temperature),
+        temperatura_corporal: 37, // Valor por defecto ya que removimos el campo
         tipo_alimentacion: data.feeding || "",
         tipo_de_movilidad: data.mobility || "",
         tipo_de_sueno: data.sleepType || "",
@@ -308,9 +308,7 @@ export const MedicalRecord: React.FC = () => {
     console.log("- entryReason:", values.entryReason, "tipo:", typeof values.entryReason);
     console.log("- height:", values.height, "tipo:", typeof values.height);
     console.log("- weight:", values.weight, "tipo:", typeof values.weight);
-    console.log("- bloodPressure:", values.bloodPressure, "tipo:", typeof values.bloodPressure);
-    console.log("- bpm:", values.bpm, "tipo:", typeof values.bpm);
-    console.log("- temperature:", values.temperature, "tipo:", typeof values.temperature);
+
     
     // Verificar si hay errores de validación
     if (Object.keys(errors).length > 0) {
@@ -384,9 +382,7 @@ export const MedicalRecord: React.FC = () => {
         abused: data.maltratado,
         alcholism: data.alcoholismo,
         alergies: alergies ?? [],
-        bloodPressure: data.presion_arterial,
         bloodType: data.tipo_sangre,
-        bpm: data.frecuencia_cardiaca,
         caffeine: data.cafeina,
         continence: data.continencia,
         diet: diet ?? [],
@@ -415,7 +411,6 @@ export const MedicalRecord: React.FC = () => {
         specialConditions,
         surgeries: surgeries ?? [],
         tabaquism: data.tabaquismo,
-        temperature: data.temperatura_corporal,
         verbalCommunication: data.comunicacion_verbal,
         weight: data.peso,
       }));
