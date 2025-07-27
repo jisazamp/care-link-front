@@ -119,11 +119,14 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
   };
 
   const handleSubmit = async (values: any) => {
-    // Convertir fechas a string
+    // Convertir fechas a string y asegurar que los valores numéricos se envíen correctamente
     const payload = {
       ...values,
       fecha_emision: values.fecha_emision ? values.fecha_emision.format("YYYY-MM-DD") : undefined,
       fecha_vencimiento: values.fecha_vencimiento ? values.fecha_vencimiento.format("YYYY-MM-DD") : undefined,
+      subtotal: Number(values.subtotal) || 0,
+      impuestos: Number(values.impuestos) || 0,
+      descuentos: Number(values.descuentos) || 0,
       total_factura: total,
       pagos: payments,
     };

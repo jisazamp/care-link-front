@@ -8,9 +8,13 @@ import type { Bill } from "../types";
 interface UpdateFacturaData {
   fecha_emision?: string;
   fecha_vencimiento?: string;
-  total?: number;
+  total_factura?: number;
+  subtotal?: number;
+  impuestos?: number;
+  descuentos?: number;
   estado_factura?: string;
   observaciones?: string;
+  pagos?: any[];
 }
 
 const updateFactura = ({ id, data }: { id: number; data: UpdateFacturaData }) =>

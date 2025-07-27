@@ -354,6 +354,30 @@ export type CronogramaAsistenciaPaciente = {
   transporte_info?: TransporteInfo;
 };
 
+// =============================================================================
+// TIPOS PARA ASISTENCIA DIARIA (DASHBOARD)
+// =============================================================================
+
+export type AsistenciaDiaria = {
+  id_cronograma_paciente: number;
+  id_usuario: number;
+  nombres: string;
+  apellidos: string;
+  tipo_servicio: string;
+  estado_asistencia:
+    | "PENDIENTE"
+    | "ASISTIO"
+    | "NO_ASISTIO"
+    | "CANCELADO"
+    | "REAGENDADO";
+  estado_texto: string;
+  color_estado: string;
+  requiere_transporte: boolean;
+  observaciones?: string;
+  fecha_creacion: string;
+  fecha_actualizacion?: string;
+};
+
 export type CronogramaCreateRequest = {
   id_profesional: number;
   fecha: string;
