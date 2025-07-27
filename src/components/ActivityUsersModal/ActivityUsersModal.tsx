@@ -9,14 +9,13 @@ import {
   Spin,
   Empty,
   message,
-  Popconfirm,
   Select,
   Input,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { DeleteOutlined, UserAddOutlined, EditOutlined } from "@ant-design/icons";
+import { UserAddOutlined, EditOutlined } from "@ant-design/icons";
 import { useGetActivityUsers } from "../../hooks/useGetActivityUsers/useGetActivityUsers";
-import { useRemoveUsersFromActivity } from "../../hooks/useRemoveUsersFromActivity/useRemoveUsersFromActivity";
+import { useUpdateUserActivityStatus } from "../../hooks/useUpdateUserActivityStatus/useUpdateUserActivityStatus";
 import { AssignUsersModal } from "../AssignUsersModal/AssignUsersModal";
 
 const { Text, Title } = Typography;
@@ -53,17 +52,25 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
   const [editingObservations, setEditingObservations] = useState<string>("");
 
   const { data: activityData, isLoading, error } = useGetActivityUsers(activityId);
-  const removeUsersMutation = useRemoveUsersFromActivity(activityId);
+  const updateUserStatusMutation = useUpdateUserActivityStatus();
 
-  const handleRemoveUser = async (userId: number) => {
+  const handleUpdateUserStatus = async () => {
+    if (!editingUser) return;
+
     try {
-      await removeUsersMutation.mutateAsync([userId]);
-      message.success("Usuario removido de la actividad");
+      await updateUserStatusMutation.mutateAsync({
+        activityUserId: editingUser.id,
+        data: {
+          estado_participacion: editingStatus,
+          observaciones: editingObservations || undefined,
+        },
+      });
+      message.success("Estado del usuario actualizado exitosamente");
+      setEditingUser(null);
     } catch (error) {
-      message.error("Error al remover usuario");
+      message.error("Error al actualizar el estado del usuario");
     }
   };
-
 
 
   const getStatusColor = (status: string) => {
@@ -146,21 +153,6 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
           >
             Editar
           </Button>
-          <Popconfirm
-            title="¿Estás seguro de remover este usuario?"
-            onConfirm={() => handleRemoveUser(record.id_usuario)}
-            okText="Sí"
-            cancelText="No"
-          >
-            <Button
-              type="link"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-            >
-              Remover
-            </Button>
-          </Popconfirm>
         </Space>
       ),
     },
@@ -239,10 +231,8 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
         title="Editar Participación del Usuario"
         open={!!editingUser}
         onCancel={() => setEditingUser(null)}
-        onOk={async () => {
-          // Aquí implementarías la actualización del estado
-          setEditingUser(null);
-        }}
+        onOk={handleUpdateUserStatus}
+        confirmLoading={updateUserStatusMutation.isPending}
       >
         {editingUser && (
           <Space direction="vertical" style={{ width: "100%" }}>

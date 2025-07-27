@@ -57,32 +57,17 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
 
   const { data: availableUsersData, isLoading, error } = useGetAvailableUsers(activityDate);
 
-  // DEBUG: Agregar logs para identificar el problema
-  console.log("🔍 DEBUG AssignUsersModal:");
-  console.log("activityDate:", activityDate);
-  console.log("availableUsersData:", availableUsersData);
-  console.log("availableUsersData.data:", (availableUsersData as any)?.data);
-  console.log("availableUsersData.data.data:", (availableUsersData as any)?.data?.data);
-  console.log("isLoading:", isLoading);
-  console.log("error:", error);
-
   // Filtrar usuarios basado en el texto de búsqueda
   // Corregir la extracción de datos según la estructura de respuesta del backend
   const users: UserForActivity[] = Array.isArray((availableUsersData as any)?.data?.data) 
     ? (availableUsersData as any)?.data?.data 
     : [];
   
-  console.log("users array:", users);
-  console.log("users length:", users.length);
-
   const filteredUsers = users.filter((user: UserForActivity) =>
     `${user.nombres} ${user.apellidos} ${user.n_documento}`
       .toLowerCase()
       .includes(searchText.toLowerCase())
   );
-
-  console.log("filteredUsers:", filteredUsers);
-  console.log("filteredUsers length:", filteredUsers.length);
 
   const assignUsersMutation = useAssignUsersToActivity(activityId);
 
