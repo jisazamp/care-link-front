@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, InputNumber, DatePicker, Button, Typography, Row, Col, Divider, Card, Select, message, Space } from "antd";
+import {
+  Form,
+  Input,
+  InputNumber,
+  DatePicker,
+  Button,
+  Typography,
+  Row,
+  Col,
+  Divider,
+  Card,
+  Select,
+  message,
+  Space,
+} from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type { Bill } from "../../types";
@@ -27,14 +41,17 @@ export const BillingForm: React.FC<BillingFormProps> = ({
   const [payments, setPayments] = useState<any[]>(initialValues?.pagos || []);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [hasNewPayments, setHasNewPayments] = useState(false);
-  
+
   // Hook para descargar PDF
   const { downloadPDF, isDownloading: isDownloadingPDF } = useDownloadPDF();
 
   // Hook para obtener el total pagado desde el backend
-  const { data: pagosTotal, isLoading: loadingPagosTotal } = useGetBillPaymentsTotal(initialValues?.id_factura);
+  const { data: pagosTotal, isLoading: loadingPagosTotal } =
+    useGetBillPaymentsTotal(initialValues?.id_factura);
   // Hook para obtener los pagos consolidados desde el backend
-const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura);
+  const { data: pagosConsolidados } = useGetBillPayments(
+    initialValues?.id_factura,
+  );
   // Determinar si es edición de factura existente
   const isEdit = Boolean(initialValues?.id_factura);
 
@@ -44,8 +61,12 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
   // Preprocesar valores iniciales para fechas
   const initialFormValues = {
     ...initialValues,
-    fecha_emision: initialValues?.fecha_emision ? dayjs(initialValues.fecha_emision) : undefined,
-    fecha_vencimiento: initialValues?.fecha_vencimiento ? dayjs(initialValues.fecha_vencimiento) : undefined,
+    fecha_emision: initialValues?.fecha_emision
+      ? dayjs(initialValues.fecha_emision)
+      : undefined,
+    fecha_vencimiento: initialValues?.fecha_vencimiento
+      ? dayjs(initialValues.fecha_vencimiento)
+      : undefined,
     subtotal: initialValues?.subtotal ?? 0,
     impuestos: initialValues?.impuestos ?? 0,
     descuentos: initialValues?.descuentos ?? 0,
@@ -65,10 +86,12 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
       let pagosBackend = (pagosConsolidados || []).map((pago: any) => ({
         ...pago,
         fecha_pago: pago.fecha_pago || "",
-        saved: true // Marcar como consolidados
+        saved: true, // Marcar como consolidados
       }));
       // Procesar pagos locales (no guardados aún)
-      let pagosLocales = (initialValues.pagos || []).filter((p: any) => !pagosBackend.some((pb: any) => pb.id_pago === p.id_pago));
+      let pagosLocales = (initialValues.pagos || []).filter(
+        (p: any) => !pagosBackend.some((pb: any) => pb.id_pago === p.id_pago),
+      );
       setPayments([...pagosBackend, ...pagosLocales]);
     } else {
       form.resetFields();
@@ -84,21 +107,30 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
     const descuentos = Number(all.descuentos) || 0;
     const newTotal = subtotal + impuestos - descuentos;
     setTotal(newTotal);
-    
+
     // Detectar si hay cambios en el formulario (solo para facturas existentes)
     if (isEdit) {
-      const hasChanges = 
+      const hasChanges =
         all.descuentos !== initialValues?.descuentos ||
         all.estado_factura !== initialValues?.estado_factura ||
         all.observaciones !== initialValues?.observaciones;
-      
+
       console.log(" Cambios detectados en formulario:", {
-        descuentos: { actual: all.descuentos, inicial: initialValues?.descuentos },
-        estado_factura: { actual: all.estado_factura, inicial: initialValues?.estado_factura },
-        observaciones: { actual: all.observaciones, inicial: initialValues?.observaciones },
-        hasChanges
+        descuentos: {
+          actual: all.descuentos,
+          inicial: initialValues?.descuentos,
+        },
+        estado_factura: {
+          actual: all.estado_factura,
+          inicial: initialValues?.estado_factura,
+        },
+        observaciones: {
+          actual: all.observaciones,
+          inicial: initialValues?.observaciones,
+        },
+        hasChanges,
       });
-      
+
       setIsFormDirty(hasChanges);
     }
   };
@@ -107,11 +139,11 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
   const handlePaymentsChange = (newPayments: any[]) => {
     console.log("💳 Cambios en pagos detectados:", newPayments);
     setPayments(newPayments);
-    
+
     // Detectar si hay pagos nuevos (no guardados)
     if (isEdit) {
-      const hasNewPayments = newPayments.some(payment => 
-        !payment.saved && !payment.id_pago && payment.valor > 0
+      const hasNewPayments = newPayments.some(
+        (payment) => !payment.saved && !payment.id_pago && payment.valor > 0,
       );
       console.log("🆕 Pagos nuevos detectados:", hasNewPayments);
       setHasNewPayments(hasNewPayments);
@@ -122,24 +154,23 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
     // Convertir fechas a string y asegurar que los valores numéricos se envíen correctamente
     const payload = {
       ...values,
-      fecha_emision: values.fecha_emision ? values.fecha_emision.format("YYYY-MM-DD") : undefined,
-      fecha_vencimiento: values.fecha_vencimiento ? values.fecha_vencimiento.format("YYYY-MM-DD") : undefined,
+      fecha_emision: values.fecha_emision
+        ? values.fecha_emision.format("YYYY-MM-DD")
+        : undefined,
+      fecha_vencimiento: values.fecha_vencimiento
+        ? values.fecha_vencimiento.format("YYYY-MM-DD")
+        : undefined,
       subtotal: Number(values.subtotal) || 0,
       impuestos: Number(values.impuestos) || 0,
       descuentos: Number(values.descuentos) || 0,
       total_factura: total,
       pagos: payments,
     };
-    
-    console.log("🚀 Actualizando factura...");
-    console.log(" Estado actual de pagos:", payments);
-    
+
     try {
       // Solo actualizar la factura - los pagos se registran individualmente
       await onSubmit(payload);
-      console.log(" Factura actualizada exitosamente");
       message.success("Factura actualizada correctamente");
-      
     } catch (error) {
       console.error(" Error al actualizar la factura:", error);
       message.error("Error al actualizar la factura");
@@ -158,7 +189,8 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
       message.success("PDF descargado correctamente");
     } catch (error) {
       console.error("Error descargando PDF:", error);
-      const errorMessage = error instanceof Error ? error.message : "Error al descargar el PDF";
+      const errorMessage =
+        error instanceof Error ? error.message : "Error al descargar el PDF";
       message.error(errorMessage);
     }
   };
@@ -171,25 +203,28 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
           {initialValues?.numero_factura && (
             <Col span={12}>
               <Form.Item label="Número de Factura">
-                <Input 
-                  value={initialValues.numero_factura} 
-                  disabled 
-                  style={{ fontWeight: 'bold', color: '#1890ff' }}
+                <Input
+                  value={initialValues.numero_factura}
+                  disabled
+                  style={{ fontWeight: "bold", color: "#1890ff" }}
                 />
               </Form.Item>
             </Col>
           )}
           <Col span={initialValues?.numero_factura ? 12 : 24}>
             <Form.Item label="Estado de la Factura">
-              <Typography.Text 
-                strong 
+              <Typography.Text
+                strong
                 type={
-                  initialValues?.estado_factura === 'PAGADA' ? 'success' :
-                  initialValues?.estado_factura === 'VENCIDA' ? 'danger' : 'warning'
+                  initialValues?.estado_factura === "PAGADA"
+                    ? "success"
+                    : initialValues?.estado_factura === "VENCIDA"
+                      ? "danger"
+                      : "warning"
                 }
                 style={{ fontSize: 16 }}
               >
-                {initialValues?.estado_factura || 'PENDIENTE'}
+                {initialValues?.estado_factura || "PENDIENTE"}
               </Typography.Text>
             </Form.Item>
           </Col>
@@ -198,9 +233,14 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
         {initialValues?.id_factura && (
           <Row gutter={16} style={{ marginTop: 8 }}>
             <Col span={24}>
-              <Typography.Text strong style={{ color: '#52c41a', fontSize: 16 }}>
+              <Typography.Text
+                strong
+                style={{ color: "#52c41a", fontSize: 16 }}
+              >
                 Valor Total Pagado:&nbsp;
-                {loadingPagosTotal ? 'Cargando...' : formatCurrency(pagosTotal?.total_pagado || 0)}
+                {loadingPagosTotal
+                  ? "Cargando..."
+                  : formatCurrency(pagosTotal?.total_pagado || 0)}
               </Typography.Text>
             </Col>
           </Row>
@@ -218,7 +258,13 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
         <Form.Item label="Número de Factura" name="numero_factura">
           <Input disabled placeholder="Se genera automáticamente" />
         </Form.Item>
-        <Form.Item label="Fecha de Emisión" name="fecha_emision" rules={[{ required: true, message: "Seleccione la fecha de emisión" }]}> 
+        <Form.Item
+          label="Fecha de Emisión"
+          name="fecha_emision"
+          rules={[
+            { required: true, message: "Seleccione la fecha de emisión" },
+          ]}
+        >
           <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" disabled />
         </Form.Item>
         <Form.Item label="Fecha de Finalización" name="fecha_vencimiento">
@@ -231,7 +277,11 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
           <InputNumber min={0} style={{ width: "100%" }} disabled />
         </Form.Item>
         <Form.Item label="Descuentos" name="descuentos">
-          <InputNumber min={0} style={{ width: "100%" }} disabled={!isEdit ? readOnly : false} />
+          <InputNumber
+            min={0}
+            style={{ width: "100%" }}
+            disabled={!isEdit ? readOnly : false}
+          />
         </Form.Item>
         <Form.Item label="Total" name="total_factura">
           <InputNumber min={0} style={{ width: "100%" }} disabled />
@@ -248,9 +298,9 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
         <Form.Item label="Observaciones" name="observaciones">
           <Input.TextArea rows={3} disabled={!isEdit ? readOnly : false} />
         </Form.Item>
-        
+
         <Divider />
-        
+
         {/* Formulario de pagos */}
         <PaymentsForm
           payments={payments}
@@ -261,28 +311,32 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
           disabled={readOnly || loading}
           facturaId={initialValues?.id_factura}
         />
-        
+
         {!readOnly && (
           <Form.Item style={{ textAlign: "right", marginTop: 24 }}>
-            <Space direction="vertical" style={{ width: '100%' }}>
+            <Space direction="vertical" style={{ width: "100%" }}>
               {isEdit && !shouldEnableUpdateButton && (
-                <div style={{ 
-                  padding: '8px 12px', 
-                  background: '#fff7e6', 
-                  border: '1px solid #ffd591', 
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  color: '#d46b08',
-                  textAlign: 'center'
-                }}>
-                  💡 <strong>Información:</strong> Edita algún campo de la factura o agrega un pago para habilitar el botón "Actualizar Factura".
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    background: "#fff7e6",
+                    border: "1px solid #ffd591",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    color: "#d46b08",
+                    textAlign: "center",
+                  }}
+                >
+                  💡 <strong>Información:</strong> Edita algún campo de la
+                  factura o agrega un pago para habilitar el botón "Actualizar
+                  Factura".
                 </div>
               )}
               <Space>
                 {initialValues?.id_factura && (
-                  <Button 
-                    type="default" 
-                    icon={<DownloadOutlined />} 
+                  <Button
+                    type="default"
+                    icon={<DownloadOutlined />}
                     onClick={handleDownloadPDF}
                     loading={isDownloadingPDF}
                     size="large"
@@ -290,15 +344,21 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
                     {isDownloadingPDF ? "Descargando..." : "Descargar PDF"}
                   </Button>
                 )}
-                <Button 
-                  type="primary" 
-                  htmlType="submit" 
-                  loading={loading} 
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
                   size="large"
                   disabled={isEdit && !shouldEnableUpdateButton}
-                  title={isEdit && !shouldEnableUpdateButton ? "Edita algún campo o agrega un pago para habilitar la actualización" : ""}
+                  title={
+                    isEdit && !shouldEnableUpdateButton
+                      ? "Edita algún campo o agrega un pago para habilitar la actualización"
+                      : ""
+                  }
                 >
-                  {initialValues?.id_factura ? 'Actualizar Factura' : 'Crear Factura'}
+                  {initialValues?.id_factura
+                    ? "Actualizar Factura"
+                    : "Crear Factura"}
                 </Button>
               </Space>
             </Space>
@@ -307,4 +367,5 @@ const { data: pagosConsolidados } = useGetBillPayments(initialValues?.id_factura
       </Form>
     </div>
   );
-}; 
+};
+

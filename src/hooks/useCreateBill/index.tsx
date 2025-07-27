@@ -18,7 +18,7 @@ const createContractBill = (data: CreateBillData) =>
 
 const useCreateBill = () => {
   const queryClient = useQueryClient();
-  
+
   const mutation = useMutation({
     mutationKey: ["create-contract-bill"],
     mutationFn: createContractBill,
@@ -35,14 +35,14 @@ const useCreateBill = () => {
     options?: {
       onSuccess?: (data: any) => void;
       onError?: (error: any) => void;
-    }
+    },
   ) => {
     mutation.mutate(data, options);
   };
 
-  return { 
-    createContractBillFn, 
-    createContractPending: mutation.isPending 
+  return {
+    createContractBillFn,
+    createContractPending: mutation.isPending,
   };
 };
 

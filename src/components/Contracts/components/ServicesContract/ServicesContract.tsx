@@ -46,12 +46,12 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
   switch (recordKey) {
     case "1":
       // Verificar si hay servicio de día seleccionado para deshabilitar tiqueteras
-      const diaService = services.find(s => s.key === "3");
+      const diaService = services.find((s) => s.key === "3");
       const isDiaSelected = diaService?.serviceType === "Servicio dia";
-      
+
       return Array.from({ length: 5 }, (_, i) => (
-        <Select.Option 
-          key={`Tiquetera ${i + 1}`} 
+        <Select.Option
+          key={`Tiquetera ${i + 1}`}
           value={`Tiquetera ${i + 1}`}
           disabled={isDiaSelected}
         >
@@ -60,16 +60,16 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
       ));
     case "2":
       // Obtener la tiquetera seleccionada para filtrar las opciones de transporte
-      const tiqueteraService = services.find(s => s.key === "1");
-      const tiqueteraNumber = tiqueteraService?.serviceType 
-        ? parseInt(tiqueteraService.serviceType.split(" ")[1]) 
+      const tiqueteraService = services.find((s) => s.key === "1");
+      const tiqueteraNumber = tiqueteraService?.serviceType
+        ? parseInt(tiqueteraService.serviceType.split(" ")[1])
         : 0;
-      
+
       // Si no hay tiquetera seleccionada, no mostrar opciones de transporte
       if (tiqueteraNumber === 0) {
         return [];
       }
-      
+
       // Filtrar transportes para mostrar solo los que tienen número igual o menor a la tiquetera
       return Array.from({ length: tiqueteraNumber }, (_, i) => (
         <Select.Option
@@ -81,12 +81,14 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
       ));
     case "3":
       // Verificar si hay tiquetera seleccionada para deshabilitar servicio de día
-      const tiqueteraSelected = services.find(s => s.key === "1");
-      const isTiqueteraSelected = tiqueteraSelected?.serviceType && tiqueteraSelected.serviceType.includes("Tiquetera");
-      
+      const tiqueteraSelected = services.find((s) => s.key === "1");
+      const isTiqueteraSelected =
+        tiqueteraSelected?.serviceType &&
+        tiqueteraSelected.serviceType.includes("Tiquetera");
+
       return (
-        <Select.Option 
-          key="Servicio dia" 
+        <Select.Option
+          key="Servicio dia"
           value="Servicio dia"
           disabled={isTiqueteraSelected}
         >
@@ -102,21 +104,21 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const methods = useFormContext<FormValues>();
   const services = methods.watch("services");
   const startDate = methods.watch("startDate");
-  
+
   // Obtener las tarifas de servicios
   const { data: serviceRatesData } = useGetServiceRates();
-  
+
   // Función para obtener el precio de un servicio basándose en las tarifas
   const getServicePrice = (serviceId: number) => {
     if (!serviceRatesData?.data?.TarifasServicioPorAnio || !startDate) {
       return 0;
     }
-    
+
     const year = startDate.year();
     const serviceRate = serviceRatesData.data.TarifasServicioPorAnio.find(
-      rate => rate.id_servicio === serviceId && rate.anio === year
+      (rate) => rate.id_servicio === serviceId && rate.anio === year,
     );
-    
+
     return serviceRate?.precio_por_dia || 0;
   };
 
@@ -125,23 +127,29 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
       case "1":
         methods.setValue("selectedDatesService", []);
         // Limpiar transporte si la nueva tiquetera es menor que el transporte seleccionado
-        const transporteService = services.find(s => s.key === "2");
+        const transporteService = services.find((s) => s.key === "2");
         if (transporteService?.serviceType && value) {
           const tiqueteraNumber = parseInt(value.split(" ")[1]);
-          const transporteNumber = parseInt(transporteService.serviceType.split(" ")[1]);
+          const transporteNumber = parseInt(
+            transporteService.serviceType.split(" ")[1],
+          );
           if (transporteNumber > tiqueteraNumber) {
             // Limpiar la selección de transporte
             const newServices = services.map((s) =>
-              s.key === "2" ? { ...s, serviceType: "", quantity: 0, price: 0 } : s,
+              s.key === "2"
+                ? { ...s, serviceType: "", quantity: 0, price: 0 }
+                : s,
             );
             methods.setValue("services", newServices);
           }
         }
-        
+
         // Si se selecciona una tiquetera, limpiar el servicio de día
         if (value) {
           const newServices = services.map((s) =>
-            s.key === "3" ? { ...s, serviceType: "", quantity: 0, price: 0 } : s,
+            s.key === "3"
+              ? { ...s, serviceType: "", quantity: 0, price: 0 }
+              : s,
           );
           methods.setValue("services", newServices);
         }
@@ -154,7 +162,9 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         // Si se selecciona el servicio de día, limpiar la tiquetera
         if (value) {
           const newServices = services.map((s) =>
-            s.key === "1" ? { ...s, serviceType: "", quantity: 0, price: 0 } : s,
+            s.key === "1"
+              ? { ...s, serviceType: "", quantity: 0, price: 0 }
+              : s,
           );
           methods.setValue("services", newServices);
         }
@@ -185,20 +195,26 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
 
   const handleNext = () => {
     // Validar que se haya seleccionado al menos una tiquetera
-    const tiqueteraService = services.find(s => s.key === "1");
+    const tiqueteraService = services.find((s) => s.key === "1");
     if (!tiqueteraService?.serviceType) {
       message.error("Debe seleccionar una tiquetera antes de continuar");
       return;
     }
 
     // Validar que si hay transporte seleccionado, sea válido según la tiquetera
-    const transporteService = services.find(s => s.key === "2");
+    const transporteService = services.find((s) => s.key === "2");
     if (transporteService?.serviceType) {
-      const tiqueteraNumber = parseInt(tiqueteraService.serviceType.split(" ")[1]);
-      const transporteNumber = parseInt(transporteService.serviceType.split(" ")[1]);
-      
+      const tiqueteraNumber = parseInt(
+        tiqueteraService.serviceType.split(" ")[1],
+      );
+      const transporteNumber = parseInt(
+        transporteService.serviceType.split(" ")[1],
+      );
+
       if (transporteNumber > tiqueteraNumber) {
-        message.error(`El transporte seleccionado (${transporteService.serviceType}) no es válido para la tiquetera seleccionada (${tiqueteraService.serviceType}). El transporte debe tener un número igual o menor.`);
+        message.error(
+          `El transporte seleccionado (${transporteService.serviceType}) no es válido para la tiquetera seleccionada (${tiqueteraService.serviceType}). El transporte debe tener un número igual o menor.`,
+        );
         return;
       }
     }
@@ -256,17 +272,20 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
       render: (_: unknown, record: Service) => {
         // Verificar si el campo debe estar deshabilitado
         let isDisabled = false;
-        
+
         if (record.key === "1") {
           // Deshabilitar tiquetera si hay servicio de día seleccionado
-          const diaService = services.find(s => s.key === "3");
+          const diaService = services.find((s) => s.key === "3");
           isDisabled = diaService?.serviceType === "Servicio dia";
         } else if (record.key === "3") {
           // Deshabilitar servicio de día si hay tiquetera seleccionada
-          const tiqueteraService = services.find(s => s.key === "1");
-          isDisabled = !!(tiqueteraService?.serviceType && tiqueteraService.serviceType.includes("Tiquetera"));
+          const tiqueteraService = services.find((s) => s.key === "1");
+          isDisabled = !!(
+            tiqueteraService?.serviceType &&
+            tiqueteraService.serviceType.includes("Tiquetera")
+          );
         }
-        
+
         return (
           <Select
             style={{ width: "100%", minWidth: 200 }}
@@ -292,10 +311,10 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
       title: "Precio",
       dataIndex: "price",
       render: (_: unknown, record: Service) => (
-        <Input 
-          value={record.price ? `$${record.price.toLocaleString()}` : "$0"} 
-          disabled 
-          style={{ textAlign: 'right' }}
+        <Input
+          value={record.price ? `$${record.price.toLocaleString()}` : "$0"}
+          disabled
+          style={{ textAlign: "right" }}
         />
       ),
     },
@@ -339,11 +358,13 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           <Col>
             <h3 style={{ margin: 0 }}>Servicios o productos incluidos</h3>
             <p style={{ margin: "8px 0 0 0", color: "#666", fontSize: "14px" }}>
-              <strong>Nota:</strong> El transporte seleccionado debe tener un número igual o menor al de la tiquetera. 
-              Por ejemplo, si selecciona Tiquetera 3, solo podrá elegir Transporte 1, 2 o 3.
+              <strong>Nota:</strong> El transporte seleccionado debe tener un
+              número igual o menor al de la tiquetera. Por ejemplo, si
+              selecciona Tiquetera 3, solo podrá elegir Transporte 1, 2 o 3.
               <br />
-              <strong>Importante:</strong> La tiquetera y el servicio de día son mutuamente excluyentes. 
-              Si selecciona una tiquetera, el servicio de día se deshabilitará y viceversa.
+              <strong>Importante:</strong> La tiquetera y el servicio de día son
+              mutuamente excluyentes. Si selecciona una tiquetera, el servicio
+              de día se deshabilitará y viceversa.
             </p>
           </Col>
         </Row>

@@ -1,14 +1,14 @@
 # 📄 Descarga de PDF - Implementación Centralizada
 
-## Problema Resuelto
+## 🎯 Problema Resuelto
 
 El botón de descarga de PDF estaba fallando porque:
 
-- No usaba el sistema de autenticación centralizado del proyecto
-- Usaba `localStorage.getItem('token')` en lugar del store Zustand
-- No aprovechaba el cliente axios configurado con interceptores
+- ❌ No usaba el sistema de autenticación centralizado del proyecto
+- ❌ Usaba `localStorage.getItem('token')` en lugar del store Zustand
+- ❌ No aprovechaba el cliente axios configurado con interceptores
 
-## Solución Implementada
+## ✅ Solución Implementada
 
 ### 1. **Hook Centralizado: `useDownloadPDF`**
 
@@ -16,21 +16,21 @@ El botón de descarga de PDF estaba fallando porque:
 
 **Características:**
 
-- **Usa el store Zustand** - `useAuthStore` para obtener el token
-- **Cliente axios configurado** - Aprovecha interceptores automáticos
-- **Manejo de errores robusto** - Errores específicos por código de estado
-- **Estados de carga** - `isDownloading` para UI
-- **Validación de autenticación** - Verifica token antes de hacer petición
-- **Verificación de tipo de contenido** - Asegura que sea PDF válido
+- ✅ **Usa el store Zustand** - `useAuthStore` para obtener el token
+- ✅ **Cliente axios configurado** - Aprovecha interceptores automáticos
+- ✅ **Manejo de errores robusto** - Errores específicos por código de estado
+- ✅ **Estados de carga** - `isDownloading` para UI
+- ✅ **Validación de autenticación** - Verifica token antes de hacer petición
+- ✅ **Verificación de tipo de contenido** - Asegura que sea PDF válido
 
 ### 2. **Integración en BillingForm**
 
 **Cambios realizados:**
 
-- Importación del hook `useDownloadPDF`
-- Función `handleDownloadPDF` que usa el hook
-- Botón con estado de carga y mensajes de error
-- Manejo de errores con mensajes específicos
+- ✅ Importación del hook `useDownloadPDF`
+- ✅ Función `handleDownloadPDF` que usa el hook
+- ✅ Botón con estado de carga y mensajes de error
+- ✅ Manejo de errores con mensajes específicos
 
 ### 3. **Sistema de Autenticación**
 
@@ -41,7 +41,7 @@ El botón de descarga de PDF estaba fallando porque:
 3. **Hook PDF** → Obtiene token del store y valida autenticación
 4. **Backend** → Valida token JWT y genera PDF
 
-## Arquitectura del Sistema
+## 🔧 Arquitectura del Sistema
 
 ### **Frontend (React/TypeScript)**
 
@@ -82,12 +82,12 @@ interface UseDownloadPDFReturn {
 
 ### **Manejo de Errores:**
 
-- **401** - "Sesión expirada. Por favor, inicie sesión nuevamente."
-- **404** - "Factura no encontrada"
-- **500** - "Error del servidor al generar el PDF"
-- **Sin token** - "Debes iniciar sesión para descargar el PDF"
-- **ID inválido** - "ID de factura no válido"
-- **Tipo de contenido** - "La respuesta no es un archivo PDF válido"
+- ❌ **401** - "Sesión expirada. Por favor, inicie sesión nuevamente."
+- ❌ **404** - "Factura no encontrada"
+- ❌ **500** - "Error del servidor al generar el PDF"
+- ❌ **Sin token** - "Debes iniciar sesión para descargar el PDF"
+- ❌ **ID inválido** - "ID de factura no válido"
+- ❌ **Tipo de contenido** - "La respuesta no es un archivo PDF válido"
 
 ### **Flujo de Descarga:**
 
@@ -113,46 +113,46 @@ interface UseDownloadPDFReturn {
 - `src/api/client.ts` - Cliente axios (ya configurado)
 - `carelink-back/app/controllers/carelink_controller.py` - Endpoint PDF (ya implementado)
 
-## Casos de Prueba
+## 🧪 Casos de Prueba
 
 ### **Escenarios Exitosos:**
 
-1.  **Usuario autenticado** → Descarga PDF correctamente
-2.  **Token válido** → PDF se genera y descarga
-3.  **Factura existente** → Datos completos en PDF
+1. ✅ **Usuario autenticado** → Descarga PDF correctamente
+2. ✅ **Token válido** → PDF se genera y descarga
+3. ✅ **Factura existente** → Datos completos en PDF
 
 ### **Escenarios de Error:**
 
-1.  **Sin autenticación** → Mensaje claro de login requerido
-2.  **Token expirado** → Redirección automática a login
-3.  **Factura inexistente** → Error 404 manejado
-4.  **Error del servidor** → Mensaje específico de error
+1. ❌ **Sin autenticación** → Mensaje claro de login requerido
+2. ❌ **Token expirado** → Redirección automática a login
+3. ❌ **Factura inexistente** → Error 404 manejado
+4. ❌ **Error del servidor** → Mensaje específico de error
 
-## Ventajas de la Implementación
+## 🔍 Ventajas de la Implementación
 
 ### **Centralización:**
 
-- **Un solo lugar** para manejo de autenticación
-- **Reutilizable** en otros componentes
-- **Consistente** con el resto del proyecto
+- ✅ **Un solo lugar** para manejo de autenticación
+- ✅ **Reutilizable** en otros componentes
+- ✅ **Consistente** con el resto del proyecto
 
 ### **Seguridad:**
 
-- **Validación de token** antes de cada petición
-- **Interceptores automáticos** para headers de autorización
-- **Manejo de sesiones expiradas**
+- ✅ **Validación de token** antes de cada petición
+- ✅ **Interceptores automáticos** para headers de autorización
+- ✅ **Manejo de sesiones expiradas**
 
 ### **Experiencia de Usuario:**
 
-- **Estados de carga** visibles
-- **Mensajes de error** claros y específicos
-- **Descarga automática** del archivo
+- ✅ **Estados de carga** visibles
+- ✅ **Mensajes de error** claros y específicos
+- ✅ **Descarga automática** del archivo
 
 ### **Mantenibilidad:**
 
-- **Código limpio** y bien estructurado
-- **Separación de responsabilidades**
-- **Fácil de extender** para otros tipos de archivos
+- ✅ **Código limpio** y bien estructurado
+- ✅ **Separación de responsabilidades**
+- ✅ **Fácil de extender** para otros tipos de archivos
 
 ## 🚀 Uso del Hook
 
@@ -171,7 +171,8 @@ const handleDownload = async () => {
 };
 ```
 
-## Métricas de Mejora
+## 📊 Métricas de Mejora
+>>>>>>> origin/main
 
 | Aspecto           | Antes                 | Después                   | Mejora |
 | ----------------- | --------------------- | ------------------------- | ------ |
@@ -183,7 +184,7 @@ const handleDownload = async () => {
 
 ---
 
-**Estado:** IMPLEMENTADO Y FUNCIONAL  
+**Estado:** ✅ IMPLEMENTADO Y FUNCIONAL  
 **Fecha:** 2025-01-XX  
 **Responsable:** Sistema de Facturación  
 **Impacto:** Alto - Solución completa y centralizada
