@@ -87,6 +87,9 @@ export const useEditSimplifiedRecordMutation = ({
       queryClient.invalidateQueries({
         queryKey: [`user-medical-record-${id}`],
       });
+      queryClient.invalidateQueries({
+        queryKey: [`record-${recordId}`],
+      });
     },
   });
 };
