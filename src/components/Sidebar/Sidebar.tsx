@@ -5,6 +5,14 @@ import { getSelectedKey } from "../../utils/getSelectedKey";
 
 const menuItems = [
   {
+    key: "1",
+    icon: <HomeOutlined />,
+    label: "Inicio",
+    children: [
+      { key: "1.1", label: <Link to="/home">Tablero de Inicio</Link> },
+    ],
+  },
+  {
     key: "2",
     icon: <UserOutlined />,
     label: "Pacientes",

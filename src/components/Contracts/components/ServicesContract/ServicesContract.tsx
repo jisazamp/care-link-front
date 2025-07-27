@@ -12,6 +12,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useFormContext } from "react-hook-form";
+import { useGetServiceRates } from "../../../../hooks/useGetServiceRates/useGetServiceRates";
 import type { FormValues } from "../FormContracts";
 import type { Service } from "../FormContracts";
 
@@ -33,6 +34,12 @@ const getPlaceholder = (recordKey: string) => {
     default:
       return "Seleccione un servicio";
   }
+};
+
+const getServiceId = (serviceType: string) => {
+  if (serviceType.includes("Transporte")) return 2;
+  if (serviceType.includes("Tiquetera")) return 1;
+  return 3;
 };
 
 const getSelectorOptions = (recordKey: string, services: Service[]) => {
@@ -94,6 +101,24 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
 export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const methods = useFormContext<FormValues>();
   const services = methods.watch("services");
+  const startDate = methods.watch("startDate");
+  
+  // Obtener las tarifas de servicios
+  const { data: serviceRatesData } = useGetServiceRates();
+  
+  // Función para obtener el precio de un servicio basándose en las tarifas
+  const getServicePrice = (serviceId: number) => {
+    if (!serviceRatesData?.data?.TarifasServicioPorAnio || !startDate) {
+      return 0;
+    }
+    
+    const year = startDate.year();
+    const serviceRate = serviceRatesData.data.TarifasServicioPorAnio.find(
+      rate => rate.id_servicio === serviceId && rate.anio === year
+    );
+    
+    return serviceRate?.precio_por_dia || 0;
+  };
 
   const handleServiceChange = (key: string, value?: string) => {
     switch (key) {
@@ -107,7 +132,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           if (transporteNumber > tiqueteraNumber) {
             // Limpiar la selección de transporte
             const newServices = services.map((s) =>
-              s.key === "2" ? { ...s, serviceType: "", quantity: 0 } : s,
+              s.key === "2" ? { ...s, serviceType: "", quantity: 0, price: 0 } : s,
             );
             methods.setValue("services", newServices);
           }
@@ -116,7 +141,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         // Si se selecciona una tiquetera, limpiar el servicio de día
         if (value) {
           const newServices = services.map((s) =>
-            s.key === "3" ? { ...s, serviceType: "", quantity: 0 } : s,
+            s.key === "3" ? { ...s, serviceType: "", quantity: 0, price: 0 } : s,
           );
           methods.setValue("services", newServices);
         }
@@ -129,7 +154,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         // Si se selecciona el servicio de día, limpiar la tiquetera
         if (value) {
           const newServices = services.map((s) =>
-            s.key === "1" ? { ...s, serviceType: "", quantity: 0 } : s,
+            s.key === "1" ? { ...s, serviceType: "", quantity: 0, price: 0 } : s,
           );
           methods.setValue("services", newServices);
         }
@@ -141,8 +166,12 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         ? Number.parseInt(value.split(" ")[1]) * WEEKS_IN_MONTH
         : 1;
 
+    // Calcular el precio basándose en las tarifas de servicios
+    const serviceId = getServiceId(value || "");
+    const price = getServicePrice(serviceId);
+
     const newServices = services.map((s) =>
-      s.key === key ? { ...s, serviceType: value || "", quantity } : s,
+      s.key === key ? { ...s, serviceType: value || "", quantity, price } : s,
     );
     methods.setValue("services", newServices);
   };
@@ -257,6 +286,17 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
       dataIndex: "quantity",
       render: (_: unknown, record: Service) => (
         <Input type="number" value={record.quantity} disabled />
+      ),
+    },
+    {
+      title: "Precio",
+      dataIndex: "price",
+      render: (_: unknown, record: Service) => (
+        <Input 
+          value={record.price ? `$${record.price.toLocaleString()}` : "$0"} 
+          disabled 
+          style={{ textAlign: 'right' }}
+        />
       ),
     },
     {

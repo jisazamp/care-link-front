@@ -13,7 +13,7 @@ import { ContractDetails } from "./components/Contracts/components/ContractDetai
 import { FormContracts } from "./components/Contracts/components/FormContracts";
 import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
-//import { Home } from "./components/Home/Home";
+import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
@@ -114,6 +114,14 @@ export const App = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route element={<MainLayout />}>
+              <Route
+                path="/home"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
               <Route
                 path="/usuarios"
                 element={
@@ -363,7 +371,7 @@ export const App = () => {
                 }
               />
             </Route>
-            <Route path="*" element={<Navigate to="/usuarios" replace />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </Router>
       </AntApp>
