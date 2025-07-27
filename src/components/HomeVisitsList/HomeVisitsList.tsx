@@ -33,10 +33,20 @@ export const HomeVisitsList: React.FC = () => {
   const navigate = useNavigate();
   const { data: homeVisitsData, isLoading, error } = useGetAllHomeVisits();
 
+  // Debug: Log de datos recibidos (solo en desarrollo)
+  if (homeVisitsData?.data.data && process.env.NODE_ENV === 'development') {
+    console.log("🔍 HomeVisitsList - Total de visitas:", homeVisitsData.data.data.length);
+    const estados = homeVisitsData.data.data.reduce((acc: any, v: any) => {
+      acc[v.estado_visita] = (acc[v.estado_visita] || 0) + 1;
+      return acc;
+    }, {});
+    console.log("🔍 HomeVisitsList - Estados de visitas:", estados);
+  }
+
   // Estados para los filtros
   const [filters, setFilters] = useState({
     estado: undefined,
-    tipoVisitas: "futuras",
+    tipoVisitas: "todas", // Cambiado de "futuras" a "todas" para mostrar todas las visitas por defecto
     fecha: null,
     paciente: "",
   });
@@ -79,28 +89,34 @@ export const HomeVisitsList: React.FC = () => {
       title: "Paciente",
       dataIndex: "paciente_nombre",
       key: "paciente_nombre",
-      render: (text: string, record: any) => (
-        <div>
-          <div style={{ fontWeight: 500 }}>{text}</div>
-          <div style={{ fontSize: "12px", color: "#666" }}>
-            ID: {record.id_usuario}
-          </div>
+      render: (text: string) => (
+        <div style={{ fontWeight: 500 }}>
+          {text || "Sin paciente"}
         </div>
       ),
     },
     {
       title: "Fecha y Hora",
       key: "fecha_hora",
-      render: (record: any) => (
-        <div>
-          <div style={{ fontWeight: 500 }}>
-            {dayjs(record.fecha_visita).format("DD/MM/YYYY")}
+      render: (record: any) => {
+        if (!record.fecha_visita || !record.hora_visita) {
+          return (
+            <div style={{ color: '#faad14', fontStyle: 'italic' }}>
+              Pendiente de programación
+            </div>
+          );
+        }
+        return (
+          <div>
+            <div style={{ fontWeight: 500 }}>
+              {dayjs(record.fecha_visita).format("DD/MM/YYYY")}
+            </div>
+            <div style={{ fontSize: "12px", color: "#666" }}>
+              {dayjs(record.hora_visita, "HH:mm:ss").format("HH:mm")}
+            </div>
           </div>
-          <div style={{ fontSize: "12px", color: "#666" }}>
-            {dayjs(record.hora_visita, "HH:mm:ss").format("HH:mm")}
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: "Dirección",
@@ -187,16 +203,12 @@ export const HomeVisitsList: React.FC = () => {
 
   // Función para aplicar filtros
   const applyFilters = useCallback(() => {
-    console.log("🔍 Aplicando filtros:", filters);
-    console.log("🔍 Datos originales:", homeVisitsData?.data.data);
-    
     if (!homeVisitsData?.data.data) {
       setFilteredData([]);
       return;
     }
 
     let filtered = [...homeVisitsData.data.data];
-    console.log("🔍 Datos iniciales para filtrar:", filtered.length);
 
     // Filtrar por estado
     if (filters.estado) {
@@ -230,7 +242,6 @@ export const HomeVisitsList: React.FC = () => {
       });
     }
 
-    console.log("🔍 Datos finales filtrados:", filtered.length, filtered);
     setFilteredData(filtered);
   }, [homeVisitsData, filters]);
 
@@ -248,7 +259,7 @@ export const HomeVisitsList: React.FC = () => {
   const clearFilters = () => {
     setFilters({
       estado: undefined,
-      tipoVisitas: "futuras",
+      tipoVisitas: "todas", // Cambiado de "futuras" a "todas"
       fecha: null,
       paciente: "",
     });
@@ -265,7 +276,7 @@ export const HomeVisitsList: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
         <Col span={24}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Title level={3}>Visitas Domiciliarias Programadas (Futuras)</Title>
+            <Title level={3}>Visitas Domiciliarias</Title>
             <Button
               type="primary"
               icon={<PlusOutlined />}

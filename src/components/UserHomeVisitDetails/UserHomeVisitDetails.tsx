@@ -326,10 +326,10 @@ export const UserHomeVisitDetails: React.FC = () => {
     {
       title: "Acciones",
       key: "acciones",
-      render: () => (
+      render: (_, record) => (
         <Space>
           <Tooltip title="Ver detalles de la visita y editarla si es necesario">
-            <Link to={`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`}>
+            <Link to={`/visitas-domiciliarias/usuarios/${userId}/editar-visita/${record.id_visitadomiciliaria}`}>
               <Button
                 type="link"
                 className="main-button-link"

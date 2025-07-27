@@ -163,6 +163,14 @@ export const App = () => {
                 }
               />
               <Route
+                path="/visitas-domiciliarias/usuarios/:id/editar-visita/:visitaId"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitNewVisit />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/visitas-domiciliarias"
                 element={
                   <PrivateRoute>
