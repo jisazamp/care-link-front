@@ -395,25 +395,16 @@ export const Cronograma: React.FC = () => {
             >
               Asistió
             </Button>
-            <Button
-              size="small"
-              danger
-              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
-              disabled={isDisabled}
-              loading={botonCargando === `${record.id_cronograma_paciente}-NO_ASISTIO`}
-              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
-            >
-              No Asistió
-            </Button>
-            <Button
-              size="small"
-              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'CANCELADO')}
-              disabled={isDisabled}
-              loading={botonCargando === `${record.id_cronograma_paciente}-CANCELADO`}
-              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
-            >
-              Cancelar
-            </Button>
+                         <Button
+               size="small"
+               danger
+               onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
+               disabled={isDisabled}
+               loading={botonCargando === `${record.id_cronograma_paciente}-NO_ASISTIO`}
+               title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
+             >
+               No Asistió
+             </Button>
           </Space>
         );
       },

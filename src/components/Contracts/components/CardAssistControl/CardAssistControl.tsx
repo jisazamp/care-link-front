@@ -150,16 +150,7 @@ export const CardAsistControl = () => {
     });
   };
 
-  // Método legacy para compatibilidad (mantener por si acaso)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleStatusChange = (record: AsistenciaDiaria, newStatus: string) => {
-    setSelectedPatient(record);
-    form.setFieldsValue({
-      estado_asistencia: newStatus,
-      observaciones: record.observaciones || ""
-    });
-    setIsModalVisible(true);
-  };
+
 
   // Manejar envío del formulario (método legacy)
   const handleFormSubmit = async (values: any) => {
@@ -332,15 +323,6 @@ export const CardAsistControl = () => {
               title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
             >
               No Asistió
-            </Button>
-            <Button
-              size="small"
-              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'CANCELADO')}
-              disabled={isDisabled}
-              loading={botonCargando === `${record.id_cronograma_paciente}-CANCELADO`}
-              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
-            >
-              Cancelar
             </Button>
           </Space>
         );
