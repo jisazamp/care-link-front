@@ -26,7 +26,9 @@ export const useGetUserFirstHomeVisit = (
     select: (data) => {
       // Retornar la primera visita (la más reciente por fecha de creación)
       const visitas = data.data.data;
-      return visitas && visitas.length > 0 ? visitas[0] : null;
+      return visitas && Array.isArray(visitas) && visitas.length > 0
+        ? visitas[0]
+        : null;
     },
   });
 };
