@@ -2,10 +2,11 @@ import { Line } from "@ant-design/plots";
 import { Card, Col, Row, Typography, Spin } from "antd";
 import { useGetQuarterlyVisits } from "../../../../hooks/useGetQuarterlyVisits/useGetQuarterlyVisits";
 import { useGetMonthlyPayments } from "../../../../hooks/useGetMonthlyPayments/useGetMonthlyPayments";
+import { useGetOperationalEfficiency } from "../../../../hooks/useGetOperationalEfficiency/useGetOperationalEfficiency";
 
 const { Title, Text } = Typography;
 
-//  Datos de ejemplo para gráficos
+// Datos de ejemplo para gráficos
 const dataVisits = [
   { date: "Enero", value: 30 },
   { date: "Febrero", value: 45 },
@@ -33,24 +34,10 @@ const dataEfficiency = [
   { date: "Junio", value: 82 },
 ];
 
-//  Configuración de gráficos con colores y estilos corregidos
-
-const configEfficiency = {
-  data: dataEfficiency,
-  xField: "date",
-  yField: "value",
-  smooth: true,
-  color: "#13C2C2", // Verde para eficiencia operativa
-  tooltip: { showMarkers: false },
-  legend: { position: "top" },
-  height: 100,
-};
-
 export const GenericsCards = () => {
   const { data: quarterlyVisitsData, isLoading: isLoadingVisits, error: errorVisits } = useGetQuarterlyVisits();
   const { data: monthlyPaymentsData, isLoading: isLoadingPayments, error: errorPayments } = useGetMonthlyPayments();
-
-
+  const { data: operationalEfficiencyData, isLoading: isLoadingEfficiency, error: errorEfficiency } = useGetOperationalEfficiency();
 
   // Configuración dinámica para el gráfico de visitas
   const configVisitsDynamic = {
@@ -92,7 +79,27 @@ export const GenericsCards = () => {
     height: 100,
   };
 
-  if (isLoadingVisits || isLoadingPayments) {
+  // Configuración dinámica para el gráfico de eficiencia operativa
+  const configEfficiencyDynamic = {
+    data: operationalEfficiencyData?.monthly_data || dataEfficiency,
+    xField: "month",
+    yField: "efficiency",
+    smooth: true,
+    color: "#13C2C2", // Verde para eficiencia operativa
+    tooltip: { 
+      showMarkers: false,
+      formatter: (datum: any) => {
+        return {
+          name: datum.month,
+          value: `${datum.efficiency || 0}%`
+        };
+      }
+    },
+    legend: { position: "top" },
+    height: 100,
+  };
+
+  if (isLoadingVisits || isLoadingPayments || isLoadingEfficiency) {
     return (
       <Row gutter={[16, 16]}>
         <Col span={8}>
@@ -120,7 +127,7 @@ export const GenericsCards = () => {
     );
   }
 
-  if (errorVisits || errorPayments) {
+  if (errorVisits || errorPayments || errorEfficiency) {
     return (
       <Row gutter={[16, 16]}>
         <Col span={8}>
@@ -183,11 +190,11 @@ export const GenericsCards = () => {
         <Card className="generic-card">
           <Title level={5}>Eficiencia operativa</Title>
           <Title level={3} style={{ color: "#13C2C2" }}>
-            78%
+            {operationalEfficiencyData?.overall_efficiency || 0}%
           </Title>
-          <Line {...configEfficiency} />
+          <Line {...configEfficiencyDynamic} />
           <Text type="secondary">
-            Aumento <Text type="success">12%</Text> Ver reporte
+            Aumento <Text type="success">{operationalEfficiencyData?.growth_percentage || 0}%</Text> Ver reporte
           </Text>
         </Card>
       </Col>
