@@ -40,13 +40,15 @@ export const useCreateContract = () => {
       // Invalidar queries relacionadas con contratos
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["user-contracts"] });
+      // Invalidar query de facturación completa para actualizar la tabla en tiempo real
+      queryClient.invalidateQueries({ queryKey: ["facturacion-completa"] });
 
       // Mostrar mensaje de éxito o error según la respuesta
       const data = response.data;
       if (data.success) {
-        console.log("✅ Contrato creado exitosamente:", data.message);
+        console.log(" Contrato creado exitosamente:", data.message);
       } else {
-        console.error("❌ Error al crear contrato:", data.message);
+        console.error(" Error al crear contrato:", data.message);
       }
     },
     onError: (error: any) => {
@@ -54,9 +56,9 @@ export const useCreateContract = () => {
       if (error.response?.status === 400) {
         const errorMessage =
           error.response.data?.message || "Error de validación";
-        console.error("❌ Error de validación:", errorMessage);
+        console.error(" Error de validación:", errorMessage);
       } else {
-        console.error("❌ Error inesperado:", error);
+        console.error(" Error inesperado:", error);
       }
     },
   });

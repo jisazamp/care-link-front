@@ -12,6 +12,7 @@ import {
   Row,
   Select,
   Spin,
+  Switch,
   Typography,
   Upload,
 } from "antd";
@@ -19,7 +20,7 @@ import request from "axios";
 import dayjs, { type Dayjs } from "dayjs";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
 import {
@@ -70,6 +71,7 @@ const formSchema = z.object({
   occupation: z.string().optional(),
   address: z.string().optional(),
   phone: z.string().optional(),
+  homeVisit: z.boolean().default(false),
   photo: z
     .any()
     .optional()
@@ -89,6 +91,7 @@ type FormValues = z.infer<typeof formSchema>;
 export const NewUser: React.FC = () => {
   const params = useParams();
   const userId = params.id;
+  const location = useLocation();
 
   const {
     control,
@@ -96,13 +99,25 @@ export const NewUser: React.FC = () => {
     handleSubmit,
     reset,
     setValue,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       gender: "Masculino",
       userId: "0000",
+      homeVisit: false,
     },
   });
+
+  // Observar el valor del switch para determinar la redirección
+  const homeVisitValue = watch("homeVisit");
+
+  // Activar automáticamente el switch si viene desde visitas domiciliarias
+  useEffect(() => {
+    if (location.state?.activateHomeVisit && !userId) {
+      setValue("homeVisit", true);
+    }
+  }, [location.state?.activateHomeVisit, setValue, userId]);
 
   const navigate = useNavigate();
   const { data, isError, isLoading, error } = useGetUserById(userId);
@@ -110,6 +125,7 @@ export const NewUser: React.FC = () => {
     mutate: createUser,
     isSuccess: isSuccessCreateUser,
     isPending: isPendingCreateUser,
+    data: createUserResponse,
   } = useCreateUserMutation();
   const {
     mutate: editUser,
@@ -127,6 +143,7 @@ export const NewUser: React.FC = () => {
   );
 
   const onSubmit = (data: FormValues) => {
+    
     const user: Partial<User> = {
       apellidos: data.lastName,
       direccion: data.address,
@@ -147,6 +164,7 @@ export const NewUser: React.FC = () => {
       is_deleted: false,
       profesion: data.occupation ?? "",
       tipo_usuario: data.userType ?? "Nuevo",
+      visitas_domiciliarias: data.homeVisit,
     };
 
     const photoFile = data.photo?.fileList?.[0]?.originFileObj;
@@ -177,6 +195,7 @@ export const NewUser: React.FC = () => {
       address: userData.direccion ?? "",
       occupation: userData.profesion ?? "",
       userType: (userData.tipo_usuario as "Nuevo" | "Recurrente") ?? "Nuevo",
+      homeVisit: userData.visitas_domiciliarias ?? false,
     };
 
     reset(resetValues);
@@ -202,9 +221,32 @@ export const NewUser: React.FC = () => {
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
-      navigate("/usuarios");
+      
+      // Redirigir según el valor del switch "Visita Domiciliaria"
+      if (homeVisitValue) {
+        // Si el switch está ON, redirigir directamente a la nueva visita del usuario creado
+        if (isSuccessCreateUser) {
+          // Para usuarios nuevos, usar el ID de la respuesta de creación
+          const userId = (createUserResponse?.data?.data as any)?.user?.id_usuario;
+          if (userId) {
+            navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+          } else {
+            navigate("/visitas-domiciliarias/usuarios");
+          }
+        } else if (isSuccessEditUser && data?.data.data?.id_usuario) {
+          // Para edición, usar el ID del usuario existente
+          const userId = data.data.data.id_usuario;
+          navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+        } else {
+          // Fallback: redirigir a la lista de usuarios con visitas domiciliarias
+          navigate("/visitas-domiciliarias/usuarios");
+        }
+      } else {
+        // Si el switch está OFF, redirigir al módulo de usuarios regular
+        navigate("/usuarios");
+      }
     }
-  }, [isSuccessCreateUser, isSuccessEditUser, navigate]);
+  }, [isSuccessCreateUser, isSuccessEditUser, navigate, homeVisitValue, createUserResponse, data?.data.data?.id_usuario]);
 
   if (isLoading) {
     return (
@@ -469,6 +511,31 @@ export const NewUser: React.FC = () => {
                             Subir fotografía
                           </Button>
                         </Upload>
+                      )}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="Visita Domiciliaria"
+                    validateStatus={errors.homeVisit ? "error" : ""}
+                    help={
+                      errors.homeVisit?.message && (
+                        <Text type="danger">{errors.homeVisit.message}</Text>
+                      )
+                    }
+                  >
+                    <Controller
+                      name="homeVisit"
+                      control={control}
+                      render={({ field }) => (
+                        <Switch
+                          {...field}
+                          checked={field.value}
+                          onChange={field.onChange}
+                          checkedChildren="Sí"
+                          unCheckedChildren="No"
+                        />
                       )}
                     />
                   </Form.Item>

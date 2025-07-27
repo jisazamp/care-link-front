@@ -1,9 +1,17 @@
-import { CheckCircleOutlined, UserOutlined, CalendarOutlined, CarOutlined, DollarOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, UserOutlined, CalendarOutlined, CarOutlined, DollarOutlined, HomeOutlined } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import { getSelectedKey } from "../../utils/getSelectedKey";
 
 const menuItems = [
+  {
+    key: "1",
+    icon: <HomeOutlined />,
+    label: "Inicio",
+    children: [
+      { key: "1.1", label: <Link to="/home">Tablero de Inicio</Link> },
+    ],
+  },
   {
     key: "2",
     icon: <UserOutlined />,
@@ -14,6 +22,15 @@ const menuItems = [
         key: "2.2",
         label: <Link to="usuarios/crear">Registrar nuevo usuario</Link>,
       },
+    ],
+  },
+  {
+    key: "7",
+    icon: <HomeOutlined />,
+    label: "Visitas Domiciliarias",
+    children: [
+      { key: "7.1", label: <Link to="visitas-domiciliarias">Consultar visitas</Link> },
+      { key: "7.2", label: <Link to="visitas-domiciliarias/usuarios">Registrar nueva visita</Link> },
     ],
   },
   {

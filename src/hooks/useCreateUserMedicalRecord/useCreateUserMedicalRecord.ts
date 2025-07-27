@@ -59,10 +59,30 @@ const createMedicalRecord = ({
   return client.post(`/api/users/${data.record.id_usuario}/record`, formData);
 };
 
+// New function for simplified medical record creation
+const createSimplifiedMedicalRecord = (data: MedicalRecord) => {
+  return client.post(`/api/users/${data.id_usuario}/medical_record`, data);
+};
+
 export const useCreateUserMedicalRecord = (id: number | string | undefined) => {
   return useMutation({
     mutationFn: createMedicalRecord,
     mutationKey: [`create-medical-record-${id}`],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`user-medical-record-${id}`],
+      });
+    },
+  });
+};
+
+// New hook for simplified medical record creation
+export const useCreateSimplifiedMedicalRecord = (
+  id: number | string | undefined,
+) => {
+  return useMutation({
+    mutationFn: createSimplifiedMedicalRecord,
+    mutationKey: [`create-simplified-medical-record-${id}`],
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`user-medical-record-${id}`],

@@ -281,47 +281,10 @@ export const AgendaSettingsContract = ({
 
       <Card variant="borderless" style={{ marginTop: 24, textAlign: "right" }}>
         {onBack && (
-          <Button onClick={onBack} style={{ marginRight: 8 }}>
+          <Button onClick={onBack}>
             Atrás
           </Button>
         )}
-        
-        {/* Validación final */}
-        <Button 
-          type="primary" 
-          onClick={() => {
-            // Validar que se hayan seleccionado fechas de tiquetera
-            if (maxServiceDays > 0 && selectedDatesService.length === 0) {
-              alert("Debe seleccionar al menos un día de tiquetera.");
-              return;
-            }
-            
-            // Validar que no se haya excedido el límite de días
-            if (selectedDatesService.length > maxServiceDays) {
-              alert(`Ha seleccionado más días de tiquetera de los permitidos (${maxServiceDays}).`);
-              return;
-            }
-            
-            if (selectedDatesTransport.length > maxTransportDays) {
-              alert(`Ha seleccionado más días de transporte de los permitidos (${maxTransportDays}).`);
-              return;
-            }
-            
-            // Validar que todas las fechas de transporte estén en las fechas de tiquetera
-            const invalidTransportDates = selectedDatesTransport.filter(
-              date => !selectedDatesService.includes(date)
-            );
-            
-            if (invalidTransportDates.length > 0) {
-              alert("Todas las fechas de transporte deben coincidir con fechas de tiquetera seleccionadas.");
-              return;
-            }
-            
-            alert("Configuración de agenda válida. Puede continuar.");
-          }}
-        >
-          Validar Configuración
-        </Button>
       </Card>
     </Card>
   );

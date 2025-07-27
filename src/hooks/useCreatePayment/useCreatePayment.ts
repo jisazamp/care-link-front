@@ -38,9 +38,9 @@ export const useCreatePayment = () => {
 
       const data = response.data;
       if (data.success) {
-        console.log("✅ Pago registrado exitosamente:", data.message);
+        console.log(" Pago registrado exitosamente:", data.message);
       } else {
-        console.error("❌ Error al registrar pago:", data.message);
+        console.error(" Error al registrar pago:", data.message);
       }
     },
     onError: (error: any) => {
@@ -48,9 +48,9 @@ export const useCreatePayment = () => {
       if (error.response?.status === 400) {
         const errorMessage =
           error.response.data?.message || "Error de validación en pago";
-        console.error("❌ Error de validación:", errorMessage);
+        console.error(" Error de validación:", errorMessage);
       } else {
-        console.error("❌ Error inesperado al registrar pago:", error);
+        console.error(" Error inesperado al registrar pago:", error);
       }
     },
   });
@@ -64,10 +64,10 @@ export const useCreatePayment = () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["bill-payments"] });
       queryClient.invalidateQueries({ queryKey: ["facturas"] });
-      console.log("✅ Pago individual registrado exitosamente:", response.data);
+      console.log(" Pago individual registrado exitosamente:", response.data);
     },
     onError: (error: any) => {
-      console.error("❌ Error al registrar pago individual:", error);
+      console.error(" Error al registrar pago individual:", error);
     },
   });
 
@@ -85,10 +85,10 @@ export const useCreatePayment = () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["bill-payments"] });
       queryClient.invalidateQueries({ queryKey: ["facturas"] });
-      console.log("✅ Pagos agregados a factura exitosamente");
+      console.log(" Pagos agregados a factura exitosamente");
     },
     onError: (error: any) => {
-      console.error("❌ Error al agregar pagos a factura:", error);
+      console.error(" Error al agregar pagos a factura:", error);
     },
   });
 

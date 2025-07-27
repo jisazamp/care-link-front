@@ -1,4 +1,4 @@
-import { DownloadOutlined, FileTextOutlined } from "@ant-design/icons";
+import { FileTextOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -17,11 +17,14 @@ import { useParams } from "react-router-dom";
 import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
-import { formatCurrency, PaymentFormData } from "../../../../utils/paymentUtils";
+import {
+  formatCurrency,
+  PaymentFormData,
+} from "../../../../utils/paymentUtils";
 import type { FormValues } from "../FormContracts";
 import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
 import dayjs from "dayjs";
-import { getEstadoFactura } from '../../../Billing/components/PaymentSummary/PaymentSummary';
+import { getEstadoFactura } from "../../../Billing/components/PaymentSummary/PaymentSummary";
 
 const { Text } = Typography;
 
@@ -43,27 +46,32 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const { contractId } = useParams();
   const { watch, setValue } = useFormContext<FormValues>();
   const { data: bills } = useGetBill(Number(contractId));
-  const { } = useGetBillPayments(
-    Number(bills?.data[0]?.id_factura),
+
+  // Programación defensiva: solo si hay facturas
+  const idFactura = bills?.data?.length ? bills.data[0].id_factura : undefined;
+
+  // Si se necesitan los pagos:
+  const { data: pagos } = useGetBillPayments(
+    idFactura ? Number(idFactura) : undefined,
   );
 
   const { calculatePartialBillFn, partialBill, calculatePartialBillPending } =
     useCalculatePartialBill();
   const services = watch("services");
   const contractStartDate = watch("startDate");
-  
+
   // Memoizar arrays para evitar recreaciones constantes
-  const selectedServicesIds = useMemo(() => 
-    services?.map((s: any) => Number(s.key)) || [], 
-    [services]
+  const selectedServicesIds = useMemo(
+    () => services?.map((s: any) => Number(s.key)) || [],
+    [services],
   );
-  const selectedServicesQuantities = useMemo(() => 
-    services?.map((s: any) => s.quantity) || [], 
-    [services]
+  const selectedServicesQuantities = useMemo(
+    () => services?.map((s: any) => s.quantity) || [],
+    [services],
   );
-  const startingContractYear = useMemo(() => 
-    contractStartDate?.year(), 
-    [contractStartDate]
+  const startingContractYear = useMemo(
+    () => contractStartDate?.year(),
+    [contractStartDate],
   );
 
   const partialBillFormatted = formatCurrency(partialBill?.data?.data ?? 0);
@@ -107,7 +115,12 @@ export const BillingContract: React.FC<BillingContractProps> = ({
         year: startingContractYear,
       });
     }
-  }, [startingContractYear, selectedServicesIds, selectedServicesQuantities, calculatePartialBillFn]);
+  }, [
+    startingContractYear,
+    selectedServicesIds,
+    selectedServicesQuantities,
+    calculatePartialBillFn,
+  ]);
 
   // Calcular factura parcial solo cuando cambien los servicios o año
   useEffect(() => {
@@ -118,11 +131,11 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   const handlePaymentsChange = useCallback((newPayments: any[]) => {
     const formattedPayments = (newPayments || [])
       .filter((p): p is any => p !== undefined && p !== null)
-      .map(p => ({
+      .map((p) => ({
         paymentMethod: p.id_metodo_pago,
         paymentDate: p.fecha_pago,
         amount: p.valor,
-        id_tipo_pago: p.id_tipo_pago
+        id_tipo_pago: p.id_tipo_pago,
       }));
     setValueRef.current("payments", formattedPayments);
   }, []);
@@ -134,15 +147,15 @@ export const BillingContract: React.FC<BillingContractProps> = ({
   // Generar número de factura temporal
   const numeroFacturaTemporal = useMemo(() => {
     const random = Math.floor(Math.random() * 1000);
-    return `FACT-${startingContractYear}-${String(random).padStart(6, '0')}`;
+    return `FACT-${startingContractYear}-${String(random).padStart(6, "0")}`;
   }, [startingContractYear]);
 
   // Calcular fecha de vencimiento (30 días después de la emisión)
   const fechaVencimiento = useMemo(() => {
     if (contractStartDate) {
-      return dayjs(contractStartDate).add(30, 'days');
+      return dayjs(contractStartDate).add(30, "days");
     }
-    return dayjs().add(30, 'days');
+    return dayjs().add(30, "days");
   }, [contractStartDate]);
 
   // Cálculo del total en tiempo real
@@ -184,10 +197,10 @@ export const BillingContract: React.FC<BillingContractProps> = ({
         <Col span={20}>
           <Card loading={calculatePartialBillPending}>
             {/* Información de la factura */}
-            <Card 
+            <Card
               title={
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <FileTextOutlined style={{ color: '#1890ff' }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <FileTextOutlined style={{ color: "#1890ff" }} />
                   <span>Información de la Factura</span>
                 </div>
               }
@@ -195,7 +208,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             >
               <Descriptions bordered column={2}>
                 <Descriptions.Item label="Número de Factura" span={1}>
-                  <Text strong style={{ color: '#1890ff' }}>
+                  <Text strong style={{ color: "#1890ff" }}>
                     {numeroFacturaTemporal}
                   </Text>
                 </Descriptions.Item>
@@ -205,13 +218,15 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                   </Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="Fecha de Emisión" span={1}>
-                  {contractStartDate ? dayjs(contractStartDate).format('DD/MM/YYYY') : dayjs().format('DD/MM/YYYY')}
+                  {contractStartDate
+                    ? dayjs(contractStartDate).format("DD/MM/YYYY")
+                    : dayjs().format("DD/MM/YYYY")}
                 </Descriptions.Item>
                 <Descriptions.Item label="Fecha de Vencimiento" span={1}>
-                  {fechaVencimiento.format('DD/MM/YYYY')}
+                  {fechaVencimiento.format("DD/MM/YYYY")}
                 </Descriptions.Item>
                 <Descriptions.Item label="Total Calculado" span={2}>
-                  <Text strong style={{ fontSize: 18, color: '#1890ff' }}>
+                  <Text strong style={{ fontSize: 18, color: "#1890ff" }}>
                     {partialBillFormatted}
                   </Text>
                 </Descriptions.Item>
@@ -219,8 +234,8 @@ export const BillingContract: React.FC<BillingContractProps> = ({
             </Card>
 
             {/* Servicios incluidos */}
-            <Card 
-              title="Servicios Incluidos" 
+            <Card
+              title="Servicios Incluidos"
               style={{ marginBottom: 16 }}
               size="small"
             >
@@ -249,39 +264,88 @@ export const BillingContract: React.FC<BillingContractProps> = ({
               disabled={false}
             />
 
-            {/* Botones de acción */}
-            <Row justify="space-between" style={{ marginTop: 24 }}>
-              <Col>
-                <Button 
-                  type="default" 
-                  icon={<DownloadOutlined />} 
-                  disabled={!hasValidPayments}
+            {/* Mostrar pagos obtenidos del backend */}
+            {pagos && Array.isArray(pagos) && pagos.length > 0 && (
+              <Card
+                size="small"
+                style={{ margin: "16px 0", background: "#fafafa" }}
+              >
+                <Typography.Title
+                  level={5}
+                  style={{ margin: 0, color: "#1890ff" }}
                 >
-                  Descargar Factura
-                </Button>
-              </Col>
-              <Col>
-                <Row gutter={8}>
-                  {onBack && (
-                    <Col>
-                      <Button onClick={onBack}>
-                        Atrás
-                      </Button>
-                    </Col>
-                  )}
-                  {onNext && (
-                    <Col>
-                      <Button 
-                        type="primary" 
-                        onClick={handleNext}
-                      >
-                        Siguiente
-                      </Button>
-                    </Col>
-                  )}
+                  Pagos registrados en el sistema
+                </Typography.Title>
+                <ul style={{ margin: 0, paddingLeft: 20 }}>
+                  {pagos.map((pago, idx) => (
+                    <li key={pago.id_pago || idx}>
+                      <span>
+                        <b>Fecha:</b> {pago.fecha_pago} | <b>Método:</b>{" "}
+                        {pago.metodo_pago || pago.id_metodo_pago} |{" "}
+                        <b>Valor:</b> {formatCurrency(pago.valor)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+
+            {/* Tarjeta de Impuestos y Descuentos */}
+            <Card
+              title={
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span>Configuración de Facturación</span>
+                </div>
+              }
+              style={{ marginBottom: 16 }}
+            >
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={() => {
+                  if (onNext) {
+                    onNext();
+                  }
+                }}
+              >
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item label="Impuestos" name="impuestos">
+                      <InputNumber
+                        min={0}
+                        style={{ width: "100%" }}
+                        placeholder="0.00"
+                        value={impuestos}
+                        onChange={(v) => setImpuestos(Number(v) || 0)}
+                        formatter={(value) =>
+                          `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) =>
+                          Number(value!.replace(/\$\s?|(,*)/g, ""))
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item label="Descuentos" name="descuentos">
+                      <InputNumber
+                        min={0}
+                        style={{ width: "100%" }}
+                        placeholder="0.00"
+                        value={descuentos}
+                        onChange={(v) => setDescuentos(Number(v) || 0)}
+                        formatter={(value) =>
+                          `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) =>
+                          Number(value!.replace(/\$\s?|(,*)/g, ""))
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
                 </Row>
-              </Col>
-            </Row>
+              </Form>
+            </Card>
 
             {/* Alertas informativas */}
             {(partialBill?.data?.data ?? 0) > 0 && (
@@ -294,39 +358,25 @@ export const BillingContract: React.FC<BillingContractProps> = ({
               />
             )}
 
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={() => {
-                if (onNext) {
-                  onNext();
-                }
-              }}
-            >
-              <Form.Item label="Impuestos" name="impuestos">
-                <InputNumber
-                  min={0}
-                  style={{ width: "100%" }}
-                  placeholder="0.00"
-                  value={impuestos}
-                  onChange={(v) => setImpuestos(Number(v) || 0)}
-                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
-                />
-              </Form.Item>
-              <Form.Item label="Descuentos" name="descuentos">
-                <InputNumber
-                  min={0}
-                  style={{ width: "100%" }}
-                  placeholder="0.00"
-                  value={descuentos}
-                  onChange={(v) => setDescuentos(Number(v) || 0)}
-                  formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
-                />
-              </Form.Item>
-              {/* Eliminado: Total calculado: {formatCurrency(total)} */}
-            </Form>
+            {/* Botones de acción */}
+            <Row justify="end" style={{ marginTop: 24 }}>
+              <Col>
+                <Row gutter={8}>
+                  {onBack && (
+                    <Col>
+                      <Button onClick={onBack}>Atrás</Button>
+                    </Col>
+                  )}
+                  {onNext && (
+                    <Col>
+                      <Button type="primary" onClick={handleNext}>
+                        Siguiente
+                      </Button>
+                    </Col>
+                  )}
+                </Row>
+              </Col>
+            </Row>
           </Card>
         </Col>
       </Row>

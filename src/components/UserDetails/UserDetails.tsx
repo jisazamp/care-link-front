@@ -17,7 +17,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useDeleteContract } from "../../hooks/useDeleteContract";
+/* import { useDeleteContract } from "../../hooks/useDeleteContract"; */
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 /* import { useDeleteMedicalReport } from "../../hooks/useDeleteMedicalReport/useDeleteMedicalReport";
  */ import { useDeleteRecordMutation } from "../../hooks/useDeleteRecordMutation/useDeleteRecordMutation";
@@ -43,7 +43,7 @@ export const UserDetails: React.FC = () => {
     useGetUserFamilyMembers(userId);
   const { mutate: deleteFamilyMember } = useDeleteFamilyMemberMutation(userId);
   const { mutate: deleteRecord } = useDeleteRecordMutation();
-  const { deleteContractFn } = useDeleteContract();
+/*   const { deleteContractFn } = useDeleteContract(); */
   const { data: record, isLoading: loadingRecord } =
     useGetUserMedicalRecord(userId);
   const { data: medicalReports } = useGetMedicalReports(userId);
@@ -166,7 +166,7 @@ export const UserDetails: React.FC = () => {
     });
   }; */
 
-  const handleDeleteContract = (contractId: number) => {
+/*   const handleDeleteContract = (contractId: number) => {
     confirm({
       title: "¿Estás seguro de que deseas eliminar este contrato?",
       content: "Esta acción no se puede deshacer.",
@@ -189,7 +189,7 @@ export const UserDetails: React.FC = () => {
         }
       },
     });
-  };
+  }; */
 
   const handleDeleteFamilyMember = (memberId: number) => {
     confirm({
@@ -246,14 +246,13 @@ export const UserDetails: React.FC = () => {
             </Button>
           </Link>
           <Divider type="vertical" />
-          <Button
-            danger
-            size="small"
-            type="link"
-            onClick={() => handleDeleteContract(contract.id_contrato)}
+          <Link
+            to={`/usuarios/${contract.id_usuario}/contrato/${contract.id_contrato}`}
           >
-            Eliminar
-          </Button>
+            <Button type="link" className="main-button-link" size="small">
+              Ver
+            </Button>
+          </Link>
         </Space>
       ),
     },
@@ -283,10 +282,15 @@ export const UserDetails: React.FC = () => {
           <Title level={3} className="page-title">
             {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
           </Title>
-          <Collapse
-            accordion
-            style={{ background: "transparent", width: "100%" }}
+          <Card
+            title={<Title level={4}>Información del Usuario</Title>}
+            style={{ marginBottom: 16 }}
+            bordered
           >
+            <Collapse
+              accordion
+              style={{ background: "transparent", width: "100%" }}
+            >
             <Panel header="Datos básicos y de localización" key="1">
               <div className="user-details-card" style={{ width: "100%" }}>
                 <div className="user-details-head">
@@ -916,6 +920,7 @@ export const UserDetails: React.FC = () => {
               </Card>
             </Panel>
           </Collapse>
+          </Card>
           <Divider />
         </>
       )}

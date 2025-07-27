@@ -29,6 +29,7 @@ export type User = {
   profesion: string | null;
   tipo_usuario: string | null;
   url_imagen?: string | null;
+  visitas_domiciliarias?: boolean;
 };
 
 export interface FamilyMember {
@@ -59,6 +60,7 @@ export type AuthorizedUser = {
 
 export type MedicalRecord = {
   id_historiaclinica?: number;
+  id_profesional?: number | null;
   Tiene_OtrasAlergias: boolean;
   Tienedieta_especial: boolean;
   alcoholismo: string | null;
@@ -100,6 +102,7 @@ export type MedicalRecord = {
   tipo_de_movilidad: string | null;
   tipo_de_sueno: string | null;
   tipo_sangre: string;
+  porte_clinico?: string;
 };
 
 export type MedicalReport = {
@@ -351,6 +354,30 @@ export type CronogramaAsistenciaPaciente = {
   transporte_info?: TransporteInfo;
 };
 
+// =============================================================================
+// TIPOS PARA ASISTENCIA DIARIA (DASHBOARD)
+// =============================================================================
+
+export type AsistenciaDiaria = {
+  id_cronograma_paciente: number;
+  id_usuario: number;
+  nombres: string;
+  apellidos: string;
+  tipo_servicio: string;
+  estado_asistencia:
+    | "PENDIENTE"
+    | "ASISTIO"
+    | "NO_ASISTIO"
+    | "CANCELADO"
+    | "REAGENDADO";
+  estado_texto: string;
+  color_estado: string;
+  requiere_transporte: boolean;
+  observaciones?: string;
+  fecha_creacion: string;
+  fecha_actualizacion?: string;
+};
+
 export type CronogramaCreateRequest = {
   id_profesional: number;
   fecha: string;
@@ -485,4 +512,21 @@ export type NotificacionTransporte = {
   leida: boolean;
   id_transporte?: number;
   id_usuario?: number;
+};
+
+export type HomeVisit = {
+  id_visitadomiciliaria: number;
+  id_contrato: number | null;
+  id_usuario: number | null;
+  fecha_visita: string | null;
+  hora_visita: string | null;
+  estado_visita: string;
+  direccion_visita: string;
+  telefono_visita: string | null;
+  valor_dia: number;
+  observaciones: string | null;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+  profesional_asignado: string | null;
+  paciente_nombre?: string;
 };

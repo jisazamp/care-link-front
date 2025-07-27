@@ -3,15 +3,15 @@ import { client } from "../api/client";
 import type { Bill } from "../types";
 
 const getFacturas = async (contratoId?: number) => {
-  console.log("🔍 useGetFacturas - Iniciando petición");
-  console.log("📋 Contrato ID:", contratoId);
+  console.log(" useGetFacturas - Iniciando petición");
+  console.log(" Contrato ID:", contratoId);
 
   try {
     const res = contratoId
       ? await client.get<any>(`/api/contratos/${contratoId}/facturas`)
       : await client.get<any>(`/api/facturas`);
 
-    console.log("📊 Respuesta del servidor:", res);
+    console.log(" Respuesta del servidor:", res);
 
     // Soporta ambas estructuras: { data: Bill[] } y { data: { data: Bill[] } }
     let facturas: Bill[] = [];
@@ -24,10 +24,10 @@ const getFacturas = async (contratoId?: number) => {
       facturas = res.data.data;
     }
 
-    console.log("✅ Facturas procesadas:", facturas);
+    console.log(" Facturas procesadas:", facturas);
     return facturas;
   } catch (error) {
-    console.error("❌ Error en useGetFacturas:", error);
+    console.error(" Error en useGetFacturas:", error);
     throw error;
   }
 };

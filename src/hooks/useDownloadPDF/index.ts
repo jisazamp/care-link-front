@@ -48,9 +48,9 @@ export const useDownloadPDF = (): UseDownloadPDFReturn => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      console.log("✅ PDF descargado exitosamente");
+      console.log(" PDF descargado exitosamente");
     } catch (error: any) {
-      console.error("❌ Error descargando PDF:", error);
+      console.error(" Error descargando PDF:", error);
 
       // Manejar errores específicos
       if (error.response?.status === 401) {

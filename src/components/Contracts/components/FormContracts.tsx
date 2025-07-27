@@ -281,7 +281,7 @@ export const FormContracts = () => {
                 id_metodo_pago: (metodoPago?.id_metodo_pago ?? 1) as number,
                 valor: p.amount,
                 fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
-                id_tipo_pago: 1,
+                id_tipo_pago: p.id_tipo_pago || 2, // Usar el valor real seleccionado por el usuario
               };
             });
             
@@ -340,7 +340,7 @@ export const FormContracts = () => {
               id_metodo_pago: p.paymentMethod as number,
               valor: p.amount,
               fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
-              id_tipo_pago: 1,
+              id_tipo_pago: p.id_tipo_pago || 2, // Usar el valor real seleccionado por el usuario
             }));
             
             // Usar el nuevo endpoint para agregar pagos a la factura

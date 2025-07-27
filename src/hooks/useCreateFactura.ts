@@ -35,13 +35,13 @@ export const useCreateFactura = () => {
 
       const data = response.data;
       if (data.success) {
-        console.log("✅ Factura creada exitosamente:", data.message);
+        console.log(" Factura creada exitosamente:", data.message);
       } else {
-        console.error("❌ Error al crear factura:", data.message);
+        console.error(" Error al crear factura:", data.message);
       }
     },
     onError: (error: any) => {
-      console.error("❌ Error al crear factura:", error);
+      console.error(" Error al crear factura:", error);
     },
   });
 };

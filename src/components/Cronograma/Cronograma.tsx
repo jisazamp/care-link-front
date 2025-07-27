@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Calendar, Card, Typography, Badge, Modal, Table, Button, Tag, Space, message, notification, Tooltip } from 'antd';
 import type { BadgeProps, CalendarProps } from 'antd';
 import { CalendarOutlined, UserOutlined, CarOutlined } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useGetCronogramasPorRango } from '../../hooks/useGetCronogramasPorRango';
 import { useUpdateEstadoAsistencia } from '../../hooks/useUpdateEstadoAsistencia';
 import { useReagendarPaciente } from '../../hooks/useReagendarPaciente';
@@ -14,6 +15,8 @@ import { JustificacionModal } from './components/JustificacionModal';
 const { Title, Text } = Typography;
 
 export const Cronograma: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPacientes, setSelectedPacientes] = useState<PacientePorFecha[]>([]);
@@ -21,11 +24,14 @@ export const Cronograma: React.FC = () => {
   const [selectedPaciente, setSelectedPaciente] = useState<CronogramaAsistenciaPaciente | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
   const [botonCargando, setBotonCargando] = useState<null | number | string>(null);
+  const [highlightedPatientId, setHighlightedPatientId] = useState<number | null>(null);
+  
+  // 🔴 NUEVO: Estado para el mes seleccionado en el calendario
+  const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
 
-  // Obtener cronogramas del mes actual
-  const currentMonth = dayjs();
-  const startOfMonth = currentMonth.startOf('month').format('YYYY-MM-DD');
-  const endOfMonth = currentMonth.endOf('month').format('YYYY-MM-DD');
+  // 🔴 NUEVO: Obtener cronogramas del mes seleccionado (no siempre el actual)
+  const startOfMonth = selectedMonth.startOf('month').format('YYYY-MM-DD');
+  const endOfMonth = selectedMonth.endOf('month').format('YYYY-MM-DD');
 
   const { data: cronogramas, isLoading, refetch } = useGetCronogramasPorRango(startOfMonth, endOfMonth);
   const { mutate: updateEstado } = useUpdateEstadoAsistencia();
@@ -41,19 +47,6 @@ export const Cronograma: React.FC = () => {
         return 'default';
       default:
         return 'processing';
-    }
-  };
-
-  const getEstadoColor = (estado: string) => {
-    switch (estado) {
-      case 'ASISTIO':
-        return 'green';
-      case 'NO_ASISTIO':
-        return 'red';
-      case 'CANCELADO':
-        return 'gray';
-      default:
-        return 'blue';
     }
   };
 
@@ -81,6 +74,73 @@ export const Cronograma: React.FC = () => {
     
     return eventos;
   }, [cronogramas]);
+
+  const getEstadoColor = (estado: string) => {
+    switch (estado) {
+      case 'ASISTIO':
+        return 'green';
+      case 'NO_ASISTIO':
+        return 'red';
+      case 'CANCELADO':
+        return 'gray';
+      default:
+        return 'blue';
+    }
+  };
+
+  // 🔴 NUEVO: Recargar datos cuando cambie el mes seleccionado
+  useEffect(() => {
+    console.log('📅 Mes seleccionado cambiado:', selectedMonth.format('YYYY-MM'));
+    console.log(' Rango de fechas:', startOfMonth, 'a', endOfMonth);
+    refetch();
+  }, [selectedMonth, startOfMonth, endOfMonth, refetch]);
+
+  // 🔴 NUEVO: Manejar parámetros de URL para resaltar paciente y abrir modal
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const highlightPatientId = searchParams.get('highlightPatient');
+    const shouldOpenModal = searchParams.get('openModal') === 'true';
+
+    if (highlightPatientId && shouldOpenModal && cronogramas?.data?.data) {
+      const patientId = parseInt(highlightPatientId);
+      
+      // Buscar el paciente en todos los cronogramas
+      let foundPatient: CronogramaAsistenciaPaciente | null = null;
+      let foundDate: string | null = null;
+      
+      for (const cronograma of cronogramas.data.data) {
+        const paciente = cronograma.pacientes.find(p => p.id_cronograma_paciente === patientId);
+        if (paciente) {
+          foundPatient = paciente;
+          foundDate = cronograma.fecha;
+          break;
+        }
+      }
+
+      if (foundPatient && foundDate) {
+        // Establecer la fecha encontrada
+        const targetDate = dayjs(foundDate);
+        setSelectedMonth(targetDate);
+        
+        // Abrir el modal con los pacientes de esa fecha
+        const pacientes = eventosPorFecha[foundDate] || [];
+        if (pacientes.length > 0) {
+          setSelectedPacientes(pacientes.map(e => e.paciente as unknown as PacientePorFecha));
+          setSelectedDate(targetDate);
+          setIsModalVisible(true);
+          
+          // Resaltar el paciente por 2 segundos
+          setHighlightedPatientId(patientId);
+          setTimeout(() => {
+            setHighlightedPatientId(null);
+          }, 2000);
+        }
+        
+        // Limpiar los parámetros de URL
+        navigate('/cronograma', { replace: true });
+      }
+    }
+  }, [cronogramas?.data?.data, location.search, navigate, eventosPorFecha]);
 
   const handleDateSelect = (date: Dayjs) => {
     const fecha = date.format('YYYY-MM-DD');
@@ -189,6 +249,12 @@ export const Cronograma: React.FC = () => {
         setBotonCargando(null);
       }
     });
+  };
+
+  // 🔴 NUEVA FUNCIÓN: Manejar cambio de mes en el calendario
+  const handleMonthChange = (date: Dayjs, mode: 'month' | 'year') => {
+    console.log(' Cambio de mes detectado:', date.format('YYYY-MM'), 'Modo:', mode);
+    setSelectedMonth(date);
   };
 
   const handleReagendar = (observaciones: string, nuevaFecha: string) => {
@@ -329,25 +395,16 @@ export const Cronograma: React.FC = () => {
             >
               Asistió
             </Button>
-            <Button
-              size="small"
-              danger
-              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
-              disabled={isDisabled}
-              loading={botonCargando === `${record.id_cronograma_paciente}-NO_ASISTIO`}
-              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
-            >
-              No Asistió
-            </Button>
-            <Button
-              size="small"
-              onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'CANCELADO')}
-              disabled={isDisabled}
-              loading={botonCargando === `${record.id_cronograma_paciente}-CANCELADO`}
-              title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
-            >
-              Cancelar
-            </Button>
+                         <Button
+               size="small"
+               danger
+               onClick={() => handleEstadoChange(record.id_cronograma_paciente, 'NO_ASISTIO')}
+               disabled={isDisabled}
+               loading={botonCargando === `${record.id_cronograma_paciente}-NO_ASISTIO`}
+               title={!isPending ? 'Solo se pueden modificar registros con estado "PENDIENTE"' : ''}
+             >
+               No Asistió
+             </Button>
           </Space>
         );
       },
@@ -366,6 +423,11 @@ export const Cronograma: React.FC = () => {
           <Text type="secondary">
             Gestiona la asistencia de pacientes en cada fecha del calendario
           </Text>
+          <div style={{ marginTop: '8px' }}>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              📅 Mostrando cronogramas de: <strong>{selectedMonth.format('MMMM YYYY')}</strong>
+            </Text>
+          </div>
         </div>
 
         {cronogramas?.data?.data && <CronogramaStats cronogramas={cronogramas.data.data} />}
@@ -385,7 +447,9 @@ export const Cronograma: React.FC = () => {
               }
               // Si el source es "month" o "year", NO hacer nada
             }}
+            onPanelChange={handleMonthChange}
             disabledDate={disabledDate}
+            value={selectedMonth}
           />
         </div>
 
@@ -407,6 +471,11 @@ export const Cronograma: React.FC = () => {
             rowKey="id_cronograma_paciente"
             pagination={false}
             size="small"
+            rowClassName={(record) => {
+              return record.id_cronograma_paciente === highlightedPatientId 
+                ? 'highlighted-patient-row' 
+                : '';
+            }}
           />
         </Modal>
 

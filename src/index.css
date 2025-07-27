@@ -746,3 +746,38 @@ body {
     padding: 16px;
   }
 }
+
+/* =============================================================================
+   ESTILOS PARA RESALTADO DE PACIENTES EN CRONOGRAMA
+   ============================================================================= */
+
+.highlighted-patient-row {
+  animation: highlightPulse 2s ease-in-out;
+  background: linear-gradient(
+    90deg,
+    #fff3cd 0%,
+    #ffeaa7 50%,
+    #fff3cd 100%
+  ) !important;
+  border: 2px solid #f39c12 !important;
+  box-shadow: 0 0 10px rgba(243, 156, 18, 0.3) !important;
+}
+
+.highlighted-patient-row td {
+  background: transparent !important;
+}
+
+@keyframes highlightPulse {
+  0% {
+    background: linear-gradient(90deg, #fff3cd 0%, #ffeaa7 50%, #fff3cd 100%);
+    transform: scale(1);
+  }
+  50% {
+    background: linear-gradient(90deg, #fdcb6e 0%, #f39c12 50%, #fdcb6e 100%);
+    transform: scale(1.02);
+  }
+  100% {
+    background: linear-gradient(90deg, #fff3cd 0%, #ffeaa7 50%, #fff3cd 100%);
+    transform: scale(1);
+  }
+}

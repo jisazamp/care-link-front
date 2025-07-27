@@ -24,7 +24,7 @@ import {
 } from "antd";
 import type React from "react";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
 import { useGetUsers } from "../../hooks/useGetUsers/useGetUsers";
 import type { User } from "../../types";
@@ -36,6 +36,7 @@ const { confirm } = Modal;
 export const UsersList: React.FC = () => {
   const { data, isPending, refetch } = useGetUsers();
   const { mutate: deleteUser } = useDeleteUserMutation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState<User[] | null>(null);
   const [pagination, setPagination] = useState({
@@ -126,6 +127,16 @@ export const UsersList: React.FC = () => {
         deleteUser(user.id_usuario);
       },
     });
+  };
+
+  // Función para manejar el click en una fila
+  const handleRowClick = (user: User) => {
+    navigate(`/usuarios/${user.id_usuario}/detalles`);
+  };
+
+  // Función para evitar que los clicks en botones de acción naveguen
+  const handleActionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   // Columnas de la tabla
@@ -221,21 +232,12 @@ export const UsersList: React.FC = () => {
     {
       title: "",
       key: "acciones",
-      width: 180,
+      width: 120,
       fixed: "right" as const,
       align: "center" as const,
       render: (_: unknown, user: User) => {
-        const menu = (
-          <Menu>
-            <Menu.Item key="details">
-              <Link to={`/usuarios/${user.id_usuario}/detalles`} style={{ color: '#7f34b4' }}>
-                Ver detalles
-              </Link>
-            </Menu.Item>
-          </Menu>
-        );
         return (
-          <Space size="small">
+          <Space size="small" onClick={handleActionClick}>
             <Tooltip title="Editar">
               <Link to={`/usuarios/${user.id_usuario}/editar`}>
                 <Button
@@ -258,9 +260,6 @@ export const UsersList: React.FC = () => {
                 Eliminar
               </Button>
             </Tooltip>
-            <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
-              <Button type="text" style={{ color: '#7f34b4', fontSize: 20, padding: '0 8px' }}>...</Button>
-            </Dropdown>
           </Space>
         );
       },
@@ -343,6 +342,10 @@ export const UsersList: React.FC = () => {
             showHeader={false}
             style={{ width: "100%" }}
             scroll={{ x: "max-content" }}
+            onRow={(record) => ({
+              onClick: () => handleRowClick(record),
+              style: { cursor: 'pointer' }
+            })}
             pagination={{
               total: (filtered ?? data?.data.data ?? []).length,
               current: pagination.current,

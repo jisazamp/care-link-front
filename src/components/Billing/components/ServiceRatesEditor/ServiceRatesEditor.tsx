@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Card, 
-  Table, 
-  InputNumber, 
-  Button, 
-  message, 
-  Space, 
+import {
+  Card,
+  Table,
+  InputNumber,
+  Button,
+  message,
+  Space,
   Typography,
-  Divider
+  Divider,
 } from "antd";
 import { SaveOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useGetServiceRates } from "../../../../hooks/useGetServiceRates/useGetServiceRates";
@@ -27,7 +27,12 @@ export const ServiceRatesEditor: React.FC = () => {
   const [editingRates, setEditingRates] = useState<ServiceRate[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
 
-  const { data: serviceRatesData, isLoading, error, refetch } = useGetServiceRates();
+  const {
+    data: serviceRatesData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetServiceRates();
   const updateServiceRatesMutation = useUpdateServiceRates();
 
   // Inicializar datos de edición cuando se cargan las tarifas
@@ -40,12 +45,10 @@ export const ServiceRatesEditor: React.FC = () => {
 
   // Manejar cambios en los precios
   const handlePriceChange = (id: number, newPrice: number) => {
-    setEditingRates(prev => 
-      prev.map(rate => 
-        rate.id === id 
-          ? { ...rate, precio_por_dia: newPrice }
-          : rate
-      )
+    setEditingRates((prev) =>
+      prev.map((rate) =>
+        rate.id === id ? { ...rate, precio_por_dia: newPrice } : rate,
+      ),
     );
     setHasChanges(true);
   };
@@ -54,18 +57,18 @@ export const ServiceRatesEditor: React.FC = () => {
   const handleSave = async () => {
     try {
       await updateServiceRatesMutation.mutateAsync({
-        TarifasServicioPorAnio: editingRates.map(rate => ({
+        TarifasServicioPorAnio: editingRates.map((rate) => ({
           id: rate.id,
           id_servicio: rate.id_servicio,
           anio: rate.anio,
-          precio_por_dia: rate.precio_por_dia
-        }))
+          precio_por_dia: rate.precio_por_dia,
+        })),
       });
-      
-      message.success("✅ Tarifas actualizadas exitosamente");
+
+      message.success(" Tarifas actualizadas exitosamente");
       setHasChanges(false);
     } catch (error) {
-      message.error("❌ Error al actualizar las tarifas");
+      message.error(" Error al actualizar las tarifas");
     }
   };
 
@@ -82,20 +85,20 @@ export const ServiceRatesEditor: React.FC = () => {
       dataIndex: "id",
       key: "id",
       width: 80,
-      render: (id: number) => <Text code>{id}</Text>
+      render: (id: number) => <Text code>{id}</Text>,
     },
     {
       title: "Servicio",
       dataIndex: "nombre_servicio",
       key: "nombre_servicio",
-      render: (nombre: string) => <Text strong>{nombre}</Text>
+      render: (nombre: string) => <Text strong>{nombre}</Text>,
     },
     {
       title: "Año",
       dataIndex: "anio",
       key: "anio",
       width: 100,
-      render: (anio: number) => <Text>{anio}</Text>
+      render: (anio: number) => <Text>{anio}</Text>,
     },
     {
       title: "Precio por Día",
@@ -106,21 +109,23 @@ export const ServiceRatesEditor: React.FC = () => {
         <InputNumber
           value={precio}
           onChange={(value) => handlePriceChange(record.id, value || 0)}
-          formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-          parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ''))}
+          formatter={(value) =>
+            `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          }
+          parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ""))}
           min={0}
           step={1000}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           placeholder="0.00"
         />
-      )
-    }
+      ),
+    },
   ];
 
   if (isLoading) {
     return (
       <Card>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
+        <div style={{ textAlign: "center", padding: "40px" }}>
           <Text>Cargando tarifas de servicios...</Text>
         </div>
       </Card>
@@ -130,10 +135,14 @@ export const ServiceRatesEditor: React.FC = () => {
   if (error) {
     return (
       <Card>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
+        <div style={{ textAlign: "center", padding: "40px" }}>
           <Text type="danger">Error al cargar las tarifas de servicios</Text>
           <br />
-          <Button onClick={handleReload} type="primary" style={{ marginTop: 16 }}>
+          <Button
+            onClick={handleReload}
+            type="primary"
+            style={{ marginTop: 16 }}
+          >
             Reintentar
           </Button>
         </div>
@@ -142,31 +151,31 @@ export const ServiceRatesEditor: React.FC = () => {
   }
 
   return (
-    <Card 
+    <Card
       title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Title level={4} style={{ margin: 0 }}>
             Configuración de Tarifas por Servicio
           </Title>
           {hasChanges && (
-            <Text type="warning" style={{ fontSize: '12px' }}>
-              ⚠️ Hay cambios sin guardar
+            <Text type="warning" style={{ fontSize: "12px" }}>
+              ! Hay cambios sin guardar
             </Text>
           )}
         </div>
       }
       extra={
         <Space>
-          <Button 
-            icon={<ReloadOutlined />} 
+          <Button
+            icon={<ReloadOutlined />}
             onClick={handleReload}
             disabled={updateServiceRatesMutation.isPending}
           >
             Recargar
           </Button>
-          <Button 
-            type="primary" 
-            icon={<SaveOutlined />} 
+          <Button
+            type="primary"
+            icon={<SaveOutlined />}
             onClick={handleSave}
             loading={updateServiceRatesMutation.isPending}
             disabled={!hasChanges}
@@ -178,7 +187,8 @@ export const ServiceRatesEditor: React.FC = () => {
     >
       <div style={{ marginBottom: 16 }}>
         <Text type="secondary">
-          Edita los precios por día para cada servicio y año. Los cambios se aplicarán a todas las facturas futuras.
+          Edita los precios por día para cada servicio y año. Los cambios se
+          aplicarán a todas las facturas futuras.
         </Text>
       </div>
 
@@ -194,10 +204,11 @@ export const ServiceRatesEditor: React.FC = () => {
       />
 
       {editingRates.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '40px' }}>
+        <div style={{ textAlign: "center", padding: "40px" }}>
           <Text type="secondary">No hay tarifas configuradas</Text>
         </div>
       )}
     </Card>
   );
-}; 
+};
+

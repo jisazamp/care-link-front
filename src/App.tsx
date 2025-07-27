@@ -13,19 +13,25 @@ import { ContractDetails } from "./components/Contracts/components/ContractDetai
 import { FormContracts } from "./components/Contracts/components/FormContracts";
 import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
-//import { Home } from "./components/Home/Home";
+import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
+import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
+import { HomeVisitNewVisit } from "./components/HomeVisitNewVisit/HomeVisitNewVisit";
+import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
 import { UserDetails } from "./components/UserDetails/UserDetails";
+import { UserHomeVisitDetails } from "./components/UserHomeVisitDetails/UserHomeVisitDetails";
+import { HomeVisitMedicalRecord } from "./components/HomeVisitMedicalRecord/HomeVisitMedicalRecord";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
+import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
@@ -109,10 +115,74 @@ export const App = () => {
             <Route path="/login" element={<Login />} />
             <Route element={<MainLayout />}>
               <Route
+                path="/home"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/usuarios"
                 element={
                   <PrivateRoute>
                     <UsersList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios"
+                element={
+                  <PrivateRoute>
+                    <UsersWithHomeVisitsList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/detalles"
+                element={
+                  <PrivateRoute>
+                    <UserHomeVisitDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/historia"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitMedicalRecord />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/nuevo-reporte"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitNewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/nueva-visita"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitNewVisit />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/editar-visita/:visitaId"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitNewVisit />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitsList />
                   </PrivateRoute>
                 }
               />
@@ -301,7 +371,7 @@ export const App = () => {
                 }
               />
             </Route>
-            <Route path="*" element={<Navigate to="/usuarios" replace />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </Router>
       </AntApp>

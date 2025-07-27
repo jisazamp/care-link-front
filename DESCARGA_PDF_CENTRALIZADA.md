@@ -172,6 +172,7 @@ const handleDownload = async () => {
 ```
 
 ## 📊 Métricas de Mejora
+>>>>>>> origin/main
 
 | Aspecto           | Antes                 | Después                   | Mejora |
 | ----------------- | --------------------- | ------------------------- | ------ |

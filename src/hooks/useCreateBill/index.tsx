@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../api/client";
 import type { Bill } from "../../types";
 
@@ -17,9 +17,17 @@ const createContractBill = (data: CreateBillData) =>
   });
 
 const useCreateBill = () => {
+  const queryClient = useQueryClient();
+
   const mutation = useMutation({
     mutationKey: ["create-contract-bill"],
     mutationFn: createContractBill,
+    onSuccess: () => {
+      // Invalidar queries relacionadas con facturación
+      queryClient.invalidateQueries({ queryKey: ["facturas"] });
+      queryClient.invalidateQueries({ queryKey: ["facturacion-completa"] });
+      queryClient.invalidateQueries({ queryKey: ["contract-bills"] });
+    },
   });
 
   const createContractBillFn = (
@@ -27,14 +35,14 @@ const useCreateBill = () => {
     options?: {
       onSuccess?: (data: any) => void;
       onError?: (error: any) => void;
-    }
+    },
   ) => {
     mutation.mutate(data, options);
   };
 
-  return { 
-    createContractBillFn, 
-    createContractPending: mutation.isPending 
+  return {
+    createContractBillFn,
+    createContractPending: mutation.isPending,
   };
 };
 
