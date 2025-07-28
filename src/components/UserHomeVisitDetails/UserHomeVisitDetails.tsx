@@ -25,7 +25,7 @@ import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/use
 import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
 import type { HomeVisit } from "../../types";
 
-import type { FamilyMember } from "../../types";
+
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -55,7 +55,7 @@ export const UserHomeVisitDetails: React.FC = () => {
     return () => clearInterval(interval);
   }, [userId, refetchHomeVisits]);
 
-  const acudientesColumns: ColumnsType<FamilyMember> = [
+  const acudientesColumns: ColumnsType<any> = [
     {
       title: "Nombres",
       dataIndex: "nombres",

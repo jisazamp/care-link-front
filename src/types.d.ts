@@ -109,6 +109,7 @@ export type MedicalReport = {
   id_reporteclinico: number;
   id_historiaclinica: number;
   id_profesional: number;
+  altura?: number;
   Circunferencia_cadera: number;
   Frecuencia_cardiaca: number;
   IMC: number;
