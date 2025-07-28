@@ -2,11 +2,11 @@ import {
   ColumnHeightOutlined,
   DownOutlined,
   FullscreenOutlined,
-  ReloadOutlined,
-  SettingOutlined,
-  QuestionCircleOutlined,
-  SearchOutlined,
   PlusOutlined,
+  QuestionCircleOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -79,10 +79,10 @@ export const UsersWithHomeVisitsList: React.FC = () => {
 
   const handleCreateNewUser = () => {
     // Redirigir al formulario de creación con el switch de visitas domiciliarias activado
-    navigate("/usuarios/crear", { 
-      state: { 
-        activateHomeVisit: true 
-      } 
+    navigate("/usuarios/crear", {
+      state: {
+        activateHomeVisit: true,
+      },
     });
   };
 
@@ -236,7 +236,9 @@ export const UsersWithHomeVisitsList: React.FC = () => {
       width: 100,
       align: "center" as const,
       render: (estado: string) => (
-        <span style={{ color: "#888", fontSize: 14 }}>{estado === "ACTIVO" ? "Activo" : "Inactivo"}</span>
+        <span style={{ color: "#888", fontSize: 14 }}>
+          {estado === "ACTIVO" ? "Activo" : "Inactivo"}
+        </span>
       ),
     },
     {
@@ -250,11 +252,7 @@ export const UsersWithHomeVisitsList: React.FC = () => {
           <Space size="small" onClick={handleActionClick}>
             <Tooltip title="Editar">
               <Link to={`/usuarios/${user.id_usuario}/editar`}>
-                <Button
-                  type="link"
-                  icon={null}
-                  style={{ color: "#7f34b4" }}
-                >
+                <Button type="link" icon={null} style={{ color: "#7f34b4" }}>
                   Editar
                 </Button>
               </Link>
@@ -292,7 +290,10 @@ export const UsersWithHomeVisitsList: React.FC = () => {
   );
 
   return (
-    <Content className="content-wrapper" style={{ padding: "16px", width: "100%" }}>
+    <Content
+      className="content-wrapper"
+      style={{ padding: "16px", width: "100%" }}
+    >
       <Breadcrumb style={{ marginBottom: "16px" }}>
         <Breadcrumb.Item>Home</Breadcrumb.Item>
         <Breadcrumb.Item>Visitas domiciliarias</Breadcrumb.Item>
@@ -305,19 +306,37 @@ export const UsersWithHomeVisitsList: React.FC = () => {
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <Card className="usuarios-search-card" style={{ width: "100%" }}>
-          <div style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: 16, 
-            width: "100%",
-            flexWrap: "wrap"
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              width: "100%",
+              flexWrap: "wrap",
+            }}
+          >
             {/* Sección de búsqueda por usuario existente */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 300 }}>
-              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)", fontWeight: 500 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flex: 1,
+                minWidth: 300,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 14,
+                  color: "rgba(0,0,0,0.85)",
+                  fontWeight: 500,
+                }}
+              >
                 A partir de usuario existente
               </span>
-              <QuestionCircleOutlined style={{ fontSize: 16, color: "rgba(0,0,0,0.65)" }} />
+              <QuestionCircleOutlined
+                style={{ fontSize: 16, color: "rgba(0,0,0,0.65)" }}
+              />
               <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)" }}>:</span>
               <Input
                 placeholder="Digite para buscar"
@@ -325,29 +344,35 @@ export const UsersWithHomeVisitsList: React.FC = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 onPressEnter={handleSearch}
                 allowClear
-                style={{ 
+                style={{
                   flex: 1,
                   minWidth: 200,
-                  borderRadius: 6
+                  borderRadius: 6,
                 }}
               />
               <Button
                 type="primary"
                 icon={<SearchOutlined />}
                 onClick={handleSearch}
-                style={{ 
-                  borderRadius: "50%", 
-                  width: 32, 
+                style={{
+                  borderRadius: "50%",
+                  width: 32,
                   height: 32,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
                 }}
               />
             </div>
 
             {/* Separador */}
-            <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", fontWeight: 400 }}>
+            <span
+              style={{
+                fontSize: 14,
+                color: "rgba(0,0,0,0.65)",
+                fontWeight: 400,
+              }}
+            >
               ó
             </span>
 
@@ -356,12 +381,12 @@ export const UsersWithHomeVisitsList: React.FC = () => {
               type="primary"
               icon={<PlusOutlined />}
               onClick={handleCreateNewUser}
-              style={{ 
+              style={{
                 borderRadius: 6,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                height: 32
+                height: 32,
               }}
             >
               A partir de nuevo usuario
@@ -370,9 +395,9 @@ export const UsersWithHomeVisitsList: React.FC = () => {
             {/* Botón de restablecer */}
             <Button
               onClick={handleReset}
-              style={{ 
+              style={{
                 borderRadius: 6,
-                height: 32
+                height: 32,
               }}
             >
               Restablecer
@@ -391,7 +416,7 @@ export const UsersWithHomeVisitsList: React.FC = () => {
             scroll={{ x: "max-content" }}
             onRow={(record) => ({
               onClick: () => handleRowClick(record),
-              style: { cursor: 'pointer' }
+              style: { cursor: "pointer" },
             })}
             pagination={{
               total: (filtered ?? data?.data.data ?? []).length,
@@ -416,18 +441,56 @@ export const UsersWithHomeVisitsList: React.FC = () => {
                 <Typography.Text strong>Lista de usuarios</Typography.Text>
                 <Space>
                   <Dropdown overlay={sortMenu} trigger={["click"]}>
-                    <Button type="text" style={{ color: '#595959', fontWeight: 400, fontSize: 14 }}>
-                      Ordenar por {sortKey === "nombre"
+                    <Button
+                      type="text"
+                      style={{
+                        color: "#595959",
+                        fontWeight: 400,
+                        fontSize: 14,
+                      }}
+                    >
+                      Ordenar por{" "}
+                      {sortKey === "nombre"
                         ? "nombre"
                         : sortKey === "estado"
-                        ? "estado"
-                        : "fecha de creación"} <DownOutlined style={{ color: '#595959' }} />
+                          ? "estado"
+                          : "fecha de creación"}{" "}
+                      <DownOutlined style={{ color: "#595959" }} />
                     </Button>
                   </Dropdown>
-                  <Button type="text" icon={<ReloadOutlined style={{ color: '#595959', fontSize: 18 }} />} onClick={() => refetch()} />
-                  <Button type="text" icon={<ColumnHeightOutlined style={{ color: '#595959', fontSize: 18 }} />} />
-                  <Button type="text" icon={<SettingOutlined style={{ color: '#595959', fontSize: 18 }} />} />
-                  <Button type="text" icon={<FullscreenOutlined style={{ color: '#595959', fontSize: 18 }} />} />
+                  <Button
+                    type="text"
+                    icon={
+                      <ReloadOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                    onClick={() => refetch()}
+                  />
+                  <Button
+                    type="text"
+                    icon={
+                      <ColumnHeightOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                  />
+                  <Button
+                    type="text"
+                    icon={
+                      <SettingOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                  />
+                  <Button
+                    type="text"
+                    icon={
+                      <FullscreenOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                  />
                 </Space>
               </Space>
             )}
@@ -436,4 +499,4 @@ export const UsersWithHomeVisitsList: React.FC = () => {
       </Space>
     </Content>
   );
-}; 
+};

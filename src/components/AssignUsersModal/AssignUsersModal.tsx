@@ -1,24 +1,25 @@
-import React, { useState } from "react";
+import { CalendarOutlined, UserAddOutlined } from "@ant-design/icons";
 import {
-  Modal,
-  Table,
   Button,
-  Space,
-  Typography,
-  Spin,
-  Empty,
-  message,
-  Tag,
   Checkbox,
-  Input,
-  Select,
   DatePicker,
+  Empty,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+  message,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { UserAddOutlined, CalendarOutlined } from "@ant-design/icons";
-import { useGetAvailableUsers } from "../../hooks/useGetAvailableUsers/useGetAvailableUsers";
-import { useAssignUsersToActivity } from "../../hooks/useAssignUsersToActivity/useAssignUsersToActivity";
 import dayjs from "dayjs";
+import type React from "react";
+import { useState } from "react";
+import { useAssignUsersToActivity } from "../../hooks/useAssignUsersToActivity/useAssignUsersToActivity";
+import { useGetAvailableUsers } from "../../hooks/useGetAvailableUsers/useGetAvailableUsers";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -52,21 +53,28 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [activityDate, setActivityDate] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
-  const [estadoParticipacion, setEstadoParticipacion] = useState<string>("PENDIENTE");
+  const [estadoParticipacion, setEstadoParticipacion] =
+    useState<string>("PENDIENTE");
   const [observaciones, setObservaciones] = useState<string>("");
 
-  const { data: availableUsersData, isLoading, error } = useGetAvailableUsers(activityDate);
+  const {
+    data: availableUsersData,
+    isLoading,
+    error,
+  } = useGetAvailableUsers(activityDate);
 
   // Filtrar usuarios basado en el texto de búsqueda
   // Corregir la extracción de datos según la estructura de respuesta del backend
-  const users: UserForActivity[] = Array.isArray((availableUsersData as any)?.data?.data) 
-    ? (availableUsersData as any)?.data?.data 
+  const users: UserForActivity[] = Array.isArray(
+    (availableUsersData as any)?.data?.data,
+  )
+    ? (availableUsersData as any)?.data?.data
     : [];
-  
+
   const filteredUsers = users.filter((user: UserForActivity) =>
     `${user.nombres} ${user.apellidos} ${user.n_documento}`
       .toLowerCase()
-      .includes(searchText.toLowerCase())
+      .includes(searchText.toLowerCase()),
   );
 
   const assignUsersMutation = useAssignUsersToActivity(activityId);
@@ -83,7 +91,9 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
         estado_participacion: estadoParticipacion,
         observaciones: observaciones || undefined,
       });
-      message.success(`${selectedUsers.length} usuarios asignados exitosamente`);
+      message.success(
+        `${selectedUsers.length} usuarios asignados exitosamente`,
+      );
       setSelectedUsers([]);
       onClose();
     } catch (error) {
@@ -100,14 +110,19 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   };
 
   const handleSelectAll = (checked: boolean) => {
-         if (checked) {
-       setSelectedUsers(filteredUsers.map((user: UserForActivity) => user.id_usuario));
-     } else {
+    if (checked) {
+      setSelectedUsers(
+        filteredUsers.map((user: UserForActivity) => user.id_usuario),
+      );
+    } else {
       setSelectedUsers([]);
     }
   };
 
-  const getCronogramaStatusColor = (tieneCronograma: boolean, estadoAsistencia?: string) => {
+  const getCronogramaStatusColor = (
+    tieneCronograma: boolean,
+    estadoAsistencia?: string,
+  ) => {
     if (!tieneCronograma) return "default";
     switch (estadoAsistencia) {
       case "CONFIRMADO":
@@ -121,7 +136,10 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
     }
   };
 
-  const getCronogramaStatusText = (tieneCronograma: boolean, estadoAsistencia?: string) => {
+  const getCronogramaStatusText = (
+    tieneCronograma: boolean,
+    estadoAsistencia?: string,
+  ) => {
     if (!tieneCronograma) return "Sin cronograma";
     switch (estadoAsistencia) {
       case "CONFIRMADO":
@@ -143,7 +161,9 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       render: (_, record: UserForActivity) => (
         <Checkbox
           checked={selectedUsers.includes(record.id_usuario)}
-          onChange={(e) => handleUserSelection(record.id_usuario, e.target.checked)}
+          onChange={(e) =>
+            handleUserSelection(record.id_usuario, e.target.checked)
+          }
         />
       ),
     },
@@ -170,10 +190,16 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       key: "schedule",
       render: (_, record: UserForActivity) => (
         <Tag
-          color={getCronogramaStatusColor(record.tiene_cronograma_fecha, record.estado_asistencia)}
+          color={getCronogramaStatusColor(
+            record.tiene_cronograma_fecha,
+            record.estado_asistencia,
+          )}
           icon={<CalendarOutlined />}
         >
-          {getCronogramaStatusText(record.tiene_cronograma_fecha, record.estado_asistencia)}
+          {getCronogramaStatusText(
+            record.tiene_cronograma_fecha,
+            record.estado_asistencia,
+          )}
         </Tag>
       ),
     },
@@ -212,7 +238,8 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
           onClick={handleAssignUsers}
           disabled={selectedUsers.length === 0}
         >
-          Asignar {selectedUsers.length} Usuario{selectedUsers.length !== 1 ? "s" : ""}
+          Asignar {selectedUsers.length} Usuario
+          {selectedUsers.length !== 1 ? "s" : ""}
         </Button>,
       ]}
     >
@@ -224,7 +251,9 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
             <br />
             <DatePicker
               value={activityDate ? dayjs(activityDate) : null}
-              onChange={(date) => setActivityDate(date ? date.format("YYYY-MM-DD") : "")}
+              onChange={(date) =>
+                setActivityDate(date ? date.format("YYYY-MM-DD") : "")
+              }
               placeholder="Seleccionar fecha"
               style={{ marginTop: 4 }}
             />
@@ -273,12 +302,19 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
         <div>
           <div style={{ marginBottom: 8 }}>
             <Checkbox
-              checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-              indeterminate={selectedUsers.length > 0 && selectedUsers.length < filteredUsers.length}
+              checked={
+                selectedUsers.length === filteredUsers.length &&
+                filteredUsers.length > 0
+              }
+              indeterminate={
+                selectedUsers.length > 0 &&
+                selectedUsers.length < filteredUsers.length
+              }
               onChange={(e) => handleSelectAll(e.target.checked)}
             >
               <Text strong>
-                Seleccionar todos ({selectedUsers.length} de {filteredUsers.length})
+                Seleccionar todos ({selectedUsers.length} de{" "}
+                {filteredUsers.length})
               </Text>
             </Checkbox>
           </div>
@@ -307,9 +343,7 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
               image={Empty.PRESENTED_IMAGE_SIMPLE}
             >
               <div style={{ marginTop: "16px" }}>
-                <Text type="secondary">
-                  Fecha seleccionada: {activityDate}
-                </Text>
+                <Text type="secondary">Fecha seleccionada: {activityDate}</Text>
                 <br />
                 <Text type="secondary">
                   Usuarios encontrados: {users.length}
@@ -330,4 +364,4 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       </Space>
     </Modal>
   );
-}; 
+};

@@ -6,31 +6,31 @@ import {
   Button,
   Card,
   Col,
+  Collapse,
+  DatePicker,
   Flex,
   Form,
   Input,
   Row,
+  Select,
+  Space,
   Spin,
   Typography,
   Upload,
-  Collapse,
   message,
-  DatePicker,
-  Select,
-  Space,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { z } from "zod";
 import { useCreateSimplifiedMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
 import { useEditSimplifiedRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
-import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetProfessionals } from "../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import type { MedicalRecord as MedicalRecordType } from "../../types";
-import { z } from "zod";
 
 const { Title } = Typography;
 const { Panel } = Collapse;
@@ -42,7 +42,7 @@ const homeVisitFormSchema = z.object({
   fecha_visita: z.any(),
   motivo_consulta: z.string().min(1, "El motivo de consulta es requerido"),
   profesional: z.number().min(1, "El profesional es requerido"),
-  
+
   // Habilidades biofísicas
   tipo_alimentacion: z.string().min(1, "El tipo de alimentación es requerido"),
   tipo_sueno: z.string().min(1, "El tipo de sueño es requerido"),
@@ -50,22 +50,26 @@ const homeVisitFormSchema = z.object({
   tipo_movilidad: z.string().min(1, "El tipo de movilidad es requerido"),
   cuidado_personal: z.string().min(1, "El cuidado personal es requerido"),
   apariencia_personal: z.string().min(1, "La apariencia personal es requerida"),
-  
+
   // Hábitos toxicológicos
   tabaquismo: z.string().min(1, "El tabaquismo es requerido"),
-  sustancias_psicoactivas: z.string().min(1, "Las sustancias psicoactivas son requeridas"),
+  sustancias_psicoactivas: z
+    .string()
+    .min(1, "Las sustancias psicoactivas son requeridas"),
   alcoholismo: z.string().min(1, "El alcoholismo es requerido"),
   cafeina: z.string().min(1, "La cafeína es requerida"),
-  
+
   // Habilidades de percepción social
   comunicacion_verbal: z.string().min(1, "La comunicación verbal es requerida"),
-  comunicacion_no_verbal: z.string().min(1, "La comunicación no verbal es requerida"),
+  comunicacion_no_verbal: z
+    .string()
+    .min(1, "La comunicación no verbal es requerida"),
   estado_animo: z.string().min(1, "El estado de ánimo es requerido"),
   ha_sufrido_maltrato: z.string().min(1, "El maltrato es requerido"),
-  
+
   // Diagnóstico
   observaciones: z.string().optional(),
-  
+
   // Archivos adjuntos
   documentos: z.any().optional(),
 });
@@ -105,8 +109,11 @@ export const HomeVisitMedicalRecord: React.FC = () => {
       observaciones: "",
     },
   });
-  
-  const { getValues, formState: { errors } } = methods;
+
+  const {
+    getValues,
+    formState: { errors },
+  } = methods;
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
     useCreateSimplifiedMedicalRecord(userId);
@@ -135,81 +142,90 @@ export const HomeVisitMedicalRecord: React.FC = () => {
     if (!userId) return;
 
     // Crear un registro médico simplificado basado en el mockup
-            const medicalRecord: MedicalRecordType = {
-          id_historiaclinica: userMedicalRecord?.data.data?.id_historiaclinica || 0,
-          id_usuario: parseInt(userId),
-          id_profesional: data.profesional || null,
-          Tiene_OtrasAlergias: false,
-          Tienedieta_especial: false,
-          alcoholismo: data.alcoholismo,
-          alergico_medicamento: false,
-          altura: 170, // Default height in cm
-          apariencia_personal: data.apariencia_personal,
-          cafeina: data.cafeina,
-          cirugias: "No",
-          comunicacion_no_verbal: data.comunicacion_no_verbal,
-          comunicacion_verbal: data.comunicacion_verbal,
-          continencia: data.continencia,
-          cuidado_personal: data.cuidado_personal,
-          dieta_especial: "No",
-          discapacidades: "No",
-          emer_medica: "No especificado",
-          eps: "No especificado",
-          estado_de_animo: data.estado_animo,
-          fecha_ingreso: data.fecha_visita ? data.fecha_visita.format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
-          frecuencia_cardiaca: 80, // Default heart rate
-          historial_cirugias: "No",
-          limitaciones: "No",
-          maltratado: data.ha_sufrido_maltrato,
-          maltrato: "No",
-          medicamentos_alergia: "No",
-          motivo_ingreso: data.motivo_consulta,
-          observ_dietaEspecial: "No",
-          observ_otrasalergias: "No",
-          observaciones_iniciales: data.observaciones || "Sin observaciones",
-          otras_alergias: "No",
-          peso: 70, // Default weight in kg
-          presion_arterial: 120, // Default blood pressure
-          sustanciaspsico: data.sustancias_psicoactivas,
-          tabaquismo: data.tabaquismo,
-          telefono_emermedica: "No especificado",
-          temperatura_corporal: 37, // Default temperature
-          tipo_alimentacion: data.tipo_alimentacion,
-          tipo_de_movilidad: data.tipo_movilidad,
-          tipo_de_sueno: data.tipo_sueno,
-          tipo_sangre: "O+", // Default blood type since it's required
-          diagnosticos: data.observaciones || "Sin diagnóstico",
-          porte_clinico: data.observaciones || "Sin porte clínico",
-        };
+    const medicalRecord: MedicalRecordType = {
+      id_historiaclinica: userMedicalRecord?.data.data?.id_historiaclinica || 0,
+      id_usuario: Number.parseInt(userId),
+      id_profesional: data.profesional || null,
+      Tiene_OtrasAlergias: false,
+      Tienedieta_especial: false,
+      alcoholismo: data.alcoholismo,
+      alergico_medicamento: false,
+      altura: 170, // Default height in cm
+      apariencia_personal: data.apariencia_personal,
+      cafeina: data.cafeina,
+      cirugias: "No",
+      comunicacion_no_verbal: data.comunicacion_no_verbal,
+      comunicacion_verbal: data.comunicacion_verbal,
+      continencia: data.continencia,
+      cuidado_personal: data.cuidado_personal,
+      dieta_especial: "No",
+      discapacidades: "No",
+      emer_medica: "No especificado",
+      eps: "No especificado",
+      estado_de_animo: data.estado_animo,
+      fecha_ingreso: data.fecha_visita
+        ? data.fecha_visita.format("YYYY-MM-DD")
+        : dayjs().format("YYYY-MM-DD"),
+      frecuencia_cardiaca: 80, // Default heart rate
+      historial_cirugias: "No",
+      limitaciones: "No",
+      maltratado: data.ha_sufrido_maltrato,
+      maltrato: "No",
+      medicamentos_alergia: "No",
+      motivo_ingreso: data.motivo_consulta,
+      observ_dietaEspecial: "No",
+      observ_otrasalergias: "No",
+      observaciones_iniciales: data.observaciones || "Sin observaciones",
+      otras_alergias: "No",
+      peso: 70, // Default weight in kg
+      presion_arterial: 120, // Default blood pressure
+      sustanciaspsico: data.sustancias_psicoactivas,
+      tabaquismo: data.tabaquismo,
+      telefono_emermedica: "No especificado",
+      temperatura_corporal: 37, // Default temperature
+      tipo_alimentacion: data.tipo_alimentacion,
+      tipo_de_movilidad: data.tipo_movilidad,
+      tipo_de_sueno: data.tipo_sueno,
+      tipo_sangre: "O+", // Default blood type since it's required
+      diagnosticos: data.observaciones || "Sin diagnóstico",
+      porte_clinico: data.observaciones || "Sin porte clínico",
+    };
 
     if (!userMedicalRecord?.data.data?.id_historiaclinica) {
-      console.log("🆕 Creando nueva historia clínica de visita domiciliaria...");
-      createUserMedicalRecord(
-        medicalRecord,
-        {
-          onSuccess: () => {
-            console.log(" Historia clínica de visita domiciliaria creada exitosamente");
-            message.success("Historia clínica de visita domiciliaria creada exitosamente");
-            navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
-          },
-          onError: (error) => {
-            console.error(" Error al crear la historia clínica:", error);
-            message.error("Error al crear la historia clínica");
-          },
-        },
+      console.log(
+        "🆕 Creando nueva historia clínica de visita domiciliaria...",
       );
+      createUserMedicalRecord(medicalRecord, {
+        onSuccess: () => {
+          console.log(
+            " Historia clínica de visita domiciliaria creada exitosamente",
+          );
+          message.success(
+            "Historia clínica de visita domiciliaria creada exitosamente",
+          );
+          navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
+        },
+        onError: (error) => {
+          console.error(" Error al crear la historia clínica:", error);
+          message.error("Error al crear la historia clínica");
+        },
+      });
     } else {
       console.log(" Actualizando historia clínica de visita domiciliaria...");
       editRecord(
         {
-          id: parseInt(userId),
+          id: Number.parseInt(userId),
           recordId: userMedicalRecord.data.data.id_historiaclinica,
           record: medicalRecord,
         },
         {
           onSuccess: () => {
-            console.log(" Historia clínica de visita domiciliaria actualizada exitosamente");
-            message.success("Historia clínica de visita domiciliaria actualizada exitosamente");
+            console.log(
+              " Historia clínica de visita domiciliaria actualizada exitosamente",
+            );
+            message.success(
+              "Historia clínica de visita domiciliaria actualizada exitosamente",
+            );
             navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
           },
           onError: (error) => {
@@ -247,7 +263,10 @@ export const HomeVisitMedicalRecord: React.FC = () => {
       <Breadcrumb
         className="breadcrumb"
         style={{ marginBottom: "16px" }}
-        items={[{ title: "Inicio" }, { title: "Historia clínica - Visitas Domiciliarias" }]}
+        items={[
+          { title: "Inicio" },
+          { title: "Historia clínica - Visitas Domiciliarias" },
+        ]}
       />
       <Title level={3} className="page-title">
         Historia Clínica - Visitas Domiciliarias
@@ -255,11 +274,19 @@ export const HomeVisitMedicalRecord: React.FC = () => {
       <FormProvider {...methods}>
         <Form layout="vertical" onFinish={handleSaveClick}>
           {/* Card de Datos del Usuario */}
-          <Card variant="borderless" loading={loadingUser} style={{ marginBottom: 16 }}>
+          <Card
+            variant="borderless"
+            loading={loadingUser}
+            style={{ marginBottom: 16 }}
+          >
             <Row align="middle" gutter={16}>
               {user?.data.data.url_imagen && (
                 <Col span={4}>
-                  <Avatar alt="Avatar" size={72} src={user.data.data.url_imagen} />
+                  <Avatar
+                    alt="Avatar"
+                    size={72}
+                    src={user.data.data.url_imagen}
+                  />
                 </Col>
               )}
               <Col span={20}>
@@ -279,10 +306,14 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                         {`${user?.data.data.n_documento}`}
                       </Typography.Text>
                       <Typography.Text>-</Typography.Text>
-                      <Typography.Text>{user?.data.data.genero}</Typography.Text>
+                      <Typography.Text>
+                        {user?.data.data.genero}
+                      </Typography.Text>
                       <Typography.Text>-</Typography.Text>
                       <Typography.Text>
-                        {dayjs(user?.data.data.fecha_nacimiento).format("DD-MM-YYYY")}
+                        {dayjs(user?.data.data.fecha_nacimiento).format(
+                          "DD-MM-YYYY",
+                        )}
                       </Typography.Text>
                       <Typography.Text>-</Typography.Text>
                       <Typography.Text style={{ fontWeight: "bold" }}>
@@ -293,15 +324,23 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                         años
                       </Typography.Text>
                     </Flex>
-                    <Typography.Text>{user?.data.data.estado_civil}</Typography.Text>
+                    <Typography.Text>
+                      {user?.data.data.estado_civil}
+                    </Typography.Text>
                   </Flex>
                   <Col lg={10}>
                     <Flex vertical gap={10}>
-                      <Typography.Text>{user?.data.data.direccion}</Typography.Text>
+                      <Typography.Text>
+                        {user?.data.data.direccion}
+                      </Typography.Text>
                       <Flex gap={4}>
-                        <Typography.Text>{user?.data.data.telefono}</Typography.Text>
+                        <Typography.Text>
+                          {user?.data.data.telefono}
+                        </Typography.Text>
                         <Typography.Text>-</Typography.Text>
-                        <Typography.Text>{user?.data.data.email}</Typography.Text>
+                        <Typography.Text>
+                          {user?.data.data.email}
+                        </Typography.Text>
                       </Flex>
                     </Flex>
                   </Col>
@@ -309,7 +348,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
               </Col>
             </Row>
           </Card>
-          
+
           <Card>
             <Collapse
               activeKey={activePanel}
@@ -347,7 +386,10 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                           validateStatus={errors.motivo_consulta ? "error" : ""}
                           help={errors.motivo_consulta?.message?.toString()}
                         >
-                          <Input {...field} placeholder="Ingrese el motivo de consulta" />
+                          <Input
+                            {...field}
+                            placeholder="Ingrese el motivo de consulta"
+                          />
                         </Form.Item>
                       )}
                     />
@@ -393,13 +435,22 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                       render={({ field }) => (
                         <Form.Item
                           label="Tipo de alimentación"
-                          validateStatus={errors.tipo_alimentacion ? "error" : ""}
+                          validateStatus={
+                            errors.tipo_alimentacion ? "error" : ""
+                          }
                           help={errors.tipo_alimentacion?.message?.toString()}
                         >
-                          <Select {...field} placeholder="Seleccione el tipo de alimentación">
+                          <Select
+                            {...field}
+                            placeholder="Seleccione el tipo de alimentación"
+                          >
                             <Select.Option value="Normal">Normal</Select.Option>
-                            <Select.Option value="Especial">Especial</Select.Option>
-                            <Select.Option value="Asistida">Asistida</Select.Option>
+                            <Select.Option value="Especial">
+                              Especial
+                            </Select.Option>
+                            <Select.Option value="Asistida">
+                              Asistida
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -415,10 +466,19 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                           validateStatus={errors.tipo_sueno ? "error" : ""}
                           help={errors.tipo_sueno?.message?.toString()}
                         >
-                          <Select {...field} placeholder="Seleccione el tipo de sueño">
-                            <Select.Option value="Regular">Regular</Select.Option>
-                            <Select.Option value="Irregular">Irregular</Select.Option>
-                            <Select.Option value="Fragmentado">Fragmentado</Select.Option>
+                          <Select
+                            {...field}
+                            placeholder="Seleccione el tipo de sueño"
+                          >
+                            <Select.Option value="Regular">
+                              Regular
+                            </Select.Option>
+                            <Select.Option value="Irregular">
+                              Irregular
+                            </Select.Option>
+                            <Select.Option value="Fragmentado">
+                              Fragmentado
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -434,10 +494,15 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                           validateStatus={errors.continencia ? "error" : ""}
                           help={errors.continencia?.message?.toString()}
                         >
-                          <Select {...field} placeholder="Seleccione la continencia">
+                          <Select
+                            {...field}
+                            placeholder="Seleccione la continencia"
+                          >
                             <Select.Option value="Sí">Sí</Select.Option>
                             <Select.Option value="No">No</Select.Option>
-                            <Select.Option value="Parcial">Parcial</Select.Option>
+                            <Select.Option value="Parcial">
+                              Parcial
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -455,10 +520,19 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                           validateStatus={errors.tipo_movilidad ? "error" : ""}
                           help={errors.tipo_movilidad?.message?.toString()}
                         >
-                          <Select {...field} placeholder="Seleccione el tipo de movilidad">
-                            <Select.Option value="Con ayuda">Con ayuda</Select.Option>
-                            <Select.Option value="Sin ayuda">Sin ayuda</Select.Option>
-                            <Select.Option value="Limitada">Limitada</Select.Option>
+                          <Select
+                            {...field}
+                            placeholder="Seleccione el tipo de movilidad"
+                          >
+                            <Select.Option value="Con ayuda">
+                              Con ayuda
+                            </Select.Option>
+                            <Select.Option value="Sin ayuda">
+                              Sin ayuda
+                            </Select.Option>
+                            <Select.Option value="Limitada">
+                              Limitada
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -471,13 +545,24 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                       render={({ field }) => (
                         <Form.Item
                           label="Cuidado personal"
-                          validateStatus={errors.cuidado_personal ? "error" : ""}
+                          validateStatus={
+                            errors.cuidado_personal ? "error" : ""
+                          }
                           help={errors.cuidado_personal?.message?.toString()}
                         >
-                          <Select {...field} placeholder="Seleccione el cuidado personal">
-                            <Select.Option value="Con ayuda parcial">Con ayuda parcial</Select.Option>
-                            <Select.Option value="Independiente">Independiente</Select.Option>
-                            <Select.Option value="Dependiente">Dependiente</Select.Option>
+                          <Select
+                            {...field}
+                            placeholder="Seleccione el cuidado personal"
+                          >
+                            <Select.Option value="Con ayuda parcial">
+                              Con ayuda parcial
+                            </Select.Option>
+                            <Select.Option value="Independiente">
+                              Independiente
+                            </Select.Option>
+                            <Select.Option value="Dependiente">
+                              Dependiente
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -490,13 +575,22 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                       render={({ field }) => (
                         <Form.Item
                           label="Apariencia personal"
-                          validateStatus={errors.apariencia_personal ? "error" : ""}
+                          validateStatus={
+                            errors.apariencia_personal ? "error" : ""
+                          }
                           help={errors.apariencia_personal?.message?.toString()}
                         >
-                          <Select {...field} placeholder="Seleccione la apariencia personal">
+                          <Select
+                            {...field}
+                            placeholder="Seleccione la apariencia personal"
+                          >
                             <Select.Option value="Buena">Buena</Select.Option>
-                            <Select.Option value="Regular">Regular</Select.Option>
-                            <Select.Option value="Descuidada">Descuidada</Select.Option>
+                            <Select.Option value="Regular">
+                              Regular
+                            </Select.Option>
+                            <Select.Option value="Descuidada">
+                              Descuidada
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -505,7 +599,10 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                 </Row>
               </Panel>
 
-              <Panel header="Hábitos o antecedentes toxicológicos" key="toxicology">
+              <Panel
+                header="Hábitos o antecedentes toxicológicos"
+                key="toxicology"
+              >
                 <Row gutter={16}>
                   <Col span={6}>
                     <Controller
@@ -520,7 +617,9 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                           <Select {...field} placeholder="Seleccione">
                             <Select.Option value="Sí">Sí</Select.Option>
                             <Select.Option value="No">No</Select.Option>
-                            <Select.Option value="Exfumador">Exfumador</Select.Option>
+                            <Select.Option value="Exfumador">
+                              Exfumador
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -533,7 +632,9 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                       render={({ field }) => (
                         <Form.Item
                           label="Sustancias Psicoactivas"
-                          validateStatus={errors.sustancias_psicoactivas ? "error" : ""}
+                          validateStatus={
+                            errors.sustancias_psicoactivas ? "error" : ""
+                          }
                           help={errors.sustancias_psicoactivas?.message?.toString()}
                         >
                           <Select {...field} placeholder="Seleccione">
@@ -576,7 +677,9 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                           <Select {...field} placeholder="Seleccione">
                             <Select.Option value="Sí">Sí</Select.Option>
                             <Select.Option value="No">No</Select.Option>
-                            <Select.Option value="Moderado">Moderado</Select.Option>
+                            <Select.Option value="Moderado">
+                              Moderado
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -585,7 +688,10 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                 </Row>
               </Panel>
 
-              <Panel header="Habilidades de percepción social" key="social-perception">
+              <Panel
+                header="Habilidades de percepción social"
+                key="social-perception"
+              >
                 <Row gutter={16}>
                   <Col span={6}>
                     <Controller
@@ -594,13 +700,19 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                       render={({ field }) => (
                         <Form.Item
                           label="Comunicación verbal"
-                          validateStatus={errors.comunicacion_verbal ? "error" : ""}
+                          validateStatus={
+                            errors.comunicacion_verbal ? "error" : ""
+                          }
                           help={errors.comunicacion_verbal?.message?.toString()}
                         >
                           <Select {...field} placeholder="Seleccione">
                             <Select.Option value="Activa">Activa</Select.Option>
-                            <Select.Option value="Limitada">Limitada</Select.Option>
-                            <Select.Option value="Ausente">Ausente</Select.Option>
+                            <Select.Option value="Limitada">
+                              Limitada
+                            </Select.Option>
+                            <Select.Option value="Ausente">
+                              Ausente
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -613,13 +725,19 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                       render={({ field }) => (
                         <Form.Item
                           label="Comunicación no verbal"
-                          validateStatus={errors.comunicacion_no_verbal ? "error" : ""}
+                          validateStatus={
+                            errors.comunicacion_no_verbal ? "error" : ""
+                          }
                           help={errors.comunicacion_no_verbal?.message?.toString()}
                         >
                           <Select {...field} placeholder="Seleccione">
                             <Select.Option value="Activa">Activa</Select.Option>
-                            <Select.Option value="Limitada">Limitada</Select.Option>
-                            <Select.Option value="Ausente">Ausente</Select.Option>
+                            <Select.Option value="Limitada">
+                              Limitada
+                            </Select.Option>
+                            <Select.Option value="Ausente">
+                              Ausente
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -639,7 +757,9 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                             <Select.Option value="Alegre">Alegre</Select.Option>
                             <Select.Option value="Triste">Triste</Select.Option>
                             <Select.Option value="Neutro">Neutro</Select.Option>
-                            <Select.Option value="Irritable">Irritable</Select.Option>
+                            <Select.Option value="Irritable">
+                              Irritable
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -652,13 +772,17 @@ export const HomeVisitMedicalRecord: React.FC = () => {
                       render={({ field }) => (
                         <Form.Item
                           label="Ha sufrido maltrato"
-                          validateStatus={errors.ha_sufrido_maltrato ? "error" : ""}
+                          validateStatus={
+                            errors.ha_sufrido_maltrato ? "error" : ""
+                          }
                           help={errors.ha_sufrido_maltrato?.message?.toString()}
                         >
                           <Select {...field} placeholder="Seleccione">
                             <Select.Option value="Sí">Sí</Select.Option>
                             <Select.Option value="No">No</Select.Option>
-                            <Select.Option value="No sabe">No sabe</Select.Option>
+                            <Select.Option value="No sabe">
+                              No sabe
+                            </Select.Option>
                           </Select>
                         </Form.Item>
                       )}
@@ -702,7 +826,13 @@ export const HomeVisitMedicalRecord: React.FC = () => {
             </Collapse>
             <Flex justify="end" style={{ marginTop: 24 }}>
               <Space>
-                <Button onClick={() => navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`)}>
+                <Button
+                  onClick={() =>
+                    navigate(
+                      `/visitas-domiciliarias/usuarios/${userId}/detalles`,
+                    )
+                  }
+                >
                   Cancelar
                 </Button>
                 <Button

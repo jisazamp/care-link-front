@@ -20,11 +20,14 @@ export const useAssignUsersToActivity = (activityId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: AssignUsersData) => assignUsersToActivity(activityId, data),
+    mutationFn: (data: AssignUsersData) =>
+      assignUsersToActivity(activityId, data),
     onSuccess: () => {
       // Invalidar las consultas relacionadas
-      queryClient.invalidateQueries({ queryKey: ["get-activity-users", activityId] });
+      queryClient.invalidateQueries({
+        queryKey: ["get-activity-users", activityId],
+      });
       queryClient.invalidateQueries({ queryKey: ["get-upcoming-activities"] });
     },
   });
-}; 
+};

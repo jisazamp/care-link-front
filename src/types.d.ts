@@ -53,10 +53,28 @@ export type AuthorizedUser = {
   email: string;
   first_name: string;
   id: number;
+  is_deleted: boolean;
   last_name: string;
   password: string;
-  is_deleted: boolean;
+  role: string;
 };
+
+export interface CreateAuthorizedUserPayload extends AuthorizedUser {
+  professional_user?: {
+    birthdate: string;
+    charge: string;
+    document_number: string;
+    email: string;
+    entry_date: string;
+    first_name: string;
+    home_address: string;
+    last_name: string;
+    phone_number: string;
+    profession: string;
+    professional_id_number: string;
+    specialty: string;
+  };
+}
 
 export type MedicalRecord = {
   id_historiaclinica?: number;

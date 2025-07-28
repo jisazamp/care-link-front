@@ -44,7 +44,7 @@ const getServiceId = (serviceType: string) => {
 
 const getSelectorOptions = (recordKey: string, services: Service[]) => {
   switch (recordKey) {
-    case "1":
+    case "1": {
       // Verificar si hay servicio de día seleccionado para deshabilitar tiqueteras
       const diaService = services.find((s) => s.key === "3");
       const isDiaSelected = diaService?.serviceType === "Servicio dia";
@@ -58,11 +58,12 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
           Tiquetera {i + 1}
         </Select.Option>
       ));
-    case "2":
+    }
+    case "2": {
       // Obtener la tiquetera seleccionada para filtrar las opciones de transporte
       const tiqueteraService = services.find((s) => s.key === "1");
       const tiqueteraNumber = tiqueteraService?.serviceType
-        ? parseInt(tiqueteraService.serviceType.split(" ")[1])
+        ? Number.parseInt(tiqueteraService.serviceType.split(" ")[1])
         : 0;
 
       // Si no hay tiquetera seleccionada, no mostrar opciones de transporte
@@ -79,12 +80,12 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
           Transporte {i + 1}
         </Select.Option>
       ));
-    case "3":
+    }
+    case "3": {
       // Verificar si hay tiquetera seleccionada para deshabilitar servicio de día
       const tiqueteraSelected = services.find((s) => s.key === "1");
       const isTiqueteraSelected =
-        tiqueteraSelected?.serviceType &&
-        tiqueteraSelected.serviceType.includes("Tiquetera");
+        tiqueteraSelected?.serviceType?.includes("Tiquetera");
 
       return (
         <Select.Option
@@ -95,6 +96,7 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
           Servicio día
         </Select.Option>
       );
+    }
     default:
       return null;
   }
@@ -124,13 +126,13 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
 
   const handleServiceChange = (key: string, value?: string) => {
     switch (key) {
-      case "1":
+      case "1": {
         methods.setValue("selectedDatesService", []);
         // Limpiar transporte si la nueva tiquetera es menor que el transporte seleccionado
         const transporteService = services.find((s) => s.key === "2");
         if (transporteService?.serviceType && value) {
-          const tiqueteraNumber = parseInt(value.split(" ")[1]);
-          const transporteNumber = parseInt(
+          const tiqueteraNumber = Number.parseInt(value.split(" ")[1]);
+          const transporteNumber = Number.parseInt(
             transporteService.serviceType.split(" ")[1],
           );
           if (transporteNumber > tiqueteraNumber) {
@@ -154,6 +156,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           methods.setValue("services", newServices);
         }
         break;
+      }
       case "2":
         methods.setValue("selectedDatesTransport", []);
         break;
@@ -204,10 +207,10 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     // Validar que si hay transporte seleccionado, sea válido según la tiquetera
     const transporteService = services.find((s) => s.key === "2");
     if (transporteService?.serviceType) {
-      const tiqueteraNumber = parseInt(
+      const tiqueteraNumber = Number.parseInt(
         tiqueteraService.serviceType.split(" ")[1],
       );
-      const transporteNumber = parseInt(
+      const transporteNumber = Number.parseInt(
         transporteService.serviceType.split(" ")[1],
       );
 
@@ -280,10 +283,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         } else if (record.key === "3") {
           // Deshabilitar servicio de día si hay tiquetera seleccionada
           const tiqueteraService = services.find((s) => s.key === "1");
-          isDisabled = !!(
-            tiqueteraService?.serviceType &&
-            tiqueteraService.serviceType.includes("Tiquetera")
-          );
+          isDisabled = !!tiqueteraService?.serviceType?.includes("Tiquetera");
         }
 
         return (

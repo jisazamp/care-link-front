@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
+import { message } from "antd";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { message } from "antd";
 
 interface PaymentData {
   id_metodo_pago: number;
@@ -15,7 +15,10 @@ const createPayment = (facturaId: number, payments: PaymentData[]) =>
 
 export const useCreatePayment = () =>
   useMutation({
-    mutationFn: ({ facturaId, payments }: { facturaId: number; payments: PaymentData[] }) =>
+    mutationFn: ({
+      facturaId,
+      payments,
+    }: { facturaId: number; payments: PaymentData[] }) =>
       createPayment(facturaId, payments),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["facturas"] });
@@ -23,6 +26,8 @@ export const useCreatePayment = () =>
       message.success("Pagos agregados exitosamente");
     },
     onError: (error: any) => {
-      message.error("Error al agregar pagos: " + (error?.response?.data?.detail || error.message));
+      message.error(
+        `Error al agregar pagos: ${error?.response?.data?.detail || error.message}`,
+      );
     },
-  }); 
+  });

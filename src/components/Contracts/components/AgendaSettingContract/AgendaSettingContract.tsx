@@ -1,4 +1,4 @@
-import { Button, Calendar, Card, Typography, Alert } from "antd";
+import { Alert, Button, Calendar, Card, Typography } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
@@ -42,40 +42,52 @@ export const AgendaSettingsContract = ({
   }, [services]);
 
   // Función para validar si una fecha está dentro del rango del contrato
-  const isDateInContractRange = useCallback((date: Dayjs) => {
-    if (!startDate || !endDate) return false;
-    return date.isSameOrAfter(startDate, 'day') && date.isSameOrBefore(endDate, 'day');
-  }, [startDate, endDate]);
+  const isDateInContractRange = useCallback(
+    (date: Dayjs) => {
+      if (!startDate || !endDate) return false;
+      return (
+        date.isSameOrAfter(startDate, "day") &&
+        date.isSameOrBefore(endDate, "day")
+      );
+    },
+    [startDate, endDate],
+  );
 
   // Función para validar si una fecha está disponible para transporte
-  const isDateAvailableForTransport = useCallback((date: Dayjs) => {
-    const formattedDate = date.format("YYYY-MM-DD");
-    // Solo se puede seleccionar transporte en días que ya están seleccionados para tiquetera
-    return selectedDatesService.includes(formattedDate);
-  }, [selectedDatesService]);
+  const isDateAvailableForTransport = useCallback(
+    (date: Dayjs) => {
+      const formattedDate = date.format("YYYY-MM-DD");
+      // Solo se puede seleccionar transporte en días que ya están seleccionados para tiquetera
+      return selectedDatesService.includes(formattedDate);
+    },
+    [selectedDatesService],
+  );
 
   // Función para deshabilitar fechas según el tipo de servicio
-  const getDisabledDate = useCallback((type: "service" | "transport" | "day") => {
-    return (current: Dayjs) => {
-      // Deshabilitar fechas fuera del rango del contrato
-      if (!isDateInContractRange(current)) {
-        return true;
-      }
+  const getDisabledDate = useCallback(
+    (type: "service" | "transport" | "day") => {
+      return (current: Dayjs) => {
+        // Deshabilitar fechas fuera del rango del contrato
+        if (!isDateInContractRange(current)) {
+          return true;
+        }
 
-      // Para transporte, solo permitir fechas que ya están seleccionadas en tiquetera
-      if (type === "transport") {
-        return !isDateAvailableForTransport(current);
-      }
+        // Para transporte, solo permitir fechas que ya están seleccionadas en tiquetera
+        if (type === "transport") {
+          return !isDateAvailableForTransport(current);
+        }
 
-      // Deshabilitar sábados y domingos para todos los servicios
-      const day = current.day();
-      if (day === 0 || day === 6) {
-        return true;
-      }
+        // Deshabilitar sábados y domingos para todos los servicios
+        const day = current.day();
+        if (day === 0 || day === 6) {
+          return true;
+        }
 
-      return false;
-    };
-  }, [isDateInContractRange, isDateAvailableForTransport]);
+        return false;
+      };
+    },
+    [isDateInContractRange, isDateAvailableForTransport],
+  );
 
   const handleSelectDate = useCallback(
     (date: Dayjs, type: "service" | "transport" | "day") => {
@@ -112,14 +124,19 @@ export const AgendaSettingsContract = ({
     ],
   );
 
-  const renderDateCell = (date: Dayjs, selectedDates: string[], type: "service" | "transport" | "day") => {
+  const renderDateCell = (
+    date: Dayjs,
+    selectedDates: string[],
+    type: "service" | "transport" | "day",
+  ) => {
     const formattedDate = date.format("YYYY-MM-DD");
     const isSelected = selectedDates.includes(formattedDate);
     const isDisabled = getDisabledDate(type)(date);
     const isInRange = isDateInContractRange(date);
-    
+
     // Para transporte, verificar si la fecha está disponible
-    const isAvailableForTransport = type === "transport" ? isDateAvailableForTransport(date) : true;
+    const isAvailableForTransport =
+      type === "transport" ? isDateAvailableForTransport(date) : true;
 
     let backgroundColor = "transparent";
     let color = "#000";
@@ -164,10 +181,10 @@ export const AgendaSettingsContract = ({
           margin: "auto",
         }}
         title={
-          isDisabled 
-            ? "Fecha no disponible" 
-            : isSelected 
-              ? "Fecha seleccionada" 
+          isDisabled
+            ? "Fecha no disponible"
+            : isSelected
+              ? "Fecha seleccionada"
               : "Fecha disponible"
         }
       >
@@ -188,19 +205,24 @@ export const AgendaSettingsContract = ({
   return (
     <Card variant="borderless">
       <Title level={4}>Configuración y Agenda</Title>
-      
+
       {/* Mensaje informativo */}
       <Alert
         message="Instrucciones de selección de fechas"
         description={
           <div>
-            <Text strong>Rango de fechas:</Text> Solo puede seleccionar fechas entre {startDate?.format('DD/MM/YYYY')} y {endDate?.format('DD/MM/YYYY')}.
+            <Text strong>Rango de fechas:</Text> Solo puede seleccionar fechas
+            entre {startDate?.format("DD/MM/YYYY")} y{" "}
+            {endDate?.format("DD/MM/YYYY")}.
             <br />
-            <Text strong>Tiquetera:</Text> Seleccione los días de atención (máximo {maxServiceDays} días).
+            <Text strong>Tiquetera:</Text> Seleccione los días de atención
+            (máximo {maxServiceDays} días).
             <br />
-            <Text strong>Transporte:</Text> Solo puede seleccionar transporte en días que ya están agendados para tiquetera.
+            <Text strong>Transporte:</Text> Solo puede seleccionar transporte en
+            días que ya están agendados para tiquetera.
             <br />
-            <Text strong>Días no laborables:</Text> Los sábados y domingos están deshabilitados.
+            <Text strong>Días no laborables:</Text> Los sábados y domingos están
+            deshabilitados.
           </div>
         }
         type="info"
@@ -262,7 +284,11 @@ export const AgendaSettingsContract = ({
       )}
 
       {maxDayService > 0 && (
-        <Card title={"Servicios de día"} variant="borderless" style={{ marginBottom: 16 }}>
+        <Card
+          title={"Servicios de día"}
+          variant="borderless"
+          style={{ marginBottom: 16 }}
+        >
           <Calendar
             fullscreen={false}
             onSelect={(date, info) => {
@@ -271,7 +297,11 @@ export const AgendaSettingsContract = ({
               }
             }}
             fullCellRender={(date) =>
-              renderDateCell(date, selectedDateDay ? [selectedDateDay] : [], "day")
+              renderDateCell(
+                date,
+                selectedDateDay ? [selectedDateDay] : [],
+                "day",
+              )
             }
             disabledDate={getDisabledDate("day")}
             style={{ width: "300px", margin: "auto" }}
@@ -280,11 +310,7 @@ export const AgendaSettingsContract = ({
       )}
 
       <Card variant="borderless" style={{ marginTop: 24, textAlign: "right" }}>
-        {onBack && (
-          <Button onClick={onBack}>
-            Atrás
-          </Button>
-        )}
+        {onBack && <Button onClick={onBack}>Atrás</Button>}
       </Card>
     </Card>
   );

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Card, Row, Col, Typography, Divider, Badge } from 'antd';
-import { formatCurrency } from '../../../../utils/paymentUtils';
+import { Badge, Card, Col, Divider, Row, Typography } from "antd";
+import type React from "react";
+import { formatCurrency } from "../../../../utils/paymentUtils";
 
 const { Text, Title } = Typography;
 
@@ -24,28 +24,28 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
   totalPayments,
   pendingBalance,
   showStatus = true,
-  title = "Resumen de Pagos"
+  title = "Resumen de Pagos",
 }) => {
   const getStatusInfo = () => {
     if (pendingBalance === 0) {
       return {
         status: "success" as const,
         text: "Factura Pagada Completamente",
-        color: "#52c41a"
+        color: "#52c41a",
       };
-    } else if (pendingBalance < totalFactura) {
+    }
+    if (pendingBalance < totalFactura) {
       return {
         status: "processing" as const,
         text: "Pago Parcial",
-        color: "#faad14"
-      };
-    } else {
-      return {
-        status: "default" as const,
-        text: "Sin Pagos Registrados",
-        color: "#d9d9d9"
+        color: "#faad14",
       };
     }
+    return {
+      status: "default" as const,
+      text: "Sin Pagos Registrados",
+      color: "#d9d9d9",
+    };
   };
 
   const statusInfo = getStatusInfo();
@@ -88,7 +88,13 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
             <Title level={4} type="secondary">
               Saldo Pendiente
             </Title>
-            <Text strong style={{ fontSize: 18, color: pendingBalance > 0 ? "#faad14" : "#52c41a" }}>
+            <Text
+              strong
+              style={{
+                fontSize: 18,
+                color: pendingBalance > 0 ? "#faad14" : "#52c41a",
+              }}
+            >
               {formatCurrency(pendingBalance)}
             </Text>
           </div>
@@ -98,7 +104,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
         <>
           <Divider />
           <div style={{ textAlign: "center" }}>
-            <Badge 
+            <Badge
               status={statusInfo.status}
               text={
                 <Text strong style={{ color: statusInfo.color }}>
@@ -111,4 +117,4 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = ({
       )}
     </Card>
   );
-}; 
+};

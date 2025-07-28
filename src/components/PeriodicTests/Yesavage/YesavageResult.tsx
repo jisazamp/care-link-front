@@ -1,5 +1,5 @@
-import React from "react";
-import { Card, Button, Typography, Space } from "antd";
+import { Button, Card, Space, Typography } from "antd";
+import type React from "react";
 
 const { Title, Paragraph } = Typography;
 
@@ -14,7 +14,10 @@ const getInterpretation = (score: number): string => {
   return "Depresión severa";
 };
 
-export const YesavageResult: React.FC<YesavageResultProps> = ({ result, onPrev }) => {
+export const YesavageResult: React.FC<YesavageResultProps> = ({
+  result,
+  onPrev,
+}) => {
   if (!result) return null;
 
   const interpretation = getInterpretation(result.score);
@@ -33,4 +36,4 @@ export const YesavageResult: React.FC<YesavageResultProps> = ({ result, onPrev }
       <Button onClick={onPrev}>Volver</Button>
     </Space>
   );
-}; 
+};

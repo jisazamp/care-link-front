@@ -1,30 +1,30 @@
 import { FileTextOutlined } from "@ant-design/icons";
 import {
+  Alert,
   Button,
   Card,
   Col,
-  Row,
-  Typography,
   Descriptions,
-  Tag,
-  Alert,
-  InputNumber,
   Form,
+  InputNumber,
+  Row,
+  Tag,
+  Typography,
 } from "antd";
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import dayjs from "dayjs";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
 import {
+  type PaymentFormData,
   formatCurrency,
-  PaymentFormData,
 } from "../../../../utils/paymentUtils";
-import type { FormValues } from "../FormContracts";
-import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
-import dayjs from "dayjs";
 import { getEstadoFactura } from "../../../Billing/components/PaymentSummary/PaymentSummary";
+import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
+import type { FormValues } from "../FormContracts";
 
 const { Text } = Typography;
 
@@ -321,7 +321,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                           `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         }
                         parser={(value) =>
-                          Number(value!.replace(/\$\s?|(,*)/g, ""))
+                          Number(value?.replace(/\$\s?|(,*)/g, ""))
                         }
                       />
                     </Form.Item>
@@ -338,7 +338,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                           `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         }
                         parser={(value) =>
-                          Number(value!.replace(/\$\s?|(,*)/g, ""))
+                          Number(value?.replace(/\$\s?|(,*)/g, ""))
                         }
                       />
                     </Form.Item>

@@ -1,5 +1,5 @@
-import React from "react";
-import { Table, Button } from "antd";
+import { Button, Table } from "antd";
+import type React from "react";
 import type { Payment } from "../../types";
 
 interface PaymentsTableProps {
@@ -7,7 +7,10 @@ interface PaymentsTableProps {
   onDelete?: (id: number) => void;
 }
 
-export const PaymentsTable: React.FC<PaymentsTableProps> = ({ pagos, onDelete }) => {
+export const PaymentsTable: React.FC<PaymentsTableProps> = ({
+  pagos,
+  onDelete,
+}) => {
   const columns = [
     { title: "ID Pago", dataIndex: "id_pago", key: "id_pago" },
     { title: "Fecha", dataIndex: "fecha_pago", key: "fecha_pago" },
@@ -31,4 +34,4 @@ export const PaymentsTable: React.FC<PaymentsTableProps> = ({ pagos, onDelete })
       pagination={false}
     />
   );
-}; 
+};

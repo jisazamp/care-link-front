@@ -1,6 +1,6 @@
-import React from 'react';
-import { Alert, Button, Space } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { Alert, Button, Space } from "antd";
+import type React from "react";
 
 interface ContratoVencidoAlertProps {
   contratoId: number;
@@ -21,8 +21,8 @@ export const ContratoVencidoAlert: React.FC<ContratoVencidoAlertProps> = ({
       description={
         <div>
           <p>
-            El contrato del paciente <strong>{pacienteNombre}</strong> ha vencido 
-            porque se han agotado todos los días de la tiquetera.
+            El contrato del paciente <strong>{pacienteNombre}</strong> ha
+            vencido porque se han agotado todos los días de la tiquetera.
           </p>
           <p>
             Es necesario renovar el contrato para continuar con el servicio.
@@ -41,10 +41,7 @@ export const ContratoVencidoAlert: React.FC<ContratoVencidoAlertProps> = ({
           >
             Renovar Contrato
           </Button>
-          <Button
-            size="small"
-            onClick={onDismiss}
-          >
+          <Button size="small" onClick={onDismiss}>
             Cerrar
           </Button>
         </Space>
@@ -54,4 +51,4 @@ export const ContratoVencidoAlert: React.FC<ContratoVencidoAlertProps> = ({
       style={{ marginBottom: 16 }}
     />
   );
-}; 
+};

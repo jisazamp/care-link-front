@@ -113,7 +113,7 @@ export const Vaccines = () => {
                       danger
                       onClick={() => {
                         const vaccine = vaccines[index];
-                        if (vaccine && vaccine.id) {
+                        if (vaccine?.id) {
                           setVaccineToDelete(Number(vaccine.id));
                           setIsDeleteModalOpen(true);
                         }
@@ -136,7 +136,11 @@ export const Vaccines = () => {
       <VaccinesModal
         open={showModal}
         editingIndex={editingIndex}
-        initialData={editingIndex !== null && vaccines[editingIndex] ? vaccines[editingIndex] : null}
+        initialData={
+          editingIndex !== null && vaccines[editingIndex]
+            ? vaccines[editingIndex]
+            : null
+        }
         append={append}
         update={update}
         onCancel={() => {

@@ -2,10 +2,10 @@ import {
   ColumnHeightOutlined,
   DownOutlined,
   FullscreenOutlined,
-  ReloadOutlined,
-  SettingOutlined,
   QuestionCircleOutlined,
+  ReloadOutlined,
   SearchOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -226,7 +226,9 @@ export const UsersList: React.FC = () => {
       width: 100,
       align: "center" as const,
       render: (estado: string) => (
-        <span style={{ color: "#888", fontSize: 14 }}>{estado === "ACTIVO" ? "Activo" : "Inactivo"}</span>
+        <span style={{ color: "#888", fontSize: 14 }}>
+          {estado === "ACTIVO" ? "Activo" : "Inactivo"}
+        </span>
       ),
     },
     {
@@ -240,11 +242,7 @@ export const UsersList: React.FC = () => {
           <Space size="small" onClick={handleActionClick}>
             <Tooltip title="Editar">
               <Link to={`/usuarios/${user.id_usuario}/editar`}>
-                <Button
-                  type="link"
-                  icon={null}
-                  style={{ color: "#7f34b4" }}
-                >
+                <Button type="link" icon={null} style={{ color: "#7f34b4" }}>
                   Editar
                 </Button>
               </Link>
@@ -282,7 +280,10 @@ export const UsersList: React.FC = () => {
   );
 
   return (
-    <Content className="content-wrapper" style={{ padding: "16px", width: "100%" }}>
+    <Content
+      className="content-wrapper"
+      style={{ padding: "16px", width: "100%" }}
+    >
       <Breadcrumb style={{ marginBottom: "16px" }}>
         <Breadcrumb.Item>Home</Breadcrumb.Item>
         <Breadcrumb.Item>Usuarios</Breadcrumb.Item>
@@ -296,9 +297,20 @@ export const UsersList: React.FC = () => {
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <Card className="usuarios-search-card" style={{ width: "100%" }}>
           <div className="usuarios-search-body" style={{ width: "100%" }}>
-            <div className="usuarios-search-left" style={{ flex: 1, minWidth: 0 }}>
+            <div
+              className="usuarios-search-left"
+              style={{ flex: 1, minWidth: 0 }}
+            >
               <span className="usuarios-search-label">Buscar por</span>
-              <QuestionCircleOutlined style={{ fontSize: 16, color: "rgba(0,0,0,0.65)", marginLeft: 4, marginRight: 4, verticalAlign: "middle" }} />
+              <QuestionCircleOutlined
+                style={{
+                  fontSize: 16,
+                  color: "rgba(0,0,0,0.65)",
+                  marginLeft: 4,
+                  marginRight: 4,
+                  verticalAlign: "middle",
+                }}
+              />
               <span className="usuarios-search-colon">:</span>
               <Input
                 className="usuarios-search-input"
@@ -308,25 +320,50 @@ export const UsersList: React.FC = () => {
                 onPressEnter={handleSearch}
                 allowClear
                 bordered={false}
-                style={{ 
-                  boxShadow: "none", 
-                  height: 32, 
-                  fontSize: 14, 
+                style={{
+                  boxShadow: "none",
+                  height: 32,
+                  fontSize: 14,
                   verticalAlign: "middle",
                   width: "100%",
                   flex: 1,
-                  minWidth: 200
+                  minWidth: 200,
                 }}
               />
             </div>
             <div className="usuarios-search-actions" style={{ flexShrink: 0 }}>
-              <Button className="usuarios-btn-secondary" style={{ height: 32, fontWeight: 400 }} onClick={handleReset}>
+              <Button
+                className="usuarios-btn-secondary"
+                style={{ height: 32, fontWeight: 400 }}
+                onClick={handleReset}
+              >
                 Restablecer
               </Button>
-              <Button className="usuarios-btn-primary" style={{ height: 32, fontWeight: 400, display: "flex", alignItems: "center" }} onClick={handleSearch} icon={<SearchOutlined style={{ fontSize: 16, marginRight: 4 }} />}>
+              <Button
+                className="usuarios-btn-primary"
+                style={{
+                  height: 32,
+                  fontWeight: 400,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+                onClick={handleSearch}
+                icon={
+                  <SearchOutlined style={{ fontSize: 16, marginRight: 4 }} />
+                }
+              >
                 Buscar
               </Button>
-              <Button type="text" style={{ color: '#7f34b4', height: 32, fontWeight: 400, fontSize: 14, padding: '0 8px' }}>
+              <Button
+                type="text"
+                style={{
+                  color: "#7f34b4",
+                  height: 32,
+                  fontWeight: 400,
+                  fontSize: 14,
+                  padding: "0 8px",
+                }}
+              >
                 Más Opciones <DownOutlined />
               </Button>
             </div>
@@ -344,7 +381,7 @@ export const UsersList: React.FC = () => {
             scroll={{ x: "max-content" }}
             onRow={(record) => ({
               onClick: () => handleRowClick(record),
-              style: { cursor: 'pointer' }
+              style: { cursor: "pointer" },
             })}
             pagination={{
               total: (filtered ?? data?.data.data ?? []).length,
@@ -369,18 +406,56 @@ export const UsersList: React.FC = () => {
                 <Typography.Text strong>Lista de usuarios</Typography.Text>
                 <Space>
                   <Dropdown overlay={sortMenu} trigger={["click"]}>
-                    <Button type="text" style={{ color: '#595959', fontWeight: 400, fontSize: 14 }}>
-                      Ordenar por {sortKey === "nombre"
+                    <Button
+                      type="text"
+                      style={{
+                        color: "#595959",
+                        fontWeight: 400,
+                        fontSize: 14,
+                      }}
+                    >
+                      Ordenar por{" "}
+                      {sortKey === "nombre"
                         ? "nombre"
                         : sortKey === "estado"
-                        ? "estado"
-                        : "fecha de creación"} <DownOutlined style={{ color: '#595959' }} />
+                          ? "estado"
+                          : "fecha de creación"}{" "}
+                      <DownOutlined style={{ color: "#595959" }} />
                     </Button>
                   </Dropdown>
-                  <Button type="text" icon={<ReloadOutlined style={{ color: '#595959', fontSize: 18 }} />} onClick={() => refetch()} />
-                  <Button type="text" icon={<ColumnHeightOutlined style={{ color: '#595959', fontSize: 18 }} />} />
-                  <Button type="text" icon={<SettingOutlined style={{ color: '#595959', fontSize: 18 }} />} />
-                  <Button type="text" icon={<FullscreenOutlined style={{ color: '#595959', fontSize: 18 }} />} />
+                  <Button
+                    type="text"
+                    icon={
+                      <ReloadOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                    onClick={() => refetch()}
+                  />
+                  <Button
+                    type="text"
+                    icon={
+                      <ColumnHeightOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                  />
+                  <Button
+                    type="text"
+                    icon={
+                      <SettingOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                  />
+                  <Button
+                    type="text"
+                    icon={
+                      <FullscreenOutlined
+                        style={{ color: "#595959", fontSize: 18 }}
+                      />
+                    }
+                  />
                 </Space>
               </Space>
             )}

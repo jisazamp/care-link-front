@@ -1,25 +1,26 @@
-import React, { useCallback, useMemo, useState } from "react";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
   Form,
   InputNumber,
-  DatePicker,
-  Button,
-  Select,
-  Card,
-  Row,
-  Col,
-  Space,
   Modal,
+  Row,
+  Select,
+  Space,
   message,
 } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
-import { useGetPaymentTypes } from "../../../../hooks/useGetPaymentTypes";
-import { PaymentFormData } from "../../../../utils/paymentUtils";
-import { PaymentSummary } from "../PaymentSummary/PaymentSummary";
+import type React from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useCreatePayment } from "../../../../hooks/useCreatePayment/useCreatePayment";
 import { useDeletePayment } from "../../../../hooks/useDeletePayment";
+import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
+import { useGetPaymentTypes } from "../../../../hooks/useGetPaymentTypes";
+import type { PaymentFormData } from "../../../../utils/paymentUtils";
+import { PaymentSummary } from "../PaymentSummary/PaymentSummary";
 
 interface PaymentsFormProps {
   payments: PaymentFormData[];
@@ -290,11 +291,10 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
 
         console.log(" Estado de pagos actualizado:", updatedPayments);
         return true;
-      } else {
-        console.error(" No se pudo identificar la factura");
-        message.error("No se pudo identificar la factura");
-        return false;
       }
+      console.error(" No se pudo identificar la factura");
+      message.error("No se pudo identificar la factura");
+      return false;
     } catch (error) {
       console.error(" Error al guardar pagos:", error);
       message.error("Error al guardar los pagos");
@@ -1092,4 +1092,3 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
     </div>
   );
 };
-

@@ -1,5 +1,5 @@
-import React from "react";
 import { Alert, Typography } from "antd";
+import type React from "react";
 
 const { Paragraph } = Typography;
 
@@ -9,10 +9,13 @@ export const YesavageInstructions: React.FC = () => (
     description={
       <>
         <Paragraph>
-          Responda cada pregunta según la situación actual del paciente. La Escala de Yesavage evalúa síntomas depresivos en adultos mayores y su resultado es orientativo, no diagnóstico definitivo.
+          Responda cada pregunta según la situación actual del paciente. La
+          Escala de Yesavage evalúa síntomas depresivos en adultos mayores y su
+          resultado es orientativo, no diagnóstico definitivo.
         </Paragraph>
         <Paragraph>
-          El puntaje máximo es 15. 0-5: Normal, 6-10: Depresión leve, 11-15: Depresión severa.
+          El puntaje máximo es 15. 0-5: Normal, 6-10: Depresión leve, 11-15:
+          Depresión severa.
         </Paragraph>
       </>
     }
@@ -20,4 +23,4 @@ export const YesavageInstructions: React.FC = () => (
     showIcon
     style={{ marginBottom: 24 }}
   />
-); 
+);
