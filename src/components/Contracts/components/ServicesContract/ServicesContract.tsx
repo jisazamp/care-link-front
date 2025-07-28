@@ -234,8 +234,22 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
 
   const handleDownloadContract = async (contractType: string) => {
     try {
+      // Obtener las cantidades según el tipo de contrato
+      let quantity = null;
+      if (contractType === "centro-dia") {
+        quantity = getTiqueteraQuantity();
+      } else if (contractType === "transporte") {
+        quantity = getTransporteQuantity();
+      }
+
+      // Construir la URL con parámetros de consulta
+      const params = new URLSearchParams();
+      if (quantity !== null) {
+        params.append("quantity", quantity.toString());
+      }
+
       const response = await client.get(
-        `/api/users/${userId}/download-contract/${contractType}`,
+        `/api/users/${userId}/download-contract/${contractType}?${params.toString()}`,
         {
           responseType: "blob",
         },
@@ -458,6 +472,12 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           Descargue los contratos correspondientes según los servicios
           seleccionados. Los contratos se generarán con la información del
           paciente.
+          {!hasSelectedServices() && (
+            <Text type="warning" style={{ display: "block", marginTop: 8 }}>
+              ! Debe seleccionar al menos un servicio para habilitar la descarga
+              de contratos.
+            </Text>
+          )}
         </Text>
 
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -469,12 +489,32 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
                   <Text type="secondary" style={{ fontSize: "12px" }}>
                     Contrato para servicios de centro de día con términos y
                     condiciones específicos.
+                    {getTiqueteraQuantity() && (
+                      <Text
+                        type="secondary"
+                        style={{
+                          display: "block",
+                          marginTop: 4,
+                          color: "#1890ff",
+                        }}
+                      >
+                        Cantidad seleccionada: {getTiqueteraQuantity()} días
+                      </Text>
+                    )}
                   </Text>
                   <Button
                     type="primary"
                     icon={<DownloadOutlined />}
                     onClick={() => handleDownloadContract("centro-dia")}
                     style={{ width: "100%" }}
+                    disabled={!hasSelectedServices() || !getTiqueteraQuantity()}
+                    title={
+                      !hasSelectedServices()
+                        ? "Seleccione un servicio primero"
+                        : !getTiqueteraQuantity()
+                          ? "Seleccione una tiquetera para descargar este contrato"
+                          : ""
+                    }
                   >
                     Descargar Contrato Centro de Día
                   </Button>
@@ -488,12 +528,34 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
                   <Text type="secondary" style={{ fontSize: "12px" }}>
                     Contrato para servicios de transporte con términos y
                     condiciones específicos.
+                    {getTransporteQuantity() && (
+                      <Text
+                        type="secondary"
+                        style={{
+                          display: "block",
+                          marginTop: 4,
+                          color: "#1890ff",
+                        }}
+                      >
+                        Cantidad seleccionada: {getTransporteQuantity()} días
+                      </Text>
+                    )}
                   </Text>
                   <Button
                     type="primary"
                     icon={<DownloadOutlined />}
                     onClick={() => handleDownloadContract("transporte")}
                     style={{ width: "100%" }}
+                    disabled={
+                      !hasSelectedServices() || !getTransporteQuantity()
+                    }
+                    title={
+                      !hasSelectedServices()
+                        ? "Seleccione un servicio primero"
+                        : !getTransporteQuantity()
+                          ? "Seleccione un transporte para descargar este contrato"
+                          : ""
+                    }
                   >
                     Descargar Contrato de Transporte
                   </Button>
