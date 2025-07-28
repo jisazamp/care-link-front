@@ -179,6 +179,22 @@ export const App = () => {
                 }
               />
               <Route
+                path="/visitas-domiciliarias/usuarios/:id/familiar"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/familiar/:familyMemberId"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/visitas-domiciliarias"
                 element={
                   <PrivateRoute>

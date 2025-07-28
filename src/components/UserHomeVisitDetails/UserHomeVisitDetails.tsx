@@ -838,7 +838,15 @@ export const UserHomeVisitDetails: React.FC = () => {
                   rowKey="id_acudiente"
                   columns={acudientesColumns}
                   loading={loadingFamilyMembers}
-                  dataSource={familyMembers?.data.data}
+                  dataSource={familyMembers?.data.data?.map((item: any) => ({
+                    id_acudiente: item.id_acudiente,
+                    nombres: item.acudiente?.nombres || '',
+                    apellidos: item.acudiente?.apellidos || '',
+                    parentesco: item.parentesco || '',
+                    telefono: item.acudiente?.telefono || '',
+                    direccion: item.acudiente?.direccion || '',
+                    email: item.acudiente?.email || '',
+                  }))}
                   pagination={false}
                 />
               </Card>
