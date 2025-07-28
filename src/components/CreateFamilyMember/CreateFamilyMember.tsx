@@ -12,6 +12,8 @@ import {
   Select,
   Spin,
   Typography,
+  message,
+  Alert,
 } from "antd";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -20,6 +22,7 @@ import { z } from "zod";
 import { useCreateFamilyMember } from "../../hooks/useCreateFamilyMember/useCreateFamilyMember";
 import { useEditFamilyMemberMutation } from "../../hooks/useEditFamilyMemberMutation/useEditFamilyMemberMutation";
 import { useGetFamilyMemberById } from "../../hooks/useGetFamilyMemberById/useGetFamilyMemberById";
+import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
 import { queryClient } from "../../main";
 import type { CreateFamilyMemberRequest } from "../../types";
 
@@ -57,10 +60,12 @@ export const CreateFamilyMember = () => {
   const { data: familyMember, isLoading: loadingFamilyMember } =
     useGetFamilyMemberById(familyMemberId);
 
-  const { mutate: createFamilyMember, isSuccess: isSuccessCreateFamilyMember } =
+  const { data: existingFamilyMembers } = useGetUserFamilyMembers(userId);
+
+  const { mutate: createFamilyMember, isSuccess: isSuccessCreateFamilyMember, error: createError } =
     useCreateFamilyMember(userId);
 
-  const { mutate: editFamilyMember, isSuccess: isSuccessEditFamilyMember } =
+  const { mutate: editFamilyMember, isSuccess: isSuccessEditFamilyMember, error: editError } =
     useEditFamilyMemberMutation(userId);
 
   const navigate = useNavigate();
@@ -76,6 +81,29 @@ export const CreateFamilyMember = () => {
   });
 
   const kinshipValue = watch("kinship");
+  const isFamilyMemberValue = watch("isFamilyMember");
+
+  // Check if user already has an acudiente
+  const hasExistingAcudiente = existingFamilyMembers?.data?.data?.some(
+    (member: any) => member.acudiente?.acudiente === true
+  );
+
+  // Handle error messages
+  useEffect(() => {
+    if (createError) {
+      const axiosError = createError as any;
+      const errorMessage = axiosError?.response?.data?.detail || "Error al crear el familiar";
+      message.error(errorMessage);
+    }
+  }, [createError]);
+
+  useEffect(() => {
+    if (editError) {
+      const axiosError = editError as any;
+      const errorMessage = axiosError?.response?.data?.detail || "Error al editar el familiar";
+      message.error(errorMessage);
+    }
+  }, [editError]);
 
   const onSubmit = (data: FormValues) => {
     const request: CreateFamilyMemberRequest = {
@@ -384,7 +412,7 @@ export const CreateFamilyMember = () => {
                 style={{ marginTop: "16px" }}
               >
                 <Row gutter={24}>
-                  <Col>
+                  <Col span={24}>
                     <Controller
                       name="isFamilyMember"
                       control={control}
@@ -394,6 +422,33 @@ export const CreateFamilyMember = () => {
                         </Checkbox>
                       )}
                     />
+                    {hasExistingAcudiente && !familyMemberId && (
+                      <Alert
+                        message="Restricción de Acudiente"
+                        description="El usuario ya tiene un acudiente registrado. Solo puede tener un acudiente por usuario. Si marca este familiar como acudiente, el acudiente anterior será desmarcado automáticamente. Los datos de localización solo se actualizarán en el usuario si marca esta opción."
+                        type="warning"
+                        showIcon
+                        style={{ marginTop: "8px" }}
+                      />
+                    )}
+                    {familyMemberId && hasExistingAcudiente && !isFamilyMemberValue && (
+                      <Alert
+                        message="Sin Acudiente"
+                        description="Este usuario no tendrá ningún acudiente asignado si desmarca esta opción. Los datos de localización del usuario se limpiarán automáticamente."
+                        type="info"
+                        showIcon
+                        style={{ marginTop: "8px" }}
+                      />
+                    )}
+                    {!hasExistingAcudiente && !familyMemberId && (
+                      <Alert
+                        message="Información Importante"
+                        description="Los datos de localización (teléfono, email, dirección) solo se actualizarán en el perfil del usuario si marca esta opción como acudiente. Si no marca esta opción, los datos solo se guardarán en el perfil del familiar."
+                        type="info"
+                        showIcon
+                        style={{ marginTop: "8px" }}
+                      />
+                    )}
                   </Col>
                   <Col>
                     <Checkbox>Marcar para facturación</Checkbox>
