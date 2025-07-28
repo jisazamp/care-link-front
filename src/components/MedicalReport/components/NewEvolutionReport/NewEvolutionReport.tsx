@@ -186,6 +186,9 @@ export const NewEvolutionReport: React.FC = () => {
               </Col>
             </Row>
             <Row justify="end" style={{ marginTop: 24 }}>
+              <Button style={{ marginRight: 12 }} className="main-button-white" onClick={() => navigate(getReportDetailsPath())}>
+                Volver
+              </Button>
               <Button style={{ marginRight: 12 }} className="main-button-white" onClick={() => form.resetFields()}>
                 Restablecer
               </Button>

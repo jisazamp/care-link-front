@@ -60,14 +60,7 @@ export const ViewReport: React.FC = () => {
     : "Nombre del profesional";
   const encabezadoReporte = `Reporte clínico - ${numeroReporte} ${fechaReporte} - Realizado por: ${profesional}`;
 
-  // Exploración física: usar campos reales de MedicalReport
-  const exploracion = {
-    peso: report?.peso !== undefined ? `${report.peso} kg` : "-",
-    presion: report?.presion_arterial !== undefined ? `${report.presion_arterial} mmHg` : "-",
-    frecuencia: report?.Frecuencia_cardiaca !== undefined ? `${report.Frecuencia_cardiaca} lpm` : "-",
-    temperatura: report?.temperatura_corporal !== undefined ? `${report.temperatura_corporal}°C` : "-",
-    pulsioximetria: report?.saturacionOxigeno !== undefined ? `${report.saturacionOxigeno}%` : "-", // Si no existe, dejar "-"
-  };
+
 
   // Columnas para la tabla de evolución clínica
   const columns = [
@@ -110,7 +103,7 @@ export const ViewReport: React.FC = () => {
       key: "actions",
       render: (_: any, record: any) => (
         <span>
-          <a style={{ marginRight: 8, color: '#9957C2' }} href="#" onClick={() => navigate(getEditEvolutionPath(record.id_TipoReporte))}>Ver</a>
+          <a style={{ marginRight: 8, color: '#9957C2' }} href="#" onClick={() => navigate(getViewEvolutionPath(record.id_TipoReporte))}>Ver</a>
           <a style={{ color: '#9957C2' }} href="#" onClick={() => navigate(getEditEvolutionPath(record.id_TipoReporte))}>Editar</a>
         </span>
       ),
@@ -134,6 +127,12 @@ export const ViewReport: React.FC = () => {
     return isHomeVisit 
       ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`
       : `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`;
+  };
+
+  const getViewEvolutionPath = (evolutionId: number) => {
+    return isHomeVisit 
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/ver-evolucion/${evolutionId}`
+      : `/usuarios/${id}/reportes/${reportId}/detalles/ver-evolucion/${evolutionId}`;
   };
 
   const getEditEvolutionPath = (evolutionId: number) => {
@@ -231,23 +230,24 @@ export const ViewReport: React.FC = () => {
                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Motivo de consulta</div>
                 <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{report?.motivo_consulta || <span style={{ color: '#bbb' }}>Agregar motivo de consulta</span>}</div>
               </div>
-                             {/* Fila: Exploración física */}
+                                            {/* Fila: Exploración física */}
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                  <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Exploración física</div>
+                  <div style={{ color: '#222', fontSize: 15, flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div><span style={{ fontWeight: 600 }}>Peso:</span> {record?.peso !== undefined ? `${record.peso} kg` : '-'}</div>
+                    <div><span style={{ fontWeight: 600 }}>Altura:</span> {record?.altura !== undefined ? `${record.altura} cm` : '-'}</div>
+                  </div>
+                </div>
+               {/* Fila: Diagnóstico */}
                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
-                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Exploración física</div>
-                 <div style={{ color: '#222', fontSize: 15, flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
-                   <div><span style={{ fontWeight: 600 }}>Peso:</span> {exploracion.peso}</div>
-                 </div>
+                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Diagnóstico</div>
+                 <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{record?.diagnosticos || '-'}</div>
                </div>
-              {/* Fila: Diagnóstico */}
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
-                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Diagnóstico</div>
-                <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{report?.diagnosticos || '-'}</div>
-              </div>
-              {/* Fila: Observaciones */}
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
-                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Observaciones</div>
-                <div style={{ color: '#bbb', fontSize: 15, flex: 1 }}>{report?.observaciones || 'Campo para agregar observaciones internas'}</div>
-              </div>
+               {/* Fila: Observaciones */}
+               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Observaciones</div>
+                 <div style={{ color: '#bbb', fontSize: 15, flex: 1 }}>{record?.observaciones_iniciales || 'Campo para agregar observaciones internas'}</div>
+               </div>
               {/* Fila: Remisión */}
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Remisión</div>

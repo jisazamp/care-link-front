@@ -33,6 +33,7 @@ import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
 import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
+import { ViewEvolution } from "./components/MedicalReport/components/ViewEvolution/ViewEvolution";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { Cronograma } from "./components/Cronograma/Cronograma";
@@ -235,6 +236,14 @@ export const App = () => {
                 }
               />
               <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/ver-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <ViewEvolution />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/visitas-domiciliarias"
                 element={
                   <PrivateRoute>
@@ -327,6 +336,14 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/ver-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <ViewEvolution />
                   </PrivateRoute>
                 }
               />

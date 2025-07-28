@@ -19,7 +19,8 @@ import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGe
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useUpdateMedicalReport } from "../../../../hooks/useUpdateMedicalReport/useUpdateMedicalReport";
-import type { MedicalReport } from "../../../../types";
+import { useUpdateMedicalRecord } from "../../../../hooks/useUpdateMedicalRecord/useUpdateMedicalRecord";
+import type { MedicalReport, MedicalRecord } from "../../../../types";
 
 export const EditMedicalReport: React.FC = () => {
   const { id, reportId } = useParams();
@@ -34,27 +35,29 @@ export const EditMedicalReport: React.FC = () => {
   const medicalRecordQuery = useGetUserMedicalRecord(id);
   const professionalsQuery = useGetProfessionals();
   const reportQuery = useGetMedicalReport(reportId);
-  const updateMutation = useUpdateMedicalReport();
+  const updateReportMutation = useUpdateMedicalReport();
+  const updateRecordMutation = useUpdateMedicalRecord();
 
   const report = reportQuery.data?.data.data;
+  const medicalRecord = medicalRecordQuery.data?.data.data;
 
-  // Cargar datos del reporte cuando esté disponible
+  // Cargar datos del reporte y del registro médico cuando estén disponibles
   useEffect(() => {
-    if (report) {
+    if (report && medicalRecord) {
       form.setFieldsValue({
         professional: report.id_profesional,
         reportType: report.tipo_reporte,
         registrationDate: report.fecha_registro ? dayjs(report.fecha_registro) : undefined,
         consultationReason: report.motivo_consulta,
-        weight: report.peso,
-        height: report.altura,
-        diagnosis: report.diagnosticos,
-        internalObservations: report.observaciones,
+        weight: medicalRecord.peso,
+        height: medicalRecord.altura,
+        diagnosis: medicalRecord.diagnosticos,
+        internalObservations: medicalRecord.observaciones_iniciales,
         referral: report.remision,
-        treatmentObservation: report.Obs_habitosalimenticios,
+        treatmentObservation: report.recomendaciones,
       });
     }
-  }, [report, form]);
+  }, [report, medicalRecord, form]);
 
   const handleFinish = async (values: {
     professional: number;
@@ -69,23 +72,41 @@ export const EditMedicalReport: React.FC = () => {
     treatmentObservation: string;
   }) => {
     try {
+      if (!medicalRecord || !medicalRecord.id_historiaclinica) {
+        message.error("No se encontró el registro médico del usuario");
+        return;
+      }
+
+      // Actualizar el reporte médico
       const medicalReport: Partial<MedicalReport> = {
         id_profesional: values.professional,
         tipo_reporte: values.reportType,
         fecha_registro: values.registrationDate.format("YYYY-MM-DD"),
         motivo_consulta: values.consultationReason,
+        remision: values.referral,
+        recomendaciones: values.treatmentObservation,
+      };
+
+      // Actualizar el registro médico (HistoriaClinica)
+      const medicalRecordUpdate: Partial<MedicalRecord> = {
         peso: values.weight,
         altura: values.height,
         diagnosticos: values.diagnosis,
-        observaciones: values.internalObservations,
-        remision: values.referral,
-        Obs_habitosalimenticios: values.treatmentObservation,
+        observaciones_iniciales: values.internalObservations,
       };
 
-      await updateMutation.mutateAsync({
-        reportId: reportId!,
-        data: medicalReport,
-      });
+      // Ejecutar ambas actualizaciones
+      await Promise.all([
+        updateReportMutation.mutateAsync({
+          reportId: reportId!,
+          data: medicalReport,
+        }),
+        updateRecordMutation.mutateAsync({
+          userId: parseInt(id!),
+          recordId: medicalRecord.id_historiaclinica,
+          data: medicalRecordUpdate,
+        }),
+      ]);
 
       message.success("Reporte actualizado correctamente");
       navigate(isHomeVisit ? `/visitas-domiciliarias/usuarios/${id}/detalles` : `/usuarios/${id}/detalles`);
