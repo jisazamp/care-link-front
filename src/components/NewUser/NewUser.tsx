@@ -65,12 +65,7 @@ const formSchema = z.object({
   maritalStatus: z.nativeEnum(CivilStatus, {
     errorMap: () => ({ message: "El estado civil es requerido" }),
   }),
-  email: z
-    .string({ message: "El correo electrónico es requerido" })
-    .email({ message: "Ingrese un correo electrónico válido" }),
   occupation: z.string().optional(),
-  address: z.string().optional(),
-  phone: z.string().optional(),
   homeVisit: z.boolean().default(false),
   photo: z
     .any()
@@ -146,8 +141,8 @@ export const NewUser: React.FC = () => {
     
     const user: Partial<User> = {
       apellidos: data.lastName,
-      direccion: data.address,
-      email: data.email,
+      direccion: null, // Enviar null en lugar de data.address
+      email: null, // Enviar null en lugar de data.email
       escribe: false,
       estado: "ACTIVO" as UserStatus,
       estado_civil: data.maritalStatus as CivilStatus,
@@ -160,7 +155,7 @@ export const NewUser: React.FC = () => {
       nombres: data.firstName,
       nucleo_familiar: "Nuclear" as UserFamilyType,
       proteccion_exequial: false,
-      telefono: data.phone,
+      telefono: null, // Enviar null en lugar de data.phone
       is_deleted: false,
       profesion: data.occupation ?? "",
       tipo_usuario: data.userType ?? "Nuevo",
@@ -190,9 +185,6 @@ export const NewUser: React.FC = () => {
       userId: `${userData.id_usuario}`,
       maritalStatus: userData.estado_civil as CivilStatus,
       gender: userData.genero as Gender,
-      email: userData.email ?? "",
-      phone: userData.telefono ?? "",
-      address: userData.direccion ?? "",
       occupation: userData.profesion ?? "",
       userType: (userData.tipo_usuario as "Nuevo" | "Recurrente") ?? "Nuevo",
       homeVisit: userData.visitas_domiciliarias ?? false,
@@ -545,75 +537,6 @@ export const NewUser: React.FC = () => {
                           checkedChildren="Sí"
                           unCheckedChildren="No"
                         />
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
-          </Col>
-          <Col span={24}>
-            <Card
-              title="Datos de localización"
-              bordered={false}
-              style={{ marginTop: "16px" }}
-            >
-              <Row gutter={24}>
-                <Col span={24}>
-                  <Form.Item
-                    label="Dirección"
-                    validateStatus={errors.address ? "error" : ""}
-                    help={
-                      errors.address?.message && (
-                        <Text type="danger">{errors.address.message}</Text>
-                      )
-                    }
-                  >
-                    <Controller
-                      name="address"
-                      control={control}
-                      render={({ field }) => (
-                        <Input {...field} placeholder="Dirección" />
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Teléfono"
-                    validateStatus={errors.phone ? "error" : ""}
-                    help={
-                      errors.phone?.message && (
-                        <Text type="danger">{errors.phone.message}</Text>
-                      )
-                    }
-                  >
-                    <Controller
-                      name="phone"
-                      control={control}
-                      render={({ field }) => (
-                        <Input {...field} placeholder="Teléfono" />
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Email"
-                    validateStatus={errors.email ? "error" : ""}
-                    help={
-                      errors.email?.message && (
-                        <Text type="danger">{errors.email.message}</Text>
-                      )
-                    }
-                  >
-                    <Controller
-                      name="email"
-                      control={control}
-                      render={({ field }) => (
-                        <Input {...field} placeholder="Correo electrónico" />
                       )}
                     />
                   </Form.Item>
