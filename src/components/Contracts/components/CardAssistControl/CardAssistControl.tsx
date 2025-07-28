@@ -355,9 +355,9 @@ export const CardAsistControl = () => {
               <Text type="secondary">
                 {selectedRows.length} seleccionado{selectedRows.length !== 1 ? 's' : ''}
               </Text>
-            )}
+            )}3
             <Button type="primary" onClick={handleAddClick}>
-              Agregar
+              Ir al cronograma
             </Button>
           </Space>
         }
