@@ -16,7 +16,7 @@ import {
   Checkbox,
 } from "antd";
 import dayjs from "dayjs";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useGetClinicalEvolutions } from "../../../../hooks/useGetClinicalEvolutions/useGetClinicalEvolutions";
 import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
@@ -27,6 +27,11 @@ const { Title } = Typography;
 
 export const ViewReport: React.FC = () => {
   const { id, reportId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Detect if we're in home visit context
+  const isHomeVisit = location.pathname.includes('/visitas-domiciliarias/');
 
   const userQuery = useGetUserById(id);
   const recordQuery = useGetUserMedicalRecord(id);
@@ -36,8 +41,6 @@ export const ViewReport: React.FC = () => {
   const record = recordQuery.data?.data.data;
   const report = reportQuery.data?.data.data;
   const evolutions = evolutionsQuery.data?.data.data;
-
-  const navigate = useNavigate();
 
   // Recomendaciones: usar el campo real si existe, si no, placeholder
   const recomendaciones = report?.recomendaciones
@@ -111,12 +114,31 @@ export const ViewReport: React.FC = () => {
       key: "actions",
       render: (_: any, record: any) => (
         <span>
-          <a style={{ marginRight: 8, color: '#9957C2' }} href="#" onClick={() => console.log('Ver registro:', record)}>Ver</a>
+          <a style={{ marginRight: 8, color: '#9957C2' }} href="#" onClick={() => navigate(getEditReportPath())}>Ver</a>
           <a style={{ color: '#9957C2' }} href="#" onClick={() => console.log('Editar registro:', record)}>Editar</a>
         </span>
       ),
     },
   ];
+
+  // Navigation functions based on context
+  const getDetailsPath = () => {
+    return isHomeVisit 
+      ? `/visitas-domiciliarias/usuarios/${id}/detalles`
+      : `/usuarios/${id}/detalles`;
+  };
+
+  const getEditReportPath = () => {
+    return isHomeVisit 
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}`
+      : `/usuarios/${id}/reportes/${reportId}`;
+  };
+
+  const getNewEvolutionPath = () => {
+    return isHomeVisit 
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`
+      : `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`;
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: "#f5f5f5", padding: 24 }}>
@@ -124,8 +146,10 @@ export const ViewReport: React.FC = () => {
       <div style={{ maxWidth: 1214, margin: "0 auto 16px 0", paddingLeft: 24, paddingRight: 24 }}>
         <div className="breadcrumbs" style={{ fontSize: 14, color: "#8C8C8C", marginBottom: 20 }}>
           <Link to="/inicio">Inicio</Link> /{" "}
-          <Link to="/usuarios">Usuarios</Link> /{" "}
-          <Link to={`/usuarios/${id}/detalles`}>{user?.nombres} {user?.apellidos}</Link> /{" "}
+          <Link to={isHomeVisit ? "/visitas-domiciliarias/usuarios" : "/usuarios"}>
+            {isHomeVisit ? "Visitas Domiciliarias" : "Usuarios"}
+          </Link> /{" "}
+          <Link to={getDetailsPath()}>{user?.nombres} {user?.apellidos}</Link> /{" "}
           <span className="current" style={{ color: "#222", fontWeight: 500 }}>Vista detalle reporte clínico</span>
         </div>
         <h1 className="page-title" style={{
@@ -178,7 +202,7 @@ export const ViewReport: React.FC = () => {
                   type="default"
                   icon={<EditOutlined />}
                   style={{ display: 'flex', alignItems: 'center', fontWeight: 500, color: '#7f34b4', borderColor: '#7f34b4', borderRadius: 2, background: '#fff', padding: '0 16px', height: 32 }}
-                  onClick={() => navigate(`/usuarios/${id}/reportes/${reportId}`)}
+                  onClick={() => navigate(getEditReportPath())}
                 >
                   Editar
                 </Button>
@@ -265,7 +289,7 @@ export const ViewReport: React.FC = () => {
                 </Title>
               </Col>
               <Col>
-                <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(`/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`)}>
+                <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(getEditReportPath())}>
                   Agregar
                 </Button>
               </Col>

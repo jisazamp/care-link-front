@@ -176,7 +176,7 @@ export const EditReport: React.FC = () => {
               <Row gutter={16}>
                 <Col span={24}>
                   <Text strong>Remisión:</Text>
-                  <p>{report?.remision.toUpperCase()}</p>
+                  <p>{report?.remision?.toUpperCase() || '-'}</p>
                 </Col>
               </Row>
             </Card>
@@ -304,7 +304,7 @@ export const EditReport: React.FC = () => {
                 <Form.Item
                   label="Tipo de reporte"
                   name="reportType"
-                  initialValue={e.tipo_report.toUpperCase()}
+                  initialValue={e.tipo_report?.toUpperCase() || ''}
                   rules={[{ required: true }]}
                 >
                   <Select
