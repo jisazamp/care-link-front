@@ -94,20 +94,15 @@ export const ViewReport: React.FC = () => {
       key: "fecha_evolucion",
       render: (_: any, record: any) => record.fecha_evolucion ? dayjs(record.fecha_evolucion).format("DD-MM-YYYY") : "",
     },
-    {
-      title: "Registro de tratamientos",
-      dataIndex: "treatments",
-      key: "treatments",
-      render: (_: any, record: any) => {
-        // No existe campo treatments en ClinicalEvolution, dejar como "No" o adaptar si se agrega
-        return (
-          <span>
-            {"No"} |
-            <a href="#" style={{ color: '#9957C2', marginLeft: 4 }} onClick={() => console.log('Ver tratamientos de:', record)}>Ver</a>
-          </span>
-        );
-      },
-    },
+         {
+       title: "Registro de tratamientos",
+       dataIndex: "treatments",
+       key: "treatments",
+       render: (_: any, record: any) => {
+         // No existe campo treatments en ClinicalEvolution, dejar como "No"
+         return "No";
+       },
+     },
     {
       title: "Acciones",
       dataIndex: "actions",
@@ -223,17 +218,13 @@ export const ViewReport: React.FC = () => {
                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Motivo de consulta</div>
                 <div style={{ color: '#222', fontSize: 15, flex: 1 }}>{report?.motivo_consulta || <span style={{ color: '#bbb' }}>Agregar motivo de consulta</span>}</div>
               </div>
-              {/* Fila: Exploración física */}
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
-                <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Exploración física</div>
-                <div style={{ color: '#222', fontSize: 15, flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
-                  <div><span style={{ fontWeight: 600 }}>Peso:</span> {exploracion.peso}</div>
-                  <div><span style={{ fontWeight: 600 }}>Presión arterial:</span> {exploracion.presion}</div>
-                  <div><span style={{ fontWeight: 600 }}>Frecuencia cardíaca:</span> {exploracion.frecuencia}</div>
-                  <div><span style={{ fontWeight: 600 }}>Temperatura corporal:</span> {exploracion.temperatura}</div>
-                  <div><span style={{ fontWeight: 600 }}>Pulsioximetría:</span> {exploracion.pulsioximetria}</div>
-                </div>
-              </div>
+                             {/* Fila: Exploración física */}
+               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
+                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Exploración física</div>
+                 <div style={{ color: '#222', fontSize: 15, flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
+                   <div><span style={{ fontWeight: 600 }}>Peso:</span> {exploracion.peso}</div>
+                 </div>
+               </div>
               {/* Fila: Diagnóstico */}
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', minHeight: 32 }}>
                 <div style={{ borderLeft: '2px solid #e0e0e0', padding: '0 16px 0 8px', fontWeight: 600, color: '#222', minWidth: 180 }}>Diagnóstico</div>
