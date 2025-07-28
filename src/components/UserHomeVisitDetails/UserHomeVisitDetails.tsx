@@ -23,6 +23,7 @@ import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/use
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
+import { queryClient } from "../../main";
 import type { HomeVisit } from "../../types";
 
 
@@ -129,6 +130,8 @@ export const UserHomeVisitDetails: React.FC = () => {
       onOk() {
         if (memberId) {
           deleteFamilyMember(memberId);
+          // Invalidar manualmente las consultas para asegurar actualización
+          queryClient.invalidateQueries({ queryKey: [`get-user-${userId}-family-members`] });
         }
       },
     });

@@ -20,6 +20,7 @@ import { z } from "zod";
 import { useCreateFamilyMember } from "../../hooks/useCreateFamilyMember/useCreateFamilyMember";
 import { useEditFamilyMemberMutation } from "../../hooks/useEditFamilyMemberMutation/useEditFamilyMemberMutation";
 import { useGetFamilyMemberById } from "../../hooks/useGetFamilyMemberById/useGetFamilyMemberById";
+import { queryClient } from "../../main";
 import type { CreateFamilyMemberRequest } from "../../types";
 
 const formSchema = z.object({
@@ -113,6 +114,9 @@ export const CreateFamilyMember = () => {
 
   useEffect(() => {
     if (isSuccessCreateFamilyMember || isSuccessEditFamilyMember) {
+      // Invalidar manualmente las consultas para asegurar actualización
+      queryClient.invalidateQueries({ queryKey: [`get-user-${userId}-family-members`] });
+      
       // Detectar si viene de visitas domiciliarias basándose en la URL actual
       const currentPath = window.location.pathname;
       if (currentPath.includes('/visitas-domiciliarias/')) {

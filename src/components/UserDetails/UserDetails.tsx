@@ -206,6 +206,8 @@ export const UserDetails: React.FC = () => {
       onOk() {
         if (memberId) {
           deleteFamilyMember(memberId);
+          // Invalidar manualmente las consultas para asegurar actualización
+          queryClient.invalidateQueries({ queryKey: [`get-user-${userId}-family-members`] });
         }
       },
     });
