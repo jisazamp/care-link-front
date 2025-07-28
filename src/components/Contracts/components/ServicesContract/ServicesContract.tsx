@@ -9,10 +9,15 @@ import {
   Select,
   Table,
   message,
+  Space,
+  Typography,
 } from "antd";
+import { DownloadOutlined, FileWordOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useFormContext } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import { useGetServiceRates } from "../../../../hooks/useGetServiceRates/useGetServiceRates";
+import { client } from "../../../../api/client";
 import type { FormValues } from "../FormContracts";
 import type { Service } from "../FormContracts";
 
@@ -102,9 +107,12 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const methods = useFormContext<FormValues>();
   const services = methods.watch("services");
   const startDate = methods.watch("startDate");
+  const { id: userId } = useParams();
   
   // Obtener las tarifas de servicios
   const { data: serviceRatesData } = useGetServiceRates();
+  
+  const { Title, Text } = Typography;
   
   // Función para obtener el precio de un servicio basándose en las tarifas
   const getServicePrice = (serviceId: number) => {
@@ -181,6 +189,29 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
       s.key === key ? { ...s, description: value } : s,
     );
     methods.setValue("services", newServices);
+  };
+
+  const handleDownloadContract = async (contractType: string) => {
+    try {
+      const response = await client.get(`/api/users/${userId}/download-contract/${contractType}`, {
+        responseType: 'blob',
+      });
+
+      const blob = response.data;
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `contrato_${contractType}_${new Date().toISOString().slice(0, 10)}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      message.success('Contrato descargado exitosamente');
+    } catch (error) {
+      console.error('Error al descargar contrato:', error);
+      message.error('Error al descargar el contrato');
+    }
   };
 
   const handleNext = () => {
@@ -354,6 +385,63 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           style={{ marginTop: 16 }}
           rowKey="key"
         />
+      </Card>
+
+      {/* Sección de descarga de contratos */}
+      <Card 
+        title={
+          <Space>
+            <FileWordOutlined style={{ color: '#1890ff' }} />
+            <Title level={5} style={{ margin: 0 }}>Descargar Contratos</Title>
+          </Space>
+        }
+        style={{ marginTop: 24 }}
+      >
+        <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
+          Descargue los contratos correspondientes según los servicios seleccionados. 
+          Los contratos se generarán con la información del paciente.
+        </Text>
+        
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Card size="small" style={{ border: '1px solid #d9d9d9' }}>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Text strong>Contrato Centro de Día</Text>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    Contrato para servicios de centro de día con términos y condiciones específicos.
+                  </Text>
+                  <Button 
+                    type="primary" 
+                    icon={<DownloadOutlined />}
+                    onClick={() => handleDownloadContract('centro-dia')}
+                    style={{ width: '100%' }}
+                  >
+                    Descargar Contrato Centro de Día
+                  </Button>
+                </Space>
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card size="small" style={{ border: '1px solid #d9d9d9' }}>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Text strong>Contrato de Transporte</Text>
+                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                    Contrato para servicios de transporte con términos y condiciones específicos.
+                  </Text>
+                  <Button 
+                    type="primary" 
+                    icon={<DownloadOutlined />}
+                    onClick={() => handleDownloadContract('transporte')}
+                    style={{ width: '100%' }}
+                  >
+                    Descargar Contrato de Transporte
+                  </Button>
+                </Space>
+              </Card>
+            </Col>
+          </Row>
+        </Space>
       </Card>
 
       <Card variant="borderless" style={{ marginTop: 24, textAlign: "right" }}>
