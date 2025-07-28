@@ -17,7 +17,6 @@ import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
-import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
 import { EditMedicalReport } from "./components/MedicalReport/components/EditMedicalReport/EditMedicalReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
@@ -228,6 +227,14 @@ export const App = () => {
                 }
               />
               <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/visitas-domiciliarias"
                 element={
                   <PrivateRoute>
@@ -309,6 +316,14 @@ export const App = () => {
               />
               <Route
                 path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion/:evolutionId"
                 element={
                   <PrivateRoute>
                     <NewEvolutionReport />

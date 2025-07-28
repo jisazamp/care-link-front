@@ -110,8 +110,8 @@ export const ViewReport: React.FC = () => {
       key: "actions",
       render: (_: any, record: any) => (
         <span>
-          <a style={{ marginRight: 8, color: '#9957C2' }} href="#" onClick={() => navigate(getEditReportPath())}>Ver</a>
-          <a style={{ color: '#9957C2' }} href="#" onClick={() => console.log('Editar registro:', record)}>Editar</a>
+          <a style={{ marginRight: 8, color: '#9957C2' }} href="#" onClick={() => navigate(getEditEvolutionPath(record.id_TipoReporte))}>Ver</a>
+          <a style={{ color: '#9957C2' }} href="#" onClick={() => navigate(getEditEvolutionPath(record.id_TipoReporte))}>Editar</a>
         </span>
       ),
     },
@@ -128,6 +128,18 @@ export const ViewReport: React.FC = () => {
     return isHomeVisit 
       ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}`
       : `/usuarios/${id}/reportes/${reportId}`;
+  };
+
+  const getNewEvolutionPath = () => {
+    return isHomeVisit 
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`
+      : `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`;
+  };
+
+  const getEditEvolutionPath = (evolutionId: number) => {
+    return isHomeVisit 
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion/${evolutionId}`
+      : `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion/${evolutionId}`;
   };
 
   return (
@@ -275,7 +287,7 @@ export const ViewReport: React.FC = () => {
                 </Title>
               </Col>
               <Col>
-                <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(getEditReportPath())}>
+                <Button type="primary" icon={<PlusCircleOutlined />} onClick={() => navigate(getNewEvolutionPath())}>
                   Agregar
                 </Button>
               </Col>
