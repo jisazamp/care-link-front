@@ -132,6 +132,8 @@ export const UserHomeVisitDetails: React.FC = () => {
           deleteFamilyMember(memberId);
           // Invalidar manualmente las consultas para asegurar actualización
           queryClient.invalidateQueries({ queryKey: [`get-user-${userId}-family-members`] });
+          // Invalidar también la query del usuario para actualizar los datos de localización
+          queryClient.invalidateQueries({ queryKey: [`get-user-${userId}`] });
         }
       },
     });

@@ -17,6 +17,10 @@ export const useCreateFamilyMember = (id: number | string | undefined) => {
       queryClient.invalidateQueries({
         queryKey: [`get-user-${id}-family-members`],
       });
+      // Invalidar también la query del usuario para actualizar los datos de localización
+      queryClient.invalidateQueries({
+        queryKey: [`get-user-${id}`],
+      });
     },
   });
 };
