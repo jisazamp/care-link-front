@@ -130,6 +130,7 @@ export const ViewReport: React.FC = () => {
   };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   const getNewEvolutionPath = () => {
     return isHomeVisit 
@@ -138,6 +139,8 @@ export const ViewReport: React.FC = () => {
   };
 
 >>>>>>> dd9c3e5 (aplicaciones de navegación entre módulos de  visitas domiciliarias)
+=======
+>>>>>>> ca2a7c6 (Update ViewReport.tsx)
   return (
     <div style={{ minHeight: "100vh", background: "#f5f5f5", padding: 24 }}>
       {/* Breadcrumbs y título del usuario */}
