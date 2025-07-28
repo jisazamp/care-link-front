@@ -38,6 +38,7 @@ export const ViewReport: React.FC = () => {
   const reportQuery = useGetMedicalReport(reportId);
   const evolutionsQuery = useGetClinicalEvolutions(reportId);
   const user = userQuery.data?.data.data;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const record = recordQuery.data?.data.data;
   const report = reportQuery.data?.data.data;
   const evolutions = evolutionsQuery.data?.data.data;
@@ -98,7 +99,7 @@ export const ViewReport: React.FC = () => {
        title: "Registro de tratamientos",
        dataIndex: "treatments",
        key: "treatments",
-       render: (_: any, record: any) => {
+       render: () => {
          // No existe campo treatments en ClinicalEvolution, dejar como "No"
          return "No";
        },
