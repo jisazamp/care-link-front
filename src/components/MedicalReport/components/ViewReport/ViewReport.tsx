@@ -134,12 +134,6 @@ export const ViewReport: React.FC = () => {
       : `/usuarios/${id}/reportes/${reportId}`;
   };
 
-  const getNewEvolutionPath = () => {
-    return isHomeVisit 
-      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`
-      : `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`;
-  };
-
   return (
     <div style={{ minHeight: "100vh", background: "#f5f5f5", padding: 24 }}>
       {/* Breadcrumbs y título del usuario */}
