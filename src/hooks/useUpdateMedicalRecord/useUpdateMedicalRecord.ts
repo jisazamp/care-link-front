@@ -23,8 +23,13 @@ export const useUpdateMedicalRecord = () => {
 
   return useMutation({
     mutationFn: updateMedicalRecord,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-medical-record"] });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [`user-medical-record-${variables.userId}`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`get-user-medical-record-${variables.userId}`],
+      });
     },
   });
 };

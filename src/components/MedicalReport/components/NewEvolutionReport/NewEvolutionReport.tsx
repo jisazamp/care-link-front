@@ -8,6 +8,7 @@ import { useEditClinicalEvolution } from "../../../../hooks/useEditClinicalEvolu
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetClinicalEvolution } from "../../../../hooks/useGetClinicalEvolution/useGetClinicalEvolution";
+import { queryClient } from "../../../../main";
 import patientImage from "../../../assets/Patients/patient1.jpg";
 
 const { Title, Text } = Typography;
@@ -83,6 +84,11 @@ export const NewEvolutionReport: React.FC = () => {
       });
       message.success("Reporte de evolución creado exitosamente");
     }
+    
+    // Invalidar manualmente las consultas para asegurar actualización
+    queryClient.invalidateQueries({ queryKey: [`report-${reportId}-clinical-evolutions`] });
+    queryClient.invalidateQueries({ queryKey: ["clinical-evolution"] });
+    
     navigate(getReportDetailsPath());
   };
 

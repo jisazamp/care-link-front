@@ -12,7 +12,10 @@ export const useUpdateMedicalReport = () => {
 
   return useMutation({
     mutationFn: async ({ reportId, data }: UpdateMedicalReportData) => {
-      const response = await client.patch(`/api/medical_reports/${reportId}`, data);
+      const response = await client.patch(
+        `/api/medical_reports/${reportId}`,
+        data,
+      );
       return response.data;
     },
     onSuccess: (_, variables) => {
@@ -21,7 +24,7 @@ export const useUpdateMedicalReport = () => {
         queryKey: ["medical-reports"],
       });
       queryClient.invalidateQueries({
-        queryKey: [`medical-report-${variables.reportId}`],
+        queryKey: [`get-medical-report-${variables.reportId}`],
       });
     },
   });

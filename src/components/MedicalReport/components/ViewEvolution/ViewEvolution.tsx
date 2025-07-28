@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import { useGetClinicalEvolution } from "../../../../hooks/useGetClinicalEvolution/useGetClinicalEvolution";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
+import { queryClient } from "../../../../main";
 import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import patientImage from "../../../assets/Patients/patient1.jpg";
@@ -142,9 +143,15 @@ export const ViewEvolution: React.FC = () => {
             </Col>
           </Row>
           <Row justify="end" style={{ marginTop: 24 }}>
-            <Button style={{ marginRight: 12 }} className="main-button-white" onClick={() => navigate(getReportDetailsPath())}>
-              Volver
-            </Button>
+                          <Button style={{ marginRight: 12 }} className="main-button-white" onClick={() => {
+                // Invalidar consultas antes de navegar para asegurar datos actualizados
+                queryClient.invalidateQueries({ queryKey: [`report-${reportId}-clinical-evolutions`] });
+                queryClient.invalidateQueries({ queryKey: [`get-medical-report-${reportId}`] });
+                queryClient.invalidateQueries({ queryKey: [`user-medical-record-${id}`] });
+                navigate(getReportDetailsPath());
+              }}>
+                Volver
+              </Button>
             <Button type="primary" onClick={() => navigate(getEditEvolutionPath())}>
               Editar evolución
             </Button>

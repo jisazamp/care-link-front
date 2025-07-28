@@ -20,6 +20,7 @@ import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGe
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useUpdateMedicalReport } from "../../../../hooks/useUpdateMedicalReport/useUpdateMedicalReport";
 import { useUpdateMedicalRecord } from "../../../../hooks/useUpdateMedicalRecord/useUpdateMedicalRecord";
+import { queryClient } from "../../../../main";
 import type { MedicalReport, MedicalRecord } from "../../../../types";
 
 export const EditMedicalReport: React.FC = () => {
@@ -109,6 +110,12 @@ export const EditMedicalReport: React.FC = () => {
       ]);
 
       message.success("Reporte actualizado correctamente");
+      
+      // Invalidar manualmente las consultas para asegurar actualización
+      queryClient.invalidateQueries({ queryKey: [`get-medical-report-${reportId}`] });
+      queryClient.invalidateQueries({ queryKey: [`user-medical-record-${id}`] });
+      queryClient.invalidateQueries({ queryKey: [`report-${reportId}-clinical-evolutions`] });
+      
       navigate(isHomeVisit ? `/visitas-domiciliarias/usuarios/${id}/detalles` : `/usuarios/${id}/detalles`);
     } catch (error) {
       message.error("Error al actualizar el reporte");
@@ -235,15 +242,17 @@ export const EditMedicalReport: React.FC = () => {
             </Row>
             <Row gutter={16}>
               <Col span={24}>
-                <Form.Item
-                  label="Remisión"
-                  name="referral"
-                >
-                  <Select placeholder="Seleccione una opción">
-                    <Select.Option value="si">Sí</Select.Option>
-                    <Select.Option value="no">No</Select.Option>
-                  </Select>
-                </Form.Item>
+                                 <Form.Item
+                   label="Remisión"
+                   name="referral"
+                 >
+                   <Select placeholder="Seleccione una opción">
+                     <Select.Option value="Enfermería">Enfermería</Select.Option>
+                     <Select.Option value="Gerontología">Gerontología</Select.Option>
+                     <Select.Option value="Psicología">Psicología</Select.Option>
+                     <Select.Option value="Fisioterapia">Fisioterapia</Select.Option>
+                   </Select>
+                 </Form.Item>
               </Col>
             </Row>
           </Card>
