@@ -224,12 +224,21 @@ export const NewUser: React.FC = () => {
       
       // Redirigir según el valor del switch "Visita Domiciliaria"
       if (homeVisitValue) {
-        // Si el switch está ON, redirigir directamente a la nueva visita del usuario creado
+        // Si el switch está ON, redirigir a la visita existente o crear nueva
         if (isSuccessCreateUser) {
-          // Para usuarios nuevos, usar el ID de la respuesta de creación
-          const userId = (createUserResponse?.data?.data as any)?.user?.id_usuario;
+          // Para usuarios nuevos, verificar si ya se creó una visita automáticamente
+          const responseData = createUserResponse?.data?.data as any;
+          const userId = responseData?.user?.id_usuario;
+          const homeVisitId = responseData?.home_visit?.id_visitadomiciliaria;
+          
           if (userId) {
-            navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+            if (homeVisitId) {
+              // Si ya se creó una visita automáticamente, redirigir a editarla
+              navigate(`/visitas-domiciliarias/usuarios/${userId}/editar-visita/${homeVisitId}`);
+            } else {
+              // Si no se creó automáticamente, redirigir a crear nueva
+              navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+            }
           } else {
             navigate("/visitas-domiciliarias/usuarios");
           }

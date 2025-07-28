@@ -69,9 +69,23 @@ export const HomeVisitNewVisit: React.FC = () => {
 
   // Forzar invalidación de queries cuando se monta el componente
   React.useEffect(() => {
-    console.log("🔍 Componente HomeVisitNewVisit montado, userId:", userId);
-    // Esto ayudará a asegurar que los datos se carguen correctamente
-  }, [userId]);
+    console.log("🔍 Componente HomeVisitNewVisit montado, userId:", userId, "visitaId:", visitaId);
+    
+    // Si tenemos un visitaId específico, invalidar la query de esa visita
+    if (visitaId) {
+      queryClient.invalidateQueries({
+        queryKey: ["home-visit", visitaId],
+      });
+    }
+    
+    // Invalidar también las queries del usuario y primera visita
+    queryClient.invalidateQueries({
+      queryKey: ["user", userId],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["user-first-home-visit", userId],
+    });
+  }, [userId, visitaId, queryClient]);
 
   // Debug logs para entender el problema de carga
   console.log("🔍 HomeVisitNewVisit Debug - Estado actual:");
@@ -124,8 +138,12 @@ export const HomeVisitNewVisit: React.FC = () => {
         
         // Redirigir de vuelta a la página de detalles para ver los cambios actualizados
         navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
+      } else if (visitaId && !currentVisitData) {
+        // Si tenemos un visitaId pero no hay datos de visita, mostrar error
+        message.error("No se pudo cargar la visita domiciliaria. Por favor, inténtalo de nuevo.");
+        return;
       } else {
-        // Crear nueva visita
+        // Crear nueva visita solo si no estamos editando una existente
         const visitaData: CreateHomeVisitData = {
           id_usuario: Number(userId),
           fecha_visita: values.fecha_visita.format("YYYY-MM-DD"),
@@ -290,6 +308,19 @@ export const HomeVisitNewVisit: React.FC = () => {
             marginTop: '8px'
           }}>
             ⚠️ Esta visita necesita ser programada
+          </div>
+        )}
+        {isEditing && currentVisitData && currentVisitData.observaciones?.includes("creada automáticamente") && (
+          <div style={{ 
+            backgroundColor: '#e6f7ff', 
+            border: '1px solid #91d5ff', 
+            borderRadius: '6px', 
+            padding: '8px 12px',
+            fontSize: '12px',
+            color: '#1890ff',
+            marginTop: '8px'
+          }}>
+            ℹ️ Esta visita fue creada automáticamente al registrar el usuario. Completa los datos para programarla.
           </div>
         )}
       </div>
