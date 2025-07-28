@@ -106,7 +106,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
     },
   });
   
-  const { getValues, formState: { errors } } = methods;
+  const { getValues, formState: { errors }, reset } = methods;
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
     useCreateSimplifiedMedicalRecord(userId);
@@ -122,6 +122,33 @@ export const HomeVisitMedicalRecord: React.FC = () => {
 
   const professionalsQuery = useGetProfessionals();
   const { data: user, isLoading: loadingUser } = useGetUserById(userId);
+
+  // Populate form with existing medical record data
+  useEffect(() => {
+    if (userMedicalRecord?.data.data) {
+      const data = userMedicalRecord.data.data;
+      reset({
+        fecha_visita: data.fecha_ingreso ? dayjs(data.fecha_ingreso) : dayjs(),
+        motivo_consulta: data.motivo_ingreso || "",
+        profesional: data.id_profesional || 0,
+        tipo_alimentacion: data.tipo_alimentacion || "",
+        tipo_sueno: data.tipo_de_sueno || "",
+        continencia: data.continencia || "",
+        tipo_movilidad: data.tipo_de_movilidad || "",
+        cuidado_personal: data.cuidado_personal || "",
+        apariencia_personal: data.apariencia_personal || "",
+        tabaquismo: data.tabaquismo || "",
+        sustancias_psicoactivas: data.sustanciaspsico || "",
+        alcoholismo: data.alcoholismo || "",
+        cafeina: data.cafeina || "",
+        comunicacion_verbal: data.comunicacion_verbal || "",
+        comunicacion_no_verbal: data.comunicacion_no_verbal || "",
+        estado_animo: data.estado_de_animo || "",
+        ha_sufrido_maltrato: data.maltratado || "",
+        observaciones: data.observaciones_iniciales || "",
+      });
+    }
+  }, [userMedicalRecord?.data.data, reset]);
 
   // Mapeo de hash a key del Collapse
   useEffect(() => {
@@ -173,7 +200,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
           sustanciaspsico: data.sustancias_psicoactivas,
           tabaquismo: data.tabaquismo,
           telefono_emermedica: "No especificado",
-          temperatura_corporal: 37, // Default temperature
+          temperatura_corporal: 37,
           tipo_alimentacion: data.tipo_alimentacion,
           tipo_de_movilidad: data.tipo_movilidad,
           tipo_de_sueno: data.tipo_sueno,

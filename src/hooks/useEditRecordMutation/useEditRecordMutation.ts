@@ -40,7 +40,7 @@ const editSimplifiedRecord = ({
   recordId: number;
   record: Partial<MedicalRecord>;
 }) => {
-  return client.patch(`/api/users/${id}/medical_record/${recordId}`, record);
+  return client.patch(`/api/users/${id}/medical_record/${recordId}/simplified`, record);
 };
 
 interface UseEditRecordMutationProps {
