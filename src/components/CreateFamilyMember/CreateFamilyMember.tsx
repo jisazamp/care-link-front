@@ -113,7 +113,13 @@ export const CreateFamilyMember = () => {
 
   useEffect(() => {
     if (isSuccessCreateFamilyMember || isSuccessEditFamilyMember) {
-      navigate(`/usuarios/${userId}/detalles`);
+      // Detectar si viene de visitas domiciliarias basándose en la URL actual
+      const currentPath = window.location.pathname;
+      if (currentPath.includes('/visitas-domiciliarias/')) {
+        navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
+      } else {
+        navigate(`/usuarios/${userId}/detalles`);
+      }
     }
   }, [
     isSuccessCreateFamilyMember,
@@ -143,7 +149,11 @@ export const CreateFamilyMember = () => {
       <Breadcrumb
         items={[
           { title: "Inicio" },
-          { title: "Usuarios" },
+          { 
+            title: window.location.pathname.includes('/visitas-domiciliarias/') 
+              ? "Visitas Domiciliarias" 
+              : "Usuarios" 
+          },
           {
             title: familyMemberId
               ? "Editar acudiente o familiar"

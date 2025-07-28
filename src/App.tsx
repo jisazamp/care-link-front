@@ -195,30 +195,6 @@ export const App = () => {
                 }
               />
               <Route
-                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles"
-                element={
-                  <PrivateRoute>
-                    <ViewReport />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId"
-                element={
-                  <PrivateRoute>
-                    <EditReport />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
-                element={
-                  <PrivateRoute>
-                    <NewEvolutionReport />
-                  </PrivateRoute>
-                }
-              />
-              <Route
                 path="/visitas-domiciliarias"
                 element={
                   <PrivateRoute>
