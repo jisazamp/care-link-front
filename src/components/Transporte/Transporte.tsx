@@ -4,9 +4,7 @@ import {
   Typography, 
   Row, 
   Col, 
-
   Button, 
-
   Table, 
   Tag, 
   Space, 
@@ -15,6 +13,8 @@ import {
   message, 
   Badge,
   Tooltip,
+  TimePicker,
+  Input,
 } from 'antd';
 import { 
   CarOutlined, 
@@ -23,12 +23,15 @@ import {
   PlusOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  EditOutlined,
+  SaveOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useGetRutaTransporte } from '../../hooks/useGetRutaTransporte/useGetRutaTransporte';
 import { useCreateTransporte } from '../../hooks/useCreateTransporte/useCreateTransporte';
-import { useUpdateTransporte } from '../../hooks/useUpdateTransporte/useUpdateTransporte';
+import { useUpdateTransporte, useUpdateTransporteHorarios } from '../../hooks/useUpdateTransporte/useUpdateTransporte';
 import type { 
   RutaTransporte, 
   CreateTransporteRequest, 
@@ -47,6 +50,13 @@ export const Transporte: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTransporte, setEditingTransporte] = useState<RutaTransporte | null>(null);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  
+  // Estados para edición inline
+  const [editingHorarios, setEditingHorarios] = useState<{
+    id_transporte: number;
+    field: 'hora_recogida' | 'hora_entrega';
+    value: string;
+  } | null>(null);
 
   // Hooks
   const { data: rutaData, isLoading, refetch } = useGetRutaTransporte(
@@ -54,6 +64,7 @@ export const Transporte: React.FC = () => {
   );
   const { mutate: createTransporte, isPending: createLoading } = useCreateTransporte();
   const { mutate: updateTransporte, isPending: updateLoading } = useUpdateTransporte();
+  const { mutate: updateHorarios, isPending: updateHorariosLoading } = useUpdateTransporteHorarios();
 
   // Estadísticas calculadas
   const stats = useMemo(() => {
@@ -114,6 +125,42 @@ export const Transporte: React.FC = () => {
     }
   };
 
+  // Funciones para edición inline
+  const handleStartEditHorario = (record: RutaTransporte, field: 'hora_recogida' | 'hora_entrega') => {
+    console.log('Iniciando edición de horario:', { record, field });
+    setEditingHorarios({
+      id_transporte: record.id_transporte,
+      field,
+      value: record[field] || ''
+    });
+  };
+
+  const handleSaveHorario = () => {
+    if (!editingHorarios) return;
+
+    const { id_transporte, field, value } = editingHorarios;
+    console.log('Guardando horario:', { id_transporte, field, value });
+    
+    updateHorarios({
+      id: id_transporte,
+      data: { [field]: value }
+    }, {
+      onSuccess: () => {
+        message.success('Horario actualizado exitosamente');
+        setEditingHorarios(null);
+        refetch();
+      },
+      onError: () => {
+        message.error('Error al actualizar el horario');
+      }
+    });
+  };
+
+  const handleCancelEditHorario = () => {
+    console.log('Cancelando edición de horario');
+    setEditingHorarios(null);
+  };
+
   const getEstadoColor = (estado: EstadoTransporte) => {
     switch (estado) {
       case 'PENDIENTE':
@@ -164,31 +211,120 @@ export const Transporte: React.FC = () => {
       ),
     },
     {
-      title: 'Dirección Entrega',
-      dataIndex: 'direccion_entrega',
-      key: 'direccion_entrega',
-      render: (direccion: string) => (
-        <Space>
-          <EnvironmentOutlined />
-          <Text>{direccion || 'No especificada'}</Text>
-        </Space>
+      title: 'Teléfono de Contacto',
+      dataIndex: 'telefono_contacto',
+      key: 'telefono_contacto',
+      render: (telefono: string) => (
+        <Text>{telefono || 'No especificado'}</Text>
       ),
     },
     {
-      title: 'Horarios',
-      key: 'horarios',
-      render: (record: RutaTransporte) => (
-        <Space direction="vertical" size="small">
+      title: 'Hora Recogida',
+      key: 'hora_recogida',
+      render: (record: RutaTransporte) => {
+        const isEditing = editingHorarios?.id_transporte === record.id_transporte && editingHorarios?.field === 'hora_recogida';
+        
+        if (isEditing) {
+          return (
+            <Space>
+              <TimePicker
+                format="HH:mm:ss"
+                value={editingHorarios.value ? dayjs(editingHorarios.value, 'HH:mm:ss') : null}
+                onChange={(time) => {
+                  setEditingHorarios(prev => prev ? {
+                    ...prev,
+                    value: time ? time.format('HH:mm:ss') : ''
+                  } : null);
+                }}
+                style={{ width: 120 }}
+              />
+              <Button
+                type="text"
+                size="small"
+                icon={<SaveOutlined />}
+                onClick={handleSaveHorario}
+                loading={updateHorariosLoading}
+              />
+              <Button
+                type="text"
+                size="small"
+                icon={<CloseOutlined />}
+                onClick={handleCancelEditHorario}
+              />
+            </Space>
+          );
+        }
+        
+        return (
           <Space>
             <ClockCircleOutlined />
-            <Text>Recogida: {record.hora_recogida || 'No especificada'}</Text>
+            <Text>{record.hora_recogida || 'No especificada'}</Text>
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => {
+                console.log('Click en editar hora recogida:', record);
+                handleStartEditHorario(record, 'hora_recogida');
+              }}
+            />
           </Space>
+        );
+      },
+    },
+    {
+      title: 'Hora Entrega',
+      key: 'hora_entrega',
+      render: (record: RutaTransporte) => {
+        const isEditing = editingHorarios?.id_transporte === record.id_transporte && editingHorarios?.field === 'hora_entrega';
+        
+        if (isEditing) {
+          return (
+            <Space>
+              <TimePicker
+                format="HH:mm:ss"
+                value={editingHorarios.value ? dayjs(editingHorarios.value, 'HH:mm:ss') : null}
+                onChange={(time) => {
+                  setEditingHorarios(prev => prev ? {
+                    ...prev,
+                    value: time ? time.format('HH:mm:ss') : ''
+                  } : null);
+                }}
+                style={{ width: 120 }}
+              />
+              <Button
+                type="text"
+                size="small"
+                icon={<SaveOutlined />}
+                onClick={handleSaveHorario}
+                loading={updateHorariosLoading}
+              />
+              <Button
+                type="text"
+                size="small"
+                icon={<CloseOutlined />}
+                onClick={handleCancelEditHorario}
+              />
+            </Space>
+          );
+        }
+        
+        return (
           <Space>
             <ClockCircleOutlined />
-            <Text>Entrega: {record.hora_entrega || 'No especificada'}</Text>
+            <Text>{record.hora_entrega || 'No especificada'}</Text>
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => {
+                console.log('Click en editar hora entrega:', record);
+                handleStartEditHorario(record, 'hora_entrega');
+              }}
+            />
           </Space>
-        </Space>
-      ),
+        );
+      },
     },
     {
       title: 'Estado',
@@ -205,55 +341,54 @@ export const Transporte: React.FC = () => {
       key: 'acciones',
       render: (record: RutaTransporte) => (
         <Space>
-          {record.estado === 'PENDIENTE' && (
-            <>
-              <Tooltip title="Marcar como realizado">
-                <Button
-                  type="primary"
-                  size="large"
-                  icon={<CheckCircleOutlined />}
-                  onClick={() => {
-                    updateTransporte({
-                      id: record.id_transporte,
-                      data: { estado: 'REALIZADO' }
-                    }, {
-                      onSuccess: () => {
-                        message.success('Transporte marcado como realizado');
-                        refetch();
-                      }
-                    });
-                  }}
-                >
-                  Realizado
-                </Button>
-              </Tooltip>
-              <Tooltip title="Cancelar transporte">
-                <Button
-                  type="text"
-                  danger
-                  size="middle"
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => {
-                    updateTransporte({
-                      id: record.id_transporte,
-                      data: { estado: 'CANCELADO' }
-                    }, {
-                      onSuccess: () => {
-                        message.success('Transporte cancelado');
-                        refetch();
-                      }
-                    });
-                  }}
-                />
-              </Tooltip>
-            </>
-          )}
+          <Tooltip title="Marcar como realizado">
+            <Button
+              type="primary"
+              size="large"
+              icon={<CheckCircleOutlined />}
+              onClick={() => {
+                console.log('Click en marcar como realizado:', record);
+                updateTransporte({
+                  id: record.id_transporte,
+                  data: { estado: 'REALIZADO' }
+                }, {
+                  onSuccess: () => {
+                    message.success('Transporte marcado como realizado');
+                    refetch();
+                  }
+                });
+              }}
+            >
+              Realizado
+            </Button>
+          </Tooltip>
+          <Tooltip title="Cancelar transporte">
+            <Button
+              type="text"
+              danger
+              size="middle"
+              icon={<CloseCircleOutlined />}
+              onClick={() => {
+                console.log('Click en cancelar transporte:', record);
+                updateTransporte({
+                  id: record.id_transporte,
+                  data: { estado: 'CANCELADO' }
+                }, {
+                  onSuccess: () => {
+                    message.success('Transporte cancelado');
+                    refetch();
+                  }
+                });
+              }}
+            />
+          </Tooltip>
         </Space>
       ),
     },
   ];
 
   console.log("RUTAS:", rutaData?.data?.data?.rutas);
+  console.log("EDITING HORARIOS:", editingHorarios);
 
   return (
     <div style={{ padding: '24px' }}>

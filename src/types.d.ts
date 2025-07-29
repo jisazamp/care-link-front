@@ -442,7 +442,7 @@ export type RutaTransporte = {
   apellidos: string;
   n_documento: string;
   direccion_recogida?: string;
-  direccion_entrega?: string;
+  telefono_contacto?: string;
   hora_recogida?: string;
   hora_entrega?: string;
   estado: EstadoTransporte;
