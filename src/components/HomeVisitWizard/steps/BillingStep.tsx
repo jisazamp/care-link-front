@@ -55,6 +55,10 @@ export const BillingStep: React.FC<BillingStepProps> = ({ onValidChange }) => {
   }, [descuentos, setValue]);
 
   const handlePaymentsChange = (newPayments: any[]) => {
+    // Actualizar el estado local de pagos
+    setPayments(newPayments || []);
+    
+    // Formatear pagos para el formulario principal
     const formattedPayments = (newPayments || [])
       .filter((p): p is any => p !== undefined && p !== null)
       .map(p => ({

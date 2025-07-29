@@ -14,6 +14,8 @@ import { BillingStep } from './steps/BillingStep';
 import { useGetUserById } from '../../hooks/useGetUserById/useGetUserById';
 import { useCreateHomeVisit, CreateHomeVisitData } from '../../hooks/useCreateHomeVisit/useCreateHomeVisit';
 import { useCreateHomeVisitBill } from '../../hooks/useCreateHomeVisitBill/useCreateHomeVisitBill';
+import { useCreatePayment } from '../../hooks/useCreatePayment/useCreatePayment';
+import { useAuthStore } from '../../store/auth';
 
 const { Title } = Typography;
 
@@ -64,6 +66,7 @@ export const HomeVisitWizard: React.FC = () => {
   const { data: user, isLoading: loadingUser } = useGetUserById(userId);
   const { mutate: createHomeVisit, isPending: creatingVisit } = useCreateHomeVisit();
   const { mutate: createBill, isPending: creatingBill } = useCreateHomeVisitBill();
+  const { addPaymentsToFacturaFnAsync } = useCreatePayment();
 
   const steps = [
     {
@@ -135,8 +138,46 @@ export const HomeVisitWizard: React.FC = () => {
 
             // Crear la factura
             createBill(billData, {
-              onSuccess: () => {
-                message.success('Visita domiciliaria y factura creadas exitosamente');
+              onSuccess: async (billResponse) => {
+                const facturaId = billResponse.data.data.id_factura;
+                
+                // Si hay pagos configurados, enviarlos
+                if (formData.payments && formData.payments.length > 0) {
+                  try {
+                    // Verificar que el usuario esté autenticado
+                    const token = useAuthStore.getState().jwtToken;
+                    if (!token) {
+                      message.warning('Visita domiciliaria y factura creadas, pero no se pudieron enviar los pagos (no hay sesión activa)');
+                      navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
+                      return;
+                    }
+
+                    // Enviar pagos a la factura
+                    const paymentsData = formData.payments.map((payment: any) => ({
+                      id_metodo_pago: payment.paymentMethod,
+                      id_tipo_pago: payment.id_tipo_pago,
+                      fecha_pago: payment.paymentDate,
+                      valor: payment.amount
+                    }));
+
+                    await addPaymentsToFacturaFnAsync({
+                      facturaId: facturaId,
+                      payments: paymentsData
+                    });
+
+                    message.success('Visita domiciliaria, factura y pagos creados exitosamente');
+                  } catch (error: any) {
+                    console.error('Error al enviar pagos:', error);
+                    if (error.response?.status === 401) {
+                      message.warning('Visita domiciliaria y factura creadas, pero la sesión expiró. Los pagos se pueden agregar manualmente más tarde.');
+                    } else {
+                      message.warning('Visita domiciliaria y factura creadas, pero hubo un problema con los pagos');
+                    }
+                  }
+                } else {
+                  message.success('Visita domiciliaria y factura creadas exitosamente');
+                }
+                
                 navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
               },
               onError: (error: any) => {
