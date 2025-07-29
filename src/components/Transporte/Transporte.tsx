@@ -21,8 +21,6 @@ import {
   ClockCircleOutlined, 
   EnvironmentOutlined, 
   PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   ReloadOutlined
@@ -31,7 +29,6 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { useGetRutaTransporte } from '../../hooks/useGetRutaTransporte/useGetRutaTransporte';
 import { useCreateTransporte } from '../../hooks/useCreateTransporte/useCreateTransporte';
 import { useUpdateTransporte } from '../../hooks/useUpdateTransporte/useUpdateTransporte';
-import { useDeleteTransporte } from '../../hooks/useDeleteTransporte/useDeleteTransporte';
 import type { 
   RutaTransporte, 
   CreateTransporteRequest, 
@@ -57,7 +54,6 @@ export const Transporte: React.FC = () => {
   );
   const { mutate: createTransporte, isPending: createLoading } = useCreateTransporte();
   const { mutate: updateTransporte, isPending: updateLoading } = useUpdateTransporte();
-  const { mutate: deleteTransporte, isPending: deleteLoading } = useDeleteTransporte();
 
   // Estadísticas calculadas
   const stats = useMemo(() => {
@@ -85,33 +81,6 @@ export const Transporte: React.FC = () => {
     setModalMode('create');
     setEditingTransporte(null);
     setIsModalVisible(true);
-  };
-
-  const handleEditTransporte = (transporte: RutaTransporte) => {
-    setModalMode('edit');
-    setEditingTransporte(transporte);
-    setIsModalVisible(true);
-  };
-
-  const handleDeleteTransporte = (id: number) => {
-    Modal.confirm({
-      title: '¿Estás seguro de eliminar este transporte?',
-      content: 'Esta acción no se puede deshacer.',
-      okText: 'Eliminar',
-      okType: 'danger',
-      cancelText: 'Cancelar',
-      onOk: () => {
-        deleteTransporte(id, {
-          onSuccess: () => {
-            message.success('Transporte eliminado exitosamente');
-            refetch();
-          },
-          onError: () => {
-            message.error('Error al eliminar el transporte');
-          }
-        });
-      }
-    });
   };
 
   const handleModalSubmit = (values: CreateTransporteRequest | UpdateTransporteRequest) => {
@@ -236,28 +205,12 @@ export const Transporte: React.FC = () => {
       key: 'acciones',
       render: (record: RutaTransporte) => (
         <Space>
-          <Tooltip title="Editar transporte">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => handleEditTransporte(record)}
-              disabled={record.estado === 'REALIZADO'}
-            />
-          </Tooltip>
-          <Tooltip title="Eliminar transporte">
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => handleDeleteTransporte(record.id_transporte)}
-              loading={deleteLoading}
-            />
-          </Tooltip>
           {record.estado === 'PENDIENTE' && (
             <>
               <Tooltip title="Marcar como realizado">
                 <Button
-                  type="text"
+                  type="primary"
+                  size="large"
                   icon={<CheckCircleOutlined />}
                   onClick={() => {
                     updateTransporte({
@@ -270,12 +223,15 @@ export const Transporte: React.FC = () => {
                       }
                     });
                   }}
-                />
+                >
+                  Realizado
+                </Button>
               </Tooltip>
               <Tooltip title="Cancelar transporte">
                 <Button
                   type="text"
                   danger
+                  size="middle"
                   icon={<CloseCircleOutlined />}
                   onClick={() => {
                     updateTransporte({
