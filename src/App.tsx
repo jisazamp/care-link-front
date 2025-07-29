@@ -20,7 +20,7 @@ import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { EditMedicalReport } from "./components/MedicalReport/components/EditMedicalReport/EditMedicalReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
-import { HomeVisitNewVisit } from "./components/HomeVisitNewVisit/HomeVisitNewVisit";
+import { HomeVisitWizard } from "./components/HomeVisitWizard/HomeVisitWizard";
 import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
@@ -167,7 +167,7 @@ export const App = () => {
                 path="/visitas-domiciliarias/usuarios/:id/nueva-visita"
                 element={
                   <PrivateRoute>
-                    <HomeVisitNewVisit />
+                    <HomeVisitWizard />
                   </PrivateRoute>
                 }
               />
@@ -175,7 +175,7 @@ export const App = () => {
                 path="/visitas-domiciliarias/usuarios/:id/editar-visita/:visitaId"
                 element={
                   <PrivateRoute>
-                    <HomeVisitNewVisit />
+                    <HomeVisitWizard />
                   </PrivateRoute>
                 }
               />

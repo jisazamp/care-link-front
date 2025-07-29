@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../api/client";
-import type { HomeVisit } from "../../types";
 
 export interface CreateHomeVisitData {
   id_usuario: number;
@@ -13,34 +12,29 @@ export interface CreateHomeVisitData {
   id_profesional_asignado?: number;
 }
 
-interface CreateHomeVisitResponse {
-  data: HomeVisit;
-  message: string;
-  success: boolean;
-}
-
-const createHomeVisit = ({
-  userId,
-  data,
-}: {
-  userId: number | string;
-  data: CreateHomeVisitData;
-}) =>
-  client.post<CreateHomeVisitResponse>(
-    `/api/users/${userId}/home-visits`,
-    data,
-  );
-
-export const useCreateHomeVisit = (userId: number | string | undefined) => {
+export const useCreateHomeVisit = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateHomeVisitData) =>
-      createHomeVisit({ userId: userId!, data }),
+    mutationFn: async (data: CreateHomeVisitData) => {
+      const response = await client.post(
+        `/api/users/${data.id_usuario}/home-visits`,
+        {
+          id_usuario: data.id_usuario,
+          fecha_visita: data.fecha_visita,
+          hora_visita: data.hora_visita,
+          direccion_visita: data.direccion_visita,
+          telefono_visita: data.telefono_visita,
+          valor_dia: data.valor_dia,
+          observaciones: data.observaciones,
+          id_profesional_asignado: data.id_profesional_asignado,
+        },
+      );
+      return response;
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["user-home-visits", userId],
-      });
+      queryClient.invalidateQueries({ queryKey: ["home-visits"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 };

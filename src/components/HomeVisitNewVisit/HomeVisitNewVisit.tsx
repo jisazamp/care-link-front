@@ -44,7 +44,7 @@ export const HomeVisitNewVisit: React.FC = () => {
   const { data: professionalsData, isLoading: loadingProfessionals } = useGetProfessionals();
   const { data: serviceRateData, isLoading: loadingServiceRate } = useGetServiceRate(4, dayjs().year()); // Service ID 4 for "Visitas Domiciliarias"
 
-  const createHomeVisitMutation = useCreateHomeVisit(userId);
+  const createHomeVisitMutation = useCreateHomeVisit();
   const updateHomeVisitMutation = useUpdateHomeVisit();
 
   // Determinar si estamos editando una visita existente o creando una nueva
