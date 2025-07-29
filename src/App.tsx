@@ -9,7 +9,6 @@ import {
   Routes,
 } from "react-router-dom";
 import { ActivitiesList } from "./components/ActivitiesList/ActivitiesList";
-import AuthorizedUsersList from "./components/AuthorizedUsersList";
 import { Billing } from "./components/Billing";
 import { ContractDetails } from "./components/Contracts/components/ContractDetails/ContractDetails";
 import { FormContracts } from "./components/Contracts/components/FormContracts";
@@ -134,7 +133,7 @@ export const App = () => {
                 }
               />
               <Route
-                path="/profesionales"
+                path="/admin"
                 element={
                   <PrivateRoute>
                     <AuthorizedUsersListScreen />
@@ -318,7 +317,7 @@ export const App = () => {
                 }
               />
               <Route
-                path="/usuarios/registrar/:id?"
+                path="/admin/registrar/:id?"
                 element={
                   <PrivateRoute>
                     <NewUserForm />

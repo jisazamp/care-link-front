@@ -5,6 +5,7 @@ import {
   DollarOutlined,
   HomeOutlined,
   UserOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router-dom";
@@ -97,6 +98,21 @@ const menuItems = [
       {
         key: "6.1",
         label: <Link to="/facturacion">Facturas del Sistema</Link>,
+      },
+    ],
+  },
+  {
+    key: "8",
+    icon: <TeamOutlined />,
+    label: "Administración",
+    children: [
+      {
+        key: "8.1",
+        label: <Link to="/admin">Listado de Usuarios</Link>,
+      },
+      {
+        key: "8.2",
+        label: <Link to="/admin/registrar">Registrar Usuario</Link>,
       },
     ],
   },

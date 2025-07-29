@@ -1,3 +1,9 @@
+import { RolesEnum } from "./components/CreateAuthorizedUser/index.schema";
+import {
+  Charge,
+  Profession,
+  Specialty,
+} from "./components/ProfessionalDataForm/index.schema";
 import type { CivilStatus, Gender, UserFamilyType, UserStatus } from "./enums";
 
 export type User = {
@@ -74,6 +80,25 @@ export interface CreateAuthorizedUserPayload extends AuthorizedUser {
     professional_id_number: string;
     specialty: string;
   };
+}
+
+export interface UpdateAuthorizedUserPayload {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: RolesEnum;
+  password?: string;
+
+  birthdate?: string;
+  charge?: Charge;
+  document_number?: string;
+  entry_date?: string;
+  home_address?: string;
+  phone_number?: string;
+  profession?: Profession;
+  professional_id_number?: string;
+  specialty?: Specialty;
 }
 
 export type MedicalRecord = {
@@ -160,6 +185,7 @@ export type MedicalReport = {
 
 export type Professional = {
   id_profesional: number;
+  id_user: number | null;
   apellidos: string;
   cargo: string;
   direccion: string;
@@ -172,7 +198,7 @@ export type Professional = {
   nombres: string;
   profesion: string;
   t_profesional: string;
-  telefono: number;
+  telefono: string;
 };
 
 export type UserMedicine = {

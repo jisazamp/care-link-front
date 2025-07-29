@@ -1,5 +1,15 @@
-import { Breadcrumb, Card, Layout, Space, Table, Typography } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import {
+  Breadcrumb,
+  Button,
+  Card,
+  Layout,
+  Space,
+  Table,
+  Typography,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
+import { useNavigate } from "react-router-dom";
 import type { AuthorizedUser } from "../../types";
 import type { IAuthorizedUsersListProps } from "./index.types";
 
@@ -22,7 +32,6 @@ const UserInfoCell: React.FC<{ user: AuthorizedUser }> = ({ user }) => {
           fontSize: 13,
           display: "block",
           width: "100%",
-          textTransform: "capitalize",
         }}
       >
         {description}
@@ -31,20 +40,40 @@ const UserInfoCell: React.FC<{ user: AuthorizedUser }> = ({ user }) => {
   );
 };
 
-const buildUserColumns = (): ColumnsType<AuthorizedUser> => [
-  {
-    title: "",
-    dataIndex: "nombres",
-    key: "nombres",
-    ellipsis: true,
-    render: (_: unknown, user: AuthorizedUser) => <UserInfoCell user={user} />,
-  },
-];
-
 export const AuthorizedUsersList: React.FC<IAuthorizedUsersListProps> = ({
   users,
   loading,
 }) => {
+  const navigate = useNavigate();
+
+  const columns: ColumnsType<AuthorizedUser> = [
+    {
+      title: "",
+      dataIndex: "nombres",
+      key: "nombres",
+      ellipsis: true,
+      render: (_: unknown, user: AuthorizedUser) => (
+        <UserInfoCell user={user} />
+      ),
+    },
+    {
+      title: "Acciones",
+      key: "actions",
+      width: 100,
+      align: "right",
+      render: (_: unknown, user: AuthorizedUser) => (
+        <Button
+          type="link"
+          icon={<EditOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/admin/registrar/${user.id}`);
+          }}
+        />
+      ),
+    },
+  ];
+
   const dataSource =
     users.map((user) => ({
       ...user,
@@ -62,11 +91,15 @@ export const AuthorizedUsersList: React.FC<IAuthorizedUsersListProps> = ({
         <Card style={{ width: "100%" }}>
           <Table<AuthorizedUser>
             className="usuarios-table"
-            columns={buildUserColumns()}
+            columns={columns}
             dataSource={dataSource}
             loading={loading}
             scroll={{ x: "max-content" }}
             showHeader={false}
+            onRow={(record) => ({
+              onClick: () => navigate(`/usuarios/registrar/${record.id}`),
+              style: { cursor: "pointer" },
+            })}
           />
         </Card>
       </Space>

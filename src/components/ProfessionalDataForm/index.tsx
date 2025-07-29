@@ -71,7 +71,7 @@ export const ProfessionalDataForm: React.FC<ProfessionalDataFormProps> = ({
 
         <Col span={12}>
           <Form.Item
-            label="ID Profesional"
+            label="Tarjeta Profesional"
             validateStatus={professionalErrors.professionalId ? "error" : ""}
             help={
               professionalErrors.professionalId?.message && (

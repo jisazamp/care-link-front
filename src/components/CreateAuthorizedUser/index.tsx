@@ -16,11 +16,18 @@ import { useEffect } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateAuthorizedUser } from "../../hooks/useCreateAuthorizedUser";
+import { useGetProfessionalByUserId } from "../../hooks/useGetProfessionalByUserId";
 import { useListAuthorizedUserById } from "../../hooks/useListAuthorizedUserByid";
+import { useUpdateAuthorizedUser } from "../../hooks/useUpdateAuthorizedUser";
+import type { UpdateAuthorizedUserPayload } from "../../types";
 import { ProfessionalDataForm } from "../ProfessionalDataForm";
-import { editUserSchema, type UserDTO, userSchema } from "./index.schema";
+import { type UserDTO, editUserSchema, userSchema } from "./index.schema";
 import { RolesEnum } from "./index.schema";
-import { mapUserDTOToEntity } from "./index.utils";
+import {
+  buildUpdateAuthorizedUserPayload,
+  mapUserDTOToEntity,
+  populateFormFromApi,
+} from "./index.utils";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -49,25 +56,30 @@ export default function NewUserForm() {
   const { createAuthorizedUserFn, isPendingCreateAuthorizedUser } =
     useCreateAuthorizedUser();
 
+  const { updateAuthorizedUserFn, isPendingUpdateAuthorizedUser } =
+    useUpdateAuthorizedUser();
+
   const { authorizedUserData, isPendingAuthorizedUser } =
     useListAuthorizedUserById(userId);
 
-  const onCreateError = (error: Error) => {
-    const resultingError: AxiosError<{ message: string }> =
-      error as AxiosError<{ message: string }>;
-    message.error(resultingError.response?.data.message);
-  };
+  const { professionalData, isLoadingProfessional } =
+    useGetProfessionalByUserId(userId);
 
-  const onCreateSuccess = () => {
+  const handleSuccess = () => {
+    message.success(
+      isEditing
+        ? "Usuario actualizado correctamente"
+        : "Usuario creado correctamente",
+    );
     navigate("/profesionales");
   };
 
-  const onSubmit = async (data: UserDTO) => {
-    const user = mapUserDTOToEntity(data);
-    createAuthorizedUserFn(user, {
-      onSuccess: onCreateSuccess,
-      onError: onCreateError,
-    });
+  const handleError = (error: Error) => {
+    const resultingError: AxiosError<{ message: string }> =
+      error as AxiosError<{
+        message: string;
+      }>;
+    message.error(resultingError.response?.data.message);
   };
 
   const handleReset = () => {
@@ -85,36 +97,57 @@ export default function NewUserForm() {
     }
   };
 
-  useEffect(() => {
-    if (userId && authorizedUserData?.data.data) {
-      const { email, first_name, last_name, role } =
-        authorizedUserData.data.data;
-      reset({
-        email,
-        firstName: first_name,
-        lastName: last_name,
-        role: role as RolesEnum,
+  const onSubmit = async (data: UserDTO) => {
+    if (isEditing) {
+      const payload: UpdateAuthorizedUserPayload =
+        buildUpdateAuthorizedUserPayload(userId, data);
+
+      updateAuthorizedUserFn(payload, {
+        onSuccess: handleSuccess,
+        onError: handleError,
+      });
+    } else {
+      const user = mapUserDTOToEntity(data);
+
+      createAuthorizedUserFn(user, {
+        onSuccess: handleSuccess,
+        onError: handleError,
       });
     }
-  }, [authorizedUserData, userId, reset]);
+  };
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const basicData = authorizedUserData?.data?.data;
+    const profData = professionalData?.data?.data;
+
+    const populatedForm = populateFormFromApi(basicData, profData);
+    reset(populatedForm);
+  }, [userId, authorizedUserData, professionalData, reset]);
 
   return (
     <>
       <Breadcrumb
         key={Date.now().toString()}
-        items={[{ title: "Inicio" }, { title: "Nuevo usuario" }]}
+        items={[
+          { title: "Inicio" },
+          { title: isEditing ? "Editar usuario" : "Nuevo usuario" },
+        ]}
         style={{ margin: "16px 0" }}
       />
 
       <FormProvider {...methods}>
         <Form
-          disabled={isPendingCreateAuthorizedUser}
+          disabled={
+            isPendingCreateAuthorizedUser || isPendingUpdateAuthorizedUser
+          }
           layout="vertical"
           onFinish={handleSubmit(onSubmit)}
         >
           <Card
-            loading={isPendingAuthorizedUser}
-            title="Crear nuevo usuario"
+            loading={isPendingAuthorizedUser || isLoadingProfessional}
+            title={isEditing ? "Editar usuario" : "Crear nuevo usuario"}
             variant="borderless"
           >
             <Row gutter={24}>
@@ -266,7 +299,10 @@ export default function NewUserForm() {
             <Row justify="end" gutter={16}>
               <Col>
                 <Button
-                  disabled={isPendingCreateAuthorizedUser}
+                  disabled={
+                    isPendingCreateAuthorizedUser ||
+                    isPendingUpdateAuthorizedUser
+                  }
                   onClick={handleReset}
                 >
                   Restablecer
@@ -274,12 +310,15 @@ export default function NewUserForm() {
               </Col>
               <Col>
                 <Button
-                  disabled={isPendingCreateAuthorizedUser}
+                  disabled={
+                    isPendingCreateAuthorizedUser ||
+                    isPendingUpdateAuthorizedUser
+                  }
                   htmlType="submit"
                   loading={isSubmitting || isPendingCreateAuthorizedUser}
                   type="primary"
                 >
-                  Crear usuario
+                  {isEditing ? "Editar usuario" : "Crear usuario"}
                 </Button>
               </Col>
             </Row>

@@ -16,5 +16,7 @@ export const getSelectedKey = (pathname: string): string => {
   if (pathname.startsWith("/cronograma")) return "4.1";
   if (pathname.startsWith("/transporte")) return "5.1";
   if (pathname.startsWith("/facturacion")) return "6.1";
+  if (pathname.startsWith("/admin")) return "8.1";
+  if (pathname === "/admin/registrar") return "8.2";
   return "";
 };
