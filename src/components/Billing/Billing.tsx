@@ -235,23 +235,70 @@ export const Billing: React.FC = () => {
 
   // Nueva tabla de facturación completa
   const columnsFacturacion = [
-    { title: "Usuario", dataIndex: "nombres", key: "nombres", render: (_: any, row: any) => `${row.nombres} ${row.apellidos}` },
-    { title: "Documento", dataIndex: "n_documento", key: "n_documento" },
-    { title: "Contrato", dataIndex: "id_contrato", key: "id_contrato" },
-    { title: "Tipo Contrato", dataIndex: "tipo_contrato", key: "tipo_contrato" },
+    { 
+      title: "Usuario", 
+      dataIndex: "nombres", 
+      key: "nombres", 
+      render: (_: any, row: any) => {
+        if (row.nombres && row.apellidos) {
+          return `${row.nombres} ${row.apellidos}`;
+        }
+        return "N/A";
+      }
+    },
+    { 
+      title: "Documento", 
+      dataIndex: "n_documento", 
+      key: "n_documento",
+      render: (text: string) => text || "N/A"
+    },
+    { 
+      title: "Contrato", 
+      dataIndex: "id_contrato", 
+      key: "id_contrato",
+      render: (text: any, row: any) => {
+        if (row.id_contrato) {
+          return row.id_contrato;
+        } else if (row.tipo_factura === 'VISITA_DOMICILIARIA') {
+          return "Visita Domiciliaria";
+        }
+        return "N/A";
+      }
+    },
+    { 
+      title: "Tipo Contrato", 
+      dataIndex: "tipo_contrato", 
+      key: "tipo_contrato",
+      render: (text: string) => text || "N/A"
+    },
     { title: "Factura", dataIndex: "numero_factura", key: "numero_factura" },
     { title: "Fecha Emisión", dataIndex: "fecha_emision", key: "fecha_emision" },
     { title: "Fecha Vencimiento", dataIndex: "fecha_vencimiento", key: "fecha_vencimiento" },
     {
       title: "Ver Contrato",
       key: "ver_contrato",
-      render: (_: any, row: any) => (
-        row.id_usuario && row.id_contrato ? (
-          <Button type="link" onClick={() => navigate(`/usuarios/${row.id_usuario}/contrato/${row.id_contrato}`)}>
-            Ir a Contrato
-          </Button>
-        ) : null
-      ),
+      render: (_: any, row: any) => {
+        if (row.tipo_factura === 'VISITA_DOMICILIARIA' && row.id_usuario && row.id_visita_domiciliaria) {
+          return (
+            <Button 
+              type="link" 
+              onClick={() => navigate(`/visitas-domiciliarias/usuarios/${row.id_usuario}/editar-visita/${row.id_visita_domiciliaria}`)}
+            >
+              Ver Visita
+            </Button>
+          );
+        } else if (row.id_usuario && row.id_contrato) {
+          return (
+            <Button 
+              type="link" 
+              onClick={() => navigate(`/usuarios/${row.id_usuario}/contrato/${row.id_contrato}`)}
+            >
+              Ir a Contrato
+            </Button>
+          );
+        }
+        return null;
+      },
     },
   ];
 
