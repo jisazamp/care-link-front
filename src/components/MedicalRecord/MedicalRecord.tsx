@@ -39,6 +39,7 @@ import { BiophysicalSkills } from "./components/BiophysicalSkills/BiophysicalSki
 import { EntryData } from "./components/EntryData/EntryData";
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
 import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
+import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
 import { SocialPerception } from "./components/SocialPerception/SocialPerception";
 import { SpecialConditions } from "./components/SpecialConditions/SpecialConditions";
 import { Toxicology } from "./components/Toxicology/Toxicology";
@@ -50,7 +51,6 @@ import {
   type PhysioRegimen,
   formSchema,
 } from "./schema/schema";
-import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
 //import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 
 const { Title } = Typography;

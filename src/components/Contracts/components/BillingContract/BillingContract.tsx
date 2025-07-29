@@ -1,17 +1,18 @@
 import { FileTextOutlined } from "@ant-design/icons";
 import {
+  Alert,
   Button,
   Card,
   Col,
-  Row,
-  Typography,
   Descriptions,
-  Tag,
-  Alert,
-  InputNumber,
   Form,
+  InputNumber,
+  Row,
+  Tag,
+  Typography,
 } from "antd";
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import dayjs from "dayjs";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBill";
@@ -23,7 +24,6 @@ import {
 } from "../../../../utils/paymentUtils";
 import type { FormValues } from "../FormContracts";
 import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
-import dayjs from "dayjs";
 import { getEstadoFactura } from "../../../Billing/components/PaymentSummary/PaymentSummary";
 
 const { Text } = Typography;

@@ -10,11 +10,12 @@ import {
   Divider,
   Row,
   Space,
+  Spin,
   Table,
   Tooltip,
   Typography,
-  Spin,
 } from "antd";
+import { useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
   Tooltip as ChartTooltip,
@@ -25,7 +26,6 @@ import {
   YAxis,
 } from "recharts";
 import { useGetUserFlow } from "../../../../hooks/useGetUserFlow/useGetUserFlow";
-import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -52,19 +52,21 @@ export const CardUserFlow = () => {
 
   // Columnas de la tabla
   const columnsUserFlow = [
-    { 
-      title: "Usuarios", 
-      dataIndex: "nombre_completo", 
-      key: "nombre_completo" 
+    {
+      title: "Usuarios",
+      dataIndex: "nombre_completo",
+      key: "nombre_completo",
     },
     {
       title: "Contrato",
       dataIndex: "id_contrato",
       key: "id_contrato",
       render: (id_contrato: number, record: any) => (
-        <a 
-          style={{ color: "#7f34b4" }} 
-          onClick={() => navigate(`/usuarios/${record.id_usuario}/contrato/${id_contrato}`)}
+        <a
+          style={{ color: "#7f34b4" }}
+          onClick={() =>
+            navigate(`/usuarios/${record.id_usuario}/contrato/${id_contrato}`)
+          }
         >
           Ver
         </a>
@@ -136,7 +138,9 @@ export const CardUserFlow = () => {
               <Title level={2}>{userFlowData?.stats.usuarios_mes || 0}</Title>
               <Space>
                 <CaretUpOutlined style={{ color: "green" }} />
-                <Text type="success">{userFlowData?.stats.usuarios_mes_trend || 0}</Text>
+                <Text type="success">
+                  {userFlowData?.stats.usuarios_mes_trend || 0}
+                </Text>
               </Space>
             </Space>
             <ResponsiveContainer width="100%" height={50}>
@@ -162,10 +166,14 @@ export const CardUserFlow = () => {
               <Tooltip title="Porcentaje de asistencia general en el mes">
                 <InfoCircleOutlined style={{ marginLeft: 5, color: "#aaa" }} />
               </Tooltip>
-              <Title level={2}>{userFlowData?.stats.tasa_asistencia || 0}%</Title>
+              <Title level={2}>
+                {userFlowData?.stats.tasa_asistencia || 0}%
+              </Title>
               <Space>
                 <CaretUpOutlined style={{ color: "green" }} />
-                <Text type="success">{userFlowData?.stats.tasa_asistencia_trend || 0}</Text>
+                <Text type="success">
+                  {userFlowData?.stats.tasa_asistencia_trend || 0}
+                </Text>
               </Space>
             </Space>
             <ResponsiveContainer width="100%" height={50}>

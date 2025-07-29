@@ -27,7 +27,9 @@ export const ActivitiesList = () => {
     null,
   );
   const [usersModalVisible, setUsersModalVisible] = useState(false);
-  const [selectedActivityForUsers, setSelectedActivityForUsers] = useState<number | null>(null);
+  const [selectedActivityForUsers, setSelectedActivityForUsers] = useState<
+    number | null
+  >(null);
 
   const showModal = (activity: Activity) => {
     setSelectedActivity(activity);
@@ -129,18 +131,18 @@ export const ActivitiesList = () => {
                 </Button>,
               ]}
             >
-                          <List.Item.Meta
-              title={<Text strong>{item.nombre}</Text>}
-              description={
-                <div>
-                  <Text>{item.descripcion}</Text>
-                  <br />
-                  <Text type="secondary">
-                    Fecha: {item.fecha} | Duración: {item.duracion} min
-                  </Text>
-                </div>
-              }
-            />
+              <List.Item.Meta
+                title={<Text strong>{item.nombre}</Text>}
+                description={
+                  <div>
+                    <Text>{item.descripcion}</Text>
+                    <br />
+                    <Text type="secondary">
+                      Fecha: {item.fecha} | Duración: {item.duracion} min
+                    </Text>
+                  </div>
+                }
+              />
             </List.Item>
           )}
         />

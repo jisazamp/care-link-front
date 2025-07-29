@@ -1,12 +1,16 @@
-import React from "react";
-import { Form, Input, Select, Button, Typography } from "antd";
-import { MMSEQuestionsProps } from "./types";
+import { Button, Form, Input, Select, Typography } from "antd";
+import type React from "react";
 import { mmseQuestions } from "./questions";
+import type { MMSEQuestionsProps } from "./types";
 
 const { Option } = Select;
 const { Title } = Typography;
 
-export const MMSEQuestions: React.FC<MMSEQuestionsProps> = ({ onNext, onChange, answers }) => {
+export const MMSEQuestions: React.FC<MMSEQuestionsProps> = ({
+  onNext,
+  onChange,
+  answers,
+}) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values: Record<string, string>) => {
@@ -16,7 +20,9 @@ export const MMSEQuestions: React.FC<MMSEQuestionsProps> = ({ onNext, onChange, 
 
   return (
     <>
-      <Title level={3} style={{ marginBottom: 16 }}>Mini-Mental State Examination (MMSE)</Title>
+      <Title level={3} style={{ marginBottom: 16 }}>
+        Mini-Mental State Examination (MMSE)
+      </Title>
       <Form
         form={form}
         layout="vertical"
@@ -53,4 +59,4 @@ export const MMSEQuestions: React.FC<MMSEQuestionsProps> = ({ onNext, onChange, 
       </Form>
     </>
   );
-}; 
+};

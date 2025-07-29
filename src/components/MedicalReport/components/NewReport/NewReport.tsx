@@ -10,6 +10,7 @@ import {
   Select,
   Upload,
 } from "antd";
+import { useWatch } from "antd/es/form/Form";
 import type { Dayjs } from "dayjs";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -17,7 +18,6 @@ import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import type { MedicalReport } from "../../../../types";
-import { useWatch } from "antd/es/form/Form";
 
 export const NewReport: React.FC = () => {
   const { id } = useParams();
@@ -167,15 +167,9 @@ export const NewReport: React.FC = () => {
               <Select placeholder="Seleccione una opción">
                 <Select.Option value="psicologia">Psicología</Select.Option>
                 <Select.Option value="fisioterapia">Fisioterapia</Select.Option>
-                <Select.Option value="gerontologia">
-                  Gerontologia
-                </Select.Option>
-                <Select.Option value="enfermeria">
-                  Enfermería
-                </Select.Option>
-                <Select.Option value="especialista">
-                  Especialista
-                </Select.Option>
+                <Select.Option value="gerontologia">Gerontologia</Select.Option>
+                <Select.Option value="enfermeria">Enfermería</Select.Option>
+                <Select.Option value="especialista">Especialista</Select.Option>
               </Select>
             </Form.Item>
           </Card>

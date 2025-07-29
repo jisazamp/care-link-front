@@ -35,9 +35,21 @@ const dataEfficiency = [
 ];
 
 export const GenericsCards = () => {
-  const { data: quarterlyVisitsData, isLoading: isLoadingVisits, error: errorVisits } = useGetQuarterlyVisits();
-  const { data: monthlyPaymentsData, isLoading: isLoadingPayments, error: errorPayments } = useGetMonthlyPayments();
-  const { data: operationalEfficiencyData, isLoading: isLoadingEfficiency, error: errorEfficiency } = useGetOperationalEfficiency();
+  const {
+    data: quarterlyVisitsData,
+    isLoading: isLoadingVisits,
+    error: errorVisits,
+  } = useGetQuarterlyVisits();
+  const {
+    data: monthlyPaymentsData,
+    isLoading: isLoadingPayments,
+    error: errorPayments,
+  } = useGetMonthlyPayments();
+  const {
+    data: operationalEfficiencyData,
+    isLoading: isLoadingEfficiency,
+    error: errorEfficiency,
+  } = useGetOperationalEfficiency();
 
   // Configuración dinámica para el gráfico de visitas
   const configVisitsDynamic = {
@@ -46,14 +58,14 @@ export const GenericsCards = () => {
     yField: "visits",
     smooth: true,
     color: "#7F34B4", // Morado para visitas
-    tooltip: { 
+    tooltip: {
       showMarkers: false,
       formatter: (datum: any) => {
         return {
           name: datum.month,
-          value: `${datum.visits || 0} visitas`
+          value: `${datum.visits || 0} visitas`,
         };
-      }
+      },
     },
     legend: { position: "top" },
     height: 100,
@@ -66,14 +78,14 @@ export const GenericsCards = () => {
     yField: "payments",
     smooth: true,
     color: "#1890FF", // Azul para pagos
-    tooltip: { 
+    tooltip: {
       showMarkers: false,
       formatter: (datum: any) => {
         return {
           name: datum.month,
-          value: `$${(datum.payments || 0).toLocaleString()}`
+          value: `$${(datum.payments || 0).toLocaleString()}`,
         };
-      }
+      },
     },
     legend: { position: "top" },
     height: 100,
@@ -86,14 +98,14 @@ export const GenericsCards = () => {
     yField: "efficiency",
     smooth: true,
     color: "#13C2C2", // Verde para eficiencia operativa
-    tooltip: { 
+    tooltip: {
       showMarkers: false,
       formatter: (datum: any) => {
         return {
           name: datum.month,
-          value: `${datum.efficiency || 0}%`
+          value: `${datum.efficiency || 0}%`,
         };
-      }
+      },
     },
     legend: { position: "top" },
     height: 100,
@@ -180,7 +192,10 @@ export const GenericsCards = () => {
           </Title>
           <Line {...configPaymentsDynamic} />
           <Text type="secondary">
-            Cumplimiento de meta <strong>{monthlyPaymentsData?.overall_goal_achievement || 0}%</strong>
+            Cumplimiento de meta{" "}
+            <strong>
+              {monthlyPaymentsData?.overall_goal_achievement || 0}%
+            </strong>
           </Text>
         </Card>
       </Col>
@@ -194,7 +209,11 @@ export const GenericsCards = () => {
           </Title>
           <Line {...configEfficiencyDynamic} />
           <Text type="secondary">
-            Aumento <Text type="success">{operationalEfficiencyData?.growth_percentage || 0}%</Text> Ver reporte
+            Aumento{" "}
+            <Text type="success">
+              {operationalEfficiencyData?.growth_percentage || 0}%
+            </Text>{" "}
+            Ver reporte
           </Text>
         </Card>
       </Col>

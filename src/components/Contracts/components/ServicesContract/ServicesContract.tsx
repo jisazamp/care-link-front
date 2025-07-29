@@ -49,7 +49,7 @@ const getServiceId = (serviceType: string) => {
 
 const getSelectorOptions = (recordKey: string, services: Service[]) => {
   switch (recordKey) {
-    case "1":
+    case "1": {
       // Verificar si hay servicio de día seleccionado para deshabilitar tiqueteras
       const diaService = services.find((s) => s.key === "3");
       const isDiaSelected = diaService?.serviceType === "Servicio dia";
@@ -63,7 +63,8 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
           Tiquetera {i + 1}
         </Select.Option>
       ));
-    case "2":
+    }
+    case "2": {
       // Obtener la tiquetera seleccionada para filtrar las opciones de transporte
       const tiqueteraService = services.find((s) => s.key === "1");
       const tiqueteraNumber = tiqueteraService?.serviceType
@@ -84,7 +85,8 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
           Transporte {i + 1}
         </Select.Option>
       ));
-    case "3":
+    }
+    case "3": {
       // Verificar si hay tiquetera seleccionada para deshabilitar servicio de día
       const tiqueteraSelected = services.find((s) => s.key === "1");
       const isTiqueteraSelected =
@@ -100,6 +102,7 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
           Servicio día
         </Select.Option>
       );
+    }
     default:
       return null;
   }
@@ -163,7 +166,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
 
   const handleServiceChange = (key: string, value?: string) => {
     switch (key) {
-      case "1":
+      case "1": {
         methods.setValue("selectedDatesService", []);
         // Limpiar transporte si la nueva tiquetera es menor que el transporte seleccionado
         const transporteService = services.find((s) => s.key === "2");
@@ -193,6 +196,7 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           methods.setValue("services", newServices);
         }
         break;
+      }
       case "2":
         methods.setValue("selectedDatesTransport", []);
         break;

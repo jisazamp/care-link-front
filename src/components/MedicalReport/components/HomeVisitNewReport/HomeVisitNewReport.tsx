@@ -167,15 +167,9 @@ export const HomeVisitNewReport: React.FC = () => {
               <Select placeholder="Seleccione una opción">
                 <Select.Option value="psicologia">Psicología</Select.Option>
                 <Select.Option value="fisioterapia">Fisioterapia</Select.Option>
-                <Select.Option value="gerontologia">
-                  Gerontologia
-                </Select.Option>
-                <Select.Option value="enfermeria">
-                  Enfermería
-                </Select.Option>
-                <Select.Option value="especialista">
-                  Especialista
-                </Select.Option>
+                <Select.Option value="gerontologia">Gerontologia</Select.Option>
+                <Select.Option value="enfermeria">Enfermería</Select.Option>
+                <Select.Option value="especialista">Especialista</Select.Option>
               </Select>
             </Form.Item>
           </Card>
@@ -211,4 +205,4 @@ export const HomeVisitNewReport: React.FC = () => {
       </Card>
     </>
   );
-}; 
+};

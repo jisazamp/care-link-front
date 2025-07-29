@@ -1,8 +1,8 @@
-import React from 'react';
-import { Row, Col, Select, Input, Button, Space, DatePicker } from 'antd';
-import { FilterOutlined, ReloadOutlined } from '@ant-design/icons';
+import { FilterOutlined, ReloadOutlined } from "@ant-design/icons";
+import { Button, Col, DatePicker, Input, Row, Select, Space } from "antd";
 //import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
+import type { Dayjs } from "dayjs";
+import type React from "react";
 
 const { Option } = Select;
 
@@ -23,17 +23,20 @@ interface ContractFiltersProps {
   onFiltersChange: (filters: ContractFiltersValues) => void;
 }
 
-export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFiltersChange }) => {
+export const ContractFilters: React.FC<ContractFiltersProps> = ({
+  filters,
+  onFiltersChange,
+}) => {
   const handleReset = () => {
     onFiltersChange({
-      documento: '',
-      estado: '',
-      contrato: '',
-      tipoContrato: '',
+      documento: "",
+      estado: "",
+      contrato: "",
+      tipoContrato: "",
       fechaEmision: null,
-      facturaAsociada: '',
+      facturaAsociada: "",
       fechaVencimiento: null,
-      nombreUsuario: '',
+      nombreUsuario: "",
     });
   };
 
@@ -43,15 +46,17 @@ export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFil
         <Input
           placeholder="Documento"
           value={filters.documento}
-          onChange={e => onFiltersChange({ ...filters, documento: e.target.value })}
+          onChange={(e) =>
+            onFiltersChange({ ...filters, documento: e.target.value })
+          }
           allowClear
         />
       </Col>
       <Col xs={24} sm={12} md={2}>
         <Select
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           value={filters.estado}
-          onChange={value => onFiltersChange({ ...filters, estado: value })}
+          onChange={(value) => onFiltersChange({ ...filters, estado: value })}
           placeholder="Estado"
           allowClear
         >
@@ -65,7 +70,9 @@ export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFil
         <Input
           placeholder="Contrato"
           value={filters.contrato}
-          onChange={e => onFiltersChange({ ...filters, contrato: e.target.value })}
+          onChange={(e) =>
+            onFiltersChange({ ...filters, contrato: e.target.value })
+          }
           allowClear
         />
       </Col>
@@ -73,7 +80,9 @@ export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFil
         <Input
           placeholder="Tipo Contrato"
           value={filters.tipoContrato}
-          onChange={e => onFiltersChange({ ...filters, tipoContrato: e.target.value })}
+          onChange={(e) =>
+            onFiltersChange({ ...filters, tipoContrato: e.target.value })
+          }
           allowClear
         />
       </Col>
@@ -81,9 +90,11 @@ export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFil
         <DatePicker
           placeholder="Fecha Emisión"
           value={filters.fechaEmision}
-          onChange={value => onFiltersChange({ ...filters, fechaEmision: value })}
+          onChange={(value) =>
+            onFiltersChange({ ...filters, fechaEmision: value })
+          }
           format="DD/MM/YYYY"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           allowClear
         />
       </Col>
@@ -91,7 +102,9 @@ export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFil
         <Input
           placeholder="Factura Asociada"
           value={filters.facturaAsociada}
-          onChange={e => onFiltersChange({ ...filters, facturaAsociada: e.target.value })}
+          onChange={(e) =>
+            onFiltersChange({ ...filters, facturaAsociada: e.target.value })
+          }
           allowClear
         />
       </Col>
@@ -99,9 +112,11 @@ export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFil
         <DatePicker
           placeholder="Fecha Vencimiento"
           value={filters.fechaVencimiento}
-          onChange={value => onFiltersChange({ ...filters, fechaVencimiento: value })}
+          onChange={(value) =>
+            onFiltersChange({ ...filters, fechaVencimiento: value })
+          }
           format="DD/MM/YYYY"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           allowClear
         />
       </Col>
@@ -109,14 +124,20 @@ export const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFil
         <Input
           placeholder="Nombre de usuario"
           value={filters.nombreUsuario}
-          onChange={e => onFiltersChange({ ...filters, nombreUsuario: e.target.value })}
+          onChange={(e) =>
+            onFiltersChange({ ...filters, nombreUsuario: e.target.value })
+          }
           allowClear
         />
       </Col>
       <Col xs={24} sm={24} md={4}>
         <Space>
-          <Button type="primary" icon={<FilterOutlined />}>Aplicar Filtros</Button>
-          <Button icon={<ReloadOutlined />} onClick={handleReset}>Limpiar</Button>
+          <Button type="primary" icon={<FilterOutlined />}>
+            Aplicar Filtros
+          </Button>
+          <Button icon={<ReloadOutlined />} onClick={handleReset}>
+            Limpiar
+          </Button>
         </Space>
       </Col>
     </Row>
@@ -136,11 +157,14 @@ interface InvoiceFiltersProps {
   onFiltersChange: (filters: InvoiceFiltersValues) => void;
 }
 
-export const InvoiceFilters: React.FC<InvoiceFiltersProps> = ({ filters, onFiltersChange }) => {
+export const InvoiceFilters: React.FC<InvoiceFiltersProps> = ({
+  filters,
+  onFiltersChange,
+}) => {
   const handleReset = () => {
     onFiltersChange({
-      factura: '',
-      estado: '',
+      factura: "",
+      estado: "",
       fechaEmision: null,
       fechaVencimiento: null,
     });
@@ -152,15 +176,17 @@ export const InvoiceFilters: React.FC<InvoiceFiltersProps> = ({ filters, onFilte
         <Input
           placeholder="Factura"
           value={filters.factura}
-          onChange={e => onFiltersChange({ ...filters, factura: e.target.value })}
+          onChange={(e) =>
+            onFiltersChange({ ...filters, factura: e.target.value })
+          }
           allowClear
         />
       </Col>
       <Col xs={24} sm={12} md={3}>
         <Select
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           value={filters.estado}
-          onChange={value => onFiltersChange({ ...filters, estado: value })}
+          onChange={(value) => onFiltersChange({ ...filters, estado: value })}
           placeholder="Estado"
           allowClear
         >
@@ -174,9 +200,11 @@ export const InvoiceFilters: React.FC<InvoiceFiltersProps> = ({ filters, onFilte
         <DatePicker
           placeholder="Fecha de emisión"
           value={filters.fechaEmision}
-          onChange={value => onFiltersChange({ ...filters, fechaEmision: value })}
+          onChange={(value) =>
+            onFiltersChange({ ...filters, fechaEmision: value })
+          }
           format="DD/MM/YYYY"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           allowClear
         />
       </Col>
@@ -184,18 +212,24 @@ export const InvoiceFilters: React.FC<InvoiceFiltersProps> = ({ filters, onFilte
         <DatePicker
           placeholder="Fecha de vencimiento"
           value={filters.fechaVencimiento}
-          onChange={value => onFiltersChange({ ...filters, fechaVencimiento: value })}
+          onChange={(value) =>
+            onFiltersChange({ ...filters, fechaVencimiento: value })
+          }
           format="DD/MM/YYYY"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           allowClear
         />
       </Col>
       <Col xs={24} sm={24} md={4}>
         <Space>
-          <Button type="primary" icon={<FilterOutlined />}>Aplicar Filtros</Button>
-          <Button icon={<ReloadOutlined />} onClick={handleReset}>Limpiar</Button>
+          <Button type="primary" icon={<FilterOutlined />}>
+            Aplicar Filtros
+          </Button>
+          <Button icon={<ReloadOutlined />} onClick={handleReset}>
+            Limpiar
+          </Button>
         </Space>
       </Col>
     </Row>
   );
-}; 
+};

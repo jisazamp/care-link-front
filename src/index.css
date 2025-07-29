@@ -753,12 +753,7 @@ body {
 
 .highlighted-patient-row {
   animation: highlightPulse 2s ease-in-out;
-  background: linear-gradient(
-    90deg,
-    #fff3cd 0%,
-    #ffeaa7 50%,
-    #fff3cd 100%
-  ) !important;
+  background: linear-gradient(90deg, #fff3cd 0%, #ffeaa7 50%, #fff3cd 100%) !important;
   border: 2px solid #f39c12 !important;
   box-shadow: 0 0 10px rgba(243, 156, 18, 0.3) !important;
 }

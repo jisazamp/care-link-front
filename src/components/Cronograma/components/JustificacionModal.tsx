@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Button, message, Space, DatePicker, Alert } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import type { CronogramaAsistenciaPaciente } from '../../../types';
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import {
+  Alert,
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Space,
+  message,
+} from "antd";
+import dayjs from "dayjs";
+import type React from "react";
+import { useEffect, useState } from "react";
+import type { CronogramaAsistenciaPaciente } from "../../../types";
 
 const { TextArea } = Input;
 
@@ -24,65 +34,69 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
   loading = false,
 }) => {
   const [form] = Form.useForm();
-  const [observaciones, setObservaciones] = useState('');
+  const [observaciones, setObservaciones] = useState("");
   const [nuevaFecha, setNuevaFecha] = useState<dayjs.Dayjs | null>(null);
 
   // 🔴 Resetear campos cada vez que cambia el paciente o se abre el modal
   useEffect(() => {
     if (visible) {
-      setObservaciones('');
+      setObservaciones("");
       setNuevaFecha(null);
       form.resetFields();
     }
   }, [paciente, visible, form]);
 
-  const handleObservacionesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleObservacionesChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
     setObservaciones(e.target.value);
     // Si el usuario empieza a escribir, mostrar el campo de fecha automáticamente
   };
 
   const handleReagendar = () => {
     if (!observaciones.trim()) {
-      message.error('Debe ingresar una justificación');
+      message.error("Debe ingresar una justificación");
       return;
     }
     if (!nuevaFecha) {
-      message.error('Debe seleccionar una nueva fecha para reagendar');
+      message.error("Debe seleccionar una nueva fecha para reagendar");
       return;
     }
-    onReagendar(observaciones, nuevaFecha.format('YYYY-MM-DD'));
+    onReagendar(observaciones, nuevaFecha.format("YYYY-MM-DD"));
   };
 
   const handleNoAsistio = () => {
     // 🔴 Ya no es obligatorio observaciones para "No Asistió"
-    onConfirm('NO_ASISTIO', observaciones);
+    onConfirm("NO_ASISTIO", observaciones);
   };
 
   const handleCancel = () => {
     form.resetFields();
-    setObservaciones('');
+    setObservaciones("");
     setNuevaFecha(null);
     onCancel();
   };
 
   // 🔴 VALIDACIÓN: Solo se puede reagendar si el estado es "PENDIENTE"
-  const canReagendar = paciente?.estado_asistencia === 'PENDIENTE' && 
-                      observaciones.trim().length > 0 && 
-                      nuevaFecha !== null;
-  
+  const canReagendar =
+    paciente?.estado_asistencia === "PENDIENTE" &&
+    observaciones.trim().length > 0 &&
+    nuevaFecha !== null;
+
   const showFecha = observaciones.trim().length > 0;
   const disabledDate = (current: dayjs.Dayjs) => {
-    return current && current < dayjs().startOf('day');
+    return current && current < dayjs().startOf("day");
   };
 
   // 🔴 Mostrar alerta si el paciente no tiene estado PENDIENTE
-  const showEstadoAlert = paciente && paciente.estado_asistencia !== 'PENDIENTE';
+  const showEstadoAlert =
+    paciente && paciente.estado_asistencia !== "PENDIENTE";
 
   return (
     <Modal
       title={
         <Space>
-          <ExclamationCircleOutlined style={{ color: '#faad14' }} />
+          <ExclamationCircleOutlined style={{ color: "#faad14" }} />
           <span>Justificación de Inasistencia</span>
         </Space>
       }
@@ -132,11 +146,11 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
             label="Nueva fecha"
             name="nueva_fecha"
             rules={[
-              { required: true, message: 'Debe seleccionar una nueva fecha' },
+              { required: true, message: "Debe seleccionar una nueva fecha" },
             ]}
           >
             <DatePicker
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               placeholder="Seleccione la nueva fecha"
               value={nuevaFecha}
               onChange={setNuevaFecha}
@@ -146,13 +160,13 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
           </Form.Item>
         )}
         <div style={{ marginTop: 16 }}>
-          <Space direction="vertical" style={{ width: '100%' }}>
+          <Space direction="vertical" style={{ width: "100%" }}>
             <Button
               danger
               onClick={handleNoAsistio}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               loading={loading}
-              disabled={paciente?.estado_asistencia !== 'PENDIENTE'}
+              disabled={paciente?.estado_asistencia !== "PENDIENTE"}
             >
               Marcar como "No Asistió"
             </Button>
@@ -160,15 +174,12 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
               type="primary"
               onClick={handleReagendar}
               disabled={!canReagendar}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               loading={loading}
             >
               Reagendar Cita
             </Button>
-            <Button
-              onClick={handleCancel}
-              style={{ width: '100%' }}
-            >
+            <Button onClick={handleCancel} style={{ width: "100%" }}>
               Cancelar
             </Button>
           </Space>
@@ -176,4 +187,4 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
       </Form>
     </Modal>
   );
-}; 
+};

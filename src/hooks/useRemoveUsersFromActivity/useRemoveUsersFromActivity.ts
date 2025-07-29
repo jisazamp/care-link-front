@@ -16,11 +16,14 @@ export const useRemoveUsersFromActivity = (activityId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userIds: number[]) => removeUsersFromActivity(activityId, userIds),
+    mutationFn: (userIds: number[]) =>
+      removeUsersFromActivity(activityId, userIds),
     onSuccess: () => {
       // Invalidar las consultas relacionadas
-      queryClient.invalidateQueries({ queryKey: ["get-activity-users", activityId] });
+      queryClient.invalidateQueries({
+        queryKey: ["get-activity-users", activityId],
+      });
       queryClient.invalidateQueries({ queryKey: ["get-upcoming-activities"] });
     },
   });
-}; 
+};

@@ -143,7 +143,6 @@ export const NewUser: React.FC = () => {
   );
 
   const onSubmit = (data: FormValues) => {
-    
     const user: Partial<User> = {
       apellidos: data.lastName,
       direccion: data.address,
@@ -221,13 +220,13 @@ export const NewUser: React.FC = () => {
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
-      
       // Redirigir según el valor del switch "Visita Domiciliaria"
       if (homeVisitValue) {
         // Si el switch está ON, redirigir directamente a la nueva visita del usuario creado
         if (isSuccessCreateUser) {
           // Para usuarios nuevos, usar el ID de la respuesta de creación
-          const userId = (createUserResponse?.data?.data as any)?.user?.id_usuario;
+          const userId = (createUserResponse?.data?.data as any)?.user
+            ?.id_usuario;
           if (userId) {
             navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
           } else {
@@ -246,7 +245,14 @@ export const NewUser: React.FC = () => {
         navigate("/usuarios");
       }
     }
-  }, [isSuccessCreateUser, isSuccessEditUser, navigate, homeVisitValue, createUserResponse, data?.data.data?.id_usuario]);
+  }, [
+    isSuccessCreateUser,
+    isSuccessEditUser,
+    navigate,
+    homeVisitValue,
+    createUserResponse,
+    data?.data.data?.id_usuario,
+  ]);
 
   if (isLoading) {
     return (

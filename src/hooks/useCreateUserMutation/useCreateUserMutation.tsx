@@ -32,12 +32,14 @@ export const useCreateUserMutation = () => {
     onSuccess: () => {
       // Invalidar todas las queries relacionadas con usuarios para asegurar actualización completa
       queryClient.invalidateQueries({ queryKey: ["get-users"] });
-      queryClient.invalidateQueries({ queryKey: ["get-users-with-home-visits"] });
+      queryClient.invalidateQueries({
+        queryKey: ["get-users-with-home-visits"],
+      });
       // También invalidar cualquier otra query que pueda estar relacionada con usuarios
-      queryClient.invalidateQueries({ 
-        predicate: (query) => 
-          query.queryKey[0] === "get-users" || 
-          query.queryKey[0] === "get-users-with-home-visits"
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === "get-users" ||
+          query.queryKey[0] === "get-users-with-home-visits",
       });
     },
   });

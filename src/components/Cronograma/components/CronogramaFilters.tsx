@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Card, Row, Col, DatePicker, Select, Button, Space } from 'antd';
-import { FilterOutlined, ReloadOutlined } from '@ant-design/icons';
-import type { Dayjs } from 'dayjs';
+import { FilterOutlined, ReloadOutlined } from "@ant-design/icons";
+import { Button, Card, Col, DatePicker, Row, Select, Space } from "antd";
+import type { Dayjs } from "dayjs";
+import { useState } from "react";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -19,7 +19,7 @@ export const CronogramaFilters: React.FC<CronogramaFiltersProps> = ({
   onReset,
 }) => {
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
-  const [estado, setEstado] = useState<string>('');
+  const [estado, setEstado] = useState<string>("");
 
   const handleFilter = () => {
     onFilterChange({
@@ -30,7 +30,7 @@ export const CronogramaFilters: React.FC<CronogramaFiltersProps> = ({
 
   const handleReset = () => {
     setDateRange(null);
-    setEstado('');
+    setEstado("");
     onReset();
   };
 
@@ -38,22 +38,22 @@ export const CronogramaFilters: React.FC<CronogramaFiltersProps> = ({
     <Card style={{ marginBottom: 16 }}>
       <Row gutter={16} align="middle">
         <Col span={8}>
-          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+          <label style={{ display: "block", marginBottom: 8, fontWeight: 500 }}>
             Rango de Fechas
           </label>
           <RangePicker
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={dateRange}
             onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs] | null)}
-            placeholder={['Fecha inicio', 'Fecha fin']}
+            placeholder={["Fecha inicio", "Fecha fin"]}
           />
         </Col>
         <Col span={6}>
-          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+          <label style={{ display: "block", marginBottom: 8, fontWeight: 500 }}>
             Estado de Asistencia
           </label>
           <Select
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             value={estado}
             onChange={setEstado}
             placeholder="Seleccionar estado"
@@ -74,10 +74,7 @@ export const CronogramaFilters: React.FC<CronogramaFiltersProps> = ({
             >
               Filtrar
             </Button>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={handleReset}
-            >
+            <Button icon={<ReloadOutlined />} onClick={handleReset}>
               Limpiar
             </Button>
           </Space>
@@ -85,4 +82,4 @@ export const CronogramaFilters: React.FC<CronogramaFiltersProps> = ({
       </Row>
     </Card>
   );
-}; 
+};

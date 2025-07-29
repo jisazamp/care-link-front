@@ -1,5 +1,5 @@
 import { Layout } from "antd";
-import { useState, ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";

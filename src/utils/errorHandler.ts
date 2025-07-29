@@ -20,7 +20,7 @@ export interface ApiError {
  */
 export const extractErrorMessage = (
   error: ApiError,
-  defaultMessage: string = "Ha ocurrido un error",
+  defaultMessage = "Ha ocurrido un error",
 ): string => {
   // Prioridad 1: Mensaje específico del backend en 'detail'
   if (error?.response?.data?.detail) {
@@ -90,7 +90,7 @@ export const handleContractError = (error: ApiError): string => {
 
   if (status === 400) {
     const detail = error?.response?.data?.detail;
-    if (detail && detail.includes("agendado")) {
+    if (detail?.includes("agendado")) {
       // Extraer la fecha del mensaje (formato DD/MM/YYYY)
       const fechaMatch = detail.match(/fecha (\d{2}\/\d{2}\/\d{4})/);
       if (fechaMatch) {
@@ -104,7 +104,7 @@ export const handleContractError = (error: ApiError): string => {
   // Para errores 500, intentar extraer el mensaje específico
   if (status === 500) {
     const detail = error?.response?.data?.detail;
-    if (detail && detail.includes("agendado")) {
+    if (detail?.includes("agendado")) {
       // Extraer la fecha del mensaje (formato DD/MM/YYYY)
       const fechaMatch = detail.match(/fecha (\d{2}\/\d{2}\/\d{4})/);
       if (fechaMatch) {
