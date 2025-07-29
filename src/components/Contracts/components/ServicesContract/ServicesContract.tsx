@@ -9,10 +9,15 @@ import {
   Select,
   Table,
   message,
+  Space,
+  Typography,
 } from "antd";
+import { DownloadOutlined, FileWordOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useFormContext } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import { useGetServiceRates } from "../../../../hooks/useGetServiceRates/useGetServiceRates";
+import { client } from "../../../../api/client";
 import type { FormValues } from "../FormContracts";
 import type { Service } from "../FormContracts";
 
@@ -63,7 +68,7 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
       // Obtener la tiquetera seleccionada para filtrar las opciones de transporte
       const tiqueteraService = services.find((s) => s.key === "1");
       const tiqueteraNumber = tiqueteraService?.serviceType
-        ? Number.parseInt(tiqueteraService.serviceType.split(" ")[1])
+        ? parseInt(tiqueteraService.serviceType.split(" ")[1])
         : 0;
 
       // Si no hay tiquetera seleccionada, no mostrar opciones de transporte
@@ -85,7 +90,8 @@ const getSelectorOptions = (recordKey: string, services: Service[]) => {
       // Verificar si hay tiquetera seleccionada para deshabilitar servicio de día
       const tiqueteraSelected = services.find((s) => s.key === "1");
       const isTiqueteraSelected =
-        tiqueteraSelected?.serviceType?.includes("Tiquetera");
+        tiqueteraSelected?.serviceType &&
+        tiqueteraSelected.serviceType.includes("Tiquetera");
 
       return (
         <Select.Option
@@ -106,9 +112,12 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
   const methods = useFormContext<FormValues>();
   const services = methods.watch("services");
   const startDate = methods.watch("startDate");
+  const { id: userId } = useParams();
 
   // Obtener las tarifas de servicios
   const { data: serviceRatesData } = useGetServiceRates();
+
+  const { Title, Text } = Typography;
 
   // Función para obtener el precio de un servicio basándose en las tarifas
   const getServicePrice = (serviceId: number) => {
@@ -124,6 +133,37 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     return serviceRate?.precio_por_dia || 0;
   };
 
+  // Función para verificar si hay servicios seleccionados
+  const hasSelectedServices = () => {
+    return services?.some(
+      (service) => service.serviceType && service.serviceType.trim() !== "",
+    );
+  };
+
+  // Función para obtener la cantidad de días para tiqueteras
+  const getTiqueteraQuantity = () => {
+    const tiqueteraService = services?.find((s) => s.key === "1");
+    if (
+      tiqueteraService?.serviceType &&
+      tiqueteraService.serviceType.includes("Tiquetera")
+    ) {
+      return tiqueteraService.quantity;
+    }
+    return null;
+  };
+
+  // Función para obtener la cantidad de días para transporte
+  const getTransporteQuantity = () => {
+    const transporteService = services?.find((s) => s.key === "2");
+    if (
+      transporteService?.serviceType &&
+      transporteService.serviceType.includes("Transporte")
+    ) {
+      return transporteService.quantity;
+    }
+    return null;
+  };
+
   const handleServiceChange = (key: string, value?: string) => {
     switch (key) {
       case "1": {
@@ -131,8 +171,8 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         // Limpiar transporte si la nueva tiquetera es menor que el transporte seleccionado
         const transporteService = services.find((s) => s.key === "2");
         if (transporteService?.serviceType && value) {
-          const tiqueteraNumber = Number.parseInt(value.split(" ")[1]);
-          const transporteNumber = Number.parseInt(
+          const tiqueteraNumber = parseInt(value.split(" ")[1]);
+          const transporteNumber = parseInt(
             transporteService.serviceType.split(" ")[1],
           );
           if (transporteNumber > tiqueteraNumber) {
@@ -196,6 +236,46 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     methods.setValue("services", newServices);
   };
 
+  const handleDownloadContract = async (contractType: string) => {
+    try {
+      // Obtener las cantidades según el tipo de contrato
+      let quantity = null;
+      if (contractType === "centro-dia") {
+        quantity = getTiqueteraQuantity();
+      } else if (contractType === "transporte") {
+        quantity = getTransporteQuantity();
+      }
+
+      // Construir la URL con parámetros de consulta
+      const params = new URLSearchParams();
+      if (quantity !== null) {
+        params.append("quantity", quantity.toString());
+      }
+
+      const response = await client.get(
+        `/api/users/${userId}/download-contract/${contractType}?${params.toString()}`,
+        {
+          responseType: "blob",
+        },
+      );
+
+      const blob = response.data;
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `contrato_${contractType}_${new Date().toISOString().slice(0, 10)}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      message.success("Contrato descargado exitosamente");
+    } catch (error) {
+      console.error("Error al descargar contrato:", error);
+      message.error("Error al descargar el contrato");
+    }
+  };
+
   const handleNext = () => {
     // Validar que se haya seleccionado al menos una tiquetera
     const tiqueteraService = services.find((s) => s.key === "1");
@@ -207,10 +287,10 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
     // Validar que si hay transporte seleccionado, sea válido según la tiquetera
     const transporteService = services.find((s) => s.key === "2");
     if (transporteService?.serviceType) {
-      const tiqueteraNumber = Number.parseInt(
+      const tiqueteraNumber = parseInt(
         tiqueteraService.serviceType.split(" ")[1],
       );
-      const transporteNumber = Number.parseInt(
+      const transporteNumber = parseInt(
         transporteService.serviceType.split(" ")[1],
       );
 
@@ -283,7 +363,10 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
         } else if (record.key === "3") {
           // Deshabilitar servicio de día si hay tiquetera seleccionada
           const tiqueteraService = services.find((s) => s.key === "1");
-          isDisabled = !!tiqueteraService?.serviceType?.includes("Tiquetera");
+          isDisabled = !!(
+            tiqueteraService?.serviceType &&
+            tiqueteraService.serviceType.includes("Tiquetera")
+          );
         }
 
         return (
@@ -375,6 +458,104 @@ export const ServicesContract = ({ onNext, onBack }: ServicesContractProps) => {
           style={{ marginTop: 16 }}
           rowKey="key"
         />
+      </Card>
+
+      {/* Sección de descarga de contratos */}
+      <Card
+        title={
+          <Space>
+            <FileWordOutlined style={{ color: "#1890ff" }} />
+            <Title level={5} style={{ margin: 0 }}>
+              Descargar Contratos
+            </Title>
+          </Space>
+        }
+        style={{ marginTop: 24 }}
+      >
+        <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+          Descargue los contratos correspondientes según los servicios
+          seleccionados. Los contratos se generarán con la información del
+          paciente.
+          {!hasSelectedServices() && (
+            <Text type="warning" style={{ display: "block", marginTop: 8 }}>
+              ! Debe seleccionar al menos un servicio para habilitar la descarga
+              de contratos.
+            </Text>
+          )}
+        </Text>
+
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Card size="small" style={{ border: "1px solid #d9d9d9" }}>
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Text strong>Contrato Centro de Día</Text>
+                  <Text type="secondary" style={{ fontSize: "12px" }}>
+                    Contrato para servicios de centro de día con términos y
+                    condiciones específicos.
+                  </Text>
+                  <Button
+                    type="primary"
+                    icon={<DownloadOutlined />}
+                    onClick={() => handleDownloadContract("centro-dia")}
+                    style={{ width: "100%" }}
+                    disabled={!hasSelectedServices() || !getTiqueteraQuantity()}
+                    title={
+                      !hasSelectedServices()
+                        ? "Seleccione un servicio primero"
+                        : !getTiqueteraQuantity()
+                          ? "Seleccione una tiquetera para descargar este contrato"
+                          : ""
+                    }
+                  >
+                    Descargar Contrato Centro de Día
+                  </Button>
+                </Space>
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card size="small" style={{ border: "1px solid #d9d9d9" }}>
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Text strong>Contrato de Transporte</Text>
+                  <Text type="secondary" style={{ fontSize: "12px" }}>
+                    Contrato para servicios de transporte con términos y
+                    condiciones específicos.
+                    {getTransporteQuantity() && (
+                      <Text
+                        type="secondary"
+                        style={{
+                          display: "block",
+                          marginTop: 4,
+                          color: "#1890ff",
+                        }}
+                      >
+                        Cantidad seleccionada: {getTransporteQuantity()} días
+                      </Text>
+                    )}
+                  </Text>
+                  <Button
+                    type="primary"
+                    icon={<DownloadOutlined />}
+                    onClick={() => handleDownloadContract("transporte")}
+                    style={{ width: "100%" }}
+                    disabled={
+                      !hasSelectedServices() || !getTransporteQuantity()
+                    }
+                    title={
+                      !hasSelectedServices()
+                        ? "Seleccione un servicio primero"
+                        : !getTransporteQuantity()
+                          ? "Seleccione un transporte para descargar este contrato"
+                          : ""
+                    }
+                  >
+                    Descargar Contrato de Transporte
+                  </Button>
+                </Space>
+              </Card>
+            </Col>
+          </Row>
+        </Space>
       </Card>
 
       <Card variant="borderless" style={{ marginTop: 24, textAlign: "right" }}>

@@ -15,7 +15,7 @@ import {
   Typography,
 } from "antd";
 import dayjs from "dayjs";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useGetClinicalEvolutions } from "../../../../hooks/useGetClinicalEvolutions/useGetClinicalEvolutions";
 import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
@@ -26,6 +26,11 @@ const { Title } = Typography;
 
 export const ViewReport: React.FC = () => {
   const { id, reportId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Detect if we're in home visit context
+  const isHomeVisit = location.pathname.includes("/visitas-domiciliarias/");
 
   const userQuery = useGetUserById(id);
   const recordQuery = useGetUserMedicalRecord(id);
@@ -35,8 +40,6 @@ export const ViewReport: React.FC = () => {
   const record = recordQuery.data?.data.data;
   const report = reportQuery.data?.data.data;
   const evolutions = evolutionsQuery.data?.data.data;
-
-  const navigate = useNavigate();
 
   // Recomendaciones: usar el campo real si existe, si no, placeholder
   const recomendaciones = report?.recomendaciones
@@ -109,19 +112,8 @@ export const ViewReport: React.FC = () => {
       dataIndex: "treatments",
       key: "treatments",
       render: (_: any, record: any) => {
-        // No existe campo treatments en ClinicalEvolution, dejar como "No" o adaptar si se agrega
-        return (
-          <span>
-            {"No"} |
-            <a
-              href="#"
-              style={{ color: "#9957C2", marginLeft: 4 }}
-              onClick={() => console.log("Ver tratamientos de:", record)}
-            >
-              Ver
-            </a>
-          </span>
-        );
+        // No existe campo treatments en ClinicalEvolution, dejar como "No"
+        return "No";
       },
     },
     {
@@ -133,7 +125,7 @@ export const ViewReport: React.FC = () => {
           <a
             style={{ marginRight: 8, color: "#9957C2" }}
             href="#"
-            onClick={() => console.log("Ver registro:", record)}
+            onClick={() => navigate(getEditReportPath())}
           >
             Ver
           </a>
@@ -148,6 +140,19 @@ export const ViewReport: React.FC = () => {
       ),
     },
   ];
+
+  // Navigation functions based on context
+  const getDetailsPath = () => {
+    return isHomeVisit
+      ? `/visitas-domiciliarias/usuarios/${id}/detalles`
+      : `/usuarios/${id}/detalles`;
+  };
+
+  const getEditReportPath = () => {
+    return isHomeVisit
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}`
+      : `/usuarios/${id}/reportes/${reportId}`;
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: "#f5f5f5", padding: 24 }}>
@@ -165,8 +170,13 @@ export const ViewReport: React.FC = () => {
           style={{ fontSize: 14, color: "#8C8C8C", marginBottom: 20 }}
         >
           <Link to="/inicio">Inicio</Link> /{" "}
-          <Link to="/usuarios">Usuarios</Link> /{" "}
-          <Link to={`/usuarios/${id}/detalles`}>
+          <Link
+            to={isHomeVisit ? "/visitas-domiciliarias/usuarios" : "/usuarios"}
+          >
+            {isHomeVisit ? "Visitas Domiciliarias" : "Usuarios"}
+          </Link>{" "}
+          /{" "}
+          <Link to={getDetailsPath()}>
             {user?.nombres} {user?.apellidos}
           </Link>{" "}
           /{" "}
@@ -335,9 +345,7 @@ export const ViewReport: React.FC = () => {
                     padding: "0 16px",
                     height: 32,
                   }}
-                  onClick={() =>
-                    navigate(`/usuarios/${id}/reportes/${reportId}`)
-                  }
+                  onClick={() => navigate(getEditReportPath())}
                 >
                   Editar
                 </Button>
@@ -462,26 +470,6 @@ export const ViewReport: React.FC = () => {
                   <div>
                     <span style={{ fontWeight: 600 }}>Peso:</span>{" "}
                     {exploracion.peso}
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: 600 }}>Presión arterial:</span>{" "}
-                    {exploracion.presion}
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: 600 }}>
-                      Frecuencia cardíaca:
-                    </span>{" "}
-                    {exploracion.frecuencia}
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: 600 }}>
-                      Temperatura corporal:
-                    </span>{" "}
-                    {exploracion.temperatura}
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: 600 }}>Pulsioximetría:</span>{" "}
-                    {exploracion.pulsioximetria}
                   </div>
                 </div>
               </div>
@@ -635,11 +623,7 @@ export const ViewReport: React.FC = () => {
                 <Button
                   type="primary"
                   icon={<PlusCircleOutlined />}
-                  onClick={() =>
-                    navigate(
-                      `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`,
-                    )
-                  }
+                  onClick={() => navigate(getEditReportPath())}
                 >
                   Agregar
                 </Button>

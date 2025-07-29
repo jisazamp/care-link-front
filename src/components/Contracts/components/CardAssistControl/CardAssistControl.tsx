@@ -2,29 +2,29 @@ import {
   Button,
   Card,
   Checkbox,
-  DatePicker,
-  Empty,
+  Table,
+  Typography,
+  Space,
+  Tooltip,
+  Modal,
   Form,
   Input,
-  Modal,
   Select,
-  Space,
-  Spin,
-  Table,
-  Tag,
-  Tooltip,
-  Typography,
   message,
+  Spin,
+  Empty,
+  Tag,
   notification,
+  DatePicker,
 } from "antd";
-import dayjs from "dayjs";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetDailyAttendance } from "../../../../hooks/useGetDailyAttendance/useGetDailyAttendance";
-import { useReagendarPaciente } from "../../../../hooks/useReagendarPaciente";
+import type { AsistenciaDiaria } from "../../../../types";
 import { useUpdateAttendanceStatus } from "../../../../hooks/useUpdateAttendanceStatus/useUpdateAttendanceStatus";
 import { useUpdateEstadoAsistencia } from "../../../../hooks/useUpdateEstadoAsistencia";
-import type { AsistenciaDiaria } from "../../../../types";
+import { useReagendarPaciente } from "../../../../hooks/useReagendarPaciente";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -447,8 +447,9 @@ export const CardAsistControl = () => {
                 {selectedRows.length !== 1 ? "s" : ""}
               </Text>
             )}
+            3
             <Button type="primary" onClick={handleAddClick}>
-              Agregar
+              Ir al cronograma
             </Button>
           </Space>
         }
@@ -549,7 +550,7 @@ export const CardAsistControl = () => {
       <Modal
         title={
           <Space>
-            <span style={{ color: "#faad14" }}>⚠️</span>
+            <span style={{ color: "#faad14" }}>!</span>
             <span>Justificación de Inasistencia</span>
           </Space>
         }
@@ -581,7 +582,7 @@ export const CardAsistControl = () => {
               }}
             >
               <p style={{ margin: 0, color: "#d46b08" }}>
-                <strong>⚠️ No se puede reagendar:</strong> Solo se puede
+                <strong>! No se puede reagendar:</strong> Solo se puede
                 reagendar pacientes con estado "PENDIENTE". El estado actual es
                 "{selectedPatient.estado_asistencia}".
               </p>
@@ -597,7 +598,6 @@ export const CardAsistControl = () => {
               onChange={handleObservacionesChange}
             />
           </Form.Item>
-
           {showFecha && (
             <Form.Item
               label="Nueva fecha"

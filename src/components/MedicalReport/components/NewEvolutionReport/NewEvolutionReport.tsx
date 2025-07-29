@@ -13,7 +13,7 @@ import {
   message,
 } from "antd";
 import dayjs from "dayjs";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 import { useCreateClinicalEvolution } from "../../../../hooks/useCreateClinicalEvolution/useCreateClinicalEvolution";
 import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
@@ -24,7 +24,12 @@ const { Title, Text } = Typography;
 
 export const NewEvolutionReport: React.FC = () => {
   const { id, reportId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  // Detect if we're in home visit context
+  const isHomeVisit = location.pathname.includes("/visitas-domiciliarias/");
+
   const professionalsQuery = useGetProfessionals();
   const createEvolution = useCreateClinicalEvolution(reportId);
   const userQuery = useGetUserById(id);
@@ -33,6 +38,19 @@ export const NewEvolutionReport: React.FC = () => {
   const report = reportQuery.data?.data.data;
 
   const [form] = Form.useForm();
+
+  // Navigation functions based on context
+  const getDetailsPath = () => {
+    return isHomeVisit
+      ? `/visitas-domiciliarias/usuarios/${id}/detalles`
+      : `/usuarios/${id}/detalles`;
+  };
+
+  const getReportDetailsPath = () => {
+    return isHomeVisit
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles`
+      : `/usuarios/${id}/reportes/${reportId}/detalles`;
+  };
 
   const handleFinish = async (values: any) => {
     await createEvolution.mutateAsync({
@@ -43,7 +61,7 @@ export const NewEvolutionReport: React.FC = () => {
       tipo_report: values.reportType,
     });
     message.success("Reporte de evolución creado exitosamente");
-    navigate(`/usuarios/${id}/reportes/${reportId}/detalles`);
+    navigate(getReportDetailsPath());
   };
 
   return (
@@ -61,15 +79,16 @@ export const NewEvolutionReport: React.FC = () => {
           style={{ fontSize: 14, color: "#8C8C8C", marginBottom: 24 }}
         >
           <Link to="/inicio">Inicio</Link> /{" "}
-          <Link to="/usuarios">Usuarios</Link> /{" "}
-          <Link to={`/usuarios/${id}/detalles`}>
+          <Link
+            to={isHomeVisit ? "/visitas-domiciliarias/usuarios" : "/usuarios"}
+          >
+            {isHomeVisit ? "Visitas Domiciliarias" : "Usuarios"}
+          </Link>{" "}
+          /{" "}
+          <Link to={getDetailsPath()}>
             {user?.nombres} {user?.apellidos}
           </Link>{" "}
-          /{" "}
-          <Link to={`/usuarios/${id}/reportes/${reportId}/detalles`}>
-            Detalle reporte clínico
-          </Link>{" "}
-          /{" "}
+          / <Link to={getReportDetailsPath()}>Detalle reporte clínico</Link> /{" "}
           <span className="current" style={{ color: "#222", fontWeight: 500 }}>
             Nuevo reporte de evolución
           </span>

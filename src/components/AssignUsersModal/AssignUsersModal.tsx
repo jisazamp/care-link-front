@@ -1,25 +1,24 @@
-import { CalendarOutlined, UserAddOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
 import {
-  Button,
-  Checkbox,
-  DatePicker,
-  Empty,
-  Input,
   Modal,
-  Select,
-  Space,
-  Spin,
   Table,
-  Tag,
+  Button,
+  Space,
   Typography,
+  Spin,
+  Empty,
   message,
+  Tag,
+  Checkbox,
+  Input,
+  Select,
+  DatePicker,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import dayjs from "dayjs";
-import type React from "react";
-import { useState } from "react";
-import { useAssignUsersToActivity } from "../../hooks/useAssignUsersToActivity/useAssignUsersToActivity";
+import { UserAddOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useGetAvailableUsers } from "../../hooks/useGetAvailableUsers/useGetAvailableUsers";
+import { useAssignUsersToActivity } from "../../hooks/useAssignUsersToActivity/useAssignUsersToActivity";
+import dayjs from "dayjs";
 
 const { Text, Title } = Typography;
 const { Option } = Select;

@@ -15,20 +15,19 @@ import { FormContracts } from "./components/Contracts/components/FormContracts";
 import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
 import NewUserForm from "./components/CreateAuthorizedUser";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
-import { Cronograma } from "./components/Cronograma/Cronograma";
 import { Home } from "./components/Home/Home";
-import { HomeVisitMedicalRecord } from "./components/HomeVisitMedicalRecord/HomeVisitMedicalRecord";
-import { HomeVisitNewVisit } from "./components/HomeVisitNewVisit/HomeVisitNewVisit";
-import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
-import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
-import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
+import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
+import { HomeVisitNewVisit } from "./components/HomeVisitNewVisit/HomeVisitNewVisit";
+import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
+import { HomeVisitMedicalRecord } from "./components/HomeVisitMedicalRecord/HomeVisitMedicalRecord";
+import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
@@ -41,6 +40,7 @@ import { UsersList } from "./components/UsersList/UsersList";
 import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
 import { colors } from "./theme";
 import { AuthorizedUsersListScreen } from "./screens/AuthorizedUsersList";
+import { Cronograma } from "./components/Cronograma";
 
 const spanishLocale = {
   ...es,
@@ -185,6 +185,46 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <HomeVisitNewVisit />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/familiar"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/familiar/:familyMemberId"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles"
+                element={
+                  <PrivateRoute>
+                    <ViewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId"
+                element={
+                  <PrivateRoute>
+                    <EditReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
                   </PrivateRoute>
                 }
               />

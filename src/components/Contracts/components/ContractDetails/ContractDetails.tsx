@@ -1,20 +1,21 @@
 import {
-  Alert,
   Avatar,
   Button,
   Card,
   Col,
   Flex,
-  Input,
   Row,
-  Select,
-  Space,
-  Spin,
   Table,
-  Tag,
-  Tooltip,
   Typography,
+  Spin,
+  Alert,
+  Space,
+  Tooltip,
+  Input,
+  Select,
+  Tag,
 } from "antd";
+import { BillingForm } from "../../../Billing";
 import { Modal } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -25,7 +26,6 @@ import { useGetFacturas } from "../../../../hooks/useGetFacturas";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 import { useUpdateFactura } from "../../../../hooks/useUpdateFactura";
 import type { Bill } from "../../../../types";
-import { BillingForm } from "../../../Billing";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -122,7 +122,7 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
       render: (_: any, record: Bill) => (
         <Space>
           <Tooltip title="Ver Detalles">
-            <Button type="link" onClick={() => onView?.(record)}>
+            <Button type="link" onClick={() => onView && onView(record)}>
               Ver
             </Button>
           </Tooltip>

@@ -1,18 +1,17 @@
-import { ReloadOutlined, SaveOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
 import {
-  Button,
   Card,
-  Divider,
-  InputNumber,
-  Space,
   Table,
-  Typography,
+  InputNumber,
+  Button,
   message,
+  Space,
+  Typography,
+  Divider,
 } from "antd";
-import type React from "react";
-import { useEffect, useState } from "react";
 import { useGetServiceRates } from "../../../../hooks/useGetServiceRates/useGetServiceRates";
 import { useUpdateServiceRates } from "../../../../hooks/useUpdateServiceRates/useUpdateServiceRates";
+import { ReloadOutlined, SaveOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -113,7 +112,7 @@ export const ServiceRatesEditor: React.FC = () => {
           formatter={(value) =>
             `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
           }
-          parser={(value) => Number(value?.replace(/\$\s?|(,*)/g, ""))}
+          parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ""))}
           min={0}
           step={1000}
           style={{ width: "100%" }}

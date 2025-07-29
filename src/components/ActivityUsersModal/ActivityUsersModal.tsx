@@ -1,20 +1,19 @@
-import { EditOutlined, UserAddOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
 import {
-  Button,
-  Empty,
-  Input,
   Modal,
-  Select,
-  Space,
-  Spin,
   Table,
+  Button,
   Tag,
+  Space,
   Typography,
+  Spin,
+  Empty,
   message,
+  Select,
+  Input,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import type React from "react";
-import { useState } from "react";
+import { UserAddOutlined, EditOutlined } from "@ant-design/icons";
 import { useGetActivityUsers } from "../../hooks/useGetActivityUsers/useGetActivityUsers";
 import { useUpdateUserActivityStatus } from "../../hooks/useUpdateUserActivityStatus/useUpdateUserActivityStatus";
 import { AssignUsersModal } from "../AssignUsersModal/AssignUsersModal";

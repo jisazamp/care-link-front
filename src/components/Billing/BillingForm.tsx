@@ -90,7 +90,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
         saved: true, // Marcar como consolidados
       }));
       // Procesar pagos locales (no guardados aún)
-      const pagosLocales = (initialValues.pagos || []).filter(
+      let pagosLocales = (initialValues.pagos || []).filter(
         (p: any) => !pagosBackend.some((pb: any) => pb.id_pago === p.id_pago),
       );
       setPayments([...pagosBackend, ...pagosLocales]);

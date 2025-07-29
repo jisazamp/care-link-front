@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   Col,
-  Collapse,
   Flex,
   Form,
   Input,
@@ -14,13 +13,14 @@ import {
   Spin,
   Typography,
   Upload,
+  Collapse,
   message,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useCreateUserMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
 import { useEditRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";

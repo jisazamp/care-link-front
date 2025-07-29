@@ -1,30 +1,30 @@
-import { CalendarOutlined, CarOutlined, UserOutlined } from "@ant-design/icons";
+import { useState, useMemo, useEffect } from "react";
 import {
-  Badge,
-  Button,
   Calendar,
   Card,
-  Modal,
-  Space,
-  Table,
-  Tag,
-  Tooltip,
   Typography,
+  Badge,
+  Modal,
+  Table,
+  Button,
+  Tag,
+  Space,
   message,
   notification,
+  Tooltip,
 } from "antd";
 import type { BadgeProps, CalendarProps } from "antd";
+import { CalendarOutlined, UserOutlined, CarOutlined } from "@ant-design/icons";
 import dayjs, { type Dayjs } from "dayjs";
-import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useGetCronogramasPorRango } from "../../hooks/useGetCronogramasPorRango";
-import { useReagendarPaciente } from "../../hooks/useReagendarPaciente";
 import { useUpdateEstadoAsistencia } from "../../hooks/useUpdateEstadoAsistencia";
+import { useReagendarPaciente } from "../../hooks/useReagendarPaciente";
 import type {
+  PacientePorFecha,
+  EventoCalendario,
   CronogramaAsistencia,
   CronogramaAsistenciaPaciente,
-  EventoCalendario,
-  PacientePorFecha,
 } from "../../types";
 import { CronogramaBreadcrumb } from "./components/CronogramaBreadcrumb";
 import { CronogramaStats } from "./components/CronogramaStats";
@@ -138,7 +138,7 @@ export const Cronograma: React.FC = () => {
     const shouldOpenModal = searchParams.get("openModal") === "true";
 
     if (highlightPatientId && shouldOpenModal && cronogramas?.data?.data) {
-      const patientId = Number.parseInt(highlightPatientId);
+      const patientId = parseInt(highlightPatientId);
 
       // Buscar el paciente en todos los cronogramas
       let foundPatient: CronogramaAsistenciaPaciente | null = null;

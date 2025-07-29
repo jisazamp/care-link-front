@@ -1,9 +1,4 @@
-import {
-  ArrowLeftOutlined,
-  ReloadOutlined,
-  SaveOutlined,
-} from "@ant-design/icons";
-import { useQueryClient } from "@tanstack/react-query";
+import React, { useEffect } from "react";
 import {
   Button,
   Card,
@@ -11,28 +6,33 @@ import {
   DatePicker,
   Form,
   Input,
+  message,
   Row,
   Select,
   TimePicker,
   Typography,
-  message,
 } from "antd";
-import dayjs from "dayjs";
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import {
-  type CreateHomeVisitData,
+  ArrowLeftOutlined,
+  SaveOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
+import { useNavigate, useParams } from "react-router-dom";
+import dayjs from "dayjs";
+import {
   useCreateHomeVisit,
+  CreateHomeVisitData,
 } from "../../hooks/useCreateHomeVisit/useCreateHomeVisit";
+import {
+  useUpdateHomeVisit,
+  UpdateHomeVisitData,
+} from "../../hooks/useUpdateHomeVisit/useUpdateHomeVisit";
+import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
+import { useGetUserFirstHomeVisit } from "../../hooks/useGetUserFirstHomeVisit/useGetUserFirstHomeVisit";
 import { useGetHomeVisitById } from "../../hooks/useGetHomeVisitById";
 import { useGetProfessionals } from "../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetServiceRate } from "../../hooks/useGetServiceRate/useGetServiceRate";
-import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
-import { useGetUserFirstHomeVisit } from "../../hooks/useGetUserFirstHomeVisit/useGetUserFirstHomeVisit";
-import {
-  type UpdateHomeVisitData,
-  useUpdateHomeVisit,
-} from "../../hooks/useUpdateHomeVisit/useUpdateHomeVisit";
+import { useQueryClient } from "@tanstack/react-query";
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -112,7 +112,6 @@ export const HomeVisitNewVisit: React.FC = () => {
     if (isViewMode) {
       return;
     }
-
     try {
       if (isEditing && currentVisitData) {
         // Actualizar visita existente
@@ -334,7 +333,7 @@ export const HomeVisitNewVisit: React.FC = () => {
                 marginTop: "8px",
               }}
             >
-              ⚠️ Esta visita necesita ser programada
+              ! Esta visita necesita ser programada
             </div>
           )}
       </div>
@@ -377,7 +376,7 @@ export const HomeVisitNewVisit: React.FC = () => {
                       type="secondary"
                       style={{ fontSize: "12px" }}
                     >
-                      ⚠️ Cambiar la fecha cambiará automáticamente el estado a
+                      ! Cambiar la fecha cambiará automáticamente el estado a
                       "REPROGRAMADA" (incluso si ya está "REALIZADA")
                     </Typography.Text>
                   ) : undefined

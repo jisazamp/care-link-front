@@ -12,8 +12,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDeleteActivity } from "../../hooks/useDeleteActivity/useDeleteActivity";
 import { useGetActivities } from "../../hooks/useGetActivities/useGetActivities";
-import type { Activity } from "../../types";
 import { ActivityUsersModal } from "../ActivityUsersModal/ActivityUsersModal";
+import type { Activity } from "../../types";
 
 const { Title, Text } = Typography;
 const { confirm } = Modal;

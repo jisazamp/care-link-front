@@ -1,17 +1,17 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  Button,
-  Card,
-  Col,
-  DatePicker,
   Form,
   InputNumber,
-  Modal,
-  Row,
+  DatePicker,
+  Button,
   Select,
+  Card,
+  Row,
+  Col,
   Space,
+  Modal,
   message,
 } from "antd";
+import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
@@ -291,10 +291,11 @@ export const PaymentsForm: React.FC<PaymentsFormProps> = ({
 
         console.log(" Estado de pagos actualizado:", updatedPayments);
         return true;
+      } else {
+        console.error(" No se pudo identificar la factura");
+        message.error("No se pudo identificar la factura");
+        return false;
       }
-      console.error(" No se pudo identificar la factura");
-      message.error("No se pudo identificar la factura");
-      return false;
     } catch (error) {
       console.error(" Error al guardar pagos:", error);
       message.error("Error al guardar los pagos");

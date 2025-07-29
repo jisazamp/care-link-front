@@ -10,7 +10,6 @@ import {
   Select,
   Upload,
 } from "antd";
-import { useWatch } from "antd/es/form/Form";
 import type { Dayjs } from "dayjs";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,6 +17,7 @@ import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import type { MedicalReport } from "../../../../types";
+import { useWatch } from "antd/es/form/Form";
 
 export const HomeVisitNewReport: React.FC = () => {
   const { id } = useParams();
@@ -36,10 +36,7 @@ export const HomeVisitNewReport: React.FC = () => {
     registrationDate: Dayjs;
     consultationReason: string;
     weight: number;
-    bloodPressure: number;
-    heartRate: number;
-    bodyTemperature: number;
-    oxygenSaturation: number;
+    height: number;
     diagnosis: string;
     internalObservations: string;
     referral: string;
@@ -49,7 +46,6 @@ export const HomeVisitNewReport: React.FC = () => {
       id_historiaclinica: Number(
         medicalRecordQuery.data?.data.data?.id_historiaclinica,
       ),
-      Frecuencia_cardiaca: values.heartRate,
       Obs_habitosalimenticios: values.treatmentObservation,
       diagnosticos: values.diagnosis,
       fecha_registro: values.registrationDate.format("YYYY-MM-DD"),
@@ -57,10 +53,8 @@ export const HomeVisitNewReport: React.FC = () => {
       motivo_consulta: values.consultationReason,
       observaciones: values.internalObservations,
       peso: values.weight,
-      presion_arterial: values.bloodPressure,
+      altura: values.height,
       remision: values.referral,
-      saturacionOxigeno: values.oxygenSaturation,
-      temperatura_corporal: values.bodyTemperature,
       tipo_reporte: values.reportType,
     };
     await createMutation.mutateAsync({ data: medicalReport });
@@ -145,32 +139,14 @@ export const HomeVisitNewReport: React.FC = () => {
           {reportType && reportType !== "psicologia" && (
             <Card title="Exploración Física" style={{ marginBottom: 16 }}>
               <Row gutter={16}>
-                <Col span={4}>
+                <Col span={12}>
                   <Form.Item label="Peso (kg)" name="weight">
                     <Input type="number" />
                   </Form.Item>
                 </Col>
-                <Col span={4}>
-                  <Form.Item label="Presión Arterial" name="bloodPressure">
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={4}>
-                  <Form.Item label="Frecuencia Cardíaca" name="heartRate">
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={4}>
-                  <Form.Item
-                    label="Temperatura Corporal (°C)"
-                    name="bodyTemperature"
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={4}>
-                  <Form.Item label="Pulsoximetría (%)" name="oxygenSaturation">
-                    <Input />
+                <Col span={12}>
+                  <Form.Item label="Estatura (cm)" name="height">
+                    <Input type="number" />
                   </Form.Item>
                 </Col>
               </Row>

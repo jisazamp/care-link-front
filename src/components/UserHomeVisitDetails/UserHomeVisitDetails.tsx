@@ -25,9 +25,9 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDeleteFamilyMemberMutation } from "../../hooks/useDeleteFamilyMemberMutation/useDeleteFamilyMemberMutation";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
-import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
-import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
+import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
+import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
 import type { HomeVisit } from "../../types";
 
 import type { FamilyMember } from "../../types";
@@ -239,7 +239,7 @@ export const UserHomeVisitDetails: React.FC = () => {
           ? new Date(record.fecha_actualizacion)
           : null;
         const visitDate = new Date(
-          `${record.fecha_visita} ${record.hora_visita}`,
+          record.fecha_visita + " " + record.hora_visita,
         );
 
         // Una visita se considera auto-completada si:
@@ -320,31 +320,34 @@ export const UserHomeVisitDetails: React.FC = () => {
               </div>
             </Tooltip>
           );
-        }
-        return (
-          <Tooltip title="No hay profesional asignado a esta visita">
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        } else {
+          return (
+            <Tooltip title="No hay profesional asignado a esta visita">
               <div
-                style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  backgroundColor: "#d9d9d9",
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  color: "#8c8c8c",
-                  fontStyle: "italic",
-                  cursor: "help",
-                }}
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                Sin asignar
-              </span>
-            </div>
-          </Tooltip>
-        );
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    backgroundColor: "#d9d9d9",
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    color: "#8c8c8c",
+                    fontStyle: "italic",
+                    cursor: "help",
+                  }}
+                >
+                  Sin asignar
+                </span>
+              </div>
+            </Tooltip>
+          );
+        }
       },
     },
     {
@@ -920,7 +923,15 @@ export const UserHomeVisitDetails: React.FC = () => {
                     rowKey="id_acudiente"
                     columns={acudientesColumns}
                     loading={loadingFamilyMembers}
-                    dataSource={familyMembers?.data.data}
+                    dataSource={familyMembers?.data.data?.map((item: any) => ({
+                      id_acudiente: item.id_acudiente,
+                      nombres: item.acudiente?.nombres || "",
+                      apellidos: item.acudiente?.apellidos || "",
+                      parentesco: item.parentesco || "",
+                      telefono: item.acudiente?.telefono || "",
+                      direccion: item.acudiente?.direccion || "",
+                      email: item.acudiente?.email || "",
+                    }))}
                     pagination={false}
                   />
                 </Card>

@@ -1,8 +1,8 @@
 import { Line } from "@ant-design/plots";
-import { Card, Col, Row, Spin, Typography } from "antd";
+import { Card, Col, Row, Typography, Spin } from "antd";
+import { useGetQuarterlyVisits } from "../../../../hooks/useGetQuarterlyVisits/useGetQuarterlyVisits";
 import { useGetMonthlyPayments } from "../../../../hooks/useGetMonthlyPayments/useGetMonthlyPayments";
 import { useGetOperationalEfficiency } from "../../../../hooks/useGetOperationalEfficiency/useGetOperationalEfficiency";
-import { useGetQuarterlyVisits } from "../../../../hooks/useGetQuarterlyVisits/useGetQuarterlyVisits";
 
 const { Title, Text } = Typography;
 

@@ -6,31 +6,31 @@ import {
   Button,
   Card,
   Col,
-  Collapse,
-  DatePicker,
   Flex,
   Form,
   Input,
   Row,
-  Select,
-  Space,
   Spin,
   Typography,
   Upload,
+  Collapse,
   message,
+  DatePicker,
+  Select,
+  Space,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { z } from "zod";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useCreateSimplifiedMedicalRecord } from "../../hooks/useCreateUserMedicalRecord/useCreateUserMedicalRecord";
 import { useEditSimplifiedRecordMutation } from "../../hooks/useEditRecordMutation/useEditRecordMutation";
+import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetProfessionals } from "../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
-import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import type { MedicalRecord as MedicalRecordType } from "../../types";
+import { z } from "zod";
 
 const { Title } = Typography;
 const { Panel } = Collapse;
@@ -42,7 +42,6 @@ const homeVisitFormSchema = z.object({
   fecha_visita: z.any(),
   motivo_consulta: z.string().min(1, "El motivo de consulta es requerido"),
   profesional: z.number().min(1, "El profesional es requerido"),
-
   // Habilidades biofísicas
   tipo_alimentacion: z.string().min(1, "El tipo de alimentación es requerido"),
   tipo_sueno: z.string().min(1, "El tipo de sueño es requerido"),
@@ -113,6 +112,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
   const {
     getValues,
     formState: { errors },
+    reset,
   } = methods;
 
   const { mutate: createUserMedicalRecord, isPending: isLoadingCreation } =
@@ -130,6 +130,33 @@ export const HomeVisitMedicalRecord: React.FC = () => {
   const professionalsQuery = useGetProfessionals();
   const { data: user, isLoading: loadingUser } = useGetUserById(userId);
 
+  // Populate form with existing medical record data
+  useEffect(() => {
+    if (userMedicalRecord?.data.data) {
+      const data = userMedicalRecord.data.data;
+      reset({
+        fecha_visita: data.fecha_ingreso ? dayjs(data.fecha_ingreso) : dayjs(),
+        motivo_consulta: data.motivo_ingreso || "",
+        profesional: data.id_profesional || 0,
+        tipo_alimentacion: data.tipo_alimentacion || "",
+        tipo_sueno: data.tipo_de_sueno || "",
+        continencia: data.continencia || "",
+        tipo_movilidad: data.tipo_de_movilidad || "",
+        cuidado_personal: data.cuidado_personal || "",
+        apariencia_personal: data.apariencia_personal || "",
+        tabaquismo: data.tabaquismo || "",
+        sustancias_psicoactivas: data.sustanciaspsico || "",
+        alcoholismo: data.alcoholismo || "",
+        cafeina: data.cafeina || "",
+        comunicacion_verbal: data.comunicacion_verbal || "",
+        comunicacion_no_verbal: data.comunicacion_no_verbal || "",
+        estado_animo: data.estado_de_animo || "",
+        ha_sufrido_maltrato: data.maltratado || "",
+        observaciones: data.observaciones_iniciales || "",
+      });
+    }
+  }, [userMedicalRecord?.data.data, reset]);
+
   // Mapeo de hash a key del Collapse
   useEffect(() => {
     const hash = location.hash.replace("#", "");
@@ -144,7 +171,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
     // Crear un registro médico simplificado basado en el mockup
     const medicalRecord: MedicalRecordType = {
       id_historiaclinica: userMedicalRecord?.data.data?.id_historiaclinica || 0,
-      id_usuario: Number.parseInt(userId),
+      id_usuario: parseInt(userId),
       id_profesional: data.profesional || null,
       Tiene_OtrasAlergias: false,
       Tienedieta_especial: false,
@@ -182,7 +209,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
       sustanciaspsico: data.sustancias_psicoactivas,
       tabaquismo: data.tabaquismo,
       telefono_emermedica: "No especificado",
-      temperatura_corporal: 37, // Default temperature
+      temperatura_corporal: 37,
       tipo_alimentacion: data.tipo_alimentacion,
       tipo_de_movilidad: data.tipo_movilidad,
       tipo_de_sueno: data.tipo_sueno,
@@ -214,7 +241,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
       console.log(" Actualizando historia clínica de visita domiciliaria...");
       editRecord(
         {
-          id: Number.parseInt(userId),
+          id: parseInt(userId),
           recordId: userMedicalRecord.data.data.id_historiaclinica,
           record: medicalRecord,
         },
@@ -348,7 +375,6 @@ export const HomeVisitMedicalRecord: React.FC = () => {
               </Col>
             </Row>
           </Card>
-
           <Card>
             <Collapse
               activeKey={activePanel}

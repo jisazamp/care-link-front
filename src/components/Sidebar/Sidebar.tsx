@@ -1,10 +1,10 @@
 import {
+  CheckCircleOutlined,
+  UserOutlined,
   CalendarOutlined,
   CarOutlined,
-  CheckCircleOutlined,
   DollarOutlined,
   HomeOutlined,
-  UserOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import { Menu } from "antd";

@@ -1,4 +1,4 @@
-import { Button, Card, Empty, Spin, Table, Typography } from "antd";
+import { Button, Card, Table, Typography, Spin, Empty } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -40,11 +40,11 @@ export const CardSheduActivities = () => {
 
         if (activityDate.isBefore(now, "day")) {
           return <Text type="danger">{activityDate.format("DD/MM/YYYY")}</Text>;
-        }
-        if (activityDate.isSame(now, "day")) {
+        } else if (activityDate.isSame(now, "day")) {
           return <Text type="warning">Hoy</Text>;
+        } else {
+          return <Text>{activityDate.format("DD/MM/YYYY")}</Text>;
         }
-        return <Text>{activityDate.format("DD/MM/YYYY")}</Text>;
       },
     },
     {

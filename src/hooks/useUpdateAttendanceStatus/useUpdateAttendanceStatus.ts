@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { message } from "antd";
 import { client } from "../../api/client";
+import { message } from "antd";
 
 interface UpdateAttendanceStatusData {
   estado_asistencia:

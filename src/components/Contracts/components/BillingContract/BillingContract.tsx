@@ -19,12 +19,12 @@ import { useCalculatePartialBill } from "../../../../hooks/useCalculatePartialBi
 import { useGetBill } from "../../../../hooks/useGetBill/useGetBill";
 import { useGetBillPayments } from "../../../../hooks/useGetBillPayments/useGetBillPayments";
 import {
-  type PaymentFormData,
   formatCurrency,
+  PaymentFormData,
 } from "../../../../utils/paymentUtils";
-import { getEstadoFactura } from "../../../Billing/components/PaymentSummary/PaymentSummary";
-import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
 import type { FormValues } from "../FormContracts";
+import { PaymentsForm } from "../../../Billing/components/PaymentsForm";
+import { getEstadoFactura } from "../../../Billing/components/PaymentSummary/PaymentSummary";
 
 const { Text } = Typography;
 
@@ -321,7 +321,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                           `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         }
                         parser={(value) =>
-                          Number(value?.replace(/\$\s?|(,*)/g, ""))
+                          Number(value!.replace(/\$\s?|(,*)/g, ""))
                         }
                       />
                     </Form.Item>
@@ -338,7 +338,7 @@ export const BillingContract: React.FC<BillingContractProps> = ({
                           `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         }
                         parser={(value) =>
-                          Number(value?.replace(/\$\s?|(,*)/g, ""))
+                          Number(value!.replace(/\$\s?|(,*)/g, ""))
                         }
                       />
                     </Form.Item>
