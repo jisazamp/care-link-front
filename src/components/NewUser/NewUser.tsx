@@ -1,4 +1,4 @@
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, DownloadOutlined, UploadOutlined as ImportOutlined } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Breadcrumb,
@@ -15,10 +15,15 @@ import {
   Switch,
   Typography,
   Upload,
+  message,
+  Modal,
+  Alert,
+  Divider,
+  Space,
 } from "antd";
 import request from "axios";
 import dayjs, { type Dayjs } from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -33,6 +38,8 @@ import { useCreateUserMutation } from "../../hooks/useCreateUserMutation/useCrea
 import { useEditUserMutation } from "../../hooks/useEditUserMutation/useEditUserMutation";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useImageFile } from "../../hooks/useImageFile/useImageFile";
+import { useExportUserTemplate } from "../../hooks/useExportUserTemplate/useExportUserTemplate";
+import { useImportUsers } from "../../hooks/useImportUsers/useImportUsers";
 import type { User } from "../../types";
 
 const { Option } = Select;
@@ -88,6 +95,11 @@ export const NewUser: React.FC = () => {
   const userId = params.id;
   const location = useLocation();
 
+  // Estados para importación masiva
+  const [importModalVisible, setImportModalVisible] = useState(false);
+  const [importResults, setImportResults] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const {
     control,
     formState: { errors },
@@ -137,6 +149,17 @@ export const NewUser: React.FC = () => {
     "image/jpeg",
   );
 
+  // Hooks para importación/exportación
+  const {
+    mutate: exportTemplate,
+    isPending: isExportingTemplate,
+  } = useExportUserTemplate();
+
+  const {
+    mutate: importUsers,
+    isPending: isImportingUsers,
+  } = useImportUsers();
+
   const onSubmit = (data: FormValues) => {
     
     const user: Partial<User> = {
@@ -169,6 +192,50 @@ export const NewUser: React.FC = () => {
       return;
     }
     editUser({ user, id: userId, photoFile });
+  };
+
+  // Funciones para importación/exportación
+  const handleExportTemplate = () => {
+    exportTemplate();
+    message.success("Descargando plantilla Excel...");
+  };
+
+  const handleImportModalOpen = () => {
+    setImportModalVisible(true);
+    setImportResults(null);
+    setSelectedFile(null);
+  };
+
+  const handleImportModalClose = () => {
+    setImportModalVisible(false);
+    setImportResults(null);
+    setSelectedFile(null);
+  };
+
+  const handleFileSelect = (file: File) => {
+    if (!file.name.endsWith('.xlsx')) {
+      message.error("Solo se permiten archivos Excel (.xlsx)");
+      return false;
+    }
+    setSelectedFile(file);
+    return false; // No subir automáticamente
+  };
+
+  const handleImportUsers = () => {
+    if (!selectedFile) {
+      message.error("Por favor seleccione un archivo Excel");
+      return;
+    }
+
+    importUsers(selectedFile, {
+      onSuccess: (response) => {
+        setImportResults(response.data.data);
+        message.success(response.data.message);
+      },
+      onError: (error: any) => {
+        message.error(error.response?.data?.detail || "Error al importar usuarios");
+      }
+    });
   };
 
   useEffect(() => {
@@ -278,6 +345,42 @@ export const NewUser: React.FC = () => {
         ]}
         style={{ margin: "16px 0" }}
       />
+      
+      {/* Botones de importación/exportación - Solo mostrar si no es edición */}
+      {!userId && (
+        <Card 
+          title="Importación Masiva de Usuarios" 
+          style={{ marginBottom: "16px" }}
+          extra={
+            <Space>
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={handleExportTemplate}
+                loading={isExportingTemplate}
+                type="primary"
+              >
+                Descargar Plantilla
+              </Button>
+              <Button
+                icon={<ImportOutlined />}
+                onClick={handleImportModalOpen}
+                type="default"
+              >
+                Importar Usuarios
+              </Button>
+            </Space>
+          }
+        >
+          <Alert
+            message="Importación Masiva"
+            description="Esta funcionalidad permite crear múltiples usuarios para asistencia a la fundación desde un archivo Excel. Solo se crearán usuarios que NO estén relacionados con visitas domiciliarias."
+            type="info"
+            showIcon
+            style={{ marginBottom: "16px" }}
+          />
+        </Card>
+      )}
+      
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
         <Row gutter={[16, 16]}>
           <Col span={24}>
@@ -567,6 +670,87 @@ export const NewUser: React.FC = () => {
           </Col>
         </Row>
       </Form>
+      
+      {/* Modal de Importación Masiva */}
+      <Modal
+        title="Importar Usuarios desde Excel"
+        open={importModalVisible}
+        onCancel={handleImportModalClose}
+        footer={[
+          <Button key="cancel" onClick={handleImportModalClose}>
+            Cancelar
+          </Button>,
+          <Button
+            key="import"
+            type="primary"
+            onClick={handleImportUsers}
+            loading={isImportingUsers}
+            disabled={!selectedFile}
+          >
+            Importar Usuarios
+          </Button>,
+        ]}
+        width={800}
+      >
+        <Space direction="vertical" style={{ width: "100%" }} size="large">
+          <Alert
+            message="Instrucciones"
+            description="Suba un archivo Excel (.xlsx) con los datos de los usuarios. El archivo debe contener las columnas: Tipo de usuario, N° Documento, Nombres, Apellidos, Género, Fecha de nacimiento, Estado civil, Ocupación."
+            type="info"
+            showIcon
+          />
+          
+          <Upload
+            accept=".xlsx"
+            beforeUpload={handleFileSelect}
+            showUploadList={false}
+            maxCount={1}
+          >
+            <Button icon={<UploadOutlined />}>
+              Seleccionar Archivo Excel
+            </Button>
+          </Upload>
+          
+          {importResults && (
+            <div>
+              <Divider>Resultados de la Importación</Divider>
+              
+              <Alert
+                message={`Procesados: ${importResults.total_processed} | Exitosos: ${importResults.total_success} | Errores: ${importResults.total_errors}`}
+                type={importResults.total_errors === 0 ? "success" : "warning"}
+                showIcon
+                style={{ marginBottom: "16px" }}
+              />
+              
+              {importResults.success.length > 0 && (
+                <div style={{ marginBottom: "16px" }}>
+                  <h4>Usuarios Creados Exitosamente:</h4>
+                  <ul>
+                    {importResults.success.map((item: any, index: number) => (
+                      <li key={index}>
+                        Fila {item.row}: {item.nombre} (ID: {item.user_id})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {importResults.errors.length > 0 && (
+                <div>
+                  <h4>Errores Encontrados:</h4>
+                  <ul>
+                    {importResults.errors.map((item: any, index: number) => (
+                      <li key={index} style={{ color: "red" }}>
+                        Fila {item.row}: {item.error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </Space>
+      </Modal>
     </>
   );
 };
