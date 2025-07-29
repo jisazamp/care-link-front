@@ -1,12 +1,12 @@
-import React from 'react';
-import { Row, Col, Statistic, Progress, Tooltip, Typography } from 'antd';
 import {
-  DollarOutlined,
-  ClockCircleOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
   CloseCircleOutlined,
+  DollarOutlined,
   FileTextOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
+import { Col, Progress, Row, Statistic, Tooltip, Typography } from "antd";
+import type React from "react";
 
 const { Text } = Typography;
 
@@ -23,12 +23,20 @@ interface BillingStatsProps {
 }
 
 export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
-  const porcentajePagadas = stats.total > 0 ? Math.round((stats.pagadas / stats.total) * 100) : 0;
-  const porcentajePendientes = stats.total > 0 ? Math.round((stats.pendientes / stats.total) * 100) : 0;
-  const porcentajeVencidas = stats.total > 0 ? Math.round((stats.vencidas / stats.total) * 100) : 0;
-  const valorPagado = stats.valorPagado || (stats.totalValor - stats.valorPendiente);
-  const porcentajeValorPagado = stats.totalValor > 0 ? Math.round((valorPagado / stats.totalValor) * 100) : 0;
-  const promedioPorFactura = stats.total > 0 ? Math.round(stats.totalValor / stats.total) : 0;
+  const porcentajePagadas =
+    stats.total > 0 ? Math.round((stats.pagadas / stats.total) * 100) : 0;
+  const porcentajePendientes =
+    stats.total > 0 ? Math.round((stats.pendientes / stats.total) * 100) : 0;
+  const porcentajeVencidas =
+    stats.total > 0 ? Math.round((stats.vencidas / stats.total) * 100) : 0;
+  const valorPagado =
+    stats.valorPagado || stats.totalValor - stats.valorPendiente;
+  const porcentajeValorPagado =
+    stats.totalValor > 0
+      ? Math.round((valorPagado / stats.totalValor) * 100)
+      : 0;
+  const promedioPorFactura =
+    stats.total > 0 ? Math.round(stats.totalValor / stats.total) : 0;
 
   return (
     <div style={{ marginBottom: 24 }}>
@@ -39,7 +47,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Total Facturas"
             value={stats.total}
             prefix={<FileTextOutlined />}
-            valueStyle={{ color: '#1890ff' }}
+            valueStyle={{ color: "#1890ff" }}
           />
         </Col>
         <Col xs={24} sm={12} md={4}>
@@ -47,7 +55,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Pendientes"
             value={`${stats.pendientes} (${porcentajePendientes}%)`}
             prefix={<ClockCircleOutlined />}
-            valueStyle={{ color: '#faad14' }}
+            valueStyle={{ color: "#faad14" }}
           />
         </Col>
         <Col xs={24} sm={12} md={4}>
@@ -55,7 +63,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Pagadas"
             value={`${stats.pagadas} (${porcentajePagadas}%)`}
             prefix={<CheckCircleOutlined />}
-            valueStyle={{ color: '#52c41a' }}
+            valueStyle={{ color: "#52c41a" }}
           />
         </Col>
         <Col xs={24} sm={12} md={4}>
@@ -63,7 +71,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Vencidas"
             value={`${stats.vencidas} (${porcentajeVencidas}%)`}
             prefix={<CloseCircleOutlined />}
-            valueStyle={{ color: '#ff4d4f' }}
+            valueStyle={{ color: "#ff4d4f" }}
           />
         </Col>
       </Row>
@@ -74,7 +82,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Valor Total"
             value={stats.totalValor}
             prefix={<DollarOutlined />}
-            valueStyle={{ color: '#722ed1' }}
+            valueStyle={{ color: "#722ed1" }}
             formatter={(value) => `$${value?.toLocaleString()}`}
           />
         </Col>
@@ -83,7 +91,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Valor Pagado"
             value={`$${valorPagado.toLocaleString()} (${porcentajeValorPagado}%)`}
             prefix={<DollarOutlined />}
-            valueStyle={{ color: '#52c41a' }}
+            valueStyle={{ color: "#52c41a" }}
           />
         </Col>
         <Col xs={24} sm={12} md={4}>
@@ -91,7 +99,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Valor Pendiente"
             value={`$${stats.valorPendiente.toLocaleString()}`}
             prefix={<DollarOutlined />}
-            valueStyle={{ color: '#fa8c16' }}
+            valueStyle={{ color: "#fa8c16" }}
           />
         </Col>
         <Col xs={24} sm={12} md={4}>
@@ -99,7 +107,7 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
             title="Promedio por Factura"
             value={`$${promedioPorFactura.toLocaleString()}`}
             prefix={<DollarOutlined />}
-            valueStyle={{ color: '#13c2c2' }}
+            valueStyle={{ color: "#13c2c2" }}
           />
         </Col>
       </Row>
@@ -109,17 +117,24 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
           <div style={{ marginTop: 8 }}>
             <Tooltip title="Porcentaje de facturas que han sido completamente pagadas respecto al total de facturas.">
               <Text type="secondary" style={{ fontSize: 13 }}>
-                Progreso de Facturas Pagadas: Indica el % de facturas saldadas en su totalidad.
+                Progreso de Facturas Pagadas: Indica el % de facturas saldadas
+                en su totalidad.
               </Text>
             </Tooltip>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 8,
+              }}
+            >
               <span>Progreso de Facturas Pagadas</span>
               <span>{porcentajePagadas}%</span>
             </div>
             <Progress
               percent={porcentajePagadas}
-              status={porcentajePagadas === 100 ? 'success' : 'active'}
-              strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
+              status={porcentajePagadas === 100 ? "success" : "active"}
+              strokeColor={{ "0%": "#108ee9", "100%": "#87d068" }}
             />
           </div>
         </Col>
@@ -127,21 +142,28 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
           <div style={{ marginTop: 8 }}>
             <Tooltip title="Porcentaje del valor total facturado que ya ha sido pagado (incluye pagos parciales y totales).">
               <Text type="secondary" style={{ fontSize: 13 }}>
-                Progreso de Valor Pagado: Indica el % del dinero total facturado que ya fue cobrado.
+                Progreso de Valor Pagado: Indica el % del dinero total facturado
+                que ya fue cobrado.
               </Text>
             </Tooltip>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 8,
+              }}
+            >
               <span>Progreso de Valor Pagado</span>
               <span>{porcentajeValorPagado}%</span>
             </div>
             <Progress
               percent={porcentajeValorPagado}
-              status={porcentajeValorPagado === 100 ? 'success' : 'active'}
-              strokeColor={{ '0%': '#faad14', '100%': '#52c41a' }}
+              status={porcentajeValorPagado === 100 ? "success" : "active"}
+              strokeColor={{ "0%": "#faad14", "100%": "#52c41a" }}
             />
           </div>
         </Col>
       </Row>
     </div>
   );
-}; 
+};

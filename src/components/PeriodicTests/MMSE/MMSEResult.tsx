@@ -1,6 +1,6 @@
-import React from "react";
-import { Card, Typography, Button } from "antd";
-import { MMSEResultProps } from "./types";
+import { Button, Card, Typography } from "antd";
+import type React from "react";
+import type { MMSEResultProps } from "./types";
 
 const { Title, Paragraph } = Typography;
 
@@ -12,7 +12,7 @@ const getInterpretation = (score: number): string => {
 
 export const MMSEResult: React.FC<MMSEResultProps> = ({ result, onPrev }) => {
   if (!result) return null;
-  
+
   return (
     <Card>
       <Title level={4}>Resultado del Test MMSE</Title>
@@ -25,4 +25,4 @@ export const MMSEResult: React.FC<MMSEResultProps> = ({ result, onPrev }) => {
       <Button onClick={onPrev}>Volver</Button>
     </Card>
   );
-}; 
+};

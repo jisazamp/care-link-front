@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import { client } from "../../api/client";
-import { handleScheduleError } from "../../utils/errorHandler";
 import type { UpdateEstadoAsistenciaRequest } from "../../types";
+import { handleScheduleError } from "../../utils/errorHandler";
 
 const updateEstadoAsistencia = ({
   id_cronograma_paciente,

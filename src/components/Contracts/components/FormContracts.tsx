@@ -6,10 +6,17 @@ import {
   SolutionOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Button, Card, Steps, Typography, notification } from "antd";
+import {
+  Breadcrumb,
+  Button,
+  Card,
+  Steps,
+  Typography,
+  notification,
+} from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateBill } from "../../../hooks/useCreateBill";
@@ -20,13 +27,13 @@ import { useGetContractBill } from "../../../hooks/useGetContractBill";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useGetPaymentMethods } from "../../../hooks/useGetPaymentMethods";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
-import type { PaymentFormData } from "../../../utils/paymentUtils";
 import type {
   CreateContractRequest,
   Payment,
   UpdateContractRequest,
 } from "../../../types";
 import { handleContractError } from "../../../utils/errorHandler";
+import type { PaymentFormData } from "../../../utils/paymentUtils";
 import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 import { BillingContract } from "./BillingContract/BillingContract";
 import { CreateContract } from "./CreateContract/CreateContract";
@@ -88,9 +95,14 @@ export interface FormValues {
   selectedDateDay: string | null;
   services: Service[];
   startDate: Dayjs | null;
-  payments: { paymentMethod: number | undefined; paymentDate: string; amount: number; id_tipo_pago?: number | undefined }[];
+  payments: {
+    paymentMethod: number | undefined;
+    paymentDate: string;
+    amount: number;
+    id_tipo_pago?: number | undefined;
+  }[];
   impuestos?: number;
-  descuentos?: number; 
+  descuentos?: number;
 }
 
 export const FormContracts = () => {
@@ -119,7 +131,11 @@ export const FormContracts = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const createContractMutation = useCreateContract();
   const { createContractBillFn, createContractPending } = useCreateBill();
-  const { createPaymentPending, addPaymentsToFacturaFnAsync, addPaymentsToFacturaPending } = useCreatePayment();
+  const {
+    createPaymentPending,
+    addPaymentsToFacturaFnAsync,
+    addPaymentsToFacturaPending,
+  } = useCreatePayment();
   const { contractBillData } = useGetContractBill(Number(contractId));
   const { data: paymentMethodsData } = useGetPaymentMethods();
   const { data: billPayments } = useGetBillPayments(
@@ -128,11 +144,11 @@ export const FormContracts = () => {
 
   // Sincronizar pagos centralizados con el formulario
   useEffect(() => {
-    const formattedPayments = payments.map(p => ({
+    const formattedPayments = payments.map((p) => ({
       paymentMethod: p.id_metodo_pago,
       paymentDate: p.fecha_pago,
       amount: p.valor,
-      id_tipo_pago: p.id_tipo_pago
+      id_tipo_pago: p.id_tipo_pago,
     }));
     setValue("payments", formattedPayments);
   }, [payments, setValue]);
@@ -144,19 +160,22 @@ export const FormContracts = () => {
   resetRef.current = reset;
 
   // Función memoizada para actualizar servicios cuando cambia startDate
-  const updateServicesWithStartDate = useCallback((newStartDate: Dayjs) => {
-    if (!contractId) {
-      const newServices: Service[] = startingServices.map((s) => ({
-        ...s,
-        startDate: newStartDate,
-        endDate: newStartDate.add(1, "month"),
-      }));
-      setValueRef.current("services", newServices);
-    }
-  }, [contractId]);
+  const updateServicesWithStartDate = useCallback(
+    (newStartDate: Dayjs) => {
+      if (!contractId) {
+        const newServices: Service[] = startingServices.map((s) => ({
+          ...s,
+          startDate: newStartDate,
+          endDate: newStartDate.add(1, "month"),
+        }));
+        setValueRef.current("services", newServices);
+      }
+    },
+    [contractId],
+  );
 
   useEffect(() => {
-    if (startDate && startDate.isValid()) {
+    if (startDate?.isValid()) {
       updateServicesWithStartDate(startDate);
     }
   }, [startDate, updateServicesWithStartDate]);
@@ -267,36 +286,42 @@ export const FormContracts = () => {
       updateContract(newContract, {
         onSuccess: async () => {
           if (billId) {
-            const validPayments = newPayments.filter(p => 
-              typeof p.paymentMethod === 'number' && p.paymentMethod > 0 && p.amount > 0
+            const validPayments = newPayments.filter(
+              (p) =>
+                typeof p.paymentMethod === "number" &&
+                p.paymentMethod > 0 &&
+                p.amount > 0,
             );
-            
-            const paymentData: Omit<Payment, "id_pago">[] = validPayments.map((p) => {
-              const metodoPago = paymentMethodsData?.find(
-                (m: { id_metodo_pago: number; nombre: string }) => m.nombre === `${p.paymentMethod}`,
-              );
-              
-              return {
-                id_factura: billId,
-                id_metodo_pago: (metodoPago?.id_metodo_pago ?? 1) as number,
-                valor: p.amount,
-                fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
-                id_tipo_pago: p.id_tipo_pago || 2, // Usar el valor real seleccionado por el usuario
-              };
-            });
-            
+
+            const paymentData: Omit<Payment, "id_pago">[] = validPayments.map(
+              (p) => {
+                const metodoPago = paymentMethodsData?.find(
+                  (m: { id_metodo_pago: number; nombre: string }) =>
+                    m.nombre === `${p.paymentMethod}`,
+                );
+
+                return {
+                  id_factura: billId,
+                  id_metodo_pago: (metodoPago?.id_metodo_pago ?? 1) as number,
+                  valor: p.amount,
+                  fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
+                  id_tipo_pago: p.id_tipo_pago || 2, // Usar el valor real seleccionado por el usuario
+                };
+              },
+            );
+
             // Usar el nuevo endpoint para agregar pagos a la factura
             if (paymentData.length > 0) {
-              const paymentsForFactura = paymentData.map(p => ({
+              const paymentsForFactura = paymentData.map((p) => ({
                 id_metodo_pago: p.id_metodo_pago,
                 id_tipo_pago: p.id_tipo_pago,
-                fecha_pago: dayjs(p.fecha_pago).format('YYYY-MM-DD'),
-                valor: Number(p.valor)
+                fecha_pago: dayjs(p.fecha_pago).format("YYYY-MM-DD"),
+                valor: Number(p.valor),
               }));
-              
+
               await addPaymentsToFacturaFnAsync({
                 facturaId: billId,
-                payments: paymentsForFactura
+                payments: paymentsForFactura,
               });
             }
             navigate(`/usuarios/${id}/detalles`);
@@ -304,7 +329,10 @@ export const FormContracts = () => {
         },
         onError: (error: any) => {
           const errorMsg = handleContractError(error);
-          notification.error({ message: "Error al actualizar contrato", description: errorMsg });
+          notification.error({
+            message: "Error al actualizar contrato",
+            description: errorMsg,
+          });
         },
       });
 
@@ -323,47 +351,58 @@ export const FormContracts = () => {
         // Obtener los valores actuales del formulario
         const impuestos = getValues("impuestos") ?? 0;
         const descuentos = getValues("descuentos") ?? 0;
-        createContractBillFn({
-          contractId: contract.id_contrato,
-          impuestos,
-          descuentos,
-          observaciones: "Factura generada automáticamente desde el contrato"
-        }, {
-          onSuccess: async (data) => {
-            const billId = data.data.data.id_factura;
-            const validPayments = getValues("payments").filter(p => 
-              typeof p.paymentMethod === 'number' && p.paymentMethod > 0 && p.amount > 0
-            );
-            
-            const paymentData: Omit<Payment, "id_pago">[] = validPayments.map((p) => ({
-              id_factura: billId,
-              id_metodo_pago: p.paymentMethod as number,
-              valor: p.amount,
-              fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
-              id_tipo_pago: p.id_tipo_pago || 2, // Usar el valor real seleccionado por el usuario
-            }));
-            
-            // Usar el nuevo endpoint para agregar pagos a la factura
-            if (paymentData.length > 0) {
-              const paymentsForFactura = paymentData.map(p => ({
-                id_metodo_pago: p.id_metodo_pago,
-                id_tipo_pago: p.id_tipo_pago,
-                fecha_pago: dayjs(p.fecha_pago).format('YYYY-MM-DD'),
-                valor: Number(p.valor)
-              }));
-              
-              await addPaymentsToFacturaFnAsync({
-                facturaId: billId,
-                payments: paymentsForFactura
-              });
-            }
-            navigate(`/usuarios/${id}/detalles`);
+        createContractBillFn(
+          {
+            contractId: contract.id_contrato,
+            impuestos,
+            descuentos,
+            observaciones: "Factura generada automáticamente desde el contrato",
           },
-        });
+          {
+            onSuccess: async (data) => {
+              const billId = data.data.data.id_factura;
+              const validPayments = getValues("payments").filter(
+                (p) =>
+                  typeof p.paymentMethod === "number" &&
+                  p.paymentMethod > 0 &&
+                  p.amount > 0,
+              );
+
+              const paymentData: Omit<Payment, "id_pago">[] = validPayments.map(
+                (p) => ({
+                  id_factura: billId,
+                  id_metodo_pago: p.paymentMethod as number,
+                  valor: p.amount,
+                  fecha_pago: dayjs(p.paymentDate).format("YYYY-MM-DD"),
+                  id_tipo_pago: p.id_tipo_pago || 2, // Usar el valor real seleccionado por el usuario
+                }),
+              );
+
+              // Usar el nuevo endpoint para agregar pagos a la factura
+              if (paymentData.length > 0) {
+                const paymentsForFactura = paymentData.map((p) => ({
+                  id_metodo_pago: p.id_metodo_pago,
+                  id_tipo_pago: p.id_tipo_pago,
+                  fecha_pago: dayjs(p.fecha_pago).format("YYYY-MM-DD"),
+                  valor: Number(p.valor),
+                }));
+
+                await addPaymentsToFacturaFnAsync({
+                  facturaId: billId,
+                  payments: paymentsForFactura,
+                });
+              }
+              navigate(`/usuarios/${id}/detalles`);
+            },
+          },
+        );
       },
       onError: (error: any) => {
         const errorMsg = handleContractError(error);
-        notification.error({ message: "Error al crear contrato", description: errorMsg });
+        notification.error({
+          message: "Error al crear contrato",
+          description: errorMsg,
+        });
       },
     });
   };
@@ -372,11 +411,7 @@ export const FormContracts = () => {
     {
       title: !contractId ? "Crear contrato" : "Editar contrato",
       icon: <FileDoneOutlined />,
-      content: (
-        <CreateContract
-          onNext={handleCreateContractNext}
-        />
-      ),
+      content: <CreateContract onNext={handleCreateContractNext} />,
     },
     {
       title: "Detalle de servicios",
@@ -406,7 +441,9 @@ export const FormContracts = () => {
     {
       title: "Configuración y Agenda",
       icon: <CalendarOutlined />,
-      content: <AgendaSettingsContract onBack={handleAgendaSettingsContractBack} />,
+      content: (
+        <AgendaSettingsContract onBack={handleAgendaSettingsContractBack} />
+      ),
     },
   ];
 

@@ -14,4 +14,4 @@ export const useGetHomeVisitById = (visitaId: string | undefined) => {
     retry: 3,
     retryDelay: 1000,
   });
-}; 
+};

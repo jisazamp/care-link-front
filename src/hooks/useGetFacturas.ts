@@ -9,7 +9,7 @@ const getFacturas = async (contratoId?: number) => {
   try {
     const res = contratoId
       ? await client.get<any>(`/api/contratos/${contratoId}/facturas`)
-      : await client.get<any>(`/api/facturas`);
+      : await client.get<any>("/api/facturas");
 
     console.log(" Respuesta del servidor:", res);
 

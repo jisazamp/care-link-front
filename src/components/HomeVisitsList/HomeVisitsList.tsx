@@ -1,30 +1,31 @@
-import React, { useCallback, useEffect, useState } from "react";
 import {
-  Table,
-  Card,
-  Tag,
-  Button,
-  Space,
-  Typography,
-  Row,
-  Col,
-  Statistic,
-  DatePicker,
-  Select,
-  Input,
-  message,
-} from "antd";
-import {
-  PlusOutlined,
-  SearchOutlined,
   CalendarOutlined,
-  UserOutlined,
   EnvironmentOutlined,
   PhoneOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Input,
+  Row,
+  Select,
+  Space,
+  Statistic,
+  Table,
+  Tag,
+  Typography,
+  message,
+} from "antd";
+import dayjs from "dayjs";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetAllHomeVisits } from "../../hooks/useGetAllHomeVisits/useGetAllHomeVisits";
-import dayjs from "dayjs";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -34,8 +35,11 @@ export const HomeVisitsList: React.FC = () => {
   const { data: homeVisitsData, isLoading, error } = useGetAllHomeVisits();
 
   // Debug: Log de datos recibidos (solo en desarrollo)
-  if (homeVisitsData?.data.data && process.env.NODE_ENV === 'development') {
-    console.log("🔍 HomeVisitsList - Total de visitas:", homeVisitsData.data.data.length);
+  if (homeVisitsData?.data.data && process.env.NODE_ENV === "development") {
+    console.log(
+      "🔍 HomeVisitsList - Total de visitas:",
+      homeVisitsData.data.data.length,
+    );
     const estados = homeVisitsData.data.data.reduce((acc: any, v: any) => {
       acc[v.estado_visita] = (acc[v.estado_visita] || 0) + 1;
       return acc;
@@ -90,9 +94,7 @@ export const HomeVisitsList: React.FC = () => {
       dataIndex: "paciente_nombre",
       key: "paciente_nombre",
       render: (text: string) => (
-        <div style={{ fontWeight: 500 }}>
-          {text || "Sin paciente"}
-        </div>
+        <div style={{ fontWeight: 500 }}>{text || "Sin paciente"}</div>
       ),
     },
     {
@@ -101,7 +103,7 @@ export const HomeVisitsList: React.FC = () => {
       render: (record: any) => {
         if (!record.fecha_visita || !record.hora_visita) {
           return (
-            <div style={{ color: '#faad14', fontStyle: 'italic' }}>
+            <div style={{ color: "#faad14", fontStyle: "italic" }}>
               Pendiente de programación
             </div>
           );
@@ -156,9 +158,7 @@ export const HomeVisitsList: React.FC = () => {
       dataIndex: "estado_visita",
       key: "estado_visita",
       render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
-          {getStatusText(status)}
-        </Tag>
+        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
       ),
     },
     {
@@ -179,7 +179,11 @@ export const HomeVisitsList: React.FC = () => {
           <Button
             type="link"
             size="small"
-            onClick={() => navigate(`/visitas-domiciliarias/usuarios/${record.id_usuario}/detalles`)}
+            onClick={() =>
+              navigate(
+                `/visitas-domiciliarias/usuarios/${record.id_usuario}/detalles`,
+              )
+            }
           >
             Ver Detalles
           </Button>
@@ -189,15 +193,20 @@ export const HomeVisitsList: React.FC = () => {
   ];
 
   const calculateStats = () => {
-    if (!homeVisitsData?.data.data) return { total: 0, pendientes: 0, realizadas: 0, canceladas: 0 };
+    if (!homeVisitsData?.data.data)
+      return { total: 0, pendientes: 0, realizadas: 0, canceladas: 0 };
 
     // Usar datos filtrados para las estadísticas
-    const visitas = filteredData.length > 0 ? filteredData : homeVisitsData.data.data;
+    const visitas =
+      filteredData.length > 0 ? filteredData : homeVisitsData.data.data;
     return {
       total: visitas.length,
-      pendientes: visitas.filter((v: any) => v.estado_visita === "PENDIENTE").length,
-      realizadas: visitas.filter((v: any) => v.estado_visita === "REALIZADA").length,
-      canceladas: visitas.filter((v: any) => v.estado_visita === "CANCELADA").length,
+      pendientes: visitas.filter((v: any) => v.estado_visita === "PENDIENTE")
+        .length,
+      realizadas: visitas.filter((v: any) => v.estado_visita === "REALIZADA")
+        .length,
+      canceladas: visitas.filter((v: any) => v.estado_visita === "CANCELADA")
+        .length,
     };
   };
 
@@ -212,7 +221,9 @@ export const HomeVisitsList: React.FC = () => {
 
     // Filtrar por estado
     if (filters.estado) {
-      filtered = filtered.filter((visita: any) => visita.estado_visita === filters.estado);
+      filtered = filtered.filter(
+        (visita: any) => visita.estado_visita === filters.estado,
+      );
     }
 
     // Filtrar por tipo de visitas (futuras o todas)
@@ -220,7 +231,9 @@ export const HomeVisitsList: React.FC = () => {
       const now = dayjs();
       filtered = filtered.filter((visita: any) => {
         if (!visita.fecha_visita || !visita.hora_visita) return false;
-        const visitaDateTime = dayjs(`${visita.fecha_visita} ${visita.hora_visita}`);
+        const visitaDateTime = dayjs(
+          `${visita.fecha_visita} ${visita.hora_visita}`,
+        );
         return visitaDateTime.isAfter(now);
       });
     }
@@ -252,7 +265,7 @@ export const HomeVisitsList: React.FC = () => {
 
   // Función para manejar cambios en filtros
   const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   // Función para limpiar filtros
@@ -275,7 +288,13 @@ export const HomeVisitsList: React.FC = () => {
     <div style={{ padding: "24px" }}>
       <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
         <Col span={24}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Title level={3}>Visitas Domiciliarias</Title>
             <Button
               type="primary"
@@ -332,15 +351,46 @@ export const HomeVisitsList: React.FC = () => {
       <Card style={{ marginBottom: "24px" }}>
         {/* Indicador de filtros activos */}
         {(filters.estado || filters.fecha || filters.paciente) && (
-          <div style={{ marginBottom: "16px", padding: "8px 12px", backgroundColor: "#f0f9ff", border: "1px solid #91d5ff", borderRadius: "6px" }}>
-            <div style={{ fontSize: "12px", color: "#1890ff", marginBottom: "4px" }}>
+          <div
+            style={{
+              marginBottom: "16px",
+              padding: "8px 12px",
+              backgroundColor: "#f0f9ff",
+              border: "1px solid #91d5ff",
+              borderRadius: "6px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "12px",
+                color: "#1890ff",
+                marginBottom: "4px",
+              }}
+            >
               🔍 Filtros activos:
             </div>
             <div style={{ fontSize: "11px", color: "#666" }}>
-              {filters.estado && <span style={{ marginRight: "8px" }}>Estado: {filters.estado}</span>}
-              {filters.fecha && <span style={{ marginRight: "8px" }}>Fecha: {dayjs(filters.fecha).format("DD/MM/YYYY")}</span>}
-              {filters.paciente && <span style={{ marginRight: "8px" }}>Paciente: {filters.paciente}</span>}
-              <span style={{ marginRight: "8px" }}>Tipo: {filters.tipoVisitas === "futuras" ? "Solo futuras" : "Todas las visitas"}</span>
+              {filters.estado && (
+                <span style={{ marginRight: "8px" }}>
+                  Estado: {filters.estado}
+                </span>
+              )}
+              {filters.fecha && (
+                <span style={{ marginRight: "8px" }}>
+                  Fecha: {dayjs(filters.fecha).format("DD/MM/YYYY")}
+                </span>
+              )}
+              {filters.paciente && (
+                <span style={{ marginRight: "8px" }}>
+                  Paciente: {filters.paciente}
+                </span>
+              )}
+              <span style={{ marginRight: "8px" }}>
+                Tipo:{" "}
+                {filters.tipoVisitas === "futuras"
+                  ? "Solo futuras"
+                  : "Todas las visitas"}
+              </span>
             </div>
           </div>
         )}
@@ -387,14 +437,16 @@ export const HomeVisitsList: React.FC = () => {
             />
           </Col>
           <Col span={3}>
-            <Button type="primary" icon={<SearchOutlined />} onClick={applyFilters}>
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              onClick={applyFilters}
+            >
               Filtrar
             </Button>
           </Col>
           <Col span={3}>
-            <Button onClick={clearFilters}>
-              Limpiar
-            </Button>
+            <Button onClick={clearFilters}>Limpiar</Button>
           </Col>
         </Row>
       </Card>
@@ -417,7 +469,13 @@ export const HomeVisitsList: React.FC = () => {
           locale={{
             emptyText: (
               <div style={{ textAlign: "center", padding: "40px 0" }}>
-                <div style={{ fontSize: "48px", color: "#d9d9d9", marginBottom: "16px" }}>
+                <div
+                  style={{
+                    fontSize: "48px",
+                    color: "#d9d9d9",
+                    marginBottom: "16px",
+                  }}
+                >
                   📋
                 </div>
                 <div style={{ color: "#666", marginBottom: "8px" }}>
@@ -433,4 +491,4 @@ export const HomeVisitsList: React.FC = () => {
       </Card>
     </div>
   );
-}; 
+};

@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import { EditOutlined, UserAddOutlined } from "@ant-design/icons";
 import {
-  Modal,
-  Table,
   Button,
-  Tag,
-  Space,
-  Typography,
-  Spin,
   Empty,
-  message,
-  Select,
   Input,
+  Modal,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+  message,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { UserAddOutlined, EditOutlined } from "@ant-design/icons";
+import type React from "react";
+import { useState } from "react";
 import { useGetActivityUsers } from "../../hooks/useGetActivityUsers/useGetActivityUsers";
 import { useUpdateUserActivityStatus } from "../../hooks/useUpdateUserActivityStatus/useUpdateUserActivityStatus";
 import { AssignUsersModal } from "../AssignUsersModal/AssignUsersModal";
@@ -51,7 +52,11 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
   const [editingStatus, setEditingStatus] = useState<string>("");
   const [editingObservations, setEditingObservations] = useState<string>("");
 
-  const { data: activityData, isLoading, error } = useGetActivityUsers(activityId);
+  const {
+    data: activityData,
+    isLoading,
+    error,
+  } = useGetActivityUsers(activityId);
   const updateUserStatusMutation = useUpdateUserActivityStatus();
 
   const handleUpdateUserStatus = async () => {
@@ -71,7 +76,6 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
       message.error("Error al actualizar el estado del usuario");
     }
   };
-
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -168,7 +172,8 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
             <Title level={4}>Usuarios de la Actividad</Title>
             {activity && (
               <Text type="secondary">
-                {activity.data.nombre} - {activity.data.total_usuarios} participantes
+                {activity.data.nombre} - {activity.data.total_usuarios}{" "}
+                participantes
               </Text>
             )}
           </div>
@@ -201,7 +206,7 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
           <div style={{ textAlign: "center", padding: "40px", color: "red" }}>
             <Text type="danger">Error al cargar los usuarios</Text>
           </div>
-                            ) : (activity?.data.usuarios_asignados || []).length === 0 ? (
+        ) : (activity?.data.usuarios_asignados || []).length === 0 ? (
           <Empty
             description="No hay usuarios asignados a esta actividad"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -221,7 +226,6 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
             columns={columns}
             pagination={{ pageSize: 10 }}
             size="small"
-
           />
         )}
       </Modal>
@@ -274,4 +278,4 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
       />
     </>
   );
-}; 
+};

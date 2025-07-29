@@ -1,4 +1,4 @@
-import { HomeOutlined, CalendarOutlined } from "@ant-design/icons";
+import { CalendarOutlined, HomeOutlined } from "@ant-design/icons";
 import { Breadcrumb } from "antd";
 
 export const CronogramaBreadcrumb: React.FC = () => {
@@ -12,4 +12,4 @@ export const CronogramaBreadcrumb: React.FC = () => {
       ]}
     />
   );
-}; 
+};

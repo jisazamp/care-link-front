@@ -1,4 +1,4 @@
-import { HomeOutlined, DollarOutlined } from "@ant-design/icons";
+import { DollarOutlined, HomeOutlined } from "@ant-design/icons";
 import { Breadcrumb } from "antd";
 
 export const BillingBreadcrumb: React.FC = () => {
@@ -12,4 +12,4 @@ export const BillingBreadcrumb: React.FC = () => {
       ]}
     />
   );
-}; 
+};

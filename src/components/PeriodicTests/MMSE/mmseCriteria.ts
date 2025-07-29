@@ -1,4 +1,4 @@
-import { MMSECriterion } from "./types";
+import type { MMSECriterion } from "./types";
 
 const normalize = (str: string) => (str || "").trim().toLowerCase();
 const palabrasRegistro = ["manzana", "mesa", "moneda"];
@@ -41,7 +41,7 @@ export const mmseCriteria: MMSECriterion[] = [
     points: 5,
     correct: (answer: string) => {
       const resultado = 100 - 7 - 7 - 7 - 7 - 7;
-      return parseInt(answer) === resultado;
+      return Number.parseInt(answer) === resultado;
     },
   },
   {

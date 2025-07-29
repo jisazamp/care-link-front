@@ -1,7 +1,17 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Card, Checkbox, Flex, Space, Table, Typography, Collapse } from "antd";
-import { useState, Dispatch, SetStateAction, useEffect } from "react";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Collapse,
+  Flex,
+  Space,
+  Table,
+  Typography,
+} from "antd";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { useLocation } from "react-router-dom";
 import type { FormValues } from "../../schema/schema";
 import { AlergiesModal } from "./components/AlergiesModal/AlergiesModal";
 import { DiagnosticsModal } from "./components/DiagnosticsModal/DiagnosticsModal";
@@ -10,7 +20,6 @@ import { DisabilityModal } from "./components/DisabilityModal/DisabilityModal";
 import { LimitationsModal } from "./components/LimitationsModal/LimitationsModal";
 import { OtherAlergiesModal } from "./components/OtherAlergies/OtherAlergies";
 import { SurgeriesModal } from "./components/SurgeriesModal/SurgeriesModal";
-import { useLocation } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -19,9 +28,9 @@ interface SpecialConditionsProps {
   setActiveSubPanel: Dispatch<SetStateAction<string | string[]>>;
 }
 
-export const SpecialConditions: React.FC<SpecialConditionsProps> = ({ 
-  activeSubPanel, 
-  setActiveSubPanel 
+export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
+  activeSubPanel,
+  setActiveSubPanel,
 }) => {
   const { control, watch, setValue } = useFormContext<FormValues>();
   const location = useLocation();
@@ -113,7 +122,7 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
   const hashToCheckboxValue: Record<string, string> = {
     "#discapacidad": "disability",
     "#limitaciones": "limitations",
-    "#dieta": "diet", 
+    "#dieta": "diet",
     "#tratamientos": "alergies",
   };
 
@@ -121,13 +130,13 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
   useEffect(() => {
     if (location.hash && hashToCheckboxValue[location.hash]) {
       const checkboxValue = hashToCheckboxValue[location.hash];
-      
+
       // Si el checkbox no está seleccionado, seleccionarlo
       if (!selectedValues.includes(checkboxValue)) {
         const newValues = [...selectedValues, checkboxValue];
         setValue("specialConditions", newValues);
       }
-      
+
       // Abrir el sub-panel correspondiente
       setActiveSubPanel(checkboxValue);
     }
@@ -135,16 +144,20 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
 
   const handleCheckboxGroupChange = (values: string[]) => {
     setValue("specialConditions", values);
-    
+
     // Si hay un hash activo, abrir automáticamente el sub-panel correspondiente
     const hashToSubPanel: Record<string, string> = {
       "#discapacidad": "disability",
-      "#limitaciones": "limitations", 
+      "#limitaciones": "limitations",
       "#dieta": "diet",
       "#tratamientos": "alergies",
     };
-    
-    if (location.hash && hashToSubPanel[location.hash] && values.includes(hashToSubPanel[location.hash])) {
+
+    if (
+      location.hash &&
+      hashToSubPanel[location.hash] &&
+      values.includes(hashToSubPanel[location.hash])
+    ) {
       setActiveSubPanel(hashToSubPanel[location.hash]);
     }
   };
@@ -199,8 +212,8 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
         />
       </Flex>
       <Flex vertical style={{ marginTop: 8 }}>
-        <Collapse 
-          bordered={false} 
+        <Collapse
+          bordered={false}
           style={{ background: "transparent" }}
           activeKey={activeSubPanel}
           onChange={setActiveSubPanel}
@@ -330,7 +343,10 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
             </Collapse.Panel>
           )}
           {selectedValues.includes("disability") && (
-            <Collapse.Panel header="Tipos de discapacidad del paciente" key="disability">
+            <Collapse.Panel
+              header="Tipos de discapacidad del paciente"
+              key="disability"
+            >
               <Card
                 extra={
                   <Button
@@ -392,7 +408,10 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
             </Collapse.Panel>
           )}
           {selectedValues.includes("limitations") && (
-            <Collapse.Panel header="Limitaciones permanentes que requieren apoyos o cuidados" key="limitations">
+            <Collapse.Panel
+              header="Limitaciones permanentes que requieren apoyos o cuidados"
+              key="limitations"
+            >
               <Card
                 extra={
                   <Button
@@ -516,7 +535,10 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
             </Collapse.Panel>
           )}
           {selectedValues.includes("surgeries") && (
-            <Collapse.Panel header="Historial de cirugías, traumatismos o accidentes" key="surgeries">
+            <Collapse.Panel
+              header="Historial de cirugías, traumatismos o accidentes"
+              key="surgeries"
+            >
               <Card
                 extra={
                   <Button

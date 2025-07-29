@@ -1,4 +1,4 @@
-import { Button, Card, Table, Typography, Spin, Empty } from "antd";
+import { Button, Card, Empty, Spin, Table, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -23,13 +23,11 @@ export const CardSheduActivities = () => {
   };
 
   const columnsActivities: ColumnsType<Activity> = [
-    { 
-      title: "Actividad", 
-      dataIndex: "nombre", 
+    {
+      title: "Actividad",
+      dataIndex: "nombre",
       key: "activity",
-      render: (nombre: string) => (
-        <Text strong>{nombre}</Text>
-      )
+      render: (nombre: string) => <Text strong>{nombre}</Text>,
     },
     {
       title: "Fecha",
@@ -39,30 +37,30 @@ export const CardSheduActivities = () => {
         if (!fecha) return <Text type="secondary">Sin fecha</Text>;
         const activityDate = dayjs(fecha);
         const now = dayjs();
-        
-        if (activityDate.isBefore(now, 'day')) {
-          return <Text type="danger">{activityDate.format('DD/MM/YYYY')}</Text>;
-        } else if (activityDate.isSame(now, 'day')) {
-          return <Text type="warning">Hoy</Text>;
-        } else {
-          return <Text>{activityDate.format('DD/MM/YYYY')}</Text>;
+
+        if (activityDate.isBefore(now, "day")) {
+          return <Text type="danger">{activityDate.format("DD/MM/YYYY")}</Text>;
         }
+        if (activityDate.isSame(now, "day")) {
+          return <Text type="warning">Hoy</Text>;
+        }
+        return <Text>{activityDate.format("DD/MM/YYYY")}</Text>;
       },
     },
     {
       title: "Acciones",
       key: "actions",
       render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button 
-            type="link" 
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button
+            type="link"
             size="small"
             onClick={() => handleViewActivity(record.id)}
           >
             Ver
           </Button>
-          <Button 
-            type="link" 
+          <Button
+            type="link"
             size="small"
             onClick={() => handleEditActivity(record.id)}
           >

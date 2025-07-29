@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from "react";
+import { DownloadOutlined } from "@ant-design/icons";
 import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Divider,
   Form,
   Input,
   InputNumber,
-  DatePicker,
-  Button,
-  Typography,
   Row,
-  Col,
-  Divider,
-  Card,
   Select,
-  message,
   Space,
+  Typography,
+  message,
 } from "antd";
-import { DownloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import type { Bill } from "../../types";
-import { PaymentsForm } from "./components/PaymentsForm";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useDownloadPDF } from "../../hooks/useDownloadPDF";
 import { useGetBillPaymentsTotal } from "../../hooks/useGetBillPayments/useGetBillPayments";
 import { useGetBillPayments } from "../../hooks/useGetBillPayments/useGetBillPayments";
+import type { Bill } from "../../types";
 import { formatCurrency } from "../../utils/paymentUtils";
-import { useDownloadPDF } from "../../hooks/useDownloadPDF";
+import { PaymentsForm } from "./components/PaymentsForm";
 
 interface BillingFormProps {
   initialValues?: Partial<Bill>;
@@ -83,13 +84,13 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       const descuentos = Number(initialValues.descuentos) || 0;
       setTotal(subtotal + impuestos - descuentos);
       // Procesar pagos consolidados del backend
-      let pagosBackend = (pagosConsolidados || []).map((pago: any) => ({
+      const pagosBackend = (pagosConsolidados || []).map((pago: any) => ({
         ...pago,
         fecha_pago: pago.fecha_pago || "",
         saved: true, // Marcar como consolidados
       }));
       // Procesar pagos locales (no guardados aún)
-      let pagosLocales = (initialValues.pagos || []).filter(
+      const pagosLocales = (initialValues.pagos || []).filter(
         (p: any) => !pagosBackend.some((pb: any) => pb.id_pago === p.id_pago),
       );
       setPayments([...pagosBackend, ...pagosLocales]);
@@ -368,4 +369,3 @@ export const BillingForm: React.FC<BillingFormProps> = ({
     </div>
   );
 };
-

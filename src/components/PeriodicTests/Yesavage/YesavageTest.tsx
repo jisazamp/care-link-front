@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { Card, Steps, Typography, Space } from "antd";
-import { YesavageQuestions } from "./YesavageQuestions";
+import { Card, Space, Steps, Typography } from "antd";
+import type React from "react";
+import { useState } from "react";
 import { YesavageConfirmation } from "./YesavageConfirmation";
-import { YesavageResult } from "./YesavageResult";
 import { YesavageInstructions } from "./YesavageInstructions";
+import { YesavageQuestions } from "./YesavageQuestions";
 import { questions as yesavageQuestions } from "./YesavageQuestions";
+import { YesavageResult } from "./YesavageResult";
 
 const { Title } = Typography;
 
@@ -20,8 +21,9 @@ const steps: Step[] = [
 
 const getScore = (answers: Record<string, string>) =>
   yesavageQuestions.reduce(
-    (sum: number, q: { id: string; depressionAnswer: string }) => sum + (answers[q.id] === q.depressionAnswer ? 1 : 0),
-    0
+    (sum: number, q: { id: string; depressionAnswer: string }) =>
+      sum + (answers[q.id] === q.depressionAnswer ? 1 : 0),
+    0,
   );
 
 export const YesavageTest: React.FC = () => {
@@ -47,7 +49,11 @@ export const YesavageTest: React.FC = () => {
         {current === 0 && (
           <>
             <YesavageInstructions />
-            <YesavageQuestions onNext={next} onChange={handleAnswers} answers={answers} />
+            <YesavageQuestions
+              onNext={next}
+              onChange={handleAnswers}
+              answers={answers}
+            />
           </>
         )}
         {current === 1 && (
@@ -65,4 +71,4 @@ export const YesavageTest: React.FC = () => {
       </Space>
     </Card>
   );
-}; 
+};

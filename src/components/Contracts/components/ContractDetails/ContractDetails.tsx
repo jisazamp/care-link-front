@@ -1,15 +1,31 @@
-import { Avatar, Button, Card, Col, Flex, Row, Table, Typography, Spin, Alert, Space, Tooltip, Input, Select, Tag } from "antd";
-import dayjs from "dayjs";
-import { useParams } from "react-router-dom";
-import { useGetContractById } from "../../../../hooks/useGetContractById/useGetContractById";
-import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
-import { useGetFacturas } from "../../../../hooks/useGetFacturas";
-import { BillingForm } from "../../../Billing";
+import {
+  Alert,
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Flex,
+  Input,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+} from "antd";
 import { Modal } from "antd";
-import { useState, useEffect } from "react";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useCreateFactura } from "../../../../hooks/useCreateFactura";
+import { useGetContractById } from "../../../../hooks/useGetContractById/useGetContractById";
+import { useGetFacturas } from "../../../../hooks/useGetFacturas";
+import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
 import { useUpdateFactura } from "../../../../hooks/useUpdateFactura";
 import type { Bill } from "../../../../types";
+import { BillingForm } from "../../../Billing";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -31,7 +47,9 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
   const [estado, setEstado] = useState<string | undefined>(undefined);
 
   const filteredBills = bills.filter((bill) => {
-    const matchSearch = bill.numero_factura?.toLowerCase().includes(search.toLowerCase()) || String(bill.id_factura).includes(search);
+    const matchSearch =
+      bill.numero_factura?.toLowerCase().includes(search.toLowerCase()) ||
+      String(bill.id_factura).includes(search);
     const matchEstado = estado ? bill.estado_factura === estado : true;
     return matchSearch && matchEstado;
   });
@@ -53,7 +71,7 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
       title: "Fecha Vencimiento",
       dataIndex: "fecha_vencimiento",
       key: "fecha_vencimiento",
-      render: (date: string) => date ? dayjs(date).format("DD/MM/YYYY") : "-",
+      render: (date: string) => (date ? dayjs(date).format("DD/MM/YYYY") : "-"),
     },
     {
       title: "Subtotal",
@@ -83,7 +101,14 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
       title: "Estado",
       dataIndex: "estado_factura",
       key: "estado_factura",
-      render: (estado: string) => <Tag color={getEstadoColor(estado)} style={{ fontWeight: 'bold', fontSize: 14 }}>{estado}</Tag>,
+      render: (estado: string) => (
+        <Tag
+          color={getEstadoColor(estado)}
+          style={{ fontWeight: "bold", fontSize: 14 }}
+        >
+          {estado}
+        </Tag>
+      ),
     },
     {
       title: "Observaciones",
@@ -97,7 +122,9 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
       render: (_: any, record: Bill) => (
         <Space>
           <Tooltip title="Ver Detalles">
-            <Button type="link" onClick={() => onView && onView(record)}>Ver</Button>
+            <Button type="link" onClick={() => onView?.(record)}>
+              Ver
+            </Button>
           </Tooltip>
         </Space>
       ),
@@ -106,12 +133,18 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
 
   function getEstadoColor(estado: string) {
     switch (estado) {
-      case "PENDIENTE": return "orange";
-      case "PAGADA": return "green";
-      case "VENCIDA": return "red";
-      case "CANCELADA": return "volcano";
-      case "ANULADA": return "gray";
-      default: return "blue";
+      case "PENDIENTE":
+        return "orange";
+      case "PAGADA":
+        return "green";
+      case "VENCIDA":
+        return "red";
+      case "CANCELADA":
+        return "volcano";
+      case "ANULADA":
+        return "gray";
+      default:
+        return "blue";
     }
   }
 
@@ -122,7 +155,7 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
           placeholder="Buscar por número de factura o ID"
           allowClear
           onSearch={setSearch}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           style={{ width: 220 }}
         />
         <Select
@@ -144,7 +177,11 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
         dataSource={filteredBills}
         loading={loading}
         rowKey="id_factura"
-        pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10, 20, 50] }}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 20, 50],
+        }}
         locale={{ emptyText: "No hay facturas registradas" }}
       />
     </>
@@ -154,10 +191,21 @@ const ContractBillingList: React.FC<ContractBillingListProps> = ({
 export const ContractDetails: React.FC = () => {
   const { id, contractId } = useParams();
 
-  const { data: user, isLoading: isLoadingUser, error: errorUser } = useGetUserById(id);
-  const { data: contract, isLoading: isLoadingContract, error: errorContract } =
-    useGetContractById(contractId);
-  const { data: facturas, isLoading: isLoadingFacturas, error: errorFacturas } = useGetFacturas(contractId ? Number(contractId) : undefined);
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    error: errorUser,
+  } = useGetUserById(id);
+  const {
+    data: contract,
+    isLoading: isLoadingContract,
+    error: errorContract,
+  } = useGetContractById(contractId);
+  const {
+    data: facturas,
+    isLoading: isLoadingFacturas,
+    error: errorFacturas,
+  } = useGetFacturas(contractId ? Number(contractId) : undefined);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingFactura, setEditingFactura] = useState<any>(null);
   const [modalReadOnly, setModalReadOnly] = useState(false);
@@ -178,7 +226,19 @@ export const ContractDetails: React.FC = () => {
     console.log(" Error User:", errorUser);
     console.log(" Error Contract:", errorContract);
     console.log(" Error Facturas:", errorFacturas);
-  }, [id, contractId, user, contract, facturas, isLoadingUser, isLoadingContract, isLoadingFacturas, errorUser, errorContract, errorFacturas]);
+  }, [
+    id,
+    contractId,
+    user,
+    contract,
+    facturas,
+    isLoadingUser,
+    isLoadingContract,
+    isLoadingFacturas,
+    errorUser,
+    errorContract,
+    errorFacturas,
+  ]);
 
   const contractData = {
     contratoId: contract?.data?.id_contrato,
@@ -188,14 +248,15 @@ export const ContractDetails: React.FC = () => {
     facturado: contract?.data?.facturar_contrato ? "Sí" : "No",
   };
 
-  const servicesData = contract?.data?.servicios?.map((s: any) => ({
-    key: s.id_servicio,
-    inicia: s.fecha,
-    finaliza: dayjs(s.fecha).add(1, "month").format("YYYY-MM-DD"),
-    servicio: s.id_servicio === 1 ? "Transporte" : "Cuidado",
-    cantidad: s.fechas_servicio?.length || 0,
-    descripcion: s.descripcion,
-  })) || [];
+  const servicesData =
+    contract?.data?.servicios?.map((s: any) => ({
+      key: s.id_servicio,
+      inicia: s.fecha,
+      finaliza: dayjs(s.fecha).add(1, "month").format("YYYY-MM-DD"),
+      servicio: s.id_servicio === 1 ? "Transporte" : "Cuidado",
+      cantidad: s.fechas_servicio?.length || 0,
+      descripcion: s.descripcion,
+    })) || [];
 
   // Handler para ver factura (solo lectura)
   const handleView = (bill: any) => {
@@ -230,9 +291,15 @@ export const ContractDetails: React.FC = () => {
           message="Error al cargar los datos"
           description={
             <div>
-              {errorUser && <div>Error al cargar usuario: {errorUser.message}</div>}
-              {errorContract && <div>Error al cargar contrato: {errorContract.message}</div>}
-              {errorFacturas && <div>Error al cargar facturas: {errorFacturas.message}</div>}
+              {errorUser && (
+                <div>Error al cargar usuario: {errorUser.message}</div>
+              )}
+              {errorContract && (
+                <div>Error al cargar contrato: {errorContract.message}</div>
+              )}
+              {errorFacturas && (
+                <div>Error al cargar facturas: {errorFacturas.message}</div>
+              )}
             </div>
           }
           type="error"
@@ -323,18 +390,33 @@ export const ContractDetails: React.FC = () => {
         className="full-width-card contract-card"
         loading={isLoadingContract}
       >
-        <div className="contract-header" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+        <div
+          className="contract-header"
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
           <div className="title-wrapper">
-            <Title level={5} className="contract-title" style={{ marginBottom: 0 }}>
-              Contrato <span style={{ color: '#722ED1', fontWeight: 700 }}>#{contractData.contratoId}</span>
+            <Title
+              level={5}
+              className="contract-title"
+              style={{ marginBottom: 0 }}
+            >
+              Contrato{" "}
+              <span style={{ color: "#722ED1", fontWeight: 700 }}>
+                #{contractData.contratoId}
+              </span>
             </Title>
             <Text type="secondary" style={{ fontSize: 16 }}>
-              Tipo: <b>{contractData.tipoContrato}</b> | Estado: <b>{contractData.facturado}</b>
+              Tipo: <b>{contractData.tipoContrato}</b> | Estado:{" "}
+              <b>{contractData.facturado}</b>
             </Text>
           </div>
         </div>
         <div className="contract-body" style={{ marginTop: 16 }}>
-          <div className="contract-row" style={{ display: 'flex', gap: 32 }}>
+          <div className="contract-row" style={{ display: "flex", gap: 32 }}>
             <div className="contract-field">
               <Text className="field-title">Fecha de inicio</Text>
               <Text className="field-value">{contractData.fechaInicio}</Text>
@@ -371,7 +453,9 @@ export const ContractDetails: React.FC = () => {
               rowKey="key"
             />
           ) : (
-            <div style={{ textAlign: 'center', margin: '24px 0', color: '#888' }}>
+            <div
+              style={{ textAlign: "center", margin: "24px 0", color: "#888" }}
+            >
               No hay servicios registrados para este contrato.
             </div>
           )}
@@ -381,7 +465,7 @@ export const ContractDetails: React.FC = () => {
       {/* Tarjeta 4: Facturación */}
       <Card className="full-width-card billing-card">
         <div className="billing-header">
-          <Title level={5} className="billing-title" style={{ color: 'white' }}>
+          <Title level={5} className="billing-title" style={{ color: "white" }}>
             Facturas Generadas
           </Title>
         </div>
@@ -391,7 +475,7 @@ export const ContractDetails: React.FC = () => {
           onView={handleView}
         />
         {(!facturas || facturas.length === 0) && !isLoadingFacturas && (
-          <div style={{ textAlign: 'center', margin: '24px 0', color: '#888' }}>
+          <div style={{ textAlign: "center", margin: "24px 0", color: "#888" }}>
             No hay facturas registradas para este contrato.
           </div>
         )}
@@ -401,8 +485,14 @@ export const ContractDetails: React.FC = () => {
           footer={null}
           width={900}
           title={
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>{editingFactura ? (modalReadOnly ? 'Ver Factura' : 'Editar Factura') : 'Nueva Factura'}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span>
+                {editingFactura
+                  ? modalReadOnly
+                    ? "Ver Factura"
+                    : "Editar Factura"
+                  : "Nueva Factura"}
+              </span>
             </div>
           }
           destroyOnClose
@@ -411,9 +501,12 @@ export const ContractDetails: React.FC = () => {
             initialValues={editingFactura}
             onSubmit={(values) => {
               if (editingFactura) {
-                updateFactura.mutate({ id: editingFactura.id_factura, data: values }, {
-                  onSuccess: () => handleModalClose(),
-                });
+                updateFactura.mutate(
+                  { id: editingFactura.id_factura, data: values },
+                  {
+                    onSuccess: () => handleModalClose(),
+                  },
+                );
               } else {
                 createFactura.mutate(values, {
                   onSuccess: () => handleModalClose(),

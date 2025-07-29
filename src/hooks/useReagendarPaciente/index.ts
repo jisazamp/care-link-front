@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
+import { message } from "antd";
 import { client } from "../../api/client";
 import { queryClient } from "../../main";
-import { message } from "antd";
 
 interface ReagendarPacienteData {
   estado_asistencia: string;
@@ -33,8 +33,7 @@ export const useReagendarPaciente = () =>
     },
     onError: (error: any) => {
       message.error(
-        "Error al reagendar paciente: " +
-          (error?.response?.data?.detail || error.message),
+        `Error al reagendar paciente: ${error?.response?.data?.detail || error.message}`,
       );
     },
   });

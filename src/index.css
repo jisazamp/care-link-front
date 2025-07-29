@@ -291,9 +291,7 @@ body {
   gap: 4px;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .usuarios-action-btn:hover {
@@ -321,9 +319,7 @@ body {
   justify-content: center;
   font-size: 18px;
   margin-left: 8px;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 .usuarios-toolbar-btn:hover {
   background: #5e2596;
@@ -341,9 +337,7 @@ body {
   font-size: 14px;
   font-weight: 400;
   margin-right: 8px;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 .usuarios-toolbar-sort:hover {
   background: #5e2596;
@@ -502,9 +496,7 @@ body {
   color: rgba(0, 0, 0, 0.85);
   height: 32px;
   cursor: pointer;
-  transition:
-    border 0.2s,
-    color 0.2s;
+  transition: border 0.2s, color 0.2s;
 }
 .user-details-btn:hover {
   border: 1px solid #7f34b4;
@@ -753,12 +745,7 @@ body {
 
 .highlighted-patient-row {
   animation: highlightPulse 2s ease-in-out;
-  background: linear-gradient(
-    90deg,
-    #fff3cd 0%,
-    #ffeaa7 50%,
-    #fff3cd 100%
-  ) !important;
+  background: linear-gradient(90deg, #fff3cd 0%, #ffeaa7 50%, #fff3cd 100%) !important;
   border: 2px solid #f39c12 !important;
   box-shadow: 0 0 10px rgba(243, 156, 18, 0.3) !important;
 }

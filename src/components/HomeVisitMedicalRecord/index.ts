@@ -1,1 +1,1 @@
-export { HomeVisitMedicalRecord } from "./HomeVisitMedicalRecord"; 
+export { HomeVisitMedicalRecord } from "./HomeVisitMedicalRecord";

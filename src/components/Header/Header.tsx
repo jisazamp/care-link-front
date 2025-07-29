@@ -1,10 +1,5 @@
-import {
-
-  LogoutOutlined,
-
-  UserOutlined,
-} from "@ant-design/icons";
-import { Avatar,  Button, Flex, Layout, Tooltip, Typography } from "antd";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Button, Flex, Layout, Tooltip, Typography } from "antd";
 import { useGetUserInfo } from "../../hooks/useGetUserInfo/useGetUserInfo";
 import { queryClient } from "../../main";
 import { useAuthStore } from "../../store/auth";

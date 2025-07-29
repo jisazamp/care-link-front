@@ -9,36 +9,38 @@ import {
   Routes,
 } from "react-router-dom";
 import { ActivitiesList } from "./components/ActivitiesList/ActivitiesList";
+import { Billing } from "./components/Billing";
 import { ContractDetails } from "./components/Contracts/components/ContractDetails/ContractDetails";
 import { FormContracts } from "./components/Contracts/components/FormContracts";
 import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
+import NewUserForm from "./components/CreateAuthorizedUser";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
+import { Cronograma } from "./components/Cronograma/Cronograma";
 import { Home } from "./components/Home/Home";
+import { HomeVisitMedicalRecord } from "./components/HomeVisitMedicalRecord/HomeVisitMedicalRecord";
+import { HomeVisitNewVisit } from "./components/HomeVisitNewVisit/HomeVisitNewVisit";
+import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
 import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
-import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
-import { HomeVisitNewVisit } from "./components/HomeVisitNewVisit/HomeVisitNewVisit";
-import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
+import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
+import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
+import { MMSETest } from "./components/PeriodicTests/MMSE";
+import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
+import { Transporte } from "./components/Transporte";
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { UserHomeVisitDetails } from "./components/UserHomeVisitDetails/UserHomeVisitDetails";
-import { HomeVisitMedicalRecord } from "./components/HomeVisitMedicalRecord/HomeVisitMedicalRecord";
 import { UserList } from "./components/UserList/UserList";
 import { UsersList } from "./components/UsersList/UsersList";
 import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
-import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
-import { MMSETest } from "./components/PeriodicTests/MMSE";
-import { YesavageTest } from "./components/PeriodicTests/Yesavage";
-import { Cronograma } from "./components/Cronograma/Cronograma";
-import { Transporte } from "./components/Transporte";
-import { Billing } from "./components/Billing";
 import { colors } from "./theme";
+import { AuthorizedUsersListScreen } from "./screens/AuthorizedUsersList";
 
 const spanishLocale = {
   ...es,
@@ -127,6 +129,14 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <UsersList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <PrivateRoute>
+                    <AuthorizedUsersListScreen />
                   </PrivateRoute>
                 }
               />
@@ -303,6 +313,14 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <ContractDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/registrar/:id?"
+                element={
+                  <PrivateRoute>
+                    <NewUserForm />
                   </PrivateRoute>
                 }
               />

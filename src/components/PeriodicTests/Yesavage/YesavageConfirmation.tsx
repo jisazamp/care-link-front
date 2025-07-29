@@ -1,6 +1,6 @@
-import React from "react";
-import { Table, Button, Space } from "antd";
+import { Button, Space, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import type React from "react";
 
 interface YesavageConfirmationProps {
   answers: Record<string, string>;
@@ -112,4 +112,4 @@ export const YesavageConfirmation: React.FC<YesavageConfirmationProps> = ({
       </Space>
     </Space>
   );
-}; 
+};

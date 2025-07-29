@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Table, Tag, Button, Space, Tooltip, Input, Select } from "antd";
-import type { Bill } from "../../types";
+import { Button, Input, Select, Space, Table, Tag, Tooltip } from "antd";
 import dayjs from "dayjs";
+import type React from "react";
+import { useState } from "react";
+import type { Bill } from "../../types";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -25,7 +26,9 @@ export const BillingList: React.FC<BillingListProps> = ({
   const [estado, setEstado] = useState<string | undefined>(undefined);
 
   const filteredBills = bills.filter((bill) => {
-    const matchSearch = bill.numero_factura?.toLowerCase().includes(search.toLowerCase()) || String(bill.id_factura).includes(search);
+    const matchSearch =
+      bill.numero_factura?.toLowerCase().includes(search.toLowerCase()) ||
+      String(bill.id_factura).includes(search);
     const matchEstado = estado ? bill.estado_factura === estado : true;
     return matchSearch && matchEstado;
   });
@@ -47,7 +50,7 @@ export const BillingList: React.FC<BillingListProps> = ({
       title: "Fecha Vencimiento",
       dataIndex: "fecha_vencimiento",
       key: "fecha_vencimiento",
-      render: (date: string) => date ? dayjs(date).format("DD/MM/YYYY") : "-",
+      render: (date: string) => (date ? dayjs(date).format("DD/MM/YYYY") : "-"),
     },
     {
       title: "Subtotal",
@@ -77,7 +80,14 @@ export const BillingList: React.FC<BillingListProps> = ({
       title: "Estado",
       dataIndex: "estado_factura",
       key: "estado_factura",
-      render: (estado: string) => <Tag color={getEstadoColor(estado)} style={{ fontWeight: 'bold', fontSize: 14 }}>{estado}</Tag>,
+      render: (estado: string) => (
+        <Tag
+          color={getEstadoColor(estado)}
+          style={{ fontWeight: "bold", fontSize: 14 }}
+        >
+          {estado}
+        </Tag>
+      ),
     },
     {
       title: "Observaciones",
@@ -91,13 +101,19 @@ export const BillingList: React.FC<BillingListProps> = ({
       render: (_: any, record: Bill) => (
         <Space>
           <Tooltip title="Ver Detalles">
-            <Button type="link" onClick={() => onView && onView(record)}>Ver</Button>
+            <Button type="link" onClick={() => onView?.(record)}>
+              Ver
+            </Button>
           </Tooltip>
           <Tooltip title="Editar">
-            <Button type="link" onClick={() => onEdit && onEdit(record)}>Editar</Button>
+            <Button type="link" onClick={() => onEdit?.(record)}>
+              Editar
+            </Button>
           </Tooltip>
           <Tooltip title="Eliminar">
-            <Button type="link" danger onClick={() => onDelete && onDelete(record)}>Eliminar</Button>
+            <Button type="link" danger onClick={() => onDelete?.(record)}>
+              Eliminar
+            </Button>
           </Tooltip>
         </Space>
       ),
@@ -106,12 +122,18 @@ export const BillingList: React.FC<BillingListProps> = ({
 
   function getEstadoColor(estado: string) {
     switch (estado) {
-      case "PENDIENTE": return "orange";
-      case "PAGADA": return "green";
-      case "VENCIDA": return "red";
-      case "CANCELADA": return "volcano";
-      case "ANULADA": return "gray";
-      default: return "blue";
+      case "PENDIENTE":
+        return "orange";
+      case "PAGADA":
+        return "green";
+      case "VENCIDA":
+        return "red";
+      case "CANCELADA":
+        return "volcano";
+      case "ANULADA":
+        return "gray";
+      default:
+        return "blue";
     }
   }
 
@@ -122,7 +144,7 @@ export const BillingList: React.FC<BillingListProps> = ({
           placeholder="Buscar por número de factura o ID"
           allowClear
           onSearch={setSearch}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           style={{ width: 220 }}
         />
         <Select
@@ -144,9 +166,13 @@ export const BillingList: React.FC<BillingListProps> = ({
         dataSource={filteredBills}
         loading={loading}
         rowKey="id_factura"
-        pagination={{ pageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10, 20, 50] }}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 20, 50],
+        }}
         locale={{ emptyText: "No hay facturas registradas" }}
       />
     </>
   );
-}; 
+};
