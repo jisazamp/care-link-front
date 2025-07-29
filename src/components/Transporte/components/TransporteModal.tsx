@@ -34,7 +34,6 @@ export const TransporteModal: React.FC<TransporteModalProps> = ({
       form.setFieldsValue({
         id_cronograma_paciente: transporte.id_cronograma_paciente,
         direccion_recogida: transporte.direccion_recogida,
-        direccion_entrega: transporte.direccion_entrega,
         hora_recogida: transporte.hora_recogida ? dayjs(transporte.hora_recogida, 'HH:mm:ss') : null,
         hora_entrega: transporte.hora_entrega ? dayjs(transporte.hora_entrega, 'HH:mm:ss') : null,
         estado: transporte.estado,
@@ -103,17 +102,6 @@ export const TransporteModal: React.FC<TransporteModalProps> = ({
           <TextArea 
             rows={2} 
             placeholder="Ingresa la dirección donde se recogerá al paciente"
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="direccion_entrega"
-          label="Dirección de Entrega"
-          rules={[{ required: true, message: 'Por favor ingresa la dirección de entrega' }]}
-        >
-          <TextArea 
-            rows={2} 
-            placeholder="Ingresa la dirección donde se entregará al paciente"
           />
         </Form.Item>
 

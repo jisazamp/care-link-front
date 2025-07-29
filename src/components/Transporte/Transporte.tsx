@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Card, 
   Typography, 
@@ -8,13 +8,11 @@ import {
   Table, 
   Tag, 
   Space, 
-  Modal, 
   Select, 
   message, 
   Badge,
   Tooltip,
   TimePicker,
-  Input,
 } from 'antd';
 import { 
   CarOutlined, 
@@ -66,6 +64,56 @@ export const Transporte: React.FC = () => {
   const { mutate: updateTransporte, isPending: updateLoading } = useUpdateTransporte();
   const { mutate: updateHorarios, isPending: updateHorariosLoading } = useUpdateTransporteHorarios();
 
+  // Estado para forzar re-render de alertas
+  const [alertaUpdate, setAlertaUpdate] = useState(0);
+
+  // Actualizar alertas cada minuto
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAlertaUpdate(prev => prev + 1);
+    }, 60000); // 1 minuto
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Funciones de utilidad para alertas
+  const getTiempoRestante = (horaRecogida: string | null | undefined): number | null => {
+    if (!horaRecogida) return null;
+    
+    try {
+      const ahora = dayjs();
+      const [horas, minutos, segundos] = horaRecogida.split(':').map(Number);
+      const horaHoy = ahora.hour(horas).minute(minutos).second(segundos);
+      
+      // Si la hora ya pasó hoy, no mostrar alerta
+      if (horaHoy.isBefore(ahora)) return null;
+      
+      const diferencia = horaHoy.diff(ahora, 'minute');
+      return diferencia;
+    } catch (error) {
+      console.error('Error calculando tiempo restante:', error);
+      return null;
+    }
+  };
+
+  const getAlertaColor = (tiempoRestante: number | null): string => {
+    if (tiempoRestante === null) return 'transparent';
+    
+    if (tiempoRestante <= 30) return '#ff7a45'; // Naranja claro - 30 min o menos
+    if (tiempoRestante <= 60) return '#faad14'; // Amarillo claro - 1 hora o menos
+    if (tiempoRestante <= 120) return '#1890ff'; // Azul claro - 2 horas o menos
+    return 'transparent'; // Sin alerta
+  };
+
+  const getAlertaTexto = (tiempoRestante: number | null): string => {
+    if (tiempoRestante === null) return '';
+    
+    if (tiempoRestante <= 30) return '¡URGENTE! Menos de 30 min';
+    if (tiempoRestante <= 60) return '¡ATENCIÓN! Menos de 1 hora';
+    if (tiempoRestante <= 120) return 'Próximo: Menos de 2 horas';
+    return '';
+  };
+
   // Estadísticas calculadas
   const stats = useMemo(() => {
     if (!rutaData?.data?.data) return null;
@@ -80,6 +128,27 @@ export const Transporte: React.FC = () => {
         : 0
     };
   }, [rutaData]);
+
+  // Estadísticas de alertas
+  const alertasStats = useMemo(() => {
+    if (!rutaData?.data?.data?.rutas) return null;
+    
+    const rutas = rutaData.data.data.rutas;
+    let urgentes = 0;
+    let atencion = 0;
+    let proximos = 0;
+    
+    rutas.forEach(ruta => {
+      const tiempoRestante = getTiempoRestante(ruta.hora_recogida);
+      if (tiempoRestante !== null) {
+        if (tiempoRestante <= 30) urgentes++;
+        else if (tiempoRestante <= 60) atencion++;
+        else if (tiempoRestante <= 120) proximos++;
+      }
+    });
+    
+    return { urgentes, atencion, proximos };
+  }, [rutaData, alertaUpdate]);
 
   // Funciones de manejo
   const handleDateChange = (date: Dayjs | null) => {
@@ -189,6 +258,23 @@ export const Transporte: React.FC = () => {
 
   // Columnas de la tabla
   const columns = [
+    {
+      title: 'Alerta',
+      key: 'alerta',
+      width: 120,
+      render: (record: RutaTransporte) => {
+        const tiempoRestante = getTiempoRestante(record.hora_recogida);
+        const alertaTexto = getAlertaTexto(tiempoRestante);
+        
+        if (!alertaTexto) return null;
+        
+        return (
+          <Tag color={tiempoRestante && tiempoRestante <= 30 ? 'red' : tiempoRestante && tiempoRestante <= 60 ? 'orange' : 'blue'}>
+            {alertaTexto}
+          </Tag>
+        );
+      },
+    },
     {
       title: 'Paciente',
       key: 'paciente',
@@ -389,6 +475,8 @@ export const Transporte: React.FC = () => {
 
   console.log("RUTAS:", rutaData?.data?.data?.rutas);
   console.log("EDITING HORARIOS:", editingHorarios);
+  console.log("ALERTAS STATS:", alertasStats);
+  console.log("ALERTA UPDATE:", alertaUpdate);
 
   return (
     <div style={{ padding: '24px' }}>
@@ -405,6 +493,26 @@ export const Transporte: React.FC = () => {
         </Col>
         <Col>
           <Space>
+            {/* Alertas */}
+            {alertasStats && (
+              <Space>
+                {alertasStats.urgentes > 0 && (
+                  <Badge count={alertasStats.urgentes} style={{ backgroundColor: '#ff4d4f' }}>
+                    <Tag color="red">Urgentes</Tag>
+                  </Badge>
+                )}
+                {alertasStats.atencion > 0 && (
+                  <Badge count={alertasStats.atencion} style={{ backgroundColor: '#faad14' }}>
+                    <Tag color="orange">Atención</Tag>
+                  </Badge>
+                )}
+                {alertasStats.proximos > 0 && (
+                  <Badge count={alertasStats.proximos} style={{ backgroundColor: '#1890ff' }}>
+                    <Tag color="blue">Próximos</Tag>
+                  </Badge>
+                )}
+              </Space>
+            )}
             <Button
               icon={<ReloadOutlined />}
               onClick={() => refetch()}
@@ -429,6 +537,39 @@ export const Transporte: React.FC = () => {
           selectedDate={selectedDate}
           onDateChange={handleDateChange}
         />
+      </Card>
+
+      {/* Información del sistema de alertas */}
+      <Card 
+        title="Sistema de Alertas" 
+        size="small" 
+        style={{ marginBottom: '24px' }}
+      >
+        <Row gutter={16}>
+          <Col span={6}>
+            <Space>
+              <div style={{ width: '16px', height: '16px', backgroundColor: '#1890ff', borderRadius: '50%' }} />
+              <Text>Próximo (≤ 2 horas)</Text>
+            </Space>
+          </Col>
+          <Col span={6}>
+            <Space>
+              <div style={{ width: '16px', height: '16px', backgroundColor: '#faad14', borderRadius: '50%' }} />
+              <Text>Atención (≤ 1 hora)</Text>
+            </Space>
+          </Col>
+          <Col span={6}>
+            <Space>
+              <div style={{ width: '16px', height: '16px', backgroundColor: '#ff7a45', borderRadius: '50%' }} />
+              <Text>Urgente (≤ 30 min)</Text>
+            </Space>
+          </Col>
+          <Col span={6}>
+            <Text type="secondary">
+              Las alertas se actualizan automáticamente cada minuto
+            </Text>
+          </Col>
+        </Row>
       </Card>
 
       {/* Estadísticas */}
@@ -459,6 +600,26 @@ export const Transporte: React.FC = () => {
           dataSource={rutaData?.data?.data?.rutas || []}
           rowKey="id_transporte"
           pagination={false}
+          rowClassName={(record) => {
+            const tiempoRestante = getTiempoRestante(record.hora_recogida);
+            const alertaColor = getAlertaColor(tiempoRestante);
+            
+            if (alertaColor === 'transparent') return '';
+            
+            return 'alerta-fila';
+          }}
+          onRow={(record) => {
+            const tiempoRestante = getTiempoRestante(record.hora_recogida);
+            const alertaColor = getAlertaColor(tiempoRestante);
+            
+            return {
+              style: {
+                backgroundColor: alertaColor === 'transparent' ? 'transparent' : `${alertaColor}15`,
+                borderLeft: alertaColor !== 'transparent' ? `4px solid ${alertaColor}` : 'none',
+                transition: 'all 0.3s ease'
+              }
+            };
+          }}
           locale={{
             emptyText: (
               <div style={{ textAlign: 'center', padding: '40px' }}>
