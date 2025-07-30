@@ -117,6 +117,7 @@ export const App = () => {
             <Route path="/login" element={<Login />} />
             <Route element={<MainLayout />}>
               <Route
+                loader
                 path="/home"
                 element={
                   <PrivateRoute>

@@ -62,7 +62,7 @@ export type AuthorizedUser = {
   is_deleted: boolean;
   last_name: string;
   password: string;
-  role: string;
+  role: RolesEnum;
 };
 
 export interface CreateAuthorizedUserPayload extends AuthorizedUser {
