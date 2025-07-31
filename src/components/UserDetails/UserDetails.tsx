@@ -772,6 +772,37 @@ export const UserDetails: React.FC = () => {
                         </Flex>
                       </Flex>
                     </Flex>
+                    {/* Sección de Archivos Adjuntos */}
+                    {records?.url_hc_adjunto && (
+                      <Flex gap={60} align="center">
+                        <Flex align="center" style={{ flex: 0.4, minWidth: 200 }}>
+                          <Divider
+                            type="vertical"
+                            style={{ height: 70, borderWidth: 2 }}
+                          />
+                          <Typography.Title level={5}>
+                            Archivos Adjuntos
+                          </Typography.Title>
+                        </Flex>
+                        <Flex vertical gap={10} style={{ flex: 2 }}>
+                          <Typography.Text
+                            style={{ fontWeight: 500, marginRight: 5 }}
+                          >
+                            Documento adjunto:{" "}
+                            <Typography.Text style={{ fontWeight: 400 }}>
+                              <a
+                                href={records.url_hc_adjunto}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "#9957C2", textDecoration: "underline" }}
+                              >
+                                Ver documento
+                              </a>
+                            </Typography.Text>
+                          </Typography.Text>
+                        </Flex>
+                      </Flex>
+                    )}
                   </Flex>
                 ) : (
                   <Flex style={{ height: 50, alignItems: "center" }}>

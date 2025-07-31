@@ -103,6 +103,7 @@ export type MedicalRecord = {
   tipo_de_sueno: string | null;
   tipo_sangre: string;
   porte_clinico?: string;
+  url_hc_adjunto?: string | null;
 };
 
 export type MedicalReport = {
