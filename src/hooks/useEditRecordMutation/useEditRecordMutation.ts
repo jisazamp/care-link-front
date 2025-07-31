@@ -26,8 +26,25 @@ const editRecord = ({
   recordId: number;
   record: Partial<EditMedicalRecordType>;
 }) => {
-  record.vaccines = [];
-  return client.patch(`/api/users/${id}/medical_record/${recordId}`, record);
+  // Extraer los datos del record anidado y enviarlos en el formato correcto
+  const {
+    record: recordData,
+    medicines,
+    cares,
+    interventions,
+    vaccines,
+  } = record;
+
+  // Crear el payload en el formato que espera el backend
+  const payload = {
+    record: recordData, // El backend espera un campo 'record' con los datos de la historia clínica
+    medicines: medicines || [],
+    cares: cares || [],
+    interventions: interventions || [],
+    vaccines: vaccines || [],
+  };
+
+  return client.patch(`/api/users/${id}/medical_record/${recordId}`, payload);
 };
 
 // Simplified edit function for home visit medical records
@@ -40,7 +57,15 @@ const editSimplifiedRecord = ({
   recordId: number;
   record: Partial<MedicalRecord>;
 }) => {
-  return client.patch(`/api/users/${id}/medical_record/${recordId}/simplified`, record);
+  // Para el endpoint simplificado, solo necesitamos enviar el record
+  const payload = {
+    record: record, // El backend espera un campo 'record' con los datos de la historia clínica
+  };
+
+  return client.patch(
+    `/api/users/${id}/medical_record/${recordId}/simplified`,
+    payload,
+  );
 };
 
 interface UseEditRecordMutationProps {
