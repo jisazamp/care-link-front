@@ -22,6 +22,10 @@ import {
   Table,
   Tooltip,
   Typography,
+  message,
+  Drawer,
+  Checkbox,
+  Switch,
 } from "antd";
 import type React from "react";
 import { useMemo, useState } from "react";
@@ -46,6 +50,22 @@ export const UsersWithHomeVisitsList: React.FC = () => {
   });
   const [sortKey, setSortKey] = useState<string>("nombre");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  
+  // Estados para funcionalidad de iconos
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showColumnSelector, setShowColumnSelector] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState({
+    avatar: true,
+    nombres: true,
+    estado: true,
+    acciones: true,
+  });
+  const [tableSettings, setTableSettings] = useState({
+    compactMode: false,
+    showRowNumbers: false,
+    autoRefresh: false,
+  });
 
   // Filtro de usuarios por nombre, apellido o ambos
   const handleSearch = () => {
@@ -84,6 +104,43 @@ export const UsersWithHomeVisitsList: React.FC = () => {
         activateHomeVisit: true 
       } 
     });
+  };
+
+  // Funciones para iconos del header
+  const handleRefresh = () => {
+    refetch();
+    message.success("Datos actualizados");
+  };
+
+  const handleColumnSelector = () => {
+    setShowColumnSelector(true);
+  };
+
+  const handleSettings = () => {
+    setShowSettings(true);
+  };
+
+  const handleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    if (!isFullscreen) {
+      message.info("Modo pantalla completa activado");
+    } else {
+      message.info("Modo pantalla completa desactivado");
+    }
+  };
+
+  const handleColumnVisibilityChange = (column: string, visible: boolean) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [column]: visible
+    }));
+  };
+
+  const handleSettingChange = (setting: string, value: boolean) => {
+    setTableSettings(prev => ({
+      ...prev,
+      [setting]: value
+    }));
   };
 
   // Lógica de ordenamiento
@@ -276,6 +333,12 @@ export const UsersWithHomeVisitsList: React.FC = () => {
     },
   ];
 
+  // Filtrar columnas según visibilidad
+  const visibleColumnsData = columns.filter((col, index) => {
+    const columnKeys = ['avatar', 'nombres', 'estado', 'acciones'];
+    return visibleColumns[columnKeys[index] as keyof typeof visibleColumns];
+  });
+
   // Opciones de ordenamiento para la toolbar de la tabla
   const sortMenu = (
     <Menu selectedKeys={[sortKey]}>
@@ -292,103 +355,117 @@ export const UsersWithHomeVisitsList: React.FC = () => {
   );
 
   return (
-    <Content className="content-wrapper" style={{ padding: "16px", width: "100%" }}>
-      <Breadcrumb style={{ marginBottom: "16px" }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>Visitas domiciliarias</Breadcrumb.Item>
-        <Breadcrumb.Item>Listado de visitas</Breadcrumb.Item>
-      </Breadcrumb>
+    <Content 
+      className="content-wrapper" 
+      style={{ 
+        padding: isFullscreen ? "0" : "16px", 
+        width: "100%",
+        height: isFullscreen ? "100vh" : "auto"
+      }}
+    >
+      {!isFullscreen && (
+        <>
+          <Breadcrumb style={{ marginBottom: "16px" }}>
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>Visitas domiciliarias</Breadcrumb.Item>
+            <Breadcrumb.Item>Listado de visitas</Breadcrumb.Item>
+          </Breadcrumb>
 
-      <Title level={3} className="page-title">
-        Listado de visitas
-      </Title>
+          <Title level={3} className="page-title">
+            Listado de visitas
+          </Title>
+        </>
+      )}
 
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Card className="usuarios-search-card" style={{ width: "100%" }}>
-          <div style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: 16, 
-            width: "100%",
-            flexWrap: "wrap"
-          }}>
-            {/* Sección de búsqueda por usuario existente */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 300 }}>
-              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)", fontWeight: 500 }}>
-                A partir de usuario existente
+        {!isFullscreen && (
+          <Card className="usuarios-search-card" style={{ width: "100%" }}>
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: 16, 
+              width: "100%",
+              flexWrap: "wrap"
+            }}>
+              {/* Sección de búsqueda por usuario existente */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 300 }}>
+                <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)", fontWeight: 500 }}>
+                  A partir de usuario existente
+                </span>
+                <QuestionCircleOutlined style={{ fontSize: 16, color: "rgba(0,0,0,0.65)" }} />
+                <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)" }}>:</span>
+                <Input
+                  placeholder="Digite para buscar"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onPressEnter={handleSearch}
+                  allowClear
+                  style={{ 
+                    flex: 1,
+                    minWidth: 200,
+                    borderRadius: 6
+                  }}
+                />
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={handleSearch}
+                  style={{ 
+                    borderRadius: "50%", 
+                    width: 32, 
+                    height: 32,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                />
+              </div>
+
+              {/* Separador */}
+              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", fontWeight: 400 }}>
+                ó
               </span>
-              <QuestionCircleOutlined style={{ fontSize: 16, color: "rgba(0,0,0,0.65)" }} />
-              <span style={{ fontSize: 14, color: "rgba(0,0,0,0.85)" }}>:</span>
-              <Input
-                placeholder="Digite para buscar"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onPressEnter={handleSearch}
-                allowClear
-                style={{ 
-                  flex: 1,
-                  minWidth: 200,
-                  borderRadius: 6
-                }}
-              />
+
+              {/* Botón para crear nuevo usuario */}
               <Button
                 type="primary"
-                icon={<SearchOutlined />}
-                onClick={handleSearch}
+                icon={<PlusOutlined />}
+                onClick={handleCreateNewUser}
                 style={{ 
-                  borderRadius: "50%", 
-                  width: 32, 
-                  height: 32,
+                  borderRadius: 6,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  gap: 8,
+                  height: 32
                 }}
-              />
+              >
+                A partir de nuevo usuario
+              </Button>
+
+              {/* Botón de restablecer */}
+              <Button
+                onClick={handleReset}
+                style={{ 
+                  borderRadius: 6,
+                  height: 32
+                }}
+              >
+                Restablecer
+              </Button>
             </div>
+          </Card>
+        )}
 
-            {/* Separador */}
-            <span style={{ fontSize: 14, color: "rgba(0,0,0,0.65)", fontWeight: 400 }}>
-              ó
-            </span>
-
-            {/* Botón para crear nuevo usuario */}
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleCreateNewUser}
-              style={{ 
-                borderRadius: 6,
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                height: 32
-              }}
-            >
-              A partir de nuevo usuario
-            </Button>
-
-            {/* Botón de restablecer */}
-            <Button
-              onClick={handleReset}
-              style={{ 
-                borderRadius: 6,
-                height: 32
-              }}
-            >
-              Restablecer
-            </Button>
-          </div>
-        </Card>
-
-        <Card style={{ width: "100%" }}>
+        <Card style={{ width: "100%", height: isFullscreen ? "100vh" : "auto" }}>
           <Table
             className="usuarios-table"
             dataSource={users.map((u) => ({ ...u, key: u.id_usuario }))}
-            columns={columns}
+            columns={visibleColumnsData}
             loading={isPending}
             showHeader={false}
             style={{ width: "100%" }}
             scroll={{ x: "max-content" }}
+            size={tableSettings.compactMode ? "small" : "default"}
             onRow={(record) => ({
               onClick: () => handleRowClick(record),
               style: { cursor: 'pointer' }
@@ -424,16 +501,122 @@ export const UsersWithHomeVisitsList: React.FC = () => {
                         : "fecha de creación"} <DownOutlined style={{ color: '#595959' }} />
                     </Button>
                   </Dropdown>
-                  <Button type="text" icon={<ReloadOutlined style={{ color: '#595959', fontSize: 18 }} />} onClick={() => refetch()} />
-                  <Button type="text" icon={<ColumnHeightOutlined style={{ color: '#595959', fontSize: 18 }} />} />
-                  <Button type="text" icon={<SettingOutlined style={{ color: '#595959', fontSize: 18 }} />} />
-                  <Button type="text" icon={<FullscreenOutlined style={{ color: '#595959', fontSize: 18 }} />} />
+                  <Tooltip title="Actualizar datos">
+                    <Button 
+                      type="text" 
+                      icon={<ReloadOutlined style={{ color: '#595959', fontSize: 18 }} />} 
+                      onClick={handleRefresh}
+                      loading={isPending}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Mostrar/ocultar columnas">
+                    <Button 
+                      type="text" 
+                      icon={<ColumnHeightOutlined style={{ color: '#595959', fontSize: 18 }} />} 
+                      onClick={handleColumnSelector}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Configuración de tabla">
+                    <Button 
+                      type="text" 
+                      icon={<SettingOutlined style={{ color: '#595959', fontSize: 18 }} />} 
+                      onClick={handleSettings}
+                    />
+                  </Tooltip>
+                  <Tooltip title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}>
+                    <Button 
+                      type="text" 
+                      icon={<FullscreenOutlined style={{ color: '#595959', fontSize: 18 }} />} 
+                      onClick={handleFullscreen}
+                    />
+                  </Tooltip>
                 </Space>
               </Space>
             )}
           />
         </Card>
       </Space>
+
+      {/* Drawer para selector de columnas */}
+      <Drawer
+        title="Mostrar/Ocultar Columnas"
+        placement="right"
+        onClose={() => setShowColumnSelector(false)}
+        open={showColumnSelector}
+        width={300}
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Checkbox
+            checked={visibleColumns.avatar}
+            onChange={(e) => handleColumnVisibilityChange('avatar', e.target.checked)}
+          >
+            Avatar
+          </Checkbox>
+          <Checkbox
+            checked={visibleColumns.nombres}
+            onChange={(e) => handleColumnVisibilityChange('nombres', e.target.checked)}
+          >
+            Información del usuario
+          </Checkbox>
+          <Checkbox
+            checked={visibleColumns.estado}
+            onChange={(e) => handleColumnVisibilityChange('estado', e.target.checked)}
+          >
+            Estado
+          </Checkbox>
+          <Checkbox
+            checked={visibleColumns.acciones}
+            onChange={(e) => handleColumnVisibilityChange('acciones', e.target.checked)}
+          >
+            Acciones
+          </Checkbox>
+        </Space>
+      </Drawer>
+
+      {/* Drawer para configuración */}
+      <Drawer
+        title="Configuración de Tabla"
+        placement="right"
+        onClose={() => setShowSettings(false)}
+        open={showSettings}
+        width={300}
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <div>
+            <Typography.Text strong>Modo compacto</Typography.Text>
+            <br />
+            <Switch
+              checked={tableSettings.compactMode}
+              onChange={(checked) => handleSettingChange('compactMode', checked)}
+            />
+            <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
+              Reduce el espaciado entre filas
+            </Typography.Text>
+          </div>
+          <div>
+            <Typography.Text strong>Mostrar números de fila</Typography.Text>
+            <br />
+            <Switch
+              checked={tableSettings.showRowNumbers}
+              onChange={(checked) => handleSettingChange('showRowNumbers', checked)}
+            />
+            <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
+              Agrega numeración a las filas
+            </Typography.Text>
+          </div>
+          <div>
+            <Typography.Text strong>Actualización automática</Typography.Text>
+            <br />
+            <Switch
+              checked={tableSettings.autoRefresh}
+              onChange={(checked) => handleSettingChange('autoRefresh', checked)}
+            />
+            <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
+              Actualiza datos cada 30 segundos
+            </Typography.Text>
+          </div>
+        </Space>
+      </Drawer>
     </Content>
   );
 }; 
