@@ -15,7 +15,7 @@ export const useEditClinicalEvolution = () =>
   useMutation({
     mutationFn: editEvolution,
     mutationKey: ["edit-clinical-evolution"],
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       // Invalidar las consultas de evoluciones clínicas
       queryClient.invalidateQueries({
         queryKey: ["clinical-evolution"],

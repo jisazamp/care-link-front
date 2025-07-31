@@ -103,6 +103,7 @@ export type MedicalRecord = {
   tipo_de_sueno: string | null;
   tipo_sangre: string;
   porte_clinico?: string;
+  url_hc_adjunto?: string | null;
 };
 
 export type MedicalReport = {
@@ -138,7 +139,8 @@ export type MedicalReport = {
   remision: string;
   saturacionOxigeno: number;
   temperatura_corporal: number;
-  tipo_reporte: string;
+  tipo_reporte?: string | null;
+  url_adjunto?: string | null;
 };
 
 export type Professional = {

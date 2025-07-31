@@ -256,7 +256,7 @@ export const Billing: React.FC = () => {
       title: "Contrato", 
       dataIndex: "id_contrato", 
       key: "id_contrato",
-      render: (text: any, row: any) => {
+      render: (_: any, row: any) => {
         if (row.id_contrato) {
           return row.id_contrato;
         } else if (row.tipo_factura === 'VISITA_DOMICILIARIA') {

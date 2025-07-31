@@ -1,8 +1,10 @@
 import { Line } from "@ant-design/plots";
-import { Card, Col, Row, Typography, Spin } from "antd";
+import { Card, Col, Row, Typography, Spin, Space, Tag, Progress } from "antd";
+import { DollarOutlined, FileTextOutlined, ClockCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { useGetQuarterlyVisits } from "../../../../hooks/useGetQuarterlyVisits/useGetQuarterlyVisits";
 import { useGetMonthlyPayments } from "../../../../hooks/useGetMonthlyPayments/useGetMonthlyPayments";
 import { useGetOperationalEfficiency } from "../../../../hooks/useGetOperationalEfficiency/useGetOperationalEfficiency";
+import { useGetBillingStats } from "../../../../hooks/useGetBillingStats/useGetBillingStats";
 
 const { Title, Text } = Typography;
 
@@ -38,6 +40,7 @@ export const GenericsCards = () => {
   const { data: quarterlyVisitsData, isLoading: isLoadingVisits, error: errorVisits } = useGetQuarterlyVisits();
   const { data: monthlyPaymentsData, isLoading: isLoadingPayments, error: errorPayments } = useGetMonthlyPayments();
   const { data: operationalEfficiencyData, isLoading: isLoadingEfficiency, error: errorEfficiency } = useGetOperationalEfficiency();
+  const { data: billingStats, isLoading: isLoadingBillingStats, error: errorBillingStats } = useGetBillingStats();
 
   // Configuración dinámica para el gráfico de visitas
   const configVisitsDynamic = {
@@ -65,7 +68,7 @@ export const GenericsCards = () => {
     xField: "month",
     yField: "payments",
     smooth: true,
-    color: "#1890FF", // Azul para pagos
+    color: "#9957C2", // Color principal del sistema
     tooltip: { 
       showMarkers: false,
       formatter: (datum: any) => {
@@ -99,7 +102,7 @@ export const GenericsCards = () => {
     height: 100,
   };
 
-  if (isLoadingVisits || isLoadingPayments || isLoadingEfficiency) {
+  if (isLoadingVisits || isLoadingPayments || isLoadingEfficiency || isLoadingBillingStats) {
     return (
       <Row gutter={[16, 16]}>
         <Col span={8}>
@@ -127,7 +130,7 @@ export const GenericsCards = () => {
     );
   }
 
-  if (errorVisits || errorPayments || errorEfficiency) {
+  if (errorVisits || errorPayments || errorEfficiency || errorBillingStats) {
     return (
       <Row gutter={[16, 16]}>
         <Col span={8}>
@@ -171,17 +174,65 @@ export const GenericsCards = () => {
         </Card>
       </Col>
 
-      {/* Tarjeta 2: Pagos */}
+      {/* Tarjeta 2: Pagos - MEJORADA */}
       <Col span={8}>
         <Card className="generic-card">
-          <Title level={5}>Pagos</Title>
-          <Title level={3} style={{ color: "#1890FF" }}>
-            ${(monthlyPaymentsData?.total_payments || 0).toLocaleString()}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <DollarOutlined style={{ color: '#9957C2', fontSize: 18 }} />
+            <Title level={5} style={{ margin: 0 }}>Pagos</Title>
+          </div>
+          
+          {/* Valor principal */}
+          <Title level={3} style={{ color: "#9957C2", marginBottom: 8 }}>
+            ${((billingStats?.valor_pagado ?? 0) || (monthlyPaymentsData?.total_payments ?? 0) || 0).toLocaleString()}
           </Title>
+
+          {/* Métricas rápidas */}
+          <Space size="small" style={{ marginBottom: 12 }}>
+            <Tag color="default" style={{ fontSize: 11 }}>
+              <FileTextOutlined style={{ marginRight: 4 }} />
+              {billingStats?.total_facturas ?? 0} facturas
+            </Tag>
+            <Tag color="processing" style={{ fontSize: 11 }}>
+              <CheckCircleOutlined style={{ marginRight: 4 }} />
+              {billingStats?.facturas_pagadas ?? 0} pagadas
+            </Tag>
+            <Tag color="warning" style={{ fontSize: 11 }}>
+              <ClockCircleOutlined style={{ marginRight: 4 }} />
+              {billingStats?.facturas_pendientes ?? 0} pendientes
+            </Tag>
+          </Space>
+
+          {/* Barra de progreso de cobranza */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Cobranza
+              </Text>
+              <Text strong style={{ fontSize: 12, color: '#9957C2' }}>
+                {billingStats?.porcentaje_valor_pagado ?? 0}%
+              </Text>
+            </div>
+            <Progress 
+              percent={billingStats?.porcentaje_valor_pagado ?? 0} 
+              size="small" 
+              strokeColor="#9957C2"
+              showInfo={false}
+            />
+          </div>
+
+          {/* Gráfico de tendencia */}
           <Line {...configPaymentsDynamic} />
-          <Text type="secondary">
-            Cumplimiento de meta <strong>{monthlyPaymentsData?.overall_goal_achievement || 0}%</strong>
-          </Text>
+
+          {/* Información adicional */}
+          <div style={{ marginTop: 8 }}>
+            <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+              Cumplimiento de meta <strong>{monthlyPaymentsData?.overall_goal_achievement ?? 0}%</strong>
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Pendiente: ${(billingStats?.valor_pendiente ?? 0).toLocaleString()}
+            </Text>
+          </div>
         </Card>
       </Col>
 
