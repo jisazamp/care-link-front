@@ -26,7 +26,7 @@ const editRecord = ({
   recordId: number;
   record: Partial<EditMedicalRecordType>;
 }) => {
-  // Extraer los datos del record anidado y enviarlos en el formato correcto
+  // Extraer los datos del record anidado
   const {
     record: recordData,
     medicines,
@@ -35,16 +35,44 @@ const editRecord = ({
     vaccines,
   } = record;
 
-  // Crear el payload en el formato que espera el backend
-  const payload = {
-    record: recordData, // El backend espera un campo 'record' con los datos de la historia clínica
-    medicines: medicines || [],
-    cares: cares || [],
-    interventions: interventions || [],
-    vaccines: vaccines || [],
-  };
+  // Crear FormData para enviar como multipart/form-data
+  const formData = new FormData();
 
-  return client.patch(`/api/users/${id}/medical_record/${recordId}`, payload);
+  // Agregar el record como JSON string
+  if (recordData) {
+    formData.append("record", JSON.stringify(recordData));
+  }
+
+  // Agregar las listas como JSON strings
+  if (medicines) {
+    formData.append("medicines", JSON.stringify(medicines));
+  } else {
+    formData.append("medicines", JSON.stringify([]));
+  }
+
+  if (cares) {
+    formData.append("cares", JSON.stringify(cares));
+  } else {
+    formData.append("cares", JSON.stringify([]));
+  }
+
+  if (interventions) {
+    formData.append("interventions", JSON.stringify(interventions));
+  } else {
+    formData.append("interventions", JSON.stringify([]));
+  }
+
+  if (vaccines) {
+    formData.append("vaccines", JSON.stringify(vaccines));
+  } else {
+    formData.append("vaccines", JSON.stringify([]));
+  }
+
+  return client.patch(`/api/users/${id}/medical_record/${recordId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // Simplified edit function for home visit medical records
@@ -57,14 +85,22 @@ const editSimplifiedRecord = ({
   recordId: number;
   record: Partial<MedicalRecord>;
 }) => {
-  // Para el endpoint simplificado, solo necesitamos enviar el record
-  const payload = {
-    record: record, // El backend espera un campo 'record' con los datos de la historia clínica
-  };
+  // Crear FormData para enviar como multipart/form-data
+  const formData = new FormData();
+
+  // Agregar el record como JSON string
+  if (record) {
+    formData.append("record", JSON.stringify(record));
+  }
 
   return client.patch(
     `/api/users/${id}/medical_record/${recordId}/simplified`,
-    payload,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
   );
 };
 
