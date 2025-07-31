@@ -139,7 +139,8 @@ export type MedicalReport = {
   remision: string;
   saturacionOxigeno: number;
   temperatura_corporal: number;
-  tipo_reporte: string;
+  tipo_reporte?: string | null;
+  url_adjunto?: string | null;
 };
 
 export type Professional = {
