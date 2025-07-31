@@ -11,7 +11,7 @@ import {
   Select, 
   message, 
   Badge,
-  Tooltip,
+
   Grid,
   Modal,
   TimePicker,
@@ -30,15 +30,11 @@ import {
 } from '@ant-design/icons';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useGetRutaTransporte } from '../../hooks/useGetRutaTransporte/useGetRutaTransporte';
-import { useCreateTransporte } from '../../hooks/useCreateTransporte/useCreateTransporte';
 import { useUpdateTransporte, useUpdateTransporteHorarios } from '../../hooks/useUpdateTransporte/useUpdateTransporte';
 import type { 
   RutaTransporte, 
-  CreateTransporteRequest, 
-  UpdateTransporteRequest,
   EstadoTransporte 
 } from '../../types';
-import { TransporteModal } from './components/TransporteModal';
 import { TransporteStats } from './components/TransporteStats';
 import { TransporteFilters } from './components/TransporteFilters';
 
@@ -48,9 +44,6 @@ const { useBreakpoint } = Grid;
 
 export const Transporte: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingTransporte, setEditingTransporte] = useState<RutaTransporte | null>(null);
-  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   
   // Estado para modal de detalles
   const [detalleModalVisible, setDetalleModalVisible] = useState(false);
@@ -69,7 +62,6 @@ export const Transporte: React.FC = () => {
   const { data: rutaData, isLoading, refetch } = useGetRutaTransporte(
     selectedDate.format('YYYY-MM-DD')
   );
-  const { mutate: createTransporte, isPending: createLoading } = useCreateTransporte();
   const { mutate: updateTransporte, isPending: updateLoading } = useUpdateTransporte();
   const { mutate: updateHorarios, isPending: updateHorariosLoading } = useUpdateTransporteHorarios();
 
@@ -169,11 +161,9 @@ export const Transporte: React.FC = () => {
     }
   };
 
-  const handleCreateTransporte = () => {
-    setModalMode('create');
-    setEditingTransporte(null);
-    setIsModalVisible(true);
-  };
+
+
+
 
   // Funciones para modal de detalles
   const handleRowClick = (record: RutaTransporte) => {
@@ -272,36 +262,7 @@ export const Transporte: React.FC = () => {
     setEditingHorarios(null); // Limpiar estado de edición al cerrar
   };
 
-  const handleModalSubmit = (values: CreateTransporteRequest | UpdateTransporteRequest) => {
-    if (modalMode === 'create') {
-      createTransporte(values as CreateTransporteRequest, {
-        onSuccess: () => {
-          message.success('Transporte creado exitosamente');
-          setIsModalVisible(false);
-          refetch();
-        },
-        onError: () => {
-          message.error('Error al crear el transporte');
-        }
-      });
-    } else {
-      if (editingTransporte) {
-        updateTransporte({
-          id: editingTransporte.id_transporte,
-          data: values as UpdateTransporteRequest
-        }, {
-          onSuccess: () => {
-            message.success('Transporte actualizado exitosamente');
-            setIsModalVisible(false);
-            refetch();
-          },
-          onError: () => {
-            message.error('Error al actualizar el transporte');
-          }
-        });
-      }
-    }
-  };
+
 
   const getEstadoColor = (estado: EstadoTransporte) => {
     switch (estado) {
@@ -335,7 +296,7 @@ export const Transporte: React.FC = () => {
       title: 'Alerta',
       key: 'alerta',
       width: screens.xs ? 80 : 120,
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (record: RutaTransporte) => {
         const tiempoRestante = getTiempoRestante(record.hora_recogida, record.estado);
         const alertaTexto = getAlertaTexto(tiempoRestante);
@@ -352,7 +313,7 @@ export const Transporte: React.FC = () => {
     {
       title: 'Paciente',
       key: 'paciente',
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (record: RutaTransporte) => (
         <Space direction="vertical" size="small">
           <Text strong>{`${record.nombres} ${record.apellidos}`}</Text>
@@ -364,7 +325,7 @@ export const Transporte: React.FC = () => {
       title: 'Dirección Recogida',
       dataIndex: 'direccion_recogida',
       key: 'direccion_recogida',
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (direccion: string) => (
         <Space>
           <EnvironmentOutlined />
@@ -376,7 +337,7 @@ export const Transporte: React.FC = () => {
       title: 'Teléfono de Contacto',
       dataIndex: 'telefono_contacto',
       key: 'telefono_contacto',
-      responsive: ['lg'],
+      responsive: ['lg' as const],
       render: (telefono: string) => (
         <Space>
           <PhoneOutlined />
@@ -387,7 +348,7 @@ export const Transporte: React.FC = () => {
     {
       title: 'Hora Recogida',
       key: 'hora_recogida',
-      responsive: ['md'],
+      responsive: ['md' as const],
       render: (record: RutaTransporte) => (
         <Space>
           <ClockCircleOutlined />
@@ -398,7 +359,7 @@ export const Transporte: React.FC = () => {
     {
       title: 'Hora Entrega',
       key: 'hora_entrega',
-      responsive: ['lg'],
+      responsive: ['lg' as const],
       render: (record: RutaTransporte) => (
         <Space>
           <ClockCircleOutlined />
@@ -410,7 +371,7 @@ export const Transporte: React.FC = () => {
       title: 'Estado',
       dataIndex: 'estado',
       key: 'estado',
-      responsive: ['sm'],
+      responsive: ['sm' as const],
       render: (estado: EstadoTransporte) => (
         <Tag color={getEstadoColor(estado)}>
           {getEstadoText(estado)}
@@ -544,15 +505,7 @@ export const Transporte: React.FC = () => {
         />
       </Card>
 
-      {/* Modal para crear/editar transporte */}
-      <TransporteModal
-        visible={isModalVisible}
-        mode={modalMode}
-        transporte={editingTransporte}
-        onCancel={() => setIsModalVisible(false)}
-        onSubmit={handleModalSubmit}
-        loading={createLoading || updateLoading}
-      />
+
 
       {/* Modal de detalles */}
       <Modal
@@ -744,7 +697,7 @@ export const Transporte: React.FC = () => {
               style={{ marginBottom: '16px' }}
             >
               <Space direction="vertical" size="small">
-                <Tag color={getEstadoColor(transporteSeleccionado.estado)} size="large">
+                <Tag color={getEstadoColor(transporteSeleccionado.estado)}>
                   {getEstadoText(transporteSeleccionado.estado)}
                 </Tag>
                 {(() => {
