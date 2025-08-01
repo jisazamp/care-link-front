@@ -7,6 +7,7 @@ export const useGetProfessionalByUserId = (userId: number) => {
     enabled: !!userId,
     queryKey: [`get-professional-${userId}`],
     queryFn: () => getProfessionalByUserId(userId),
+    retry: 0,
   });
 
   return { professionalData: data, isLoadingProfessional: isLoading };

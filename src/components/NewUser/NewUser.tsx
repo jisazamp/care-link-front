@@ -612,6 +612,7 @@ export const NewUser: React.FC = () => {
                           accept="image/*"
                           listType="picture"
                           fileList={field.value?.fileList || []}
+                          showUploadList={{ showRemoveIcon: false }}
                         >
                           <Button
                             style={{
