@@ -1,33 +1,49 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "../../api/client";
+import type { Bill } from "../../types";
 
-interface AssignUsersData {
-  usuarios_ids: number[];
-  estado_participacion?: string;
+interface CreateBillData {
+  contractId: number;
+  impuestos?: number;
+  descuentos?: number;
   observaciones?: string;
 }
 
-interface AssignUsersResponse {
-  data: { message: string };
-  message: string;
-  success: boolean;
-}
+const createContractBill = (data: CreateBillData) =>
+  client.post<{ data: Bill }>(`/api/facturas/${data.contractId}`, {
+    impuestos: data.impuestos,
+    descuentos: data.descuentos,
+    observaciones: data.observaciones,
+  });
 
-const assignUsersToActivity = (activityId: number, data: AssignUsersData) =>
-  client.post<AssignUsersResponse>(`/api/activities/${activityId}/users`, data);
-
-export const useAssignUsersToActivity = (activityId: number) => {
+const useCreateBill = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (data: AssignUsersData) =>
-      assignUsersToActivity(activityId, data),
+  const mutation = useMutation({
+    mutationKey: ["create-contract-bill"],
+    mutationFn: createContractBill,
     onSuccess: () => {
-      // Invalidar las consultas relacionadas
-      queryClient.invalidateQueries({
-        queryKey: ["get-activity-users", activityId],
-      });
-      queryClient.invalidateQueries({ queryKey: ["get-upcoming-activities"] });
+      // Invalidar queries relacionadas con facturación
+      queryClient.invalidateQueries({ queryKey: ["facturas"] });
+      queryClient.invalidateQueries({ queryKey: ["facturacion-completa"] });
+      queryClient.invalidateQueries({ queryKey: ["contract-bills"] });
     },
   });
+
+  const createContractBillFn = (
+    data: CreateBillData,
+    options?: {
+      onSuccess?: (data: any) => void;
+      onError?: (error: any) => void;
+    },
+  ) => {
+    mutation.mutate(data, options);
+  };
+
+  return {
+    createContractBillFn,
+    createContractPending: mutation.isPending,
+  };
 };
+
+export { useCreateBill };
