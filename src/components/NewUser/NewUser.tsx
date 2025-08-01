@@ -95,7 +95,7 @@ export const NewUser: React.FC = () => {
 
   const {
     control,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     handleSubmit,
     reset,
     setValue,
@@ -172,13 +172,22 @@ export const NewUser: React.FC = () => {
       visitas_domiciliarias: data.homeVisit,
     };
 
-    const photoFile = data.photo?.fileList?.[0]?.originFileObj;
+    let photoFile: File | undefined;
+
+    if (dirtyFields.photo) {
+      photoFile = data.photo?.fileList?.[0]?.originFileObj;
+    }
 
     if (!userId) {
       createUser({ user, photoFile });
       return;
     }
-    editUser({ user, id: userId, photoFile });
+    editUser({
+      user,
+      id: userId,
+      photoFile,
+      hasEditedPhoto: dirtyFields.photo,
+    });
   };
 
   // Funciones para importación/exportación
@@ -315,7 +324,7 @@ export const NewUser: React.FC = () => {
     data?.data.data?.id_usuario,
   ]);
 
-  if (isLoading) {
+  if (isLoading || isPendingCreateUser || isPendingEditUser) {
     return (
       <Flex align="center" justify="center" style={{ minHeight: "300px" }}>
         <Spin />
