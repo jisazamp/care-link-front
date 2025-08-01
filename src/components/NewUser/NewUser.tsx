@@ -78,18 +78,7 @@ const formSchema = z.object({
   }),
   occupation: z.string().optional(),
   homeVisit: z.boolean().default(false),
-  photo: z
-    .any()
-    .optional()
-    .refine(
-      (value) =>
-        value === undefined ||
-        value.fileList?.length === 0 ||
-        (value.file instanceof File && value.file.size <= 5 * 1024 * 1024),
-      {
-        message: "La foto debe ser un archivo válido y pesar menos de 5MB",
-      },
-    ),
+  photo: z.any().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
