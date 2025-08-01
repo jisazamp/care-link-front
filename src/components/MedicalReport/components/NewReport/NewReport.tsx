@@ -9,9 +9,10 @@ import {
   Row,
   Select,
   Upload,
+  Table,
 } from "antd";
 import type { Dayjs } from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport/useCreateMedicalReport";
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
@@ -25,6 +26,7 @@ export const NewReport: React.FC = () => {
 
   const [form] = Form.useForm();
   const reportType = useWatch("reportType", form);
+  const [attachments, setAttachments] = useState<any[]>([]);
 
   const createMutation = useCreateMedicalReport(id);
   const medicalRecordQuery = useGetUserMedicalRecord(id);
@@ -36,10 +38,7 @@ export const NewReport: React.FC = () => {
     registrationDate: Dayjs;
     consultationReason: string;
     weight: number;
-    bloodPressure: number;
-    heartRate: number;
-    bodyTemperature: number;
-    oxygenSaturation: number;
+    height: number;
     diagnosis: string;
     internalObservations: string;
     referral: string;
@@ -49,21 +48,18 @@ export const NewReport: React.FC = () => {
       id_historiaclinica: Number(
         medicalRecordQuery.data?.data.data?.id_historiaclinica,
       ),
-      Frecuencia_cardiaca: values.heartRate,
-      Obs_habitosalimenticios: values.treatmentObservation,
+      recomendaciones: values.treatmentObservation,
       diagnosticos: values.diagnosis,
       fecha_registro: values.registrationDate.format("YYYY-MM-DD"),
       id_profesional: values.professional,
       motivo_consulta: values.consultationReason,
       observaciones: values.internalObservations,
       peso: values.weight,
-      presion_arterial: values.bloodPressure,
+      altura: values.height,
       remision: values.referral,
-      saturacionOxigeno: values.oxygenSaturation,
-      temperatura_corporal: values.bodyTemperature,
       tipo_reporte: values.reportType,
     };
-    await createMutation.mutateAsync({ data: medicalReport });
+    await createMutation.mutateAsync({ data: medicalReport, attachments });
   };
 
   useEffect(() => {
@@ -71,6 +67,12 @@ export const NewReport: React.FC = () => {
       navigate(`/usuarios/${id}/detalles`);
     }
   }, [createMutation.isSuccess, id, navigate]);
+
+  const handleFileUpload = (info: any) => {
+    if (info.file.status === "done") {
+      setAttachments((prev) => [...prev, info.file]);
+    }
+  };
 
   return (
     <>
@@ -145,32 +147,14 @@ export const NewReport: React.FC = () => {
           {reportType && reportType !== "psicologia" && (
             <Card title="Exploración Física" style={{ marginBottom: 16 }}>
               <Row gutter={16}>
-                <Col span={4}>
+                <Col span={12}>
                   <Form.Item label="Peso (kg)" name="weight">
                     <Input type="number" />
                   </Form.Item>
                 </Col>
-                <Col span={4}>
-                  <Form.Item label="Presión Arterial" name="bloodPressure">
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={4}>
-                  <Form.Item label="Frecuencia Cardíaca" name="heartRate">
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={4}>
-                  <Form.Item
-                    label="Temperatura Corporal (°C)"
-                    name="bodyTemperature"
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={4}>
-                  <Form.Item label="Pulsoximetría (%)" name="oxygenSaturation">
-                    <Input />
+                <Col span={12}>
+                  <Form.Item label="Estatura (cm)" name="height">
+                    <Input type="number" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -191,15 +175,9 @@ export const NewReport: React.FC = () => {
               <Select placeholder="Seleccione una opción">
                 <Select.Option value="psicologia">Psicología</Select.Option>
                 <Select.Option value="fisioterapia">Fisioterapia</Select.Option>
-                <Select.Option value="gerontologia">
-                  Gerontologia
-                </Select.Option>
-                <Select.Option value="enfermeria">
-                  Enfermería
-                </Select.Option>
-                <Select.Option value="especialista">
-                  Especialista
-                </Select.Option>
+                <Select.Option value="gerontologia">Gerontologia</Select.Option>
+                <Select.Option value="enfermeria">Enfermería</Select.Option>
+                <Select.Option value="especialista">Especialista</Select.Option>
               </Select>
             </Form.Item>
           </Card>
@@ -214,10 +192,61 @@ export const NewReport: React.FC = () => {
           </Card>
 
           <Card title="Adjuntar documentos" style={{ marginBottom: 16 }}>
-            <Upload>
+            <Upload
+              onChange={handleFileUpload}
+              beforeUpload={() => false}
+              multiple
+            >
               <Button icon={<UploadOutlined />}>Agregar</Button>
             </Upload>
           </Card>
+
+          {/* Nueva card para mostrar documentos adjuntos */}
+          {attachments.length > 0 && (
+            <Card title="Documentos Adjuntos" style={{ marginBottom: 16 }}>
+              <Table
+                dataSource={attachments.map((attachment, index) => ({
+                  key: index,
+                  nombre: attachment.name || "Documento adjunto",
+                  fecha: new Date().toLocaleDateString("es-ES"),
+                  url: URL.createObjectURL(attachment.originFileObj),
+                }))}
+                columns={[
+                  {
+                    title: "Nombre del documento",
+                    dataIndex: "nombre",
+                    key: "nombre",
+                    width: "40%",
+                  },
+                  {
+                    title: "Fecha de ingreso",
+                    dataIndex: "fecha",
+                    key: "fecha",
+                    width: "30%",
+                  },
+                  {
+                    title: "Acciones",
+                    key: "acciones",
+                    width: "30%",
+                    render: (_, record) => (
+                      <Button
+                        type="link"
+                        onClick={() => window.open(record.url, "_blank")}
+                        style={{
+                          color: "#9957C2",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        Ver documento
+                      </Button>
+                    ),
+                  },
+                ]}
+                pagination={false}
+                size="small"
+              />
+            </Card>
+          )}
 
           <Card style={{ width: "100%", textAlign: "right" }}>
             <Button style={{ marginRight: 8 }} className="main-button-white">

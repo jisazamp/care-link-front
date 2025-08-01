@@ -37,7 +37,10 @@ export const Vaccines = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      remove(vaccines.findIndex((v) => v.id === vaccineToDelete));
+      const index = vaccines.findIndex((v) => v.id === vaccineToDelete);
+      if (index !== -1) {
+        remove(index);
+      }
     }
   }, [isSuccess, remove, vaccineToDelete, vaccines]);
 
@@ -109,8 +112,11 @@ export const Vaccines = () => {
                       type="link"
                       danger
                       onClick={() => {
-                        setVaccineToDelete(Number(vaccines[index].id));
-                        setIsDeleteModalOpen(true);
+                        const vaccine = vaccines[index];
+                        if (vaccine?.id) {
+                          setVaccineToDelete(Number(vaccine.id));
+                          setIsDeleteModalOpen(true);
+                        }
                       }}
                     >
                       Eliminar
@@ -130,7 +136,11 @@ export const Vaccines = () => {
       <VaccinesModal
         open={showModal}
         editingIndex={editingIndex}
-        initialData={editingIndex !== null ? vaccines[editingIndex] : null}
+        initialData={
+          editingIndex !== null && vaccines[editingIndex]
+            ? vaccines[editingIndex]
+            : null
+        }
         append={append}
         update={update}
         onCancel={() => {
@@ -149,7 +159,10 @@ export const Vaccines = () => {
                 vaccineId: Number(vaccineToDelete),
               });
             } else {
-              remove(vaccines.findIndex((v) => v.id === vaccineToDelete));
+              const index = vaccines.findIndex((v) => v.id === vaccineToDelete);
+              if (index !== -1) {
+                remove(index);
+              }
             }
             setIsDeleteModalOpen(false);
             setVaccineToDelete(null);

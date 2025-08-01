@@ -15,5 +15,9 @@ export const useCreateClinicalEvolution = (reportId?: number | string) =>
       queryClient.invalidateQueries({
         queryKey: [`report-${reportId}-clinical-evolutions`],
       });
+      // También invalidar las consultas de evoluciones individuales
+      queryClient.invalidateQueries({
+        queryKey: ["clinical-evolution"],
+      });
     },
   });

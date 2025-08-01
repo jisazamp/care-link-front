@@ -1,10 +1,22 @@
 export const getSelectedKey = (pathname: string): string => {
-  if (pathname.startsWith("/inicio")) return "1";
+  if (pathname.startsWith("/inicio") || pathname === "/home") return "1";
   if (pathname.startsWith("/usuarios")) return "2.1";
   if (pathname === "/usuarios/crear") return "2.2";
   if (pathname.includes("nuevo-reporte")) return "2.3";
+  if (
+    pathname.startsWith("/visitas-domiciliarias/usuarios") &&
+    pathname.includes("/detalles")
+  )
+    return "7.1";
+  if (pathname === "/visitas-domiciliarias") return "7.1";
+  if (pathname.startsWith("/visitas-domiciliarias/usuarios")) return "7.2";
   if (pathname.startsWith("/actividades") && pathname !== "/actividades/crear")
     return "3.1";
   if (pathname === "/actividades/crear") return "3.2";
+  if (pathname.startsWith("/cronograma")) return "4.1";
+  if (pathname.startsWith("/transporte")) return "5.1";
+  if (pathname.startsWith("/facturacion")) return "6.1";
+  if (pathname.startsWith("/admin")) return "8.1";
+  if (pathname === "/admin/registrar") return "8.2";
   return "";
 };

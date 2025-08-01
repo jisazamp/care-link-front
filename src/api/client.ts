@@ -1,4 +1,4 @@
-import { message } from "antd";
+import { notification } from "antd";
 import axios from "axios";
 import { useAuthStore } from "../store/auth";
 
@@ -21,22 +21,27 @@ client.interceptors.request.use(
 
 client.interceptors.response.use(
   (response) => {
-    if (response.config.method !== "get") {
-      message.success(response.data.message || "Solicitud exitosa");
+    if (response.config.method !== "get" && response.data?.message) {
+      notification.success({
+        message: "Éxito",
+        description: response.data.message,
+        placement: "topRight",
+      });
     }
     return response;
   },
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
+    if (error.response?.status === 401) {
       useAuthStore.setState({
         jwtToken: null,
       });
+      notification.error({
+        message: "Error de Autenticación",
+        description: "Sesión expirada. Por favor, inicie sesión nuevamente.",
+        placement: "topRight",
+      });
     }
 
-    message.error(
-      error.response?.data?.message ||
-        "Algo salió mal al intentar procesar la solicitud",
-    );
     return Promise.reject(error);
   },
 );

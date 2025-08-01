@@ -9,6 +9,6 @@ export const useGetMedicalReport = (id?: number | string) =>
   useQuery({
     enabled: !!id,
     queryKey: [`get-medical-report-${id}`],
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 0, // Cambiar a 0 para que siempre se actualice cuando se invalide
     queryFn: () => getReport(id),
   });

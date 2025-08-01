@@ -13,6 +13,7 @@ import {
   Table,
   Tooltip,
   Typography,
+  Spin,
 } from "antd";
 import {
   CartesianGrid,
@@ -23,10 +24,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useGetUserFlow } from "../../../../hooks/useGetUserFlow/useGetUserFlow";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
-// Datos ficticios para los gráficos
+// Datos ficticios para los gráficos (se mantienen para el diseño visual)
 const userChartData = [
   { name: "Lun", value: 80 },
   { name: "Mar", value: 90 },
@@ -43,120 +46,164 @@ const attendanceChartData = [
   { name: "Vie", value: 95 },
 ];
 
-// Columnas de la tabla
-const columnsUserFlow = [
-  { title: "Usuarios", dataIndex: "user", key: "user" },
-  {
-    title: "Contrato",
-    dataIndex: "contract",
-    key: "contract",
-    render: () => (
-      <a style={{ color: "#7f34b4" }} href="https://google.com">
-        Ver
-      </a>
-    ),
-  },
-  {
-    title: "Visitas del mes",
-    dataIndex: "visits",
-    key: "visits",
-    render: (visits: number) => (
-      <Space>
-        <Badge color="purple" />
-        {visits}
-      </Space>
-    ),
-  },
-];
+export const CardUserFlow = () => {
+  const { data: userFlowData, isLoading, error } = useGetUserFlow();
+  const navigate = useNavigate();
 
-// Datos de usuarios
-const userFlowData = [
-  { key: "1", user: "Nombre usuario", contract: "Ver", visits: 5 },
-  { key: "2", user: "Nombre usuario", contract: "Ver", visits: 10 },
-  { key: "3", user: "Nombre usuario", contract: "Ver", visits: 3 },
-  { key: "4", user: "Nombre usuario", contract: "Ver", visits: 5 },
-  { key: "5", user: "Nombre usuario", contract: "Ver", visits: 10 },
-];
+  // Columnas de la tabla
+  const columnsUserFlow = [
+    {
+      title: "Usuarios",
+      dataIndex: "nombre_completo",
+      key: "nombre_completo",
+    },
+    {
+      title: "Contrato",
+      dataIndex: "id_contrato",
+      key: "id_contrato",
+      render: (id_contrato: number, record: any) => (
+        <a
+          style={{ color: "#7f34b4" }}
+          onClick={() =>
+            navigate(`/usuarios/${record.id_usuario}/contrato/${id_contrato}`)
+          }
+        >
+          Ver
+        </a>
+      ),
+    },
+    {
+      title: "Visitas del mes",
+      dataIndex: "visitas_mes",
+      key: "visitas_mes",
+      render: (visitas: number) => (
+        <Space>
+          <Badge color="purple" />
+          {visitas}
+        </Space>
+      ),
+    },
+  ];
 
-export const CardUserFlow = () => (
-  <Col span={6}>
-    {" "}
-    {/*  Ajustado al 25% del ancho (6 de 24 columnas) */}
-    <Card
-      title="Flujo de usuarios"
-      extra={<EllipsisOutlined />}
-      className="user-flow-card"
-      style={{ width: "100%", minWidth: 280 }} //  Ancho controlado
-    >
-      {/* Sección de Estadísticas */}
-      <Row gutter={16} justify="space-between">
-        <Col span={12}>
-          <Space direction="vertical">
-            <Text strong>Usuarios del mes</Text>
-            <Tooltip title="Número de usuarios registrados en el mes">
-              <InfoCircleOutlined style={{ marginLeft: 5, color: "#aaa" }} />
-            </Tooltip>
-            <Title level={2}>100</Title>
-            <Space>
-              <CaretUpOutlined style={{ color: "green" }} />
-              <Text type="success">17.1</Text>
+  if (isLoading) {
+    return (
+      <Col span={6}>
+        <Card
+          title="Flujo de usuarios"
+          extra={<EllipsisOutlined />}
+          className="user-flow-card"
+          style={{ width: "100%", minWidth: 280 }}
+        >
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <Spin size="large" />
+          </div>
+        </Card>
+      </Col>
+    );
+  }
+
+  if (error) {
+    return (
+      <Col span={6}>
+        <Card
+          title="Flujo de usuarios"
+          extra={<EllipsisOutlined />}
+          className="user-flow-card"
+          style={{ width: "100%", minWidth: 280 }}
+        >
+          <div style={{ textAlign: "center", padding: "20px", color: "red" }}>
+            Error al cargar los datos
+          </div>
+        </Card>
+      </Col>
+    );
+  }
+
+  return (
+    <Col span={6}>
+      <Card
+        title="Flujo de usuarios"
+        extra={<EllipsisOutlined />}
+        className="user-flow-card"
+        style={{ width: "100%", minWidth: 280 }}
+      >
+        {/* Sección de Estadísticas */}
+        <Row gutter={16} justify="space-between">
+          <Col span={12}>
+            <Space direction="vertical">
+              <Text strong>Usuarios del mes</Text>
+              <Tooltip title="Número de usuarios registrados en el mes">
+                <InfoCircleOutlined style={{ marginLeft: 5, color: "#aaa" }} />
+              </Tooltip>
+              <Title level={2}>{userFlowData?.stats.usuarios_mes || 0}</Title>
+              <Space>
+                <CaretUpOutlined style={{ color: "green" }} />
+                <Text type="success">
+                  {userFlowData?.stats.usuarios_mes_trend || 0}
+                </Text>
+              </Space>
             </Space>
-          </Space>
-          <ResponsiveContainer width="100%" height={50}>
-            <LineChart data={userChartData}>
-              <XAxis dataKey="name" hide />
-              <YAxis hide />
-              <CartesianGrid strokeDasharray="3 3" />
-              <ChartTooltip />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#7f34b4"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Col>
+            <ResponsiveContainer width="100%" height={50}>
+              <LineChart data={userChartData}>
+                <XAxis dataKey="name" hide />
+                <YAxis hide />
+                <CartesianGrid strokeDasharray="3 3" />
+                <ChartTooltip />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#7f34b4"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Col>
 
-        <Col span={12}>
-          <Space direction="vertical">
-            <Text strong>Tasa de asistencia</Text>
-            <Tooltip title="Porcentaje de asistencia general en el mes">
-              <InfoCircleOutlined style={{ marginLeft: 5, color: "#aaa" }} />
-            </Tooltip>
-            <Title level={2}>90%</Title>
-            <Space>
-              <CaretUpOutlined style={{ color: "green" }} />
-              <Text type="success">26.2</Text>
+          <Col span={12}>
+            <Space direction="vertical">
+              <Text strong>Tasa de asistencia</Text>
+              <Tooltip title="Porcentaje de asistencia general en el mes">
+                <InfoCircleOutlined style={{ marginLeft: 5, color: "#aaa" }} />
+              </Tooltip>
+              <Title level={2}>
+                {userFlowData?.stats.tasa_asistencia || 0}%
+              </Title>
+              <Space>
+                <CaretUpOutlined style={{ color: "green" }} />
+                <Text type="success">
+                  {userFlowData?.stats.tasa_asistencia_trend || 0}
+                </Text>
+              </Space>
             </Space>
-          </Space>
-          <ResponsiveContainer width="100%" height={50}>
-            <LineChart data={attendanceChartData}>
-              <XAxis dataKey="name" hide />
-              <YAxis hide />
-              <CartesianGrid strokeDasharray="3 3" />
-              <ChartTooltip />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#7f34b4"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Col>
-      </Row>
+            <ResponsiveContainer width="100%" height={50}>
+              <LineChart data={attendanceChartData}>
+                <XAxis dataKey="name" hide />
+                <YAxis hide />
+                <CartesianGrid strokeDasharray="3 3" />
+                <ChartTooltip />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#7f34b4"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Col>
+        </Row>
 
-      <Divider />
+        <Divider />
 
-      {/*  Tabla de flujo de usuarios */}
-      <Table
-        dataSource={userFlowData}
-        columns={columnsUserFlow}
-        pagination={{ pageSize: 5 }}
-      />
-    </Card>
-  </Col>
-);
+        {/* Tabla de flujo de usuarios */}
+        <Table
+          dataSource={userFlowData?.users || []}
+          columns={columnsUserFlow}
+          pagination={{ pageSize: 5 }}
+          rowKey="id_usuario"
+        />
+      </Card>
+    </Col>
+  );
+};

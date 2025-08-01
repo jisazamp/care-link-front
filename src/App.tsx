@@ -1,5 +1,5 @@
 import "./index.css";
-import { ConfigProvider } from "antd";
+import { App as AntApp, ConfigProvider } from "antd";
 import es from "antd/es/date-picker/locale/es_ES";
 import esES from "antd/es/locale/es_ES";
 import {
@@ -9,29 +9,41 @@ import {
   Routes,
 } from "react-router-dom";
 import { ActivitiesList } from "./components/ActivitiesList/ActivitiesList";
+import { Billing } from "./components/Billing";
 import { ContractDetails } from "./components/Contracts/components/ContractDetails/ContractDetails";
 import { FormContracts } from "./components/Contracts/components/FormContracts";
 import { CreateActivityForm } from "./components/CreateActivity/CreateActivity";
+import NewUserForm from "./components/CreateAuthorizedUser";
 import { CreateFamilyMember } from "./components/CreateFamilyMember/CreateFamilyMember";
 import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
-import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
+import { EditMedicalReport } from "./components/MedicalReport/components/EditMedicalReport/EditMedicalReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
+import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
+import { HomeVisitWizard } from "./components/HomeVisitWizard/HomeVisitWizard";
+import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
-import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
-import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
-import { UserDetails } from "./components/UserDetails/UserDetails";
-import { UserList } from "./components/UserList/UserList";
+import { HomeVisitMedicalRecord } from "./components/HomeVisitMedicalRecord/HomeVisitMedicalRecord";
 import { UsersList } from "./components/UsersList/UsersList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
+import { ViewEvolution } from "./components/MedicalReport/components/ViewEvolution/ViewEvolution";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
+import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
+import { ShowMedicalReport } from "./components/ShowMedicalReport/ShowMedicalReport";
+import { Transporte } from "./components/Transporte";
+import { UserDetails } from "./components/UserDetails/UserDetails";
+import { UserHomeVisitDetails } from "./components/UserHomeVisitDetails/UserHomeVisitDetails";
+import { UserList } from "./components/UserList/UserList";
+import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
 import { colors } from "./theme";
+import { AuthorizedUsersListScreen } from "./screens/AuthorizedUsersList";
+import { Cronograma } from "./components/Cronograma";
 
-const spanishLocale: typeof es = {
+const spanishLocale = {
   ...es,
   lang: {
     ...es.lang,
@@ -39,7 +51,7 @@ const spanishLocale: typeof es = {
   },
 };
 
-const locale: typeof esES = {
+const locale = {
   ...esES,
   DatePicker: esES.DatePicker && {
     ...esES.DatePicker,
@@ -100,182 +112,368 @@ export const App = () => {
         },
       }}
     >
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<MainLayout />}>
-            <Route
-              path="/usuarios"
-              element={
-                <PrivateRoute>
-                  <UsersList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/crear"
-              element={
-                <PrivateRoute>
-                  <NewUser />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/editar"
-              element={
-                <PrivateRoute>
-                  <NewUser />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/detalles"
-              element={
-                <PrivateRoute>
-                  <UserDetails />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/familiar"
-              element={
-                <PrivateRoute>
-                  <CreateFamilyMember />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/familiar/:familyMemberId"
-              element={
-                <PrivateRoute>
-                  <CreateFamilyMember />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/historia"
-              element={
-                <PrivateRoute>
-                  <MedicalRecord />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/nuevo-reporte"
-              element={
-                <PrivateRoute>
-                  <NewReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/reportes/:reportId"
-              element={
-                <PrivateRoute>
-                  <EditReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/reportes/:reportId/detalles"
-              element={
-                <PrivateRoute>
-                  <ViewReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
-              element={
-                <PrivateRoute>
-                  <NewEvolutionReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/ShowMedicalReport"
-              element={
-                <PrivateRoute>
-                  <ShowMedicalReport />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/UserList"
-              element={
-                <PrivateRoute>
-                  <UserList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/contrato"
-              element={
-                <PrivateRoute>
-                  <FormContracts />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/contrato/:contractId/editar"
-              element={
-                <PrivateRoute>
-                  <FormContracts />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/usuarios/:id/contrato/:contractId"
-              element={
-                <PrivateRoute>
-                  <ContractDetails />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/actividades"
-              element={
-                <PrivateRoute>
-                  <ActivitiesList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/actividades/crear"
-              element={
-                <PrivateRoute>
-                  <CreateActivityForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/actividades/:id/editar"
-              element={
-                <PrivateRoute>
-                  <CreateActivityForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/pruebas/mmse"
-              element={
-                <PrivateRoute>
-                  <MMSETest />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/pruebas/yesavage"
-              element={
-                <PrivateRoute>
-                  <YesavageTest />
-                </PrivateRoute>
-              }
-            />
-          </Route>
-          <Route path="*" element={<Navigate to="/usuarios" replace />} />
-        </Routes>
-      </Router>
+      <AntApp>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<MainLayout />}>
+              <Route
+                path="/home"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios"
+                element={
+                  <PrivateRoute>
+                    <UsersList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <PrivateRoute>
+                    <AuthorizedUsersListScreen />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios"
+                element={
+                  <PrivateRoute>
+                    <UsersWithHomeVisitsList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/detalles"
+                element={
+                  <PrivateRoute>
+                    <UserHomeVisitDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/historia"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitMedicalRecord />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/nuevo-reporte"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitNewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/nueva-visita"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitWizard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/editar-visita/:visitaId"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitWizard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/editar"
+                element={
+                  <PrivateRoute>
+                    <NewUser />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/familiar"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/familiar/:familyMemberId"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles"
+                element={
+                  <PrivateRoute>
+                    <ViewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId"
+                element={
+                  <PrivateRoute>
+                    <EditMedicalReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/ver-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <ViewEvolution />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias"
+                element={
+                  <PrivateRoute>
+                    <HomeVisitsList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/crear"
+                element={
+                  <PrivateRoute>
+                    <NewUser />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/editar"
+                element={
+                  <PrivateRoute>
+                    <NewUser />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/detalles"
+                element={
+                  <PrivateRoute>
+                    <UserDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/familiar"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/familiar/:familyMemberId"
+                element={
+                  <PrivateRoute>
+                    <CreateFamilyMember />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/historia"
+                element={
+                  <PrivateRoute>
+                    <MedicalRecord />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/nuevo-reporte"
+                element={
+                  <PrivateRoute>
+                    <NewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId"
+                element={
+                  <PrivateRoute>
+                    <EditMedicalReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles"
+                element={
+                  <PrivateRoute>
+                    <ViewReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/ver-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <ViewEvolution />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/ShowMedicalReport"
+                element={
+                  <PrivateRoute>
+                    <ShowMedicalReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/UserList"
+                element={
+                  <PrivateRoute>
+                    <UserList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/contrato"
+                element={
+                  <PrivateRoute>
+                    <FormContracts />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/contrato/:contractId/editar"
+                element={
+                  <PrivateRoute>
+                    <FormContracts />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/contrato/:contractId"
+                element={
+                  <PrivateRoute>
+                    <ContractDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/registrar/:id?"
+                element={
+                  <PrivateRoute>
+                    <NewUserForm />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/actividades"
+                element={
+                  <PrivateRoute>
+                    <ActivitiesList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/actividades/crear"
+                element={
+                  <PrivateRoute>
+                    <CreateActivityForm />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/actividades/:id/editar"
+                element={
+                  <PrivateRoute>
+                    <CreateActivityForm />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/pruebas/mmse"
+                element={
+                  <PrivateRoute>
+                    <MMSETest />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/pruebas/yesavage"
+                element={
+                  <PrivateRoute>
+                    <YesavageTest />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/cronograma"
+                element={
+                  <PrivateRoute>
+                    <Cronograma />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/transporte"
+                element={
+                  <PrivateRoute>
+                    <Transporte />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/facturacion"
+                element={
+                  <PrivateRoute>
+                    <Billing />
+                  </PrivateRoute>
+                }
+              />
+            </Route>
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </Router>
+      </AntApp>
     </ConfigProvider>
   );
 };

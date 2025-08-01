@@ -1,5 +1,5 @@
-import React from "react";
-import { Form, Radio, Button, Space } from "antd";
+import { Button, Form, Radio, Space } from "antd";
+import type React from "react";
 
 interface YesavageQuestion {
   id: string;
@@ -131,7 +131,9 @@ export const YesavageQuestions: React.FC<YesavageQuestionsProps> = ({
           key={question.id}
           name={question.id}
           label={question.text}
-          rules={[{ required: true, message: "Por favor seleccione una respuesta" }]}
+          rules={[
+            { required: true, message: "Por favor seleccione una respuesta" },
+          ]}
         >
           <Radio.Group>
             <Space direction="vertical">
@@ -151,4 +153,4 @@ export const YesavageQuestions: React.FC<YesavageQuestionsProps> = ({
       </Form.Item>
     </Form>
   );
-}; 
+};

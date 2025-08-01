@@ -55,7 +55,7 @@ export const SurgeriesModal = ({
   return (
     <Modal
       open={!!open}
-      title={editingIndex !== null ? "Editar alergias" : "Agregar alergias"}
+      title={editingIndex !== null ? "Editar cirugía" : "Agregar cirugía, traumatismos, o accidentes"}
       onCancel={onCancel}
       footer={[
         <Button key="cancel" className="main-button-white" onClick={onCancel}>

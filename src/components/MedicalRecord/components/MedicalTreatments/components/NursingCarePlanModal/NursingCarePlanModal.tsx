@@ -72,7 +72,7 @@ export const NursingCarePlanModal = ({
     <Modal
       open={!!open}
       title={
-        editingIndex !== null ? "Editar tratamiento" : "Agregar tratamiento"
+        editingIndex !== null ? "Editar plan de cuidados" : "Agregar plan de cuidados"
       }
       onCancel={onCancel}
       footer={[

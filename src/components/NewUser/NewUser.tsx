@@ -1,4 +1,8 @@
-import { UploadOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  DownloadOutlined,
+  UploadOutlined as ImportOutlined,
+} from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Breadcrumb,
@@ -12,14 +16,20 @@ import {
   Row,
   Select,
   Spin,
+  Switch,
   Typography,
   Upload,
+  message,
+  Modal,
+  Alert,
+  Divider,
+  Space,
 } from "antd";
 import request from "axios";
 import dayjs, { type Dayjs } from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
 import {
@@ -32,6 +42,8 @@ import { useCreateUserMutation } from "../../hooks/useCreateUserMutation/useCrea
 import { useEditUserMutation } from "../../hooks/useEditUserMutation/useEditUserMutation";
 import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useImageFile } from "../../hooks/useImageFile/useImageFile";
+import { useExportUserTemplate } from "../../hooks/useExportUserTemplate/useExportUserTemplate";
+import { useImportUsers } from "../../hooks/useImportUsers/useImportUsers";
 import type { User } from "../../types";
 
 const { Option } = Select;
@@ -64,24 +76,9 @@ const formSchema = z.object({
   maritalStatus: z.nativeEnum(CivilStatus, {
     errorMap: () => ({ message: "El estado civil es requerido" }),
   }),
-  email: z
-    .string({ message: "El correo electrónico es requerido" })
-    .email({ message: "Ingrese un correo electrónico válido" }),
   occupation: z.string().optional(),
-  address: z.string().optional(),
-  phone: z.string().optional(),
-  photo: z
-    .any()
-    .optional()
-    .refine(
-      (value) =>
-        value === undefined ||
-        value.fileList?.length === 0 ||
-        (value.file instanceof File && value.file.size <= 5 * 1024 * 1024),
-      {
-        message: "La foto debe ser un archivo válido y pesar menos de 5MB",
-      },
-    ),
+  homeVisit: z.boolean().default(false),
+  photo: z.any().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -89,6 +86,12 @@ type FormValues = z.infer<typeof formSchema>;
 export const NewUser: React.FC = () => {
   const params = useParams();
   const userId = params.id;
+  const location = useLocation();
+
+  // Estados para importación masiva
+  const [importModalVisible, setImportModalVisible] = useState(false);
+  const [importResults, setImportResults] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const {
     control,
@@ -96,13 +99,25 @@ export const NewUser: React.FC = () => {
     handleSubmit,
     reset,
     setValue,
+    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       gender: "Masculino",
       userId: "0000",
+      homeVisit: false,
     },
   });
+
+  // Observar el valor del switch para determinar la redirección
+  const homeVisitValue = watch("homeVisit");
+
+  // Activar automáticamente el switch si viene desde visitas domiciliarias
+  useEffect(() => {
+    if (location.state?.activateHomeVisit && !userId) {
+      setValue("homeVisit", true);
+    }
+  }, [location.state?.activateHomeVisit, setValue, userId]);
 
   const navigate = useNavigate();
   const { data, isError, isLoading, error } = useGetUserById(userId);
@@ -110,6 +125,7 @@ export const NewUser: React.FC = () => {
     mutate: createUser,
     isSuccess: isSuccessCreateUser,
     isPending: isPendingCreateUser,
+    data: createUserResponse,
   } = useCreateUserMutation();
   const {
     mutate: editUser,
@@ -126,11 +142,17 @@ export const NewUser: React.FC = () => {
     "image/jpeg",
   );
 
+  // Hooks para importación/exportación
+  const { mutate: exportTemplate, isPending: isExportingTemplate } =
+    useExportUserTemplate();
+
+  const { mutate: importUsers, isPending: isImportingUsers } = useImportUsers();
+
   const onSubmit = (data: FormValues) => {
     const user: Partial<User> = {
       apellidos: data.lastName,
-      direccion: data.address,
-      email: data.email,
+      direccion: null, // Enviar null en lugar de data.address
+      email: null, // Enviar null en lugar de data.email
       escribe: false,
       estado: "ACTIVO" as UserStatus,
       estado_civil: data.maritalStatus as CivilStatus,
@@ -143,10 +165,11 @@ export const NewUser: React.FC = () => {
       nombres: data.firstName,
       nucleo_familiar: "Nuclear" as UserFamilyType,
       proteccion_exequial: false,
-      telefono: data.phone,
+      telefono: null, // Enviar null en lugar de data.phone
       is_deleted: false,
       profesion: data.occupation ?? "",
       tipo_usuario: data.userType ?? "Nuevo",
+      visitas_domiciliarias: data.homeVisit,
     };
 
     const photoFile = data.photo?.fileList?.[0]?.originFileObj;
@@ -156,6 +179,52 @@ export const NewUser: React.FC = () => {
       return;
     }
     editUser({ user, id: userId, photoFile });
+  };
+
+  // Funciones para importación/exportación
+  const handleExportTemplate = () => {
+    exportTemplate();
+    message.success("Descargando plantilla Excel...");
+  };
+
+  const handleImportModalOpen = () => {
+    setImportModalVisible(true);
+    setImportResults(null);
+    setSelectedFile(null);
+  };
+
+  const handleImportModalClose = () => {
+    setImportModalVisible(false);
+    setImportResults(null);
+    setSelectedFile(null);
+  };
+
+  const handleFileSelect = (file: File) => {
+    if (!file.name.endsWith(".xlsx")) {
+      message.error("Solo se permiten archivos Excel (.xlsx)");
+      return false;
+    }
+    setSelectedFile(file);
+    return false; // No subir automáticamente
+  };
+
+  const handleImportUsers = () => {
+    if (!selectedFile) {
+      message.error("Por favor seleccione un archivo Excel");
+      return;
+    }
+
+    importUsers(selectedFile, {
+      onSuccess: (response) => {
+        setImportResults(response.data.data);
+        message.success(response.data.message);
+      },
+      onError: (error: any) => {
+        message.error(
+          error.response?.data?.detail || "Error al importar usuarios",
+        );
+      },
+    });
   };
 
   useEffect(() => {
@@ -172,11 +241,9 @@ export const NewUser: React.FC = () => {
       userId: `${userData.id_usuario}`,
       maritalStatus: userData.estado_civil as CivilStatus,
       gender: userData.genero as Gender,
-      email: userData.email ?? "",
-      phone: userData.telefono ?? "",
-      address: userData.direccion ?? "",
       occupation: userData.profesion ?? "",
       userType: (userData.tipo_usuario as "Nuevo" | "Recurrente") ?? "Nuevo",
+      homeVisit: userData.visitas_domiciliarias ?? false,
     };
 
     reset(resetValues);
@@ -202,9 +269,51 @@ export const NewUser: React.FC = () => {
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
-      navigate("/usuarios");
+      // Redirigir según el valor del switch "Visita Domiciliaria"
+      if (homeVisitValue) {
+        // Si el switch está ON, redirigir a la visita existente o crear nueva
+        if (isSuccessCreateUser) {
+          // Para usuarios nuevos, verificar si ya se creó una visita automáticamente
+          const responseData = createUserResponse?.data?.data as any;
+          const userId = responseData?.user?.id_usuario;
+          const homeVisitId = responseData?.home_visit?.id_visitadomiciliaria;
+
+          if (userId) {
+            if (homeVisitId) {
+              // Si ya se creó una visita automáticamente, redirigir a editarla
+              navigate(
+                `/visitas-domiciliarias/usuarios/${userId}/editar-visita/${homeVisitId}`,
+              );
+            } else {
+              // Si no se creó automáticamente, redirigir a crear nueva
+              navigate(
+                `/visitas-domiciliarias/usuarios/${userId}/nueva-visita`,
+              );
+            }
+          } else {
+            navigate("/visitas-domiciliarias/usuarios");
+          }
+        } else if (isSuccessEditUser && data?.data.data?.id_usuario) {
+          // Para edición, usar el ID del usuario existente
+          const userId = data.data.data.id_usuario;
+          navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+        } else {
+          // Fallback: redirigir a la lista de usuarios con visitas domiciliarias
+          navigate("/visitas-domiciliarias/usuarios");
+        }
+      } else {
+        // Si el switch está OFF, redirigir al módulo de usuarios regular
+        navigate("/usuarios");
+      }
     }
-  }, [isSuccessCreateUser, isSuccessEditUser, navigate]);
+  }, [
+    isSuccessCreateUser,
+    isSuccessEditUser,
+    navigate,
+    homeVisitValue,
+    createUserResponse,
+    data?.data.data?.id_usuario,
+  ]);
 
   if (isLoading) {
     return (
@@ -235,6 +344,42 @@ export const NewUser: React.FC = () => {
         ]}
         style={{ margin: "16px 0" }}
       />
+
+      {/* Botones de importación/exportación - Solo mostrar si no es edición */}
+      {!userId && (
+        <Card
+          title="Importación Masiva de Usuarios"
+          style={{ marginBottom: "16px" }}
+          extra={
+            <Space>
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={handleExportTemplate}
+                loading={isExportingTemplate}
+                type="primary"
+              >
+                Descargar Plantilla
+              </Button>
+              <Button
+                icon={<ImportOutlined />}
+                onClick={handleImportModalOpen}
+                type="default"
+              >
+                Importar Usuarios
+              </Button>
+            </Space>
+          }
+        >
+          <Alert
+            message="Importación Masiva"
+            description="Esta funcionalidad permite crear múltiples usuarios para asistencia a la fundación desde un archivo Excel. Solo se crearán usuarios que NO estén relacionados con visitas domiciliarias."
+            type="info"
+            showIcon
+            style={{ marginBottom: "16px" }}
+          />
+        </Card>
+      )}
+
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
         <Row gutter={[16, 16]}>
           <Col span={24}>
@@ -473,71 +618,27 @@ export const NewUser: React.FC = () => {
                     />
                   </Form.Item>
                 </Col>
-              </Row>
-            </Card>
-          </Col>
-          <Col span={24}>
-            <Card
-              title="Datos de localización"
-              bordered={false}
-              style={{ marginTop: "16px" }}
-            >
-              <Row gutter={24}>
-                <Col span={24}>
+                <Col span={8}>
                   <Form.Item
-                    label="Dirección"
-                    validateStatus={errors.address ? "error" : ""}
+                    label="Visita Domiciliaria"
+                    validateStatus={errors.homeVisit ? "error" : ""}
                     help={
-                      errors.address?.message && (
-                        <Text type="danger">{errors.address.message}</Text>
+                      errors.homeVisit?.message && (
+                        <Text type="danger">{errors.homeVisit.message}</Text>
                       )
                     }
                   >
                     <Controller
-                      name="address"
+                      name="homeVisit"
                       control={control}
                       render={({ field }) => (
-                        <Input {...field} placeholder="Dirección" />
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={24}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Teléfono"
-                    validateStatus={errors.phone ? "error" : ""}
-                    help={
-                      errors.phone?.message && (
-                        <Text type="danger">{errors.phone.message}</Text>
-                      )
-                    }
-                  >
-                    <Controller
-                      name="phone"
-                      control={control}
-                      render={({ field }) => (
-                        <Input {...field} placeholder="Teléfono" />
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Email"
-                    validateStatus={errors.email ? "error" : ""}
-                    help={
-                      errors.email?.message && (
-                        <Text type="danger">{errors.email.message}</Text>
-                      )
-                    }
-                  >
-                    <Controller
-                      name="email"
-                      control={control}
-                      render={({ field }) => (
-                        <Input {...field} placeholder="Correo electrónico" />
+                        <Switch
+                          {...field}
+                          checked={field.value}
+                          onChange={field.onChange}
+                          checkedChildren="Sí"
+                          unCheckedChildren="No"
+                        />
                       )}
                     />
                   </Form.Item>
@@ -568,6 +669,85 @@ export const NewUser: React.FC = () => {
           </Col>
         </Row>
       </Form>
+
+      {/* Modal de Importación Masiva */}
+      <Modal
+        title="Importar Usuarios desde Excel"
+        open={importModalVisible}
+        onCancel={handleImportModalClose}
+        footer={[
+          <Button key="cancel" onClick={handleImportModalClose}>
+            Cancelar
+          </Button>,
+          <Button
+            key="import"
+            type="primary"
+            onClick={handleImportUsers}
+            loading={isImportingUsers}
+            disabled={!selectedFile}
+          >
+            Importar Usuarios
+          </Button>,
+        ]}
+        width={800}
+      >
+        <Space direction="vertical" style={{ width: "100%" }} size="large">
+          <Alert
+            message="Instrucciones"
+            description="Suba un archivo Excel (.xlsx) con los datos de los usuarios. El archivo debe contener las columnas: Tipo de usuario, N° Documento, Nombres, Apellidos, Género, Fecha de nacimiento, Estado civil, Ocupación."
+            type="info"
+            showIcon
+          />
+
+          <Upload
+            accept=".xlsx"
+            beforeUpload={handleFileSelect}
+            showUploadList={false}
+            maxCount={1}
+          >
+            <Button icon={<UploadOutlined />}>Seleccionar Archivo Excel</Button>
+          </Upload>
+
+          {importResults && (
+            <div>
+              <Divider>Resultados de la Importación</Divider>
+
+              <Alert
+                message={`Procesados: ${importResults.total_processed} | Exitosos: ${importResults.total_success} | Errores: ${importResults.total_errors}`}
+                type={importResults.total_errors === 0 ? "success" : "warning"}
+                showIcon
+                style={{ marginBottom: "16px" }}
+              />
+
+              {importResults.success.length > 0 && (
+                <div style={{ marginBottom: "16px" }}>
+                  <h4>Usuarios Creados Exitosamente:</h4>
+                  <ul>
+                    {importResults.success.map((item: any, index: number) => (
+                      <li key={index}>
+                        Fila {item.row}: {item.nombre} (ID: {item.user_id})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {importResults.errors.length > 0 && (
+                <div>
+                  <h4>Errores Encontrados:</h4>
+                  <ul>
+                    {importResults.errors.map((item: any, index: number) => (
+                      <li key={index} style={{ color: "red" }}>
+                        Fila {item.row}: {item.error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </Space>
+      </Modal>
     </>
   );
 };

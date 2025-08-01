@@ -9,6 +9,6 @@ export const useGetUserFamilyMembers = (id?: number | string) => {
     enabled: !!id,
     queryFn: () => getUserFamilyMembers(id),
     queryKey: [`get-user-${id}-family-members`],
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 0, // Cambiar a 0 para que siempre se actualice cuando se invalide
   });
 };

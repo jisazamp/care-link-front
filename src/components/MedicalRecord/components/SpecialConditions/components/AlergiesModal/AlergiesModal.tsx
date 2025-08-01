@@ -54,7 +54,7 @@ export const AlergiesModal = ({
   return (
     <Modal
       open={!!open}
-      title={editingIndex !== null ? "Editar alergias" : "Agregar alergias"}
+      title={editingIndex !== null ? "Editar alergia a medicamento" : "Agregar alergia a medicamento"}
       onCancel={onCancel}
       footer={[
         <Button key="cancel" className="main-button-white" onClick={onCancel}>

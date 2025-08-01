@@ -1,4 +1,4 @@
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import {
   Breadcrumb,
   Button,
@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDeleteActivity } from "../../hooks/useDeleteActivity/useDeleteActivity";
 import { useGetActivities } from "../../hooks/useGetActivities/useGetActivities";
+import { ActivityUsersModal } from "../ActivityUsersModal/ActivityUsersModal";
 import type { Activity } from "../../types";
 
 const { Title, Text } = Typography;
@@ -25,6 +26,10 @@ export const ActivitiesList = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
     null,
   );
+  const [usersModalVisible, setUsersModalVisible] = useState(false);
+  const [selectedActivityForUsers, setSelectedActivityForUsers] = useState<
+    number | null
+  >(null);
 
   const showModal = (activity: Activity) => {
     setSelectedActivity(activity);
@@ -34,6 +39,16 @@ export const ActivitiesList = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setSelectedActivity(null);
+  };
+
+  const showUsersModal = (activityId: number) => {
+    setSelectedActivityForUsers(activityId);
+    setUsersModalVisible(true);
+  };
+
+  const handleUsersModalClose = () => {
+    setUsersModalVisible(false);
+    setSelectedActivityForUsers(null);
   };
 
   const showDeleteConfirm = (activity: Activity) => {
@@ -89,6 +104,15 @@ export const ActivitiesList = () => {
                 >
                   Detalles
                 </Button>,
+                <Button
+                  key={`users/${item.id}`}
+                  type="link"
+                  className="main-button-link"
+                  icon={<TeamOutlined />}
+                  onClick={() => showUsersModal(item.id)}
+                >
+                  Usuarios
+                </Button>,
                 <Link
                   key={`link/${item.id}`}
                   to={`/actividades/${item.id}/editar`}
@@ -109,7 +133,15 @@ export const ActivitiesList = () => {
             >
               <List.Item.Meta
                 title={<Text strong>{item.nombre}</Text>}
-                description={item.descripcion}
+                description={
+                  <div>
+                    <Text>{item.descripcion}</Text>
+                    <br />
+                    <Text type="secondary">
+                      Fecha: {item.fecha} | Duración: {item.duracion} min
+                    </Text>
+                  </div>
+                }
               />
             </List.Item>
           )}
@@ -164,6 +196,15 @@ export const ActivitiesList = () => {
           </Descriptions>
         )}
       </Modal>
+
+      {/* Modal para gestionar usuarios de la actividad */}
+      {selectedActivityForUsers && (
+        <ActivityUsersModal
+          visible={usersModalVisible}
+          activityId={selectedActivityForUsers}
+          onClose={handleUsersModalClose}
+        />
+      )}
     </>
   );
 };

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Card, Steps, Button, Typography, Space, Alert, Progress } from "antd";
+import { Alert, Button, Card, Progress, Space, Steps, Typography } from "antd";
+import type React from "react";
+import { useState } from "react";
 import { MMSEQuestions } from "./MMSEQuestions";
 import { mmseCriteria } from "./mmseCriteria";
 
@@ -24,20 +25,25 @@ export const MMSETest: React.FC = () => {
     let totalScore = 0;
     let maxScore = 0;
 
-    mmseCriteria.forEach((criterion: { key: string; points: number; correct: (answer: string) => boolean | number }) => {
-      const answer = answers[criterion.key];
-      const result = criterion.correct(answer);
-      
-      if (typeof result === "number") {
-        totalScore += result;
-      } else if (result === true) {
-        totalScore += criterion.points;
-      }
-      
-      maxScore += criterion.points;
-    });
+    mmseCriteria.forEach(
+      (criterion: {
+        key: string;
+        points: number;
+        correct: (answer: string) => boolean | number;
+      }) => {
+        const answer = answers[criterion.key];
+        const result = criterion.correct(answer);
 
-    const percentage = (totalScore / maxScore) * 100;
+        if (typeof result === "number") {
+          totalScore += result;
+        } else if (result === true) {
+          totalScore += criterion.points;
+        }
+
+        maxScore += criterion.points;
+      },
+    );
+
     setScore(totalScore);
 
     // Interpretación según el puntaje
@@ -86,7 +92,7 @@ export const MMSETest: React.FC = () => {
             <Progress
               type="circle"
               percent={score ? (score / 30) * 100 : 0}
-              format={(percent) => `${score}/30`}
+              format={() => `${score}/30`}
             />
             <Alert
               message="Interpretación"
@@ -106,7 +112,9 @@ export const MMSETest: React.FC = () => {
 
   return (
     <Card>
-      <Title level={3} style={{ marginBottom: 16 }}>Mini-Mental State Examination (MMSE)</Title>
+      <Title level={3} style={{ marginBottom: 16 }}>
+        Mini-Mental State Examination (MMSE)
+      </Title>
       <Steps current={currentStep} style={{ marginBottom: 24 }}>
         <Step title="Preguntas" description="Responda las preguntas" />
         <Step title="Revisión" description="Revise sus respuestas" />
@@ -115,4 +123,4 @@ export const MMSETest: React.FC = () => {
       <div style={{ marginTop: 24 }}>{renderStepContent()}</div>
     </Card>
   );
-}; 
+};

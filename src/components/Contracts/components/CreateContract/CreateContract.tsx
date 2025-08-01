@@ -1,7 +1,8 @@
 import { FileDoneOutlined } from "@ant-design/icons";
 import { Button, Card, DatePicker, Form, Layout, Select } from "antd";
 import type { Dayjs } from "dayjs";
-import { useEffect } from "react";
+import dayjs from "dayjs";
+import { useEffect, useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import type { FormValues } from "../FormContracts";
 
@@ -25,6 +26,10 @@ export const CreateContract = ({
   const contractType = methods.watch("contractType");
   const billed = methods.watch("billed");
 
+  // Usar useRef para mantener referencias estables
+  const methodsRef = useRef(methods);
+  methodsRef.current = methods;
+
   const handleNext = () => {
     if (startDate && endDate && contractType && billed) {
       const contractData: ContractData = {
@@ -37,11 +42,21 @@ export const CreateContract = ({
     }
   };
 
+  // useEffect optimizado para sugerir fecha fin solo si el usuario no la ha cambiado
   useEffect(() => {
-    if (startDate) {
-      methods.setValue("endDate", startDate.add(1, "month"));
+    if (startDate?.isValid()) {
+      const newEndDate = startDate.add(1, "month");
+      const currentEndDate = methods.getValues("endDate");
+      // Solo sugerir si el usuario no ha cambiado la fecha
+      if (
+        !currentEndDate ||
+        currentEndDate.isSame(startDate, "day") ||
+        currentEndDate.isBefore(startDate, "day")
+      ) {
+        methods.setValue("endDate", newEndDate);
+      }
     }
-  }, [startDate, methods.setValue]);
+  }, [startDate, methods]);
 
   return (
     <Layout style={{ padding: "24px", minHeight: "100vh" }}>
@@ -77,12 +92,40 @@ export const CreateContract = ({
               control={methods.control}
               name="startDate"
               render={({ field }) => (
-                <DatePicker {...field} style={{ width: "100%" }} />
+                <DatePicker
+                  {...field}
+                  style={{ width: "100%" }}
+                  disabledDate={(current) => {
+                    return current && current < dayjs().startOf("day");
+                  }}
+                />
               )}
             />
           </Form.Item>
 
-          <Form.Item label="Fecha de finalización">
+          <Form.Item
+            label="Fecha de finalización"
+            name="endDate"
+            rules={[
+              {
+                required: true,
+                message: "Seleccione la fecha de finalización",
+              },
+              {
+                validator(_, value) {
+                  const start = methods.getValues("startDate");
+                  if (!value || !start || value.isSameOrAfter(start, "day")) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error(
+                      "La fecha de finalización debe ser igual o posterior a la de inicio",
+                    ),
+                  );
+                },
+              },
+            ]}
+          >
             <Controller
               control={methods.control}
               name="endDate"
@@ -90,8 +133,12 @@ export const CreateContract = ({
                 <DatePicker
                   {...field}
                   style={{ width: "100%" }}
-                  disabled
-                  inputReadOnly
+                  disabledDate={(current) => {
+                    const start = methods.getValues("startDate");
+                    if (!current) return false;
+                    if (!start) return false;
+                    return current.isBefore(start, "day");
+                  }}
                 />
               )}
             />
