@@ -598,6 +598,7 @@ export const CardAsistControl = () => {
               onChange={handleObservacionesChange}
             />
           </Form.Item>
+
           {showFecha && (
             <Form.Item
               label="Nueva fecha"

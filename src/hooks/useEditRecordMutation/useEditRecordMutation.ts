@@ -15,19 +15,57 @@ type EditMedicalRecordType = {
   cares: UserCare[];
   interventions: UserIntervention[];
   vaccines: UserVaccine[];
+  attachments?: File[];
 };
 
 const editRecord = ({
   id,
   recordId,
   record,
+  attachments,
 }: {
   id: number;
   recordId: number;
   record: Partial<EditMedicalRecordType>;
+  attachments?: File[];
 }) => {
   record.vaccines = [];
-  return client.patch(`/api/users/${id}/medical_record/${recordId}`, record);
+
+  // Crear FormData para enviar archivos adjuntos
+  const formData = new FormData();
+  formData.append("record", JSON.stringify(record.record));
+  formData.append("medicines", JSON.stringify(record.medicines));
+  formData.append("cares", JSON.stringify(record.cares));
+  formData.append("interventions", JSON.stringify(record.interventions));
+  formData.append("vaccines", JSON.stringify(record.vaccines));
+
+  if (attachments) {
+    attachments.forEach((file) => {
+      formData.append("attachments", file);
+    });
+  }
+
+  return client.patch(`/api/users/${id}/medical_record/${recordId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+// Simplified edit function for home visit medical records
+const editSimplifiedRecord = ({
+  id,
+  recordId,
+  record,
+}: {
+  id: number;
+  recordId: number;
+  record: Partial<MedicalRecord>;
+}) => {
+  return client.patch(
+    `/api/users/${id}/medical_record/${recordId}/simplified`,
+    record,
+  );
 };
 
 // Simplified edit function for home visit medical records

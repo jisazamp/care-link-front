@@ -1,28 +1,27 @@
-import { DownloadOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
 import {
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Divider,
   Form,
   Input,
   InputNumber,
-  Row,
-  Select,
-  Space,
+  DatePicker,
+  Button,
   Typography,
+  Row,
+  Col,
+  Divider,
+  Card,
+  Select,
   message,
+  Space,
 } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useDownloadPDF } from "../../hooks/useDownloadPDF";
+import type { Bill } from "../../types";
+import { PaymentsForm } from "./components/PaymentsForm";
 import { useGetBillPaymentsTotal } from "../../hooks/useGetBillPayments/useGetBillPayments";
 import { useGetBillPayments } from "../../hooks/useGetBillPayments/useGetBillPayments";
-import type { Bill } from "../../types";
 import { formatCurrency } from "../../utils/paymentUtils";
-import { PaymentsForm } from "./components/PaymentsForm";
+import { useDownloadPDF } from "../../hooks/useDownloadPDF";
 
 interface BillingFormProps {
   initialValues?: Partial<Bill>;
@@ -84,7 +83,7 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       const descuentos = Number(initialValues.descuentos) || 0;
       setTotal(subtotal + impuestos - descuentos);
       // Procesar pagos consolidados del backend
-      const pagosBackend = (pagosConsolidados || []).map((pago: any) => ({
+      let pagosBackend = (pagosConsolidados || []).map((pago: any) => ({
         ...pago,
         fecha_pago: pago.fecha_pago || "",
         saved: true, // Marcar como consolidados
@@ -168,9 +167,13 @@ export const BillingForm: React.FC<BillingFormProps> = ({
       pagos: payments,
     };
 
+    console.log("🚀 Actualizando factura...");
+    console.log(" Estado actual de pagos:", payments);
+
     try {
       // Solo actualizar la factura - los pagos se registran individualmente
       await onSubmit(payload);
+      console.log(" Factura actualizada exitosamente");
       message.success("Factura actualizada correctamente");
     } catch (error) {
       console.error(" Error al actualizar la factura:", error);

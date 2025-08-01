@@ -753,7 +753,16 @@ body {
 
 .highlighted-patient-row {
   animation: highlightPulse 2s ease-in-out;
+<<<<<<< HEAD
   background: linear-gradient(90deg, #fff3cd 0%, #ffeaa7 50%, #fff3cd 100%) !important;
+=======
+  background: linear-gradient(
+    90deg,
+    #fff3cd 0%,
+    #ffeaa7 50%,
+    #fff3cd 100%
+  ) !important;
+>>>>>>> UltimaRamaFrontend
   border: 2px solid #f39c12 !important;
   box-shadow: 0 0 10px rgba(243, 156, 18, 0.3) !important;
 }
@@ -776,3 +785,408 @@ body {
     transform: scale(1);
   }
 }
+<<<<<<< HEAD
+=======
+
+/* Estilos responsive para el módulo de transporte */
+
+/* Contenedor principal */
+.transporte-container {
+  min-height: 100vh;
+}
+
+/* Header responsive */
+.transporte-header {
+  margin-bottom: 24px;
+}
+
+.transporte-header-mobile {
+  margin-bottom: 16px;
+}
+
+/* Títulos responsive */
+.transporte-title {
+  margin: 0;
+}
+
+.transporte-title-mobile {
+  font-size: 18px !important;
+  line-height: 1.4;
+}
+
+.transporte-subtitle {
+  margin-top: 4px;
+}
+
+/* Tags de alertas responsive */
+.transporte-alerts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.transporte-alerts-mobile {
+  gap: 4px;
+  justify-content: center;
+}
+
+.transporte-alert-tag {
+  border-radius: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.transporte-alert-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Botones responsive */
+.transporte-action-button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.transporte-action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.transporte-action-button-mobile {
+  height: 32px;
+  font-size: 12px;
+}
+
+/* Tabla responsive */
+.transporte-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.transporte-table .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+}
+
+.transporte-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 16px;
+}
+
+.transporte-table .ant-table-tbody > tr:hover > td {
+  background-color: #f6f8ff;
+}
+
+/* Filas con alertas */
+.transporte-alert-row {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.transporte-alert-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 0 2px 2px 0;
+}
+
+.transporte-alert-row.urgent::before {
+  background-color: #ff4d4f;
+}
+
+.transporte-alert-row.attention::before {
+  background-color: #faad14;
+}
+
+.transporte-alert-row.upcoming::before {
+  background-color: #1890ff;
+}
+
+/* Cards responsive */
+.transporte-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.transporte-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.transporte-card-mobile {
+  margin-bottom: 12px;
+  border-radius: 8px;
+}
+
+/* Sistema de alertas */
+.transporte-alert-system {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.transporte-alert-system-mobile {
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.transporte-alert-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.transporte-alert-legend-mobile {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transporte-alert-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transporte-alert-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Loading states */
+.transporte-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.transporte-loading-mobile {
+  padding: 20px;
+}
+
+/* Empty states */
+.transporte-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #8c8c8c;
+}
+
+.transporte-empty-mobile {
+  padding: 20px;
+}
+
+.transporte-empty-icon {
+  font-size: 48px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.transporte-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.transporte-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Media queries para diferentes tamaños de pantalla */
+@media (max-width: 576px) {
+  .transporte-container {
+    padding: 8px;
+  }
+
+  .transporte-header {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+
+  .transporte-title {
+    font-size: 18px !important;
+  }
+
+  .transporte-alerts {
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .transporte-alert-tag {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .transporte-container {
+    padding: 12px;
+  }
+
+  .transporte-header {
+    padding: 16px 20px;
+  }
+
+  .transporte-alerts {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 992px) {
+  .transporte-container {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 993px) {
+  .transporte-container {
+    padding: 24px;
+  }
+}
+
+/* Estilos específicos para tablets */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .transporte-table {
+    font-size: 14px;
+  }
+}
+
+/* Estilos para pantallas muy grandes */
+@media (min-width: 1200px) {
+  .transporte-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* Estilos para orientación landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+  .transporte-header {
+    padding: 8px 16px;
+  }
+
+  .transporte-title {
+    font-size: 16px !important;
+  }
+}
+
+/* Estilos para dispositivos con pantalla táctil */
+@media (hover: none) and (pointer: coarse) {
+  .transporte-action-button {
+    min-height: 44px;
+    padding: 8px 16px;
+  }
+}
+
+/* Estilos para modo oscuro (si se implementa en el futuro) */
+@media (prefers-color-scheme: dark) {
+  .transporte-container {
+    background-color: #141414;
+  }
+
+  .transporte-card,
+  .transporte-alert-system {
+    background-color: #1f1f1f;
+    color: #ffffff;
+  }
+}
+
+/* Estilos para filas clickeables en la tabla de transporte */
+.transporte-table-clickable .ant-table-tbody > tr {
+  transition: all 0.3s ease;
+}
+
+.transporte-table-clickable .ant-table-tbody > tr:hover {
+  background-color: #f6f8ff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transporte-table-clickable .ant-table-tbody > tr:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal de detalles responsive */
+.transporte-detail-modal .ant-modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.transporte-detail-modal .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.transporte-detail-modal .ant-card-head {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.transporte-detail-modal .ant-card-head-title {
+  color: white;
+  font-weight: 600;
+}
+
+/* Responsive para el modal */
+@media (max-width: 768px) {
+  .transporte-detail-modal .ant-modal {
+    width: 95% !important;
+    margin: 10px;
+  }
+
+  .transporte-detail-modal .ant-modal-body {
+    padding: 12px;
+  }
+
+  .transporte-detail-modal .ant-card {
+    margin-bottom: 12px;
+  }
+
+  .transporte-detail-modal .ant-space {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .transporte-detail-modal .ant-btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+>>>>>>> UltimaRamaFrontend

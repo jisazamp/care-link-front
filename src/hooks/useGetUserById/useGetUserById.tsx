@@ -10,6 +10,6 @@ export const useGetUserById = (id: string | undefined) => {
     queryKey: [`get-user-${id}`, id],
     queryFn: () => getUser(id),
     enabled: !!id,
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 0, // Permitir actualizaciones inmediatas
   });
 };

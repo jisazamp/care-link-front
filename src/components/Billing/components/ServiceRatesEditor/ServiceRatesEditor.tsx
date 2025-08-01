@@ -9,9 +9,9 @@ import {
   Typography,
   Divider,
 } from "antd";
+import { SaveOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useGetServiceRates } from "../../../../hooks/useGetServiceRates/useGetServiceRates";
 import { useUpdateServiceRates } from "../../../../hooks/useUpdateServiceRates/useUpdateServiceRates";
-import { ReloadOutlined, SaveOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 

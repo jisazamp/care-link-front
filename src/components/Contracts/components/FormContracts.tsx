@@ -16,7 +16,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateBill } from "../../../hooks/useCreateBill";
@@ -27,13 +27,13 @@ import { useGetContractBill } from "../../../hooks/useGetContractBill";
 import { useGetContractById } from "../../../hooks/useGetContractById/useGetContractById";
 import { useGetPaymentMethods } from "../../../hooks/useGetPaymentMethods";
 import { useUpdateContract } from "../../../hooks/useUpdateContract/useUpdateContract";
+import type { PaymentFormData } from "../../../utils/paymentUtils";
 import type {
   CreateContractRequest,
   Payment,
   UpdateContractRequest,
 } from "../../../types";
 import { handleContractError } from "../../../utils/errorHandler";
-import type { PaymentFormData } from "../../../utils/paymentUtils";
 import { AgendaSettingsContract } from "./AgendaSettingContract/AgendaSettingContract";
 import { BillingContract } from "./BillingContract/BillingContract";
 import { CreateContract } from "./CreateContract/CreateContract";
@@ -175,7 +175,7 @@ export const FormContracts = () => {
   );
 
   useEffect(() => {
-    if (startDate?.isValid()) {
+    if (startDate && startDate.isValid()) {
       updateServicesWithStartDate(startDate);
     }
   }, [startDate, updateServicesWithStartDate]);

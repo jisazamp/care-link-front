@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { client } from "../../api/client";
 import { useAuthStore } from "../../store/auth";
+import { client } from "../../api/client";
 
 interface UseDownloadPDFReturn {
   downloadPDF: (facturaId: number) => Promise<void>;
@@ -57,14 +57,13 @@ export const useDownloadPDF = (): UseDownloadPDFReturn => {
         throw new Error(
           "Sesión expirada. Por favor, inicie sesión nuevamente.",
         );
-      }
-      if (error.response?.status === 404) {
+      } else if (error.response?.status === 404) {
         throw new Error("Factura no encontrada");
-      }
-      if (error.response?.status === 500) {
+      } else if (error.response?.status === 500) {
         throw new Error("Error del servidor al generar el PDF");
+      } else {
+        throw new Error(error.message || "Error inesperado al descargar PDF");
       }
-      throw new Error(error.message || "Error inesperado al descargar PDF");
     } finally {
       setIsDownloading(false);
     }

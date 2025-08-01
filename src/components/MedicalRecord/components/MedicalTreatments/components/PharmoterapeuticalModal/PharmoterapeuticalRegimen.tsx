@@ -77,7 +77,7 @@ export const PharmoterapeuticModal = ({
     <Modal
       open={!!open}
       title={
-        editingIndex !== null ? "Editar tratamiento" : "Agregar tratamiento"
+        editingIndex !== null ? "Editar medicamento" : "Agregar medicamento"
       }
       onCancel={onCancel}
       footer={[

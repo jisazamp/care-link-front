@@ -75,7 +75,7 @@ export const PhysioterapeuticModal = ({
     <Modal
       open={!!open}
       title={
-        editingIndex !== null ? "Editar tratamiento" : "Agregar tratamiento"
+        editingIndex !== null ? "Editar intervención fisioterapéutica" : "Agregar intervención fisioterapéutica"
       }
       onCancel={onCancel}
       footer={[

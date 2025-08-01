@@ -28,9 +28,8 @@ import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/use
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
+import { queryClient } from "../../main";
 import type { HomeVisit } from "../../types";
-
-import type { FamilyMember } from "../../types";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -69,7 +68,7 @@ export const UserHomeVisitDetails: React.FC = () => {
     return () => clearInterval(interval);
   }, [userId, refetchHomeVisits]);
 
-  const acudientesColumns: ColumnsType<FamilyMember> = [
+  const acudientesColumns: ColumnsType<any> = [
     {
       title: "Nombres",
       dataIndex: "nombres",
@@ -141,6 +140,12 @@ export const UserHomeVisitDetails: React.FC = () => {
       onOk() {
         if (memberId) {
           deleteFamilyMember(memberId);
+          // Invalidar manualmente las consultas para asegurar actualización
+          queryClient.invalidateQueries({
+            queryKey: [`get-user-${userId}-family-members`],
+          });
+          // Invalidar también la query del usuario para actualizar los datos de localización
+          queryClient.invalidateQueries({ queryKey: [`get-user-${userId}`] });
         }
       },
     });
