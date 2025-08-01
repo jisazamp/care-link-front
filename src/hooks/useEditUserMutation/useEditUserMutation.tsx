@@ -7,16 +7,18 @@ const editUser = ({
   id,
   photoFile,
   user,
+  hasEditedPhoto,
 }: {
   id: number | string;
   photoFile?: File;
   user: Partial<User>;
+  hasEditedPhoto: boolean;
 }) => {
   const formData = new FormData();
 
   formData.append("user", JSON.stringify(user));
 
-  if (photoFile) {
+  if (photoFile && hasEditedPhoto) {
     formData.append("photo", photoFile);
   }
 
