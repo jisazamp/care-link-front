@@ -15,6 +15,7 @@ import {
   Upload,
   Collapse,
   message,
+  Table,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -39,7 +40,6 @@ import { BiophysicalSkills } from "./components/BiophysicalSkills/BiophysicalSki
 import { EntryData } from "./components/EntryData/EntryData";
 import { MedicalServices } from "./components/MedicalServices/MedicalServices";
 import { MedicalTreatments } from "./components/MedicalTreatments/MedicalTreatments";
-import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
 import { SocialPerception } from "./components/SocialPerception/SocialPerception";
 import { SpecialConditions } from "./components/SpecialConditions/SpecialConditions";
 import { Toxicology } from "./components/Toxicology/Toxicology";
@@ -51,6 +51,7 @@ import {
   type PhysioRegimen,
   formSchema,
 } from "./schema/schema";
+import { PhysicalExploration } from "./components/PhysicalExploration/PhysicalExploration";
 //import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 
 const { Title } = Typography;
@@ -282,6 +283,7 @@ export const MedicalRecord: React.FC = () => {
             cares,
             interventions,
           },
+          attachments: data.attachedDocuments,
         },
         {
           onSuccess: () => {
@@ -634,6 +636,69 @@ export const MedicalRecord: React.FC = () => {
               </Card>
             </Col>
           </Row>
+
+          {/* Nueva card para mostrar documentos adjuntos */}
+          {userMedicalRecord?.data.data?.url_hc_adjunto && (
+            <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+              <Col span={24}>
+                <Card
+                  bordered
+                  title={
+                    <Title level={4} style={{ margin: 0 }}>
+                      Documentos Adjuntos
+                    </Title>
+                  }
+                >
+                  <Table
+                    dataSource={[
+                      {
+                        key: "1",
+                        nombre: "Documento adjunto",
+                        url: userMedicalRecord.data.data.url_hc_adjunto,
+                        fecha: userMedicalRecord.data.data.fecha_ingreso,
+                      },
+                    ]}
+                    columns={[
+                      {
+                        title: "Nombre del documento",
+                        dataIndex: "nombre",
+                        key: "nombre",
+                        width: "40%",
+                      },
+                      {
+                        title: "Fecha de ingreso",
+                        dataIndex: "fecha",
+                        key: "fecha",
+                        width: "30%",
+                        render: (fecha) =>
+                          new Date(fecha).toLocaleDateString("es-ES"),
+                      },
+                      {
+                        title: "Acciones",
+                        key: "acciones",
+                        width: "30%",
+                        render: (_, record) => (
+                          <Button
+                            type="link"
+                            onClick={() => window.open(record.url, "_blank")}
+                            style={{
+                              color: "#9957C2",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            Ver documento
+                          </Button>
+                        ),
+                      },
+                    ]}
+                    pagination={false}
+                    size="small"
+                  />
+                </Card>
+              </Col>
+            </Row>
+          )}
+
           <Row gutter={[16, 16]} justify="end" style={{ marginTop: 20 }}>
             <Col>
               <Button

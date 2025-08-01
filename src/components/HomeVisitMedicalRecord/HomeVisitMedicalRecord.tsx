@@ -42,6 +42,7 @@ const homeVisitFormSchema = z.object({
   fecha_visita: z.any(),
   motivo_consulta: z.string().min(1, "El motivo de consulta es requerido"),
   profesional: z.number().min(1, "El profesional es requerido"),
+
   // Habilidades biofísicas
   tipo_alimentacion: z.string().min(1, "El tipo de alimentación es requerido"),
   tipo_sueno: z.string().min(1, "El tipo de sueño es requerido"),
@@ -375,6 +376,7 @@ export const HomeVisitMedicalRecord: React.FC = () => {
               </Col>
             </Row>
           </Card>
+
           <Card>
             <Collapse
               activeKey={activePanel}

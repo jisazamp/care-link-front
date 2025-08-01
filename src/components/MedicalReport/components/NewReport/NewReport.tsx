@@ -9,15 +9,16 @@ import {
   Row,
   Select,
   Upload,
+  Table,
 } from "antd";
-import { useWatch } from "antd/es/form/Form";
 import type { Dayjs } from "dayjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCreateMedicalReport } from "../../../../hooks/useCreateMedicalReport/useCreateMedicalReport";
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
 import { useGetUserMedicalRecord } from "../../../../hooks/useGetUserMedicalRecord/useGetUserMedicalRecord";
 import type { MedicalReport } from "../../../../types";
+import { useWatch } from "antd/es/form/Form";
 
 export const NewReport: React.FC = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export const NewReport: React.FC = () => {
 
   const [form] = Form.useForm();
   const reportType = useWatch("reportType", form);
+  const [attachments, setAttachments] = useState<any[]>([]);
 
   const createMutation = useCreateMedicalReport(id);
   const medicalRecordQuery = useGetUserMedicalRecord(id);
@@ -46,7 +48,7 @@ export const NewReport: React.FC = () => {
       id_historiaclinica: Number(
         medicalRecordQuery.data?.data.data?.id_historiaclinica,
       ),
-      Obs_habitosalimenticios: values.treatmentObservation,
+      recomendaciones: values.treatmentObservation,
       diagnosticos: values.diagnosis,
       fecha_registro: values.registrationDate.format("YYYY-MM-DD"),
       id_profesional: values.professional,
@@ -57,7 +59,7 @@ export const NewReport: React.FC = () => {
       remision: values.referral,
       tipo_reporte: values.reportType,
     };
-    await createMutation.mutateAsync({ data: medicalReport });
+    await createMutation.mutateAsync({ data: medicalReport, attachments });
   };
 
   useEffect(() => {
@@ -65,6 +67,12 @@ export const NewReport: React.FC = () => {
       navigate(`/usuarios/${id}/detalles`);
     }
   }, [createMutation.isSuccess, id, navigate]);
+
+  const handleFileUpload = (info: any) => {
+    if (info.file.status === "done") {
+      setAttachments((prev) => [...prev, info.file]);
+    }
+  };
 
   return (
     <>
@@ -184,10 +192,61 @@ export const NewReport: React.FC = () => {
           </Card>
 
           <Card title="Adjuntar documentos" style={{ marginBottom: 16 }}>
-            <Upload>
+            <Upload
+              onChange={handleFileUpload}
+              beforeUpload={() => false}
+              multiple
+            >
               <Button icon={<UploadOutlined />}>Agregar</Button>
             </Upload>
           </Card>
+
+          {/* Nueva card para mostrar documentos adjuntos */}
+          {attachments.length > 0 && (
+            <Card title="Documentos Adjuntos" style={{ marginBottom: 16 }}>
+              <Table
+                dataSource={attachments.map((attachment, index) => ({
+                  key: index,
+                  nombre: attachment.name || "Documento adjunto",
+                  fecha: new Date().toLocaleDateString("es-ES"),
+                  url: URL.createObjectURL(attachment.originFileObj),
+                }))}
+                columns={[
+                  {
+                    title: "Nombre del documento",
+                    dataIndex: "nombre",
+                    key: "nombre",
+                    width: "40%",
+                  },
+                  {
+                    title: "Fecha de ingreso",
+                    dataIndex: "fecha",
+                    key: "fecha",
+                    width: "30%",
+                  },
+                  {
+                    title: "Acciones",
+                    key: "acciones",
+                    width: "30%",
+                    render: (_, record) => (
+                      <Button
+                        type="link"
+                        onClick={() => window.open(record.url, "_blank")}
+                        style={{
+                          color: "#9957C2",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        Ver documento
+                      </Button>
+                    ),
+                  },
+                ]}
+                pagination={false}
+                size="small"
+              />
+            </Card>
+          )}
 
           <Card style={{ width: "100%", textAlign: "right" }}>
             <Button style={{ marginRight: 8 }} className="main-button-white">

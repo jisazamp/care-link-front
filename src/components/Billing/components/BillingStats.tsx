@@ -1,14 +1,14 @@
+import React from "react";
+import { Row, Col, Statistic, Progress, Typography, Card, Divider } from "antd";
 import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  CloseCircleOutlined,
   DollarOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import { Col, Progress, Row, Statistic, Tooltip, Typography } from "antd";
-import type React from "react";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 interface BillingStatsProps {
   stats: {
@@ -38,132 +38,238 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
   const promedioPorFactura =
     stats.total > 0 ? Math.round(stats.totalValor / stats.total) : 0;
 
+  // Colores del sistema - minimalistas
+  const primaryColor = "#9957C2"; // Color principal del sistema
+  const textColor = "#262626"; // Color de texto principal
+  const secondaryTextColor = "#8c8c8c"; // Color de texto secundario
+  const neutralColor = "#595959"; // Color neutro para iconos
+
   return (
-    <div style={{ marginBottom: 24 }}>
-      {/* Primera fila: indicadores de cantidad */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 8 }}>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Total Facturas"
-            value={stats.total}
-            prefix={<FileTextOutlined />}
-            valueStyle={{ color: "#1890ff" }}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Pendientes"
-            value={`${stats.pendientes} (${porcentajePendientes}%)`}
-            prefix={<ClockCircleOutlined />}
-            valueStyle={{ color: "#faad14" }}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Pagadas"
-            value={`${stats.pagadas} (${porcentajePagadas}%)`}
-            prefix={<CheckCircleOutlined />}
-            valueStyle={{ color: "#52c41a" }}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Vencidas"
-            value={`${stats.vencidas} (${porcentajeVencidas}%)`}
-            prefix={<CloseCircleOutlined />}
-            valueStyle={{ color: "#ff4d4f" }}
-          />
-        </Col>
-      </Row>
-      {/* Segunda fila: indicadores de valor */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 8 }}>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Valor Total"
-            value={stats.totalValor}
-            prefix={<DollarOutlined />}
-            valueStyle={{ color: "#722ed1" }}
-            formatter={(value) => `$${value?.toLocaleString()}`}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Valor Pagado"
-            value={`$${valorPagado.toLocaleString()} (${porcentajeValorPagado}%)`}
-            prefix={<DollarOutlined />}
-            valueStyle={{ color: "#52c41a" }}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Valor Pendiente"
-            value={`$${stats.valorPendiente.toLocaleString()}`}
-            prefix={<DollarOutlined />}
-            valueStyle={{ color: "#fa8c16" }}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={4}>
-          <Statistic
-            title="Promedio por Factura"
-            value={`$${promedioPorFactura.toLocaleString()}`}
-            prefix={<DollarOutlined />}
-            valueStyle={{ color: "#13c2c2" }}
-          />
-        </Col>
-      </Row>
-      {/* Barras de progreso con explicación */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
-          <div style={{ marginTop: 8 }}>
-            <Tooltip title="Porcentaje de facturas que han sido completamente pagadas respecto al total de facturas.">
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                Progreso de Facturas Pagadas: Indica el % de facturas saldadas
-                en su totalidad.
-              </Text>
-            </Tooltip>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 8,
-              }}
-            >
-              <span>Progreso de Facturas Pagadas</span>
-              <span>{porcentajePagadas}%</span>
-            </div>
-            <Progress
-              percent={porcentajePagadas}
-              status={porcentajePagadas === 100 ? "success" : "active"}
-              strokeColor={{ "0%": "#108ee9", "100%": "#87d068" }}
+    <Card
+      title={
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <FileTextOutlined style={{ color: primaryColor }} />
+          <Title level={4} style={{ margin: 0, color: textColor }}>
+            Resumen de Facturación
+          </Title>
+        </div>
+      }
+      style={{ marginBottom: 24 }}
+    >
+      {/* Sección 1: Métricas de Cantidad */}
+      <div style={{ marginBottom: 24 }}>
+        <Text
+          strong
+          style={{
+            fontSize: 16,
+            color: textColor,
+            marginBottom: 16,
+            display: "block",
+          }}
+        >
+          Estado de Facturas
+        </Text>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={
+                <Text style={{ color: secondaryTextColor }}>
+                  Total Facturas
+                </Text>
+              }
+              value={stats.total}
+              prefix={<FileTextOutlined style={{ color: neutralColor }} />}
+              valueStyle={{ color: textColor, fontSize: 24, fontWeight: 600 }}
             />
-          </div>
-        </Col>
-        <Col xs={24} md={12}>
-          <div style={{ marginTop: 8 }}>
-            <Tooltip title="Porcentaje del valor total facturado que ya ha sido pagado (incluye pagos parciales y totales).">
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                Progreso de Valor Pagado: Indica el % del dinero total facturado
-                que ya fue cobrado.
-              </Text>
-            </Tooltip>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 8,
-              }}
-            >
-              <span>Progreso de Valor Pagado</span>
-              <span>{porcentajeValorPagado}%</span>
-            </div>
-            <Progress
-              percent={porcentajeValorPagado}
-              status={porcentajeValorPagado === 100 ? "success" : "active"}
-              strokeColor={{ "0%": "#faad14", "100%": "#52c41a" }}
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={
+                <Text style={{ color: secondaryTextColor }}>Pendientes</Text>
+              }
+              value={`${stats.pendientes} (${porcentajePendientes}%)`}
+              prefix={<ClockCircleOutlined style={{ color: neutralColor }} />}
+              valueStyle={{ color: textColor, fontSize: 24, fontWeight: 600 }}
             />
-          </div>
-        </Col>
-      </Row>
-    </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={<Text style={{ color: secondaryTextColor }}>Pagadas</Text>}
+              value={`${stats.pagadas} (${porcentajePagadas}%)`}
+              prefix={<CheckCircleOutlined style={{ color: neutralColor }} />}
+              valueStyle={{ color: textColor, fontSize: 24, fontWeight: 600 }}
+            />
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={
+                <Text style={{ color: secondaryTextColor }}>Vencidas</Text>
+              }
+              value={`${stats.vencidas} (${porcentajeVencidas}%)`}
+              prefix={<CloseCircleOutlined style={{ color: neutralColor }} />}
+              valueStyle={{ color: textColor, fontSize: 24, fontWeight: 600 }}
+            />
+          </Col>
+        </Row>
+      </div>
+
+      <Divider style={{ margin: "16px 0" }} />
+
+      {/* Sección 2: Métricas de Valor */}
+      <div style={{ marginBottom: 24 }}>
+        <Text
+          strong
+          style={{
+            fontSize: 16,
+            color: textColor,
+            marginBottom: 16,
+            display: "block",
+          }}
+        >
+          Información Financiera
+        </Text>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={
+                <Text style={{ color: secondaryTextColor }}>Valor Total</Text>
+              }
+              value={stats.totalValor}
+              prefix={<DollarOutlined style={{ color: primaryColor }} />}
+              valueStyle={{
+                color: primaryColor,
+                fontSize: 24,
+                fontWeight: 600,
+              }}
+              formatter={(value) => `$${value?.toLocaleString()}`}
+            />
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={
+                <Text style={{ color: secondaryTextColor }}>Valor Pagado</Text>
+              }
+              value={`$${valorPagado.toLocaleString()} (${porcentajeValorPagado}%)`}
+              prefix={<DollarOutlined style={{ color: primaryColor }} />}
+              valueStyle={{
+                color: primaryColor,
+                fontSize: 24,
+                fontWeight: 600,
+              }}
+            />
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={
+                <Text style={{ color: secondaryTextColor }}>
+                  Valor Pendiente
+                </Text>
+              }
+              value={`$${stats.valorPendiente.toLocaleString()}`}
+              prefix={<DollarOutlined style={{ color: neutralColor }} />}
+              valueStyle={{ color: textColor, fontSize: 24, fontWeight: 600 }}
+            />
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Statistic
+              title={
+                <Text style={{ color: secondaryTextColor }}>
+                  Promedio por Factura
+                </Text>
+              }
+              value={`$${promedioPorFactura.toLocaleString()}`}
+              prefix={<DollarOutlined style={{ color: primaryColor }} />}
+              valueStyle={{
+                color: primaryColor,
+                fontSize: 24,
+                fontWeight: 600,
+              }}
+            />
+          </Col>
+        </Row>
+      </div>
+
+      <Divider style={{ margin: "16px 0" }} />
+
+      {/* Sección 3: Barras de Progreso */}
+      <div>
+        <Text
+          strong
+          style={{
+            fontSize: 16,
+            color: textColor,
+            marginBottom: 16,
+            display: "block",
+          }}
+        >
+          Progreso de Cobranza
+        </Text>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={12}>
+            <div style={{ marginBottom: 16 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <Text style={{ color: secondaryTextColor, fontSize: 14 }}>
+                  Facturas Completamente Pagadas
+                </Text>
+                <Text strong style={{ color: textColor }}>
+                  {porcentajePagadas}%
+                </Text>
+              </div>
+              <Progress
+                percent={porcentajePagadas}
+                status={porcentajePagadas === 100 ? "success" : "active"}
+                strokeColor={primaryColor}
+                showInfo={false}
+                size="small"
+              />
+              <Text
+                type="secondary"
+                style={{ fontSize: 12, display: "block", marginTop: 4 }}
+              >
+                {stats.pagadas} de {stats.total} facturas completamente saldadas
+              </Text>
+            </div>
+          </Col>
+          <Col xs={24} md={12}>
+            <div style={{ marginBottom: 16 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <Text style={{ color: secondaryTextColor, fontSize: 14 }}>
+                  Valor Total Cobrado
+                </Text>
+                <Text strong style={{ color: textColor }}>
+                  {porcentajeValorPagado}%
+                </Text>
+              </div>
+              <Progress
+                percent={porcentajeValorPagado}
+                status={porcentajeValorPagado === 100 ? "success" : "active"}
+                strokeColor={primaryColor}
+                showInfo={false}
+                size="small"
+              />
+              <Text
+                type="secondary"
+                style={{ fontSize: 12, display: "block", marginTop: 4 }}
+              >
+                ${valorPagado.toLocaleString()} de $
+                {stats.totalValor.toLocaleString()} cobrados
+              </Text>
+            </div>
+          </Col>
+        </Row>
+      </div>
+    </Card>
   );
 };

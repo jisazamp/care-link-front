@@ -1,9 +1,3 @@
-import { RolesEnum } from "./components/CreateAuthorizedUser/index.schema";
-import {
-  Charge,
-  Profession,
-  Specialty,
-} from "./components/ProfessionalDataForm/index.schema";
 import type { CivilStatus, Gender, UserFamilyType, UserStatus } from "./enums";
 
 export type User = {
@@ -59,47 +53,10 @@ export type AuthorizedUser = {
   email: string;
   first_name: string;
   id: number;
-  is_deleted: boolean;
   last_name: string;
   password: string;
-  role: string;
+  is_deleted: boolean;
 };
-
-export interface CreateAuthorizedUserPayload extends AuthorizedUser {
-  professional_user?: {
-    birthdate: string;
-    charge: string;
-    document_number: string;
-    email: string;
-    entry_date: string;
-    first_name: string;
-    home_address: string;
-    last_name: string;
-    phone_number: string;
-    profession: string;
-    professional_id_number: string;
-    specialty: string;
-  };
-}
-
-export interface UpdateAuthorizedUserPayload {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: RolesEnum;
-  password?: string;
-
-  birthdate?: string;
-  charge?: Charge;
-  document_number?: string;
-  entry_date?: string;
-  home_address?: string;
-  phone_number?: string;
-  profession?: Profession;
-  professional_id_number?: string;
-  specialty?: Specialty;
-}
 
 export type MedicalRecord = {
   id_historiaclinica?: number;
@@ -146,12 +103,14 @@ export type MedicalRecord = {
   tipo_de_sueno: string | null;
   tipo_sangre: string;
   porte_clinico?: string;
+  url_hc_adjunto?: string | null;
 };
 
 export type MedicalReport = {
   id_reporteclinico: number;
   id_historiaclinica: number;
   id_profesional: number;
+  altura?: number;
   Circunferencia_cadera: number;
   Frecuencia_cardiaca: number;
   IMC: number;
@@ -180,12 +139,12 @@ export type MedicalReport = {
   remision: string;
   saturacionOxigeno: number;
   temperatura_corporal: number;
-  tipo_reporte: string;
+  tipo_reporte?: string | null;
+  url_adjunto?: string | null;
 };
 
 export type Professional = {
   id_profesional: number;
-  id_user: number | null;
   apellidos: string;
   cargo: string;
   direccion: string;
@@ -198,7 +157,7 @@ export type Professional = {
   nombres: string;
   profesion: string;
   t_profesional: string;
-  telefono: string;
+  telefono: number;
 };
 
 export type UserMedicine = {
@@ -485,7 +444,7 @@ export type RutaTransporte = {
   apellidos: string;
   n_documento: string;
   direccion_recogida?: string;
-  direccion_entrega?: string;
+  telefono_contacto?: string;
   hora_recogida?: string;
   hora_entrega?: string;
   estado: EstadoTransporte;

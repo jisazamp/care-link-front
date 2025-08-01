@@ -11,6 +11,7 @@ import {
   Modal,
   Row,
   Select,
+  Table,
   Typography,
 } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
@@ -389,6 +390,55 @@ export const EditReport: React.FC = () => {
           </Form>
         </Card>
       ))}
+      
+      {/* Nueva card para mostrar documentos adjuntos */}
+      {report?.url_adjunto && (
+        <Card
+          title="Documentos Adjuntos"
+          style={{ marginBottom: 16, width: "100%" }}
+        >
+          <Table
+            dataSource={[
+              {
+                key: 1,
+                nombre: 'Documento adjunto del reporte',
+                fecha: report?.fecha_registro ? dayjs(report.fecha_registro).format("DD-MM-YYYY") : new Date().toLocaleDateString('es-ES'),
+                url: report.url_adjunto,
+              }
+            ]}
+            columns={[
+              {
+                title: 'Nombre del documento',
+                dataIndex: 'nombre',
+                key: 'nombre',
+                width: '40%',
+              },
+              {
+                title: 'Fecha de ingreso',
+                dataIndex: 'fecha',
+                key: 'fecha',
+                width: '30%',
+              },
+              {
+                title: 'Acciones',
+                key: 'acciones',
+                width: '30%',
+                render: (_, record) => (
+                  <Button
+                    type="link"
+                    onClick={() => window.open(record.url, '_blank')}
+                    style={{ color: '#9957C2', textDecoration: 'underline' }}
+                  >
+                    Ver documento
+                  </Button>
+                ),
+              },
+            ]}
+            pagination={false}
+            size="small"
+          />
+        </Card>
+      )}
     </Flex>
   );
 };

@@ -97,7 +97,7 @@ export const AuthorizedUsersList: React.FC<IAuthorizedUsersListProps> = ({
             scroll={{ x: "max-content" }}
             showHeader={false}
             onRow={(record) => ({
-              onClick: () => navigate(`/usuarios/registrar/${record.id}`),
+              onClick: () => navigate(`/admin/registrar/${record.id}`),
               style: { cursor: "pointer" },
             })}
           />

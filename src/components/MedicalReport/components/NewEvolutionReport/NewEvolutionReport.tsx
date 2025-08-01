@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button,
   Card,
   Col,
@@ -10,34 +9,59 @@ import {
   Row,
   Select,
   Typography,
+  Avatar,
   message,
 } from "antd";
 import dayjs from "dayjs";
+import { useEffect } from "react";
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
-import { useCreateClinicalEvolution } from "../../../../hooks/useCreateClinicalEvolution/useCreateClinicalEvolution";
-import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
 import { useGetProfessionals } from "../../../../hooks/useGetProfessionals/useGetProfessionals";
+import { useCreateClinicalEvolution } from "../../../../hooks/useCreateClinicalEvolution/useCreateClinicalEvolution";
+import { useEditClinicalEvolution } from "../../../../hooks/useEditClinicalEvolution/useEditClinicalEvolution";
 import { useGetUserById } from "../../../../hooks/useGetUserById/useGetUserById";
+import { useGetMedicalReport } from "../../../../hooks/useGetMedicalReport/useGetMedicalReport";
+import { useGetClinicalEvolution } from "../../../../hooks/useGetClinicalEvolution/useGetClinicalEvolution";
+import { queryClient } from "../../../../main";
 import patientImage from "../../../assets/Patients/patient1.jpg";
 
 const { Title, Text } = Typography;
 
 export const NewEvolutionReport: React.FC = () => {
-  const { id, reportId } = useParams();
+  const { id, reportId, evolutionId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
   // Detect if we're in home visit context
   const isHomeVisit = location.pathname.includes("/visitas-domiciliarias/");
 
+  // Check if we're in edit mode
+  const isEditMode = !!evolutionId;
+
   const professionalsQuery = useGetProfessionals();
   const createEvolution = useCreateClinicalEvolution(reportId);
+  const editEvolution = useEditClinicalEvolution();
   const userQuery = useGetUserById(id);
   const reportQuery = useGetMedicalReport(reportId);
+  const evolutionQuery = useGetClinicalEvolution(evolutionId);
   const user = userQuery.data?.data.data;
   const report = reportQuery.data?.data.data;
+  const evolution = evolutionQuery.data?.data.data;
 
   const [form] = Form.useForm();
+
+  // Load evolution data when in edit mode
+  useEffect(() => {
+    if (isEditMode && evolution) {
+      form.setFieldsValue({
+        professional: evolution.id_profesional,
+        reportType: evolution.tipo_report,
+        date: evolution.fecha_evolucion
+          ? dayjs(evolution.fecha_evolucion)
+          : undefined,
+        observation: evolution.observacion_evolucion,
+      });
+    }
+  }, [evolution, form, isEditMode]);
 
   // Navigation functions based on context
   const getDetailsPath = () => {
@@ -53,14 +77,35 @@ export const NewEvolutionReport: React.FC = () => {
   };
 
   const handleFinish = async (values: any) => {
-    await createEvolution.mutateAsync({
-      fecha_evolucion: values.date.format("YYYY-MM-DD"),
-      id_profesional: values.professional,
-      id_reporteclinico: Number(reportId),
-      observacion_evolucion: values.observation,
-      tipo_report: values.reportType,
+    if (isEditMode && evolutionId) {
+      await editEvolution.mutateAsync({
+        evolutionId: Number(evolutionId),
+        data: {
+          fecha_evolucion: values.date.format("YYYY-MM-DD"),
+          id_profesional: values.professional,
+          id_reporteclinico: Number(reportId),
+          observacion_evolucion: values.observation,
+          tipo_report: values.reportType,
+        },
+      });
+      message.success("Reporte de evolución actualizado exitosamente");
+    } else {
+      await createEvolution.mutateAsync({
+        fecha_evolucion: values.date.format("YYYY-MM-DD"),
+        id_profesional: values.professional,
+        id_reporteclinico: Number(reportId),
+        observacion_evolucion: values.observation,
+        tipo_report: values.reportType,
+      });
+      message.success("Reporte de evolución creado exitosamente");
+    }
+
+    // Invalidar manualmente las consultas para asegurar actualización
+    queryClient.invalidateQueries({
+      queryKey: [`report-${reportId}-clinical-evolutions`],
     });
-    message.success("Reporte de evolución creado exitosamente");
+    queryClient.invalidateQueries({ queryKey: ["clinical-evolution"] });
+
     navigate(getReportDetailsPath());
   };
 
@@ -90,7 +135,9 @@ export const NewEvolutionReport: React.FC = () => {
           </Link>{" "}
           / <Link to={getReportDetailsPath()}>Detalle reporte clínico</Link> /{" "}
           <span className="current" style={{ color: "#222", fontWeight: 500 }}>
-            Nuevo reporte de evolución
+            {isEditMode
+              ? "Editar reporte de evolución"
+              : "Nuevo reporte de evolución"}
           </span>
         </div>
         <h1
@@ -102,7 +149,9 @@ export const NewEvolutionReport: React.FC = () => {
             margin: "0 0 12px 0",
           }}
         >
-          Nuevo reporte de evolución clínica
+          {isEditMode
+            ? "Editar reporte de evolución clínica"
+            : "Nuevo reporte de evolución clínica"}
         </h1>
       </div>
       {/* Framer principal */}
@@ -139,7 +188,7 @@ export const NewEvolutionReport: React.FC = () => {
               <Text strong> Género:</Text> {user?.genero} &nbsp;|
               <Text strong> Edad:</Text>{" "}
               {user?.fecha_nacimiento
-                ? `${dayjs().diff(dayjs(user?.fecha_nacimiento), "years")} años`
+                ? dayjs().diff(dayjs(user?.fecha_nacimiento), "years") + " años"
                 : "-"}{" "}
               &nbsp;|
               <Text strong> Estado Civil:</Text> {user?.estado_civil}
@@ -301,6 +350,13 @@ export const NewEvolutionReport: React.FC = () => {
               <Button
                 style={{ marginRight: 12 }}
                 className="main-button-white"
+                onClick={() => navigate(getReportDetailsPath())}
+              >
+                Volver
+              </Button>
+              <Button
+                style={{ marginRight: 12 }}
+                className="main-button-white"
                 onClick={() => form.resetFields()}
               >
                 Restablecer
@@ -308,9 +364,13 @@ export const NewEvolutionReport: React.FC = () => {
               <Button
                 htmlType="submit"
                 type="primary"
-                loading={createEvolution.isPending}
+                loading={
+                  isEditMode
+                    ? editEvolution.isPending
+                    : createEvolution.isPending
+                }
               >
-                Guardar evolución
+                {isEditMode ? "Actualizar evolución" : "Guardar evolución"}
               </Button>
             </Row>
           </Form>

@@ -1,3 +1,4 @@
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Form,
   InputNumber,
@@ -13,14 +14,12 @@ import {
 } from "antd";
 import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import type React from "react";
-import { useCallback, useMemo, useState } from "react";
-import { useCreatePayment } from "../../../../hooks/useCreatePayment/useCreatePayment";
-import { useDeletePayment } from "../../../../hooks/useDeletePayment";
 import { useGetPaymentMethods } from "../../../../hooks/useGetPaymentMethods";
 import { useGetPaymentTypes } from "../../../../hooks/useGetPaymentTypes";
-import type { PaymentFormData } from "../../../../utils/paymentUtils";
+import { PaymentFormData } from "../../../../utils/paymentUtils";
 import { PaymentSummary } from "../PaymentSummary/PaymentSummary";
+import { useCreatePayment } from "../../../../hooks/useCreatePayment/useCreatePayment";
+import { useDeletePayment } from "../../../../hooks/useDeletePayment";
 
 interface PaymentsFormProps {
   payments: PaymentFormData[];

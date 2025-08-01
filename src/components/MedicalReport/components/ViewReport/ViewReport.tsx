@@ -4,15 +4,15 @@ import {
   PlusCircleOutlined,
 } from "@ant-design/icons";
 import {
-  Avatar,
   Button,
   Card,
-  Checkbox,
   Col,
   Divider,
   Row,
   Table,
   Typography,
+  Avatar,
+  Checkbox,
 } from "antd";
 import dayjs from "dayjs";
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
@@ -37,6 +37,7 @@ export const ViewReport: React.FC = () => {
   const reportQuery = useGetMedicalReport(reportId);
   const evolutionsQuery = useGetClinicalEvolutions(reportId);
   const user = userQuery.data?.data.data;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const record = recordQuery.data?.data.data;
   const report = reportQuery.data?.data.data;
   const evolutions = evolutionsQuery.data?.data.data;
@@ -55,27 +56,6 @@ export const ViewReport: React.FC = () => {
     ? `${report.profesional.nombres} ${report.profesional.apellidos}`
     : "Nombre del profesional";
   const encabezadoReporte = `Reporte clínico - ${numeroReporte} ${fechaReporte} - Realizado por: ${profesional}`;
-
-  // Exploración física: usar campos reales de MedicalReport
-  const exploracion = {
-    peso: report?.peso !== undefined ? `${report.peso} kg` : "-",
-    presion:
-      report?.presion_arterial !== undefined
-        ? `${report.presion_arterial} mmHg`
-        : "-",
-    frecuencia:
-      report?.Frecuencia_cardiaca !== undefined
-        ? `${report.Frecuencia_cardiaca} lpm`
-        : "-",
-    temperatura:
-      report?.temperatura_corporal !== undefined
-        ? `${report.temperatura_corporal}°C`
-        : "-",
-    pulsioximetria:
-      report?.saturacionOxigeno !== undefined
-        ? `${report.saturacionOxigeno}%`
-        : "-", // Si no existe, dejar "-"
-  };
 
   // Columnas para la tabla de evolución clínica
   const columns = [
@@ -111,7 +91,7 @@ export const ViewReport: React.FC = () => {
       title: "Registro de tratamientos",
       dataIndex: "treatments",
       key: "treatments",
-      render: (_: any, record: any) => {
+      render: () => {
         // No existe campo treatments en ClinicalEvolution, dejar como "No"
         return "No";
       },
@@ -125,14 +105,18 @@ export const ViewReport: React.FC = () => {
           <a
             style={{ marginRight: 8, color: "#9957C2" }}
             href="#"
-            onClick={() => navigate(getEditReportPath())}
+            onClick={() =>
+              navigate(getViewEvolutionPath(record.id_TipoReporte))
+            }
           >
             Ver
           </a>
           <a
             style={{ color: "#9957C2" }}
             href="#"
-            onClick={() => console.log("Editar registro:", record)}
+            onClick={() =>
+              navigate(getEditEvolutionPath(record.id_TipoReporte))
+            }
           >
             Editar
           </a>
@@ -152,6 +136,24 @@ export const ViewReport: React.FC = () => {
     return isHomeVisit
       ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}`
       : `/usuarios/${id}/reportes/${reportId}`;
+  };
+
+  const getNewEvolutionPath = () => {
+    return isHomeVisit
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`
+      : `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion`;
+  };
+
+  const getViewEvolutionPath = (evolutionId: number) => {
+    return isHomeVisit
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/ver-evolucion/${evolutionId}`
+      : `/usuarios/${id}/reportes/${reportId}/detalles/ver-evolucion/${evolutionId}`;
+  };
+
+  const getEditEvolutionPath = (evolutionId: number) => {
+    return isHomeVisit
+      ? `/visitas-domiciliarias/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion/${evolutionId}`
+      : `/usuarios/${id}/reportes/${reportId}/detalles/nuevo-reporte-evolucion/${evolutionId}`;
   };
 
   return (
@@ -261,7 +263,8 @@ export const ViewReport: React.FC = () => {
                     -{" "}
                     <span style={{ fontWeight: 700 }}>
                       {user?.fecha_nacimiento
-                        ? `${dayjs().diff(dayjs(user?.fecha_nacimiento), "years")} años`
+                        ? dayjs().diff(dayjs(user?.fecha_nacimiento), "years") +
+                          " años"
                         : "-"}
                     </span>
                   </div>
@@ -464,12 +467,16 @@ export const ViewReport: React.FC = () => {
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 0,
+                    gap: 4,
                   }}
                 >
                   <div>
                     <span style={{ fontWeight: 600 }}>Peso:</span>{" "}
-                    {exploracion.peso}
+                    {record?.peso !== undefined ? `${record.peso} kg` : "-"}
+                  </div>
+                  <div>
+                    <span style={{ fontWeight: 600 }}>Altura:</span>{" "}
+                    {record?.altura !== undefined ? `${record.altura} cm` : "-"}
                   </div>
                 </div>
               </div>
@@ -494,7 +501,7 @@ export const ViewReport: React.FC = () => {
                   Diagnóstico
                 </div>
                 <div style={{ color: "#222", fontSize: 15, flex: 1 }}>
-                  {report?.diagnosticos || "-"}
+                  {record?.diagnosticos || "-"}
                 </div>
               </div>
               {/* Fila: Observaciones */}
@@ -518,7 +525,7 @@ export const ViewReport: React.FC = () => {
                   Observaciones
                 </div>
                 <div style={{ color: "#bbb", fontSize: 15, flex: 1 }}>
-                  {report?.observaciones ||
+                  {record?.observaciones_iniciales ||
                     "Campo para agregar observaciones internas"}
                 </div>
               </div>
@@ -623,7 +630,7 @@ export const ViewReport: React.FC = () => {
                 <Button
                   type="primary"
                   icon={<PlusCircleOutlined />}
-                  onClick={() => navigate(getEditReportPath())}
+                  onClick={() => navigate(getNewEvolutionPath())}
                 >
                   Agregar
                 </Button>
@@ -640,6 +647,73 @@ export const ViewReport: React.FC = () => {
             />
           </Card>
         </Col>
+
+        {/* Nueva card para mostrar documentos adjuntos */}
+        {report?.url_adjunto && (
+          <Col span={24} style={{ width: "100%" }}>
+            <Card
+              className="card-legacy"
+              style={{
+                marginBottom: "24px",
+                padding: "16px 32px",
+                borderRadius: 0,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                backgroundColor: "#FFFFFF",
+                width: "100%",
+              }}
+            >
+              <Title level={5} style={{ fontWeight: "bold", color: "#333333" }}>
+                Documentos Adjuntos
+              </Title>
+              <Divider style={{ margin: "12px 0" }} />
+              <Table
+                dataSource={[
+                  {
+                    key: 1,
+                    nombre: "Documento adjunto del reporte",
+                    fecha: report?.fecha_registro
+                      ? dayjs(report.fecha_registro).format("DD-MM-YYYY")
+                      : new Date().toLocaleDateString("es-ES"),
+                    url: report.url_adjunto,
+                  },
+                ]}
+                columns={[
+                  {
+                    title: "Nombre del documento",
+                    dataIndex: "nombre",
+                    key: "nombre",
+                    width: "40%",
+                  },
+                  {
+                    title: "Fecha de ingreso",
+                    dataIndex: "fecha",
+                    key: "fecha",
+                    width: "30%",
+                  },
+                  {
+                    title: "Acciones",
+                    key: "acciones",
+                    width: "30%",
+                    render: (_, record) => (
+                      <Button
+                        type="link"
+                        onClick={() => window.open(record.url, "_blank")}
+                        style={{
+                          color: "#9957C2",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        Ver documento
+                      </Button>
+                    ),
+                  },
+                ]}
+                pagination={false}
+                size="small"
+              />
+            </Card>
+          </Col>
+        )}
       </Row>
     </div>
   );

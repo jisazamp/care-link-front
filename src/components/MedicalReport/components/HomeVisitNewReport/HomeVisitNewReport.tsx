@@ -46,7 +46,7 @@ export const HomeVisitNewReport: React.FC = () => {
       id_historiaclinica: Number(
         medicalRecordQuery.data?.data.data?.id_historiaclinica,
       ),
-      Obs_habitosalimenticios: values.treatmentObservation,
+      recomendaciones: values.treatmentObservation,
       diagnosticos: values.diagnosis,
       fecha_registro: values.registrationDate.format("YYYY-MM-DD"),
       id_profesional: values.professional,

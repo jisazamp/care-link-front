@@ -10,12 +10,11 @@ import {
   Divider,
   Row,
   Space,
-  Spin,
   Table,
   Tooltip,
   Typography,
+  Spin,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
   Tooltip as ChartTooltip,
@@ -26,6 +25,7 @@ import {
   YAxis,
 } from "recharts";
 import { useGetUserFlow } from "../../../../hooks/useGetUserFlow/useGetUserFlow";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 

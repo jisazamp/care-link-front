@@ -10,6 +10,6 @@ export const useGetUserMedicalRecord = (id: number | string | undefined) => {
     enabled: !!id,
     queryKey: [`user-medical-record-${id}`],
     queryFn: () => getUserMedicalRecord(id),
-    staleTime: Number.POSITIVE_INFINITY,
+    staleTime: 0, // Cambiar a 0 para que siempre se actualice cuando se invalide
   });
 };

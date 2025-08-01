@@ -1,27 +1,27 @@
-import {
-  DollarOutlined,
-  FileTextOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
-import { Button, Card, Divider, Modal, Spin, Typography } from "antd";
-import { Table } from "antd";
-import dayjs from "dayjs";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCreateFactura } from "../../hooks/useCreateFactura";
-import { useDeleteFactura } from "../../hooks/useDeleteFactura";
-import { useGetFacturacionCompleta } from "../../hooks/useGetFacturacionCompleta";
-import { useGetFacturas } from "../../hooks/useGetFacturas";
-import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
-import { useUpdateFactura } from "../../hooks/useUpdateFactura";
-import type { Bill } from "../../types";
-import { BillingForm } from "./BillingForm";
+import { Card, Button, Typography, Divider, Spin, Modal } from "antd";
+import {
+  PlusOutlined,
+  FileTextOutlined,
+  DollarOutlined,
+} from "@ant-design/icons";
 import { BillingList } from "./BillingList";
-import { BillingBreadcrumb } from "./components/BillingBreadcrumb";
-import { ContractFilters, InvoiceFilters } from "./components/BillingFilters";
+import { BillingForm } from "./BillingForm";
 //import { BillingDetails } from "./BillingDetails";
 import { BillingStats } from "./components/BillingStats";
+import { ContractFilters, InvoiceFilters } from "./components/BillingFilters";
+import { BillingBreadcrumb } from "./components/BillingBreadcrumb";
 import { ServiceRatesEditor } from "./components/ServiceRatesEditor/ServiceRatesEditor";
+import { useGetFacturas } from "../../hooks/useGetFacturas";
+import { useCreateFactura } from "../../hooks/useCreateFactura";
+import { useUpdateFactura } from "../../hooks/useUpdateFactura";
+import { useDeleteFactura } from "../../hooks/useDeleteFactura";
+import { useGetUserContracts } from "../../hooks/useGetUserContracts/useGetUserContracts";
+import { useGetFacturacionCompleta } from "../../hooks/useGetFacturacionCompleta";
+import { Table } from "antd";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import type { Bill } from "../../types";
 
 const { Title } = Typography;
 
@@ -295,14 +295,37 @@ export const Billing: React.FC = () => {
       title: "Usuario",
       dataIndex: "nombres",
       key: "nombres",
-      render: (_: any, row: any) => `${row.nombres} ${row.apellidos}`,
+      render: (_: any, row: any) => {
+        if (row.nombres && row.apellidos) {
+          return `${row.nombres} ${row.apellidos}`;
+        }
+        return "N/A";
+      },
     },
-    { title: "Documento", dataIndex: "n_documento", key: "n_documento" },
-    { title: "Contrato", dataIndex: "id_contrato", key: "id_contrato" },
+    {
+      title: "Documento",
+      dataIndex: "n_documento",
+      key: "n_documento",
+      render: (text: string) => text || "N/A",
+    },
+    {
+      title: "Contrato",
+      dataIndex: "id_contrato",
+      key: "id_contrato",
+      render: (_: any, row: any) => {
+        if (row.id_contrato) {
+          return row.id_contrato;
+        } else if (row.tipo_factura === "VISITA_DOMICILIARIA") {
+          return "Visita Domiciliaria";
+        }
+        return "N/A";
+      },
+    },
     {
       title: "Tipo Contrato",
       dataIndex: "tipo_contrato",
       key: "tipo_contrato",
+      render: (text: string) => text || "N/A",
     },
     { title: "Factura", dataIndex: "numero_factura", key: "numero_factura" },
     {
@@ -318,19 +341,40 @@ export const Billing: React.FC = () => {
     {
       title: "Ver Contrato",
       key: "ver_contrato",
-      render: (_: any, row: any) =>
-        row.id_usuario && row.id_contrato ? (
-          <Button
-            type="link"
-            onClick={() =>
-              navigate(
-                `/usuarios/${row.id_usuario}/contrato/${row.id_contrato}`,
-              )
-            }
-          >
-            Ir a Contrato
-          </Button>
-        ) : null,
+      render: (_: any, row: any) => {
+        if (
+          row.tipo_factura === "VISITA_DOMICILIARIA" &&
+          row.id_usuario &&
+          row.id_visita_domiciliaria
+        ) {
+          return (
+            <Button
+              type="link"
+              onClick={() =>
+                navigate(
+                  `/visitas-domiciliarias/usuarios/${row.id_usuario}/editar-visita/${row.id_visita_domiciliaria}`,
+                )
+              }
+            >
+              Ver Visita
+            </Button>
+          );
+        } else if (row.id_usuario && row.id_contrato) {
+          return (
+            <Button
+              type="link"
+              onClick={() =>
+                navigate(
+                  `/usuarios/${row.id_usuario}/contrato/${row.id_contrato}`,
+                )
+              }
+            >
+              Ir a Contrato
+            </Button>
+          );
+        }
+        return null;
+      },
     },
   ];
 

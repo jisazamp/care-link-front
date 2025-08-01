@@ -19,15 +19,17 @@ import { Home } from "./components/Home/Home";
 import { Login } from "./components/Login/Login";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 import { MedicalRecord } from "./components/MedicalRecord/MedicalRecord";
-import { EditReport } from "./components/MedicalReport/components/EditReport/EditReport";
+import { EditMedicalReport } from "./components/MedicalReport/components/EditMedicalReport/EditMedicalReport";
 import { NewReport } from "./components/MedicalReport/components/NewReport/NewReport";
 import { HomeVisitNewReport } from "./components/MedicalReport/components/HomeVisitNewReport/HomeVisitNewReport";
-import { HomeVisitNewVisit } from "./components/HomeVisitNewVisit/HomeVisitNewVisit";
+import { HomeVisitWizard } from "./components/HomeVisitWizard/HomeVisitWizard";
 import { HomeVisitsList } from "./components/HomeVisitsList/HomeVisitsList";
 import { ViewReport } from "./components/MedicalReport/components/ViewReport/ViewReport";
 import { NewUser } from "./components/NewUser/NewUser";
 import { HomeVisitMedicalRecord } from "./components/HomeVisitMedicalRecord/HomeVisitMedicalRecord";
+import { UsersList } from "./components/UsersList/UsersList";
 import { NewEvolutionReport } from "./components/MedicalReport/components/NewEvolutionReport/NewEvolutionReport";
+import { ViewEvolution } from "./components/MedicalReport/components/ViewEvolution/ViewEvolution";
 import { MMSETest } from "./components/PeriodicTests/MMSE";
 import { YesavageTest } from "./components/PeriodicTests/Yesavage";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
@@ -36,7 +38,6 @@ import { Transporte } from "./components/Transporte";
 import { UserDetails } from "./components/UserDetails/UserDetails";
 import { UserHomeVisitDetails } from "./components/UserHomeVisitDetails/UserHomeVisitDetails";
 import { UserList } from "./components/UserList/UserList";
-import { UsersList } from "./components/UsersList/UsersList";
 import { UsersWithHomeVisitsList } from "./components/UsersWithHomeVisitsList/UsersWithHomeVisitsList";
 import { colors } from "./theme";
 import { AuthorizedUsersListScreen } from "./screens/AuthorizedUsersList";
@@ -176,7 +177,7 @@ export const App = () => {
                 path="/visitas-domiciliarias/usuarios/:id/nueva-visita"
                 element={
                   <PrivateRoute>
-                    <HomeVisitNewVisit />
+                    <HomeVisitWizard />
                   </PrivateRoute>
                 }
               />
@@ -184,7 +185,15 @@ export const App = () => {
                 path="/visitas-domiciliarias/usuarios/:id/editar-visita/:visitaId"
                 element={
                   <PrivateRoute>
-                    <HomeVisitNewVisit />
+                    <HomeVisitWizard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/editar"
+                element={
+                  <PrivateRoute>
+                    <NewUser />
                   </PrivateRoute>
                 }
               />
@@ -216,7 +225,7 @@ export const App = () => {
                 path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId"
                 element={
                   <PrivateRoute>
-                    <EditReport />
+                    <EditMedicalReport />
                   </PrivateRoute>
                 }
               />
@@ -225,6 +234,22 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/visitas-domiciliarias/usuarios/:id/reportes/:reportId/detalles/ver-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <ViewEvolution />
                   </PrivateRoute>
                 }
               />
@@ -296,7 +321,7 @@ export const App = () => {
                 path="/usuarios/:id/reportes/:reportId"
                 element={
                   <PrivateRoute>
-                    <EditReport />
+                    <EditMedicalReport />
                   </PrivateRoute>
                 }
               />
@@ -313,6 +338,22 @@ export const App = () => {
                 element={
                   <PrivateRoute>
                     <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/nuevo-reporte-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <NewEvolutionReport />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/usuarios/:id/reportes/:reportId/detalles/ver-evolucion/:evolutionId"
+                element={
+                  <PrivateRoute>
+                    <ViewEvolution />
                   </PrivateRoute>
                 }
               />

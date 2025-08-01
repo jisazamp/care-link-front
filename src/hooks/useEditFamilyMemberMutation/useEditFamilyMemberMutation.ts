@@ -30,6 +30,10 @@ export const useEditFamilyMemberMutation = (id?: number | string) => {
       queryClient.invalidateQueries({
         queryKey: [`get-user-${id}-family-members`],
       });
+      // Invalidar también la query del usuario para actualizar los datos de localización
+      queryClient.invalidateQueries({
+        queryKey: [`get-user-${id}`],
+      });
     },
   });
 };
