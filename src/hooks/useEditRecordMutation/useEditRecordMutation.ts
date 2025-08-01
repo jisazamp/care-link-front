@@ -68,22 +68,6 @@ const editSimplifiedRecord = ({
   );
 };
 
-// Simplified edit function for home visit medical records
-const editSimplifiedRecord = ({
-  id,
-  recordId,
-  record,
-}: {
-  id: number;
-  recordId: number;
-  record: Partial<MedicalRecord>;
-}) => {
-  return client.patch(
-    `/api/users/${id}/medical_record/${recordId}/simplified`,
-    record,
-  );
-};
-
 interface UseEditRecordMutationProps {
   id?: string | number;
   recordId?: string | number;

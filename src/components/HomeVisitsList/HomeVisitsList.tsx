@@ -1,659 +1,492 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  Button,
+  Table,
   Card,
+  Tag,
+  Button,
+  Space,
+  Typography,
+  Row,
   Col,
+  Statistic,
   DatePicker,
-  Form,
+  Select,
   Input,
   message,
-  Row,
-  Select,
-  TimePicker,
-  Typography,
 } from "antd";
 import {
-  ArrowLeftOutlined,
-  SaveOutlined,
-  ReloadOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  CalendarOutlined,
+  UserOutlined,
+  EnvironmentOutlined,
+  PhoneOutlined,
 } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useGetAllHomeVisits } from "../../hooks/useGetAllHomeVisits/useGetAllHomeVisits";
 import dayjs from "dayjs";
-import {
-  useCreateHomeVisit,
-  CreateHomeVisitData,
-} from "../../hooks/useCreateHomeVisit/useCreateHomeVisit";
-import {
-  useUpdateHomeVisit,
-  UpdateHomeVisitData,
-} from "../../hooks/useUpdateHomeVisit/useUpdateHomeVisit";
-import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
-import { useGetUserFirstHomeVisit } from "../../hooks/useGetUserFirstHomeVisit/useGetUserFirstHomeVisit";
-import { useGetHomeVisitById } from "../../hooks/useGetHomeVisitById";
-import { useGetProfessionals } from "../../hooks/useGetProfessionals/useGetProfessionals";
-import { useGetServiceRate } from "../../hooks/useGetServiceRate/useGetServiceRate";
-import { useQueryClient } from "@tanstack/react-query";
 
 const { Title } = Typography;
-const { TextArea } = Input;
 const { Option } = Select;
 
-export const HomeVisitNewVisit: React.FC = () => {
+export const HomeVisitsList: React.FC = () => {
   const navigate = useNavigate();
-  const params = useParams();
-  const userId = params.id;
-  const visitaId = params.visitaId; // Nuevo parámetro para editar visitas específicas
-  const [form] = Form.useForm();
-  const [selectedProfessional, setSelectedProfessional] =
-    React.useState<any>(null);
-  const [isViewMode, setIsViewMode] = React.useState<boolean>(false);
-  const queryClient = useQueryClient();
+  const { data: homeVisitsData, isLoading, error } = useGetAllHomeVisits();
 
-  const { data: userData, isLoading: loadingUser } = useGetUserById(userId);
-  const { data: firstHomeVisit, isLoading: loadingFirstVisit } =
-    useGetUserFirstHomeVisit(userId);
-  const { data: specificVisit, isLoading: loadingSpecificVisit } =
-    useGetHomeVisitById(visitaId);
-  const { data: professionalsData, isLoading: loadingProfessionals } =
-    useGetProfessionals();
-  const { data: serviceRateData, isLoading: loadingServiceRate } =
-    useGetServiceRate(4, dayjs().year()); // Service ID 4 for "Visitas Domiciliarias"
-
-  const createHomeVisitMutation = useCreateHomeVisit();
-  const updateHomeVisitMutation = useUpdateHomeVisit();
-
-  // Determinar si estamos editando una visita existente o creando una nueva
-  // Solo es edición si tenemos un visitaId específico
-  const isEditing = !!visitaId;
-
-  // Determinar qué visita usar: específica o primera visita
-  const currentVisitData = visitaId ? specificVisit?.data : firstHomeVisit;
-
-  // Si estamos editando una visita específica, verificar si la visita tiene fecha y hora programadas
-  // Si no las tiene (NULL), entonces no estamos en modo visualización
-  React.useEffect(() => {
-    if (isEditing && currentVisitData) {
-      // Si la visita no tiene fecha o hora programada, no está en modo visualización
-      const hasScheduledDateTime =
-        currentVisitData.fecha_visita && currentVisitData.hora_visita;
-      setIsViewMode(hasScheduledDateTime);
-    } else {
-      // Si no estamos editando, no estamos en modo visualización
-      setIsViewMode(false);
-    }
-  }, [isEditing, currentVisitData]);
-
-  // Forzar invalidación de queries cuando se monta el componente
-  React.useEffect(() => {
+  // Debug: Log de datos recibidos (solo en desarrollo)
+  if (homeVisitsData?.data.data && process.env.NODE_ENV === "development") {
     console.log(
-      "🔍 Componente HomeVisitNewVisit montado, userId:",
-      userId,
-      "visitaId:",
-      visitaId,
+      "🔍 HomeVisitsList - Total de visitas:",
+      homeVisitsData.data.data.length,
     );
+    const estados = homeVisitsData.data.data.reduce((acc: any, v: any) => {
+      acc[v.estado_visita] = (acc[v.estado_visita] || 0) + 1;
+      return acc;
+    }, {});
+    console.log("🔍 HomeVisitsList - Estados de visitas:", estados);
+  }
 
-    // Si tenemos un visitaId específico, invalidar la query de esa visita
-    if (visitaId) {
-      queryClient.invalidateQueries({
-        queryKey: ["home-visit", visitaId],
-      });
+  // Estados para los filtros
+  const [filters, setFilters] = useState({
+    estado: undefined,
+    tipoVisitas: "todas", // Cambiado de "futuras" a "todas" para mostrar todas las visitas por defecto
+    fecha: null,
+    paciente: "",
+  });
+
+  // Estado para los datos filtrados
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDIENTE":
+        return "orange";
+      case "REALIZADA":
+        return "green";
+      case "CANCELADA":
+        return "red";
+      case "REPROGRAMADA":
+        return "blue";
+      default:
+        return "default";
     }
+  };
 
-    // Invalidar también las queries del usuario y primera visita
-    queryClient.invalidateQueries({
-      queryKey: ["user", userId],
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["user-first-home-visit", userId],
-    });
-  }, [userId, visitaId, queryClient]);
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "PENDIENTE":
+        return "Pendiente";
+      case "REALIZADA":
+        return "Realizada";
+      case "CANCELADA":
+        return "Cancelada";
+      case "REPROGRAMADA":
+        return "Reprogramada";
+      default:
+        return status;
+    }
+  };
 
-  // Debug logs para entender el problema de carga
-  console.log("🔍 HomeVisitNewVisit Debug - Estado actual:");
-  console.log("userId:", userId);
-  console.log("visitaId:", visitaId);
-  console.log("loadingUser:", loadingUser);
-  console.log("loadingFirstVisit:", loadingFirstVisit);
-  console.log("loadingSpecificVisit:", loadingSpecificVisit);
-  console.log("loadingProfessionals:", loadingProfessionals);
-  console.log("loadingServiceRate:", loadingServiceRate);
-  console.log("userData:", userData);
-  console.log("firstHomeVisit:", firstHomeVisit);
-  console.log("specificVisit:", specificVisit);
-  console.log("currentVisitData:", currentVisitData);
-  console.log("professionalsData:", professionalsData);
-  console.log("serviceRateData:", serviceRateData);
-  console.log("isEditing:", isEditing);
-  console.log("isViewMode:", isViewMode);
+  const columns = [
+    {
+      title: "Paciente",
+      dataIndex: "paciente_nombre",
+      key: "paciente_nombre",
+      render: (text: string) => (
+        <div style={{ fontWeight: 500 }}>{text || "Sin paciente"}</div>
+      ),
+    },
+    {
+      title: "Fecha y Hora",
+      key: "fecha_hora",
+      render: (record: any) => {
+        if (!record.fecha_visita || !record.hora_visita) {
+          return (
+            <div style={{ color: "#faad14", fontStyle: "italic" }}>
+              Pendiente de programación
+            </div>
+          );
+        }
+        return (
+          <div>
+            <div style={{ fontWeight: 500 }}>
+              {dayjs(record.fecha_visita).format("DD/MM/YYYY")}
+            </div>
+            <div style={{ fontSize: "12px", color: "#666" }}>
+              {dayjs(record.hora_visita, "HH:mm:ss").format("HH:mm")}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Dirección",
+      dataIndex: "direccion_visita",
+      key: "direccion_visita",
+      render: (text: string) => (
+        <div style={{ maxWidth: 200 }}>
+          <EnvironmentOutlined style={{ marginRight: 4, color: "#666" }} />
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: "Teléfono",
+      dataIndex: "telefono_visita",
+      key: "telefono_visita",
+      render: (text: string) => (
+        <div>
+          <PhoneOutlined style={{ marginRight: 4, color: "#666" }} />
+          {text || "No disponible"}
+        </div>
+      ),
+    },
+    {
+      title: "Profesional",
+      dataIndex: "profesional_asignado",
+      key: "profesional_asignado",
+      render: (text: string) => (
+        <div>
+          <UserOutlined style={{ marginRight: 4, color: "#666" }} />
+          {text || "Sin asignar"}
+        </div>
+      ),
+    },
+    {
+      title: "Estado",
+      dataIndex: "estado_visita",
+      key: "estado_visita",
+      render: (status: string) => (
+        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
+      ),
+    },
+    {
+      title: "Valor",
+      dataIndex: "valor_dia",
+      key: "valor_dia",
+      render: (value: number) => (
+        <div style={{ fontWeight: 500, color: "#52c41a" }}>
+          ${value?.toLocaleString() || "0"}
+        </div>
+      ),
+    },
+    {
+      title: "Acciones",
+      key: "actions",
+      render: (record: any) => (
+        <Space>
+          <Button
+            type="link"
+            size="small"
+            onClick={() =>
+              navigate(
+                `/visitas-domiciliarias/usuarios/${record.id_usuario}/detalles`,
+              )
+            }
+          >
+            Ver Detalles
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
-  const handleSubmit = async (values: any) => {
-    // No permitir envío en modo visualización
-    if (isViewMode) {
+  const calculateStats = () => {
+    if (!homeVisitsData?.data.data)
+      return { total: 0, pendientes: 0, realizadas: 0, canceladas: 0 };
+
+    // Usar datos filtrados para las estadísticas
+    const visitas =
+      filteredData.length > 0 ? filteredData : homeVisitsData.data.data;
+    return {
+      total: visitas.length,
+      pendientes: visitas.filter((v: any) => v.estado_visita === "PENDIENTE")
+        .length,
+      realizadas: visitas.filter((v: any) => v.estado_visita === "REALIZADA")
+        .length,
+      canceladas: visitas.filter((v: any) => v.estado_visita === "CANCELADA")
+        .length,
+    };
+  };
+
+  // Función para aplicar filtros
+  const applyFilters = useCallback(() => {
+    if (!homeVisitsData?.data.data) {
+      setFilteredData([]);
       return;
     }
 
-    try {
-      if (isEditing && currentVisitData) {
-        // Actualizar visita existente
-        const updateData: UpdateHomeVisitData = {
-          fecha_visita: values.fecha_visita.format("YYYY-MM-DD"),
-          hora_visita: values.hora_visita.format("HH:mm:ss"),
-          direccion_visita: userData?.data.data?.direccion || "",
-          telefono_visita: userData?.data.data?.telefono || "",
-          valor_dia: serviceRateData?.data.data?.precio_por_dia || 0,
-          observaciones: values.observaciones,
-          id_profesional_asignado: values.id_profesional_asignado,
-        };
+    let filtered = [...homeVisitsData.data.data];
 
-        // Usar el ID de la visita específica si está disponible, sino usar el de la primera visita
-        const visitaIdToUpdate = visitaId
-          ? Number(visitaId)
-          : currentVisitData.id_visitadomiciliaria;
+    // Filtrar por estado
+    if (filters.estado) {
+      filtered = filtered.filter(
+        (visita: any) => visita.estado_visita === filters.estado,
+      );
+    }
 
-        await updateHomeVisitMutation.mutateAsync({
-          userId: Number(userId),
-          visitaId: visitaIdToUpdate,
-          data: updateData,
-        });
-        message.success(" Visita domiciliaria actualizada exitosamente");
-
-        // Redirigir de vuelta a la página de detalles para ver los cambios actualizados
-        navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
-      } else if (visitaId && !currentVisitData) {
-        // Si tenemos un visitaId pero no hay datos de visita, mostrar error
-        message.error(
-          "No se pudo cargar la visita domiciliaria. Por favor, inténtalo de nuevo.",
+    // Filtrar por tipo de visitas (futuras o todas)
+    if (filters.tipoVisitas === "futuras") {
+      const now = dayjs();
+      filtered = filtered.filter((visita: any) => {
+        if (!visita.fecha_visita || !visita.hora_visita) return false;
+        const visitaDateTime = dayjs(
+          `${visita.fecha_visita} ${visita.hora_visita}`,
         );
-        return;
-      } else {
-        // Crear nueva visita solo si no estamos editando una existente
-        const visitaData: CreateHomeVisitData = {
-          id_usuario: Number(userId),
-          fecha_visita: values.fecha_visita.format("YYYY-MM-DD"),
-          hora_visita: values.hora_visita.format("HH:mm:ss"),
-          direccion_visita: userData?.data.data?.direccion || "",
-          telefono_visita: userData?.data.data?.telefono || "",
-          valor_dia: serviceRateData?.data.data?.precio_por_dia || 0,
-          observaciones: values.observaciones,
-          id_profesional_asignado: values.id_profesional_asignado,
-        };
-
-        await createHomeVisitMutation.mutateAsync(visitaData);
-        message.success(" Visita domiciliaria creada exitosamente");
-      }
-
-      navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
-    } catch (error) {
-      message.error(
-        ` Error al ${isEditing ? "actualizar" : "crear"} la visita domiciliaria`,
-      );
+        return visitaDateTime.isAfter(now);
+      });
     }
-  };
 
-  const handleCancel = () => {
-    navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
-  };
+    // Filtrar por fecha
+    if (filters.fecha) {
+      const filterDate = dayjs(filters.fecha).format("YYYY-MM-DD");
+      filtered = filtered.filter((visita: any) => {
+        if (!visita.fecha_visita) return false;
+        return dayjs(visita.fecha_visita).format("YYYY-MM-DD") === filterDate;
+      });
+    }
 
-  const handleProfessionalChange = (value: number) => {
-    const professional = professionalsData?.data.data?.find(
-      (p: any) => p.id_profesional === value,
-    );
-    setSelectedProfessional(professional);
-  };
+    // Filtrar por paciente
+    if (filters.paciente) {
+      filtered = filtered.filter((visita: any) => {
+        const pacienteNombre = visita.paciente_nombre?.toLowerCase() || "";
+        return pacienteNombre.includes(filters.paciente.toLowerCase());
+      });
+    }
 
-  // Establecer el profesional asignado cuando se carguen los datos
+    setFilteredData(filtered);
+  }, [homeVisitsData, filters]);
+
+  // Aplicar filtros cuando cambien los datos o filtros
   useEffect(() => {
-    if (isEditing && currentVisitData && professionalsData?.data.data) {
-      // Buscar el profesional asignado en la lista de profesionales
-      const assignedProfessional = professionalsData.data.data.find(
-        (prof: any) => {
-          const profName = `${prof.nombres} ${prof.apellidos}`;
-          return currentVisitData.profesional_asignado?.includes(profName);
-        },
-      );
+    applyFilters();
+  }, [applyFilters]);
 
-      if (assignedProfessional) {
-        form.setFieldsValue({
-          id_profesional_asignado: assignedProfessional.id_profesional,
-        });
-        setSelectedProfessional(assignedProfessional);
-      }
-    }
-  }, [isEditing, currentVisitData, professionalsData, form]);
+  // Función para manejar cambios en filtros
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
 
-  // Mostrar loading solo si faltan datos críticos
-  if (loadingUser || !userData) {
-    console.log("🔍 Cargando datos del paciente...");
-    return (
-      <div style={{ padding: "24px", textAlign: "center" }}>
-        <p>Cargando datos del paciente...</p>
-      </div>
-    );
-  }
+  // Función para limpiar filtros
+  const clearFilters = () => {
+    setFilters({
+      estado: undefined,
+      tipoVisitas: "todas", // Cambiado de "futuras" a "todas"
+      fecha: null,
+      paciente: "",
+    });
+  };
 
-  // Si estamos editando una visita específica, esperar a que se cargue
-  if (visitaId && (loadingSpecificVisit || !specificVisit?.data)) {
-    console.log("🔍 Cargando datos de la visita específica...");
-    return (
-      <div style={{ padding: "24px", textAlign: "center" }}>
-        <p>Cargando datos de la visita domiciliaria...</p>
-      </div>
-    );
-  }
+  const stats = calculateStats();
 
-  if (loadingProfessionals || !professionalsData) {
-    console.log("🔍 Cargando lista de profesionales...");
-    return (
-      <div style={{ padding: "24px", textAlign: "center" }}>
-        <p>Cargando lista de profesionales...</p>
-      </div>
-    );
-  }
-
-  if (loadingServiceRate || !serviceRateData) {
-    console.log("🔍 Obteniendo tarifa de visitas domiciliarias...");
-    return (
-      <div style={{ padding: "24px", textAlign: "center" }}>
-        <p>Obteniendo tarifa de "Visitas Domiciliarias"...</p>
-      </div>
-    );
-  }
-
-  // Si estamos editando una visita específica y no está cargando, verificar si existe
-  if (visitaId && !loadingSpecificVisit && !specificVisit?.data) {
-    console.log(
-      "🔍 No se encontró la visita específica, mostrando mensaje de error",
-    );
-    return (
-      <div style={{ padding: "24px", textAlign: "center" }}>
-        <p>No se encontró la visita domiciliaria especificada.</p>
-        <Button
-          type="primary"
-          onClick={() =>
-            navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`)
-          }
-          style={{ marginTop: "16px" }}
-        >
-          Volver a detalles del paciente
-        </Button>
-      </div>
-    );
+  if (error) {
+    message.error("Error al cargar las visitas domiciliarias");
   }
 
   return (
     <div style={{ padding: "24px" }}>
-      <div style={{ marginBottom: "24px" }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={handleCancel}
-          style={{ marginBottom: "16px" }}
-        >
-          Volver
-        </Button>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Title level={3}>
-            {isViewMode
-              ? "Detalles de Visita Domiciliaria"
-              : isEditing &&
-                  currentVisitData &&
-                  (!currentVisitData.fecha_visita ||
-                    !currentVisitData.hora_visita)
-                ? "Programar Visita Domiciliaria"
-                : isEditing
-                  ? "Editar Visita Domiciliaria"
-                  : "Crear Nueva Visita Domiciliaria"}
-          </Title>
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            {/* Botón de refrescar datos */}
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => {
-                console.log("🔍 Invalidando queries manualmente...");
-                queryClient.invalidateQueries({
-                  queryKey: ["user-first-home-visit", userId],
-                });
-                queryClient.invalidateQueries({
-                  queryKey: ["user-home-visits", userId],
-                });
-                queryClient.invalidateQueries({
-                  queryKey: ["user", userId],
-                });
-                if (visitaId) {
-                  queryClient.invalidateQueries({
-                    queryKey: ["home-visit", visitaId],
-                  });
-                }
-              }}
-              size="small"
-              title="Refrescar datos"
-            >
-              Refrescar
-            </Button>
-            {isViewMode && isEditing && (
-              <Button
-                onClick={() => setIsViewMode(false)}
-                className="main-button-white"
-              >
-                Editar
-              </Button>
-            )}
-          </div>
-        </div>
-        {isEditing &&
-          currentVisitData &&
-          (!currentVisitData.fecha_visita || !currentVisitData.hora_visita) && (
-            <div
-              style={{
-                backgroundColor: "#fff7e6",
-                border: "1px solid #ffd591",
-                borderRadius: "6px",
-                padding: "8px 12px",
-                fontSize: "12px",
-                color: "#d46b08",
-                marginTop: "8px",
-              }}
-            >
-              ! Esta visita necesita ser programada
-            </div>
-          )}
-        {isEditing &&
-          currentVisitData &&
-          currentVisitData.observaciones?.includes(
-            "creada automáticamente",
-          ) && (
-            <div
-              style={{
-                backgroundColor: "#e6f7ff",
-                border: "1px solid #91d5ff",
-                borderRadius: "6px",
-                padding: "8px 12px",
-                fontSize: "12px",
-                color: "#1890ff",
-                marginTop: "8px",
-              }}
-            >
-              i Esta visita fue creada automáticamente al registrar el usuario.
-              Completa los datos para programarla.
-            </div>
-          )}
-      </div>
-
-      <Card>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          initialValues={{
-            fecha_visita:
-              isEditing && currentVisitData && currentVisitData.fecha_visita
-                ? dayjs(currentVisitData.fecha_visita)
-                : undefined,
-            hora_visita:
-              isEditing && currentVisitData && currentVisitData.hora_visita
-                ? dayjs(`2000-01-01 ${currentVisitData.hora_visita}`)
-                : undefined,
-            observaciones:
-              isEditing && currentVisitData
-                ? currentVisitData.observaciones || ""
-                : "",
-            id_profesional_asignado: undefined, // Se manejará en useEffect
-          }}
-        >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Fecha de Visita"
-                name="fecha_visita"
-                rules={[
-                  {
-                    required: true,
-                    message: "Por favor selecciona la fecha de visita",
-                  },
-                ]}
-                extra={
-                  isEditing && !isViewMode ? (
-                    <Typography.Text
-                      type="secondary"
-                      style={{ fontSize: "12px" }}
-                    >
-                      ! Cambiar la fecha cambiará automáticamente el estado a
-                      "REPROGRAMADA" (incluso si ya está "REALIZADA")
-                    </Typography.Text>
-                  ) : undefined
-                }
-              >
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="DD/MM/YYYY"
-                  placeholder="Seleccionar fecha"
-                  disabled={isViewMode}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Hora de Visita"
-                name="hora_visita"
-                rules={[
-                  {
-                    required: true,
-                    message: "Por favor selecciona la hora de visita",
-                  },
-                ]}
-              >
-                <TimePicker
-                  style={{ width: "100%" }}
-                  format="HH:mm"
-                  placeholder="Seleccionar hora"
-                  disabled={isViewMode}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="Profesional Asignado"
-                name="id_profesional_asignado"
-                rules={[
-                  {
-                    required: true,
-                    message: "Por favor selecciona un profesional",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Selecciona un profesional"
-                  loading={loadingProfessionals}
-                  showSearch
-                  onChange={handleProfessionalChange}
-                  disabled={isViewMode}
-                  filterOption={(input, option) =>
-                    (option?.children as unknown as string)
-                      ?.toLowerCase()
-                      .includes(input.toLowerCase())
-                  }
-                >
-                  {professionalsData?.data.data?.map((prof: any) => (
-                    <Option
-                      key={prof.id_profesional}
-                      value={prof.id_profesional}
-                    >
-                      {prof.nombres} {prof.apellidos} - {prof.especialidad}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Form.Item label="Observaciones" name="observaciones">
-            <TextArea
-              rows={4}
-              placeholder="Ingresa observaciones adicionales sobre la visita"
-              disabled={isViewMode}
-            />
-          </Form.Item>
-
-          {/* Resumen de la visita */}
-          <Card
-            title={
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
-                <span>Resumen de la Visita</span>
-                {selectedProfessional && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      fontSize: "12px",
-                      color: "#52c41a",
-                      marginLeft: "8px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "6px",
-                        height: "6px",
-                        borderRadius: "50%",
-                        backgroundColor: "#52c41a",
-                      }}
-                    />
-                    <span>Profesional asignado</span>
-                  </div>
-                )}
-              </div>
-            }
-            size="small"
+      <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
+        <Col span={24}>
+          <div
             style={{
-              marginBottom: 16,
-              backgroundColor: selectedProfessional ? "#f6ffed" : "#fafafa",
-              borderColor: selectedProfessional ? "#b7eb8f" : "#d9d9d9",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            <Row gutter={16}>
-              <Col span={8}>
-                <div style={{ marginBottom: 8 }}>
-                  <strong>Paciente:</strong>
-                  <div style={{ color: "#666" }}>
-                    {userData?.data.data?.nombres}{" "}
-                    {userData?.data.data?.apellidos}
-                  </div>
-                </div>
-              </Col>
-              <Col span={8}>
-                <div style={{ marginBottom: 8 }}>
-                  <strong>Dirección:</strong>
-                  <div style={{ color: "#666" }}>
-                    {userData?.data.data?.direccion}
-                  </div>
-                </div>
-              </Col>
-              <Col span={8}>
-                <div style={{ marginBottom: 8 }}>
-                  <strong>Teléfono:</strong>
-                  <div style={{ color: "#666" }}>
-                    {userData?.data.data?.telefono}
-                  </div>
-                </div>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={8}>
-                <div style={{ marginBottom: 8 }}>
-                  <strong>Valor por día:</strong>
-                  <div style={{ color: "#52c41a", fontWeight: 500 }}>
-                    $
-                    {serviceRateData?.data.data?.precio_por_dia?.toLocaleString() ||
-                      "0"}
-                  </div>
-                </div>
-              </Col>
-              <Col span={8}>
-                <div style={{ marginBottom: 8 }}>
-                  <strong>Estado actual:</strong>
-                  <div
-                    style={{
-                      color:
-                        isEditing &&
-                        currentVisitData &&
-                        (!currentVisitData.fecha_visita ||
-                          !currentVisitData.hora_visita)
-                          ? "#faad14"
-                          : isEditing &&
-                              currentVisitData?.estado_visita === "REPROGRAMADA"
-                            ? "#fa8c16"
-                            : isEditing &&
-                                currentVisitData?.estado_visita === "REALIZADA"
-                              ? "#52c41a"
-                              : isEditing &&
-                                  currentVisitData?.estado_visita ===
-                                    "CANCELADA"
-                                ? "#ff4d4f"
-                                : "#1890ff",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {isEditing &&
-                    currentVisitData &&
-                    (!currentVisitData.fecha_visita ||
-                      !currentVisitData.hora_visita)
-                      ? "PENDIENTE DE PROGRAMACIÓN"
-                      : isEditing && currentVisitData
-                        ? currentVisitData.estado_visita
-                        : "PENDIENTE"}
-                  </div>
-                </div>
-              </Col>
-              <Col span={8}>
-                <div style={{ marginBottom: 8 }}>
-                  <strong>Profesional asignado:</strong>
-                  <div style={{ color: "#1890ff", fontWeight: 500 }}>
-                    {selectedProfessional
-                      ? `${selectedProfessional.nombres} ${selectedProfessional.apellidos} (${selectedProfessional.especialidad})`
-                      : "Sin asignar"}
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          </Card>
-
-          <Form.Item>
-            {!isViewMode && (
-              <Button
-                type="primary"
-                htmlType="submit"
-                icon={<SaveOutlined />}
-                loading={
-                  createHomeVisitMutation.isPending ||
-                  updateHomeVisitMutation.isPending
-                }
-                style={{ marginRight: "8px" }}
-              >
-                {isEditing &&
-                currentVisitData &&
-                (!currentVisitData.fecha_visita ||
-                  !currentVisitData.hora_visita)
-                  ? "Programar Visita"
-                  : isEditing
-                    ? "Actualizar Visita"
-                    : "Crear Visita"}
-              </Button>
-            )}
-            <Button onClick={handleCancel}>
-              {isViewMode ? "Cerrar" : "Cancelar"}
+            <Title level={3}>Visitas Domiciliarias</Title>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate("/visitas-domiciliarias/usuarios")}
+            >
+              Nueva Visita
             </Button>
-          </Form.Item>
-        </Form>
+          </div>
+        </Col>
+      </Row>
+
+      {/* Estadísticas */}
+      <Row gutter={16} style={{ marginBottom: "24px" }}>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Total de Visitas"
+              value={stats.total}
+              prefix={<CalendarOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Pendientes"
+              value={stats.pendientes}
+              valueStyle={{ color: "#faad14" }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Realizadas"
+              value={stats.realizadas}
+              valueStyle={{ color: "#52c41a" }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Canceladas"
+              value={stats.canceladas}
+              valueStyle={{ color: "#ff4d4f" }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Filtros */}
+      <Card style={{ marginBottom: "24px" }}>
+        {/* Indicador de filtros activos */}
+        {(filters.estado || filters.fecha || filters.paciente) && (
+          <div
+            style={{
+              marginBottom: "16px",
+              padding: "8px 12px",
+              backgroundColor: "#f0f9ff",
+              border: "1px solid #91d5ff",
+              borderRadius: "6px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "12px",
+                color: "#1890ff",
+                marginBottom: "4px",
+              }}
+            >
+              🔍 Filtros activos:
+            </div>
+            <div style={{ fontSize: "11px", color: "#666" }}>
+              {filters.estado && (
+                <span style={{ marginRight: "8px" }}>
+                  Estado: {filters.estado}
+                </span>
+              )}
+              {filters.fecha && (
+                <span style={{ marginRight: "8px" }}>
+                  Fecha: {dayjs(filters.fecha).format("DD/MM/YYYY")}
+                </span>
+              )}
+              {filters.paciente && (
+                <span style={{ marginRight: "8px" }}>
+                  Paciente: {filters.paciente}
+                </span>
+              )}
+              <span style={{ marginRight: "8px" }}>
+                Tipo:{" "}
+                {filters.tipoVisitas === "futuras"
+                  ? "Solo futuras"
+                  : "Todas las visitas"}
+              </span>
+            </div>
+          </div>
+        )}
+        <Row gutter={16}>
+          <Col span={4}>
+            <Select
+              placeholder="Filtrar por estado"
+              style={{ width: "100%" }}
+              allowClear
+              value={filters.estado}
+              onChange={(value) => handleFilterChange("estado", value)}
+            >
+              <Option value="PENDIENTE">Pendiente</Option>
+              <Option value="REALIZADA">Realizada</Option>
+              <Option value="CANCELADA">Cancelada</Option>
+              <Option value="REPROGRAMADA">Reprogramada</Option>
+            </Select>
+          </Col>
+          <Col span={4}>
+            <Select
+              placeholder="Mostrar visitas"
+              style={{ width: "100%" }}
+              value={filters.tipoVisitas}
+              onChange={(value) => handleFilterChange("tipoVisitas", value)}
+            >
+              <Option value="futuras">Solo futuras</Option>
+              <Option value="todas">Todas las visitas</Option>
+            </Select>
+          </Col>
+          <Col span={4}>
+            <DatePicker
+              placeholder="Filtrar por fecha"
+              style={{ width: "100%" }}
+              value={filters.fecha}
+              onChange={(value) => handleFilterChange("fecha", value)}
+            />
+          </Col>
+          <Col span={6}>
+            <Input
+              placeholder="Buscar por paciente"
+              prefix={<SearchOutlined />}
+              value={filters.paciente}
+              onChange={(e) => handleFilterChange("paciente", e.target.value)}
+            />
+          </Col>
+          <Col span={3}>
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              onClick={applyFilters}
+            >
+              Filtrar
+            </Button>
+          </Col>
+          <Col span={3}>
+            <Button onClick={clearFilters}>Limpiar</Button>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Tabla */}
+      <Card>
+        <Table
+          columns={columns}
+          dataSource={filteredData}
+          loading={isLoading}
+          rowKey="id_visitadomiciliaria"
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} de ${total} visitas`,
+          }}
+          scroll={{ x: 1200 }}
+          locale={{
+            emptyText: (
+              <div style={{ textAlign: "center", padding: "40px 0" }}>
+                <div
+                  style={{
+                    fontSize: "48px",
+                    color: "#d9d9d9",
+                    marginBottom: "16px",
+                  }}
+                >
+                  📋
+                </div>
+                <div style={{ color: "#666", marginBottom: "8px" }}>
+                  No hay visitas que coincidan con los filtros
+                </div>
+                <div style={{ fontSize: "12px", color: "#999" }}>
+                  Intenta ajustar los filtros o crear una nueva visita
+                </div>
+              </div>
+            ),
+          }}
+        />
       </Card>
     </div>
   );
