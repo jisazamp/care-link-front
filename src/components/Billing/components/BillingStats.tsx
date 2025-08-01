@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Statistic, Progress, Tooltip, Typography, Card, Divider } from 'antd';
+import { Row, Col, Statistic, Progress, Typography, Card, Divider } from 'antd';
 import {
   DollarOutlined,
   ClockCircleOutlined,
@@ -34,7 +34,6 @@ export const BillingStats: React.FC<BillingStatsProps> = ({ stats }) => {
   const primaryColor = '#9957C2'; // Color principal del sistema
   const textColor = '#262626'; // Color de texto principal
   const secondaryTextColor = '#8c8c8c'; // Color de texto secundario
-  const negativeColor = '#ff4d4f'; // Solo para valores negativos
   const neutralColor = '#595959'; // Color neutro para iconos
 
   return (

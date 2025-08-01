@@ -334,7 +334,7 @@ export const UsersWithHomeVisitsList: React.FC = () => {
   ];
 
   // Filtrar columnas según visibilidad
-  const visibleColumnsData = columns.filter((col, index) => {
+  const visibleColumnsData = columns.filter((_, index) => {
     const columnKeys = ['avatar', 'nombres', 'estado', 'acciones'];
     return visibleColumns[columnKeys[index] as keyof typeof visibleColumns];
   });
@@ -465,7 +465,7 @@ export const UsersWithHomeVisitsList: React.FC = () => {
             showHeader={false}
             style={{ width: "100%" }}
             scroll={{ x: "max-content" }}
-            size={tableSettings.compactMode ? "small" : "default"}
+            size={tableSettings.compactMode ? "small" : "middle"}
             onRow={(record) => ({
               onClick: () => handleRowClick(record),
               style: { cursor: 'pointer' }

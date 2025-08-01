@@ -275,6 +275,7 @@ export const MedicalRecord: React.FC = () => {
           cares,
           interventions,
         },
+        attachments: data.attachedDocuments,
       }, {
         onSuccess: () => {
           console.log(" Historia clínica actualizada exitosamente");

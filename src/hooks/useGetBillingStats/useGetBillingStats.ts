@@ -14,18 +14,14 @@ interface BillingStatsData {
   porcentaje_valor_pagado: number;
 }
 
-interface BillingStatsResponse {
-  data: BillingStatsData;
-}
-
 export const useGetBillingStats = () => {
   return useQuery({
     queryKey: ["billing-stats"],
     queryFn: async (): Promise<BillingStatsData> => {
-      const response = await client.get<BillingStatsResponse>(
+      const response = await client.get<BillingStatsData>(
         "/api/facturas/estadisticas",
       );
-      return response.data.data;
+      return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
     refetchOnWindowFocus: false,
