@@ -28,6 +28,7 @@ import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/use
 import { useGetMedicalReports } from "../../hooks/useGetUserMedicalReports/useGetUserMedicalReports";
 import { queryClient } from "../../main";
 import type { Contract, FamilyMember } from "../../types";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -884,7 +885,7 @@ export const UserDetails: React.FC = () => {
                         title: "Profesional",
                         dataIndex: "profesional",
                         render: (_, record) => {
-                          return `${record.profesional?.nombres} ${record.profesional?.apellidos}`;
+                          return upperCaseFullName(record.profesional?.nombres, record.profesional?.apellidos);
                         },
                       },
                       {

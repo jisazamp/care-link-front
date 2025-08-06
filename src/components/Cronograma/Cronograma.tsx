@@ -29,6 +29,7 @@ import type {
 import { CronogramaBreadcrumb } from "./components/CronogramaBreadcrumb";
 import { CronogramaStats } from "./components/CronogramaStats";
 import { JustificacionModal } from "./components/JustificacionModal";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Title, Text } = Typography;
 
@@ -97,7 +98,7 @@ export const Cronograma: React.FC = () => {
               getEstadoBadgeType(paciente.estado_asistencia) || "processing";
             eventos[fecha].push({
               type: tipo,
-              content: `${paciente.nombres || "Paciente"} ${paciente.apellidos || ""}`,
+              content: upperCaseFullName(paciente.nombres || "Paciente", paciente.apellidos || ""),
               paciente: paciente as any,
             });
           },
@@ -448,7 +449,7 @@ export const Cronograma: React.FC = () => {
       render: (_: any, record: PacientePorFecha) => (
         <Space>
           <UserOutlined />
-          <Text>{`${record.nombres} ${record.apellidos}`}</Text>
+          <Text>{upperCaseFullName(record.nombres, record.apellidos)}</Text>
           {record.requiere_transporte && (
             <Tooltip title="Requiere transporte">
               <CarOutlined style={{ color: "#1890ff" }} />

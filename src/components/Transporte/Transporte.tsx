@@ -36,6 +36,7 @@ import {
 import type { RutaTransporte, EstadoTransporte } from "../../types";
 import { TransporteStats } from "./components/TransporteStats";
 import { TransporteFilters } from "./components/TransporteFilters";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Title, Text } = Typography;
 const {} = Select;
@@ -316,11 +317,89 @@ export const Transporte: React.FC = () => {
 
   // Columnas de la tabla
   const columns = [
+    // Columna para móviles que combina toda la información
+    {
+      title: "Información",
+      key: "info_mobile",
+      responsive: ["xs" as const],
+      render: (record: RutaTransporte) => {
+        const tiempoRestante = getTiempoRestante(
+          record.hora_recogida,
+          record.estado,
+        );
+        const alertaTexto = getAlertaTexto(tiempoRestante);
+
+        return (
+          <div style={{ width: "100%" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+              <div style={{ flex: 1 }}>
+                <Text strong style={{ fontSize: "14px", display: "block" }}>
+                  {upperCaseFullName(record.nombres, record.apellidos)}
+                </Text>
+                <Text type="secondary" style={{ fontSize: "12px" }}>
+                  {record.n_documento}
+                </Text>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                {alertaTexto && (
+                  <Tag
+                    color={
+                      tiempoRestante && tiempoRestante <= 30
+                        ? "red"
+                        : tiempoRestante && tiempoRestante <= 60
+                          ? "orange"
+                          : "blue"
+                    }
+                    style={{ margin: 0, fontSize: "10px" }}
+                  >
+                    !
+                  </Tag>
+                )}
+                <Tag color={getEstadoColor(record.estado)} style={{ margin: 0, fontSize: "10px" }}>
+                  {getEstadoText(record.estado)}
+                </Tag>
+              </div>
+            </div>
+            
+            {record.direccion_recogida && (
+              <div style={{ marginBottom: 4 }}>
+                <EnvironmentOutlined style={{ marginRight: 4, fontSize: "12px" }} />
+                <Text style={{ fontSize: "12px" }}>{record.direccion_recogida}</Text>
+              </div>
+            )}
+            
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: 12 }}>
+                {record.hora_recogida && (
+                  <div>
+                    <ClockCircleOutlined style={{ marginRight: 2, fontSize: "12px" }} />
+                    <Text style={{ fontSize: "12px" }}>R: {record.hora_recogida}</Text>
+                  </div>
+                )}
+                {record.hora_entrega && (
+                  <div>
+                    <ClockCircleOutlined style={{ marginRight: 2, fontSize: "12px" }} />
+                    <Text style={{ fontSize: "12px" }}>E: {record.hora_entrega}</Text>
+                  </div>
+                )}
+              </div>
+              {record.telefono_contacto && (
+                <div>
+                  <PhoneOutlined style={{ marginRight: 2, fontSize: "12px" }} />
+                  <Text style={{ fontSize: "12px" }}>{record.telefono_contacto}</Text>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      },
+    },
+    // Columnas para tablets y desktop
     {
       title: "Alerta",
       key: "alerta",
       width: screens.xs ? 80 : 120,
-      responsive: ["md" as const],
+      responsive: ["sm" as const],
       render: (record: RutaTransporte) => {
         const tiempoRestante = getTiempoRestante(
           record.hora_recogida,
@@ -351,7 +430,7 @@ export const Transporte: React.FC = () => {
       responsive: ["sm" as const],
       render: (record: RutaTransporte) => (
         <Space direction="vertical" size="small">
-          <Text strong>{`${record.nombres} ${record.apellidos}`}</Text>
+          <Text strong>{upperCaseFullName(record.nombres, record.apellidos)}</Text>
           <Text type="secondary">{record.n_documento}</Text>
         </Space>
       ),
@@ -536,7 +615,8 @@ export const Transporte: React.FC = () => {
           dataSource={rutaData?.data?.data?.rutas || []}
           rowKey="id_transporte"
           pagination={false}
-          scroll={{ x: screens.xs ? 800 : 1200 }}
+          scroll={{ x: screens.xs ? 350 : 1200 }}
+          size={screens.xs ? "small" : "middle"}
           className="transporte-table-clickable"
           onRow={(record) => {
             const tiempoRestante = getTiempoRestante(
@@ -615,7 +695,7 @@ export const Transporte: React.FC = () => {
                 <Col span={12}>
                   <Text strong>Nombre:</Text>
                   <br />
-                  <Text>{`${transporteSeleccionado.nombres} ${transporteSeleccionado.apellidos}`}</Text>
+                  <Text>{upperCaseFullName(transporteSeleccionado.nombres, transporteSeleccionado.apellidos)}</Text>
                 </Col>
                 <Col span={12}>
                   <Text strong>Documento:</Text>
