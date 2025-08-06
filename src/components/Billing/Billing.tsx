@@ -22,6 +22,7 @@ import { Table } from "antd";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import type { Bill } from "../../types";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Title } = Typography;
 
@@ -280,7 +281,7 @@ export const Billing: React.FC = () => {
       // Filtro por nombre usuario
       if (
         contractFilters.nombreUsuario &&
-        !`${item.nombres} ${item.apellidos}`
+        !upperCaseFullName(item.nombres, item.apellidos)
           .toLowerCase()
           .includes(contractFilters.nombreUsuario.toLowerCase())
       ) {
@@ -297,7 +298,7 @@ export const Billing: React.FC = () => {
       key: "nombres",
       render: (_: any, row: any) => {
         if (row.nombres && row.apellidos) {
-          return `${row.nombres} ${row.apellidos}`;
+          return upperCaseFullName(row.nombres, row.apellidos);
         }
         return "N/A";
       },
