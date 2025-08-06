@@ -19,6 +19,7 @@ import { UserAddOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useGetAvailableUsers } from "../../hooks/useGetAvailableUsers/useGetAvailableUsers";
 import { useAssignUsersToActivity } from "../../hooks/useAssignUsersToActivity/useAssignUsersToActivity";
 import dayjs from "dayjs";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -172,7 +173,7 @@ export const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       key: "user",
       render: (nombres: string, record: UserForActivity) => (
         <div>
-          <Text strong>{`${nombres} ${record.apellidos}`}</Text>
+          <Text strong>{upperCaseFullName(nombres, record.apellidos)}</Text>
           <br />
           <Text type="secondary">{record.n_documento}</Text>
           {record.telefono && (
