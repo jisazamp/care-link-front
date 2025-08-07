@@ -6,7 +6,6 @@ import {
   CloseCircleOutlined, 
   ClockCircleOutlined,
   CloseOutlined,
-  DownloadOutlined,
   PrinterOutlined
 } from "@ant-design/icons";
 import { useGetPatientAttendanceReport } from "../../../hooks/useGetPatientAttendanceReport";
@@ -138,11 +137,6 @@ export const PatientAttendanceReport: React.FC<PatientAttendanceReportProps> = (
     },
   ];
 
-  const handleExport = () => {
-    // Implementar exportación a PDF/Excel
-    console.log("Exportar informe");
-  };
-
   const handlePrint = () => {
     // Implementar impresión
     window.print();
@@ -244,9 +238,6 @@ export const PatientAttendanceReport: React.FC<PatientAttendanceReportProps> = (
       open={visible}
       extra={
         <Space>
-          <Button icon={<DownloadOutlined />} onClick={handleExport}>
-            Exportar
-          </Button>
           <Button icon={<PrinterOutlined />} onClick={handlePrint}>
             Imprimir
           </Button>
