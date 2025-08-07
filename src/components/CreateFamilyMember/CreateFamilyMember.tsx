@@ -28,6 +28,7 @@ import { useCreateFamilyMember } from "../../hooks/useCreateFamilyMember/useCrea
 import { useEditFamilyMemberMutation } from "../../hooks/useEditFamilyMemberMutation/useEditFamilyMemberMutation";
 import { useGetFamilyMemberById } from "../../hooks/useGetFamilyMemberById/useGetFamilyMemberById";
 import { useGetUserFamilyMembers } from "../../hooks/useGetUserFamilyMembers/useGetUserFamilyMembers";
+import { useGetUserById } from "../../hooks/useGetUserById/useGetUserById";
 import { useExportFamilyMemberTemplate } from "../../hooks/useExportFamilyMemberTemplate/useExportFamilyMemberTemplate";
 import { useImportFamilyMembers } from "../../hooks/useImportFamilyMembers/useImportFamilyMembers";
 import { queryClient } from "../../main";
@@ -69,6 +70,7 @@ export const CreateFamilyMember = () => {
     useGetFamilyMemberById(familyMemberId);
 
   const { data: existingFamilyMembers } = useGetUserFamilyMembers(userId);
+  const { data: userData } = useGetUserById(userId);
 
   const { mutate: createFamilyMember, isSuccess: isSuccessCreateFamilyMember, error: createError } =
     useCreateFamilyMember(userId);
@@ -219,12 +221,20 @@ export const CreateFamilyMember = () => {
       // Invalidar también la query del usuario para actualizar los datos de localización
       queryClient.invalidateQueries({ queryKey: [`get-user-${userId}`] });
       
-      // Detectar si viene de visitas domiciliarias basándose en la URL actual
-      const currentPath = window.location.pathname;
-      if (currentPath.includes('/visitas-domiciliarias/')) {
-        navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
+      // Verificar si el usuario tiene el switch "Visita Domiciliaria" activo
+      const userHasHomeVisitEnabled = userData?.data?.data?.visitas_domiciliarias;
+      
+      if (userHasHomeVisitEnabled) {
+        // Si tiene visita domiciliaria habilitada, redirigir al wizard
+        navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
       } else {
-        navigate(`/usuarios/${userId}/detalles`);
+        // Si no tiene visita domiciliaria, redirigir según el contexto
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/visitas-domiciliarias/')) {
+          navigate(`/visitas-domiciliarias/usuarios/${userId}/detalles`);
+        } else {
+          navigate(`/usuarios/${userId}/detalles`);
+        }
       }
     }
   }, [
@@ -232,6 +242,7 @@ export const CreateFamilyMember = () => {
     isSuccessEditFamilyMember,
     navigate,
     userId,
+    userData?.data?.data?.visitas_domiciliarias,
   ]);
 
   useEffect(() => {

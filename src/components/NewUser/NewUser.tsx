@@ -109,8 +109,7 @@ export const NewUser: React.FC = () => {
     },
   });
 
-  // Observar el valor del switch para determinar la redirección
-  const homeVisitValue = watch("homeVisit");
+
 
   // Activar automáticamente el switch si viene desde visitas domiciliarias
   useEffect(() => {
@@ -278,40 +277,20 @@ export const NewUser: React.FC = () => {
 
   useEffect(() => {
     if (isSuccessCreateUser || isSuccessEditUser) {
-      // Redirigir según el valor del switch "Visita Domiciliaria"
-      if (homeVisitValue) {
-        // Si el switch está ON, redirigir a la visita existente o crear nueva
-        if (isSuccessCreateUser) {
-          // Para usuarios nuevos, verificar si ya se creó una visita automáticamente
-          const responseData = createUserResponse?.data?.data as any;
-          const userId = responseData?.user?.id_usuario;
-          const homeVisitId = responseData?.home_visit?.id_visitadomiciliaria;
-
-          if (userId) {
-            if (homeVisitId) {
-              // Si ya se creó una visita automáticamente, redirigir a editarla
-              navigate(
-                `/visitas-domiciliarias/usuarios/${userId}/editar-visita/${homeVisitId}`,
-              );
-            } else {
-              // Si no se creó automáticamente, redirigir a crear nueva
-              navigate(
-                `/visitas-domiciliarias/usuarios/${userId}/nueva-visita`,
-              );
-            }
-          } else {
-            navigate("/visitas-domiciliarias/usuarios");
-          }
-        } else if (isSuccessEditUser && data?.data.data?.id_usuario) {
-          // Para edición, usar el ID del usuario existente
-          const userId = data.data.data.id_usuario;
-          navigate(`/visitas-domiciliarias/usuarios/${userId}/nueva-visita`);
+      // Siempre redirigir a crear acudiente primero, independientemente del switch
+      if (isSuccessCreateUser) {
+        // Para usuarios nuevos, redirigir a crear acudiente
+        const responseData = createUserResponse?.data?.data as any;
+        const userId = responseData?.user?.id_usuario;
+        if (userId) {
+          // Siempre redirigir a crear acudiente primero
+          navigate(`/visitas-domiciliarias/usuarios/${userId}/familiar`);
         } else {
-          // Fallback: redirigir a la lista de usuarios con visitas domiciliarias
+          // Fallback si no se obtiene el userId
           navigate("/visitas-domiciliarias/usuarios");
         }
-      } else {
-        // Si el switch está OFF, redirigir al módulo de usuarios regular
+      } else if (isSuccessEditUser) {
+        // Para edición, mantener el comportamiento original
         navigate("/usuarios");
       }
     }
@@ -319,7 +298,6 @@ export const NewUser: React.FC = () => {
     isSuccessCreateUser,
     isSuccessEditUser,
     navigate,
-    homeVisitValue,
     createUserResponse,
     data?.data.data?.id_usuario,
   ]);
