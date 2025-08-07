@@ -311,8 +311,21 @@ export const NewUser: React.FC = () => {
           navigate("/visitas-domiciliarias/usuarios");
         }
       } else {
-        // Si el switch está OFF, redirigir al módulo de usuarios regular
-        navigate("/usuarios");
+        // Si el switch está OFF, verificar si es creación de usuario nuevo o edición
+        if (isSuccessCreateUser) {
+          // Para usuarios nuevos, redirigir a crear acudiente
+          const responseData = createUserResponse?.data?.data as any;
+          const userId = responseData?.user?.id_usuario;
+          if (userId) {
+            navigate(`/usuarios/${userId}/familiar`);
+          } else {
+            // Fallback si no se obtiene el userId
+            navigate("/usuarios");
+          }
+        } else if (isSuccessEditUser) {
+          // Para edición, mantener el comportamiento original
+          navigate("/usuarios");
+        }
       }
     }
   }, [
