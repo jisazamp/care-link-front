@@ -1,4 +1,4 @@
-import { Breadcrumb, Flex } from "antd";
+import { Breadcrumb, Flex, Row, Col } from "antd";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetUserInfo } from "../../hooks/useGetUserInfo/useGetUserInfo";
@@ -25,10 +25,14 @@ export const Home = () => {
       </Breadcrumb>
       <Flex vertical gap="middle">
         <CardAsistControl />
-        <Flex gap="middle">
-          <CardUserFlow />
-          <CardSheduActivities />
-        </Flex>
+        <Row gutter={16}>
+          <Col span={12}>
+            <CardUserFlow />
+          </Col>
+          <Col span={12}>
+            <CardSheduActivities />
+          </Col>
+        </Row>
         <GenericsCards />
       </Flex>
     </>

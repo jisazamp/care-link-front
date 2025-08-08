@@ -56,6 +56,7 @@ export type AuthorizedUser = {
   last_name: string;
   password: string;
   is_deleted: boolean;
+  role: string;
 };
 
 export type MedicalRecord = {

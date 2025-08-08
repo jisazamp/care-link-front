@@ -154,24 +154,70 @@ export const GenericsCards = () => {
     height: 100,
   };
 
-  // Configuración dinámica para el gráfico de eficiencia operativa
+  // Configuración dinámica para el gráfico de eficiencia operativa - MEJORADA
   const configEfficiencyDynamic = {
     data: operationalEfficiencyData?.monthly_data || dataEfficiency,
     xField: "month",
     yField: "efficiency",
     smooth: true,
     color: "#13C2C2", // Verde para eficiencia operativa
+    point: {
+      size: 4,
+      shape: 'circle',
+      style: {
+        fill: '#13C2C2',
+        stroke: '#fff',
+        lineWidth: 2,
+      },
+    },
     tooltip: {
-      showMarkers: false,
+      showMarkers: true,
       formatter: (datum: any) => {
+        const efficiency = datum.efficiency || 0;
+        const status = efficiency >= 90 ? 'Excelente' :
+                      efficiency >= 70 ? 'Buena' :
+                      efficiency >= 50 ? 'Regular' : 'Crítica';
+        
         return {
           name: datum.month,
-          value: `${datum.efficiency || 0}%`,
+          value: `${efficiency}% (${status})`,
         };
       },
     },
     legend: { position: "top" },
     height: 100,
+    area: {
+      style: {
+        fill: 'l(270) 0:#13C2C2 0.5:#13C2C2 1:#13C2C2',
+        fillOpacity: 0.1,
+      },
+    },
+    grid: {
+      line: {
+        style: {
+          stroke: '#f0f0f0',
+          lineWidth: 1,
+        },
+      },
+    },
+    axis: {
+      x: {
+        line: {
+          style: {
+            stroke: '#f0f0f0',
+            lineWidth: 1,
+          },
+        },
+      },
+      y: {
+        line: {
+          style: {
+            stroke: '#f0f0f0',
+            lineWidth: 1,
+          },
+        },
+      },
+    },
   };
 
   if (
@@ -633,21 +679,275 @@ export const GenericsCards = () => {
         </Card>
       </Col>
 
-      {/* Tarjeta 3: Eficiencia Operativa */}
+      {/* Tarjeta 3: Eficiencia Operativa - MEJORADA CON MÁS INFORMACIÓN */}
       <Col span={8}>
         <Card className="generic-card">
-          <Title level={5}>Eficiencia operativa</Title>
-          <Title level={3} style={{ color: "#13C2C2" }}>
-            {operationalEfficiencyData?.overall_efficiency || 0}%
-          </Title>
-          <Line {...configEfficiencyDynamic} />
-          <Text type="secondary">
-            Aumento{" "}
-            <Text type="success">
-              {operationalEfficiencyData?.growth_percentage || 0}%
-            </Text>{" "}
-            Ver reporte
-          </Text>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <CheckCircleOutlined style={{ color: "#13C2C2", fontSize: 18 }} />
+              <Title level={5} style={{ margin: 0 }}>
+                Eficiencia operativa
+              </Title>
+            </div>
+            <Tag 
+              color={
+                (operationalEfficiencyData?.overall_efficiency ?? 0) >= 80 ? 'success' :
+                (operationalEfficiencyData?.overall_efficiency ?? 0) >= 60 ? 'processing' :
+                (operationalEfficiencyData?.overall_efficiency ?? 0) >= 40 ? 'warning' : 'error'
+              }
+              style={{ fontSize: 10 }}
+            >
+              {operationalEfficiencyData?.overall_efficiency ?? 0}% eficiencia
+            </Tag>
+          </div>
+
+          {/* Métricas principales */}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <Text strong style={{ fontSize: "24px", color: "#13C2C2" }}>
+                {operationalEfficiencyData?.overall_efficiency || 0}%
+              </Text>
+              <div style={{ textAlign: "right" }}>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  Crecimiento
+                </Text>
+                <div style={{ fontSize: 14, fontWeight: 500, color: "#13C2C2" }}>
+                  {operationalEfficiencyData?.growth_percentage || 0}%
+                </div>
+              </div>
+            </div>
+            
+            {/* Indicadores de rendimiento */}
+            <Space size="small" style={{ marginBottom: 8 }}>
+              <Tag color="default" style={{ fontSize: 10 }}>
+                <CheckCircleOutlined style={{ marginRight: 4 }} />
+                {operationalEfficiencyData?.monthly_data?.length || 0} meses
+              </Tag>
+              <Tag 
+                color={
+                  (operationalEfficiencyData?.growth_percentage ?? 0) > 0 ? 'success' :
+                  (operationalEfficiencyData?.growth_percentage ?? 0) === 0 ? 'processing' : 'error'
+                }
+                style={{ fontSize: 10 }}
+              >
+                {operationalEfficiencyData?.growth_percentage ?? 0}% vs mes anterior
+              </Tag>
+            </Space>
+          </div>
+
+          {/* Gráfico mejorado */}
+          <div style={{ marginBottom: 12 }}>
+            <Line {...configEfficiencyDynamic} />
+          </div>
+
+          {/* Información adicional mejorada */}
+          <div style={{ marginTop: 8 }}>
+            {/* Desglose de componentes de eficiencia */}
+            <div style={{ marginBottom: 8 }}>
+              <Text type="secondary" style={{ fontSize: 11, marginBottom: 4, display: 'block' }}>
+                Componentes de eficiencia:
+              </Text>
+              <Space size="small" wrap>
+                <Tag color="success" style={{ fontSize: 10 }}>
+                  📅 {(operationalEfficiencyData?.attendance_rate ?? 0) * 0.30}% Asistencia
+                </Tag>
+                                 <Tag color="processing" style={{ fontSize: 10 }}>
+                   🏠 {(operationalEfficiencyData?.home_visits_completion_rate ?? 0) * 0.25}% Visitas
+                 </Tag>
+                 <Tag color="warning" style={{ fontSize: 10 }}>
+                   📋 {(operationalEfficiencyData?.contract_management_rate ?? 0) * 0.25}% Contratos
+                 </Tag>
+                 <Tag color="error" style={{ fontSize: 10 }}>
+                   💰 {(operationalEfficiencyData?.billing_efficiency_rate ?? 0) * 0.20}% Facturación
+                 </Tag>
+              </Space>
+            </div>
+
+            {/* Métricas detalladas */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Tasa de asistencia
+              </Text>
+              <Text strong style={{ fontSize: 12, color: "#13C2C2" }}>
+                {operationalEfficiencyData?.attendance_rate ?? 0}%
+              </Text>
+            </div>
+            
+                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+               <Text type="secondary" style={{ fontSize: 12 }}>
+                 Completitud visitas
+               </Text>
+               <Text strong style={{ fontSize: 12, color: "#13C2C2" }}>
+                 {operationalEfficiencyData?.home_visits_completion_rate ?? 0}%
+               </Text>
+             </div>
+             
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+               <Text type="secondary" style={{ fontSize: 12 }}>
+                 Gestión contratos
+               </Text>
+               <Text strong style={{ fontSize: 12, color: "#13C2C2" }}>
+                 {operationalEfficiencyData?.contract_management_rate ?? 0}%
+               </Text>
+             </div>
+             
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+               <Text type="secondary" style={{ fontSize: 12 }}>
+                 Eficiencia facturación
+               </Text>
+               <Text strong style={{ fontSize: 12, color: "#13C2C2" }}>
+                 {operationalEfficiencyData?.billing_efficiency_rate ?? 0}%
+               </Text>
+             </div>
+
+            {/* Tendencia y análisis */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Tendencia
+              </Text>
+              <Text 
+                strong 
+                style={{ 
+                  fontSize: 12, 
+                  color: (() => {
+                    const monthlyData = operationalEfficiencyData?.monthly_data || [];
+                    if (monthlyData.length < 2) return '#666';
+                    const firstHalf = monthlyData.slice(0, Math.ceil(monthlyData.length / 2));
+                    const secondHalf = monthlyData.slice(Math.ceil(monthlyData.length / 2));
+                    const firstAvg = firstHalf.reduce((sum: number, m: any) => sum + (m.efficiency || 0), 0) / firstHalf.length;
+                    const secondAvg = secondHalf.reduce((sum: number, m: any) => sum + (m.efficiency || 0), 0) / secondHalf.length;
+                    return secondAvg > firstAvg ? '#52c41a' : secondAvg < firstAvg ? '#ff4d4f' : '#666';
+                  })()
+                }}
+              >
+                {(() => {
+                  const monthlyData = operationalEfficiencyData?.monthly_data || [];
+                  if (monthlyData.length < 2) return 'Estable';
+                  const firstHalf = monthlyData.slice(0, Math.ceil(monthlyData.length / 2));
+                  const secondHalf = monthlyData.slice(Math.ceil(monthlyData.length / 2));
+                  const firstAvg = firstHalf.reduce((sum: number, m: any) => sum + (m.efficiency || 0), 0) / firstHalf.length;
+                  const secondAvg = secondHalf.reduce((sum: number, m: any) => sum + (m.efficiency || 0), 0) / secondHalf.length;
+                  return secondAvg > firstAvg ? '↗️ Mejorando' : secondAvg < firstAvg ? '↘️ Declinando' : '→ Estable';
+                })()}
+              </Text>
+            </div>
+
+            {/* Mes con mejor eficiencia */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Mejor mes
+              </Text>
+              <Text strong style={{ fontSize: 12, color: "#13C2C2" }}>
+                {(() => {
+                  const monthlyData = operationalEfficiencyData?.monthly_data || [];
+                  if (monthlyData.length === 0) return 'N/A';
+                  const maxEfficiency = Math.max(...monthlyData.map((m: any) => m.efficiency || 0));
+                  const maxMonth = monthlyData.find((m: any) => (m.efficiency || 0) === maxEfficiency);
+                  return maxMonth ? `${maxMonth.month} (${maxEfficiency}%)` : 'N/A';
+                })()}
+              </Text>
+            </div>
+
+            {/* Alertas contextuales mejoradas */}
+            {(operationalEfficiencyData?.overall_efficiency ?? 0) < 50 && (
+              <Alert
+                message="Eficiencia operativa crítica"
+                description={`Solo ${operationalEfficiencyData?.overall_efficiency ?? 0}% de eficiencia - Revisar procesos urgentemente`}
+                type="error"
+                showIcon
+                style={{ marginTop: 8, fontSize: 11 }}
+              />
+            )}
+            
+            {(operationalEfficiencyData?.overall_efficiency ?? 0) >= 50 && (operationalEfficiencyData?.overall_efficiency ?? 0) < 70 && (
+              <Alert
+                message="Eficiencia operativa baja"
+                description={`${operationalEfficiencyData?.overall_efficiency ?? 0}% de eficiencia - Oportunidades de mejora`}
+                type="warning"
+                showIcon
+                style={{ marginTop: 8, fontSize: 11 }}
+              />
+            )}
+            
+            {(operationalEfficiencyData?.overall_efficiency ?? 0) >= 70 && (operationalEfficiencyData?.overall_efficiency ?? 0) < 90 && (
+              <Alert
+                message="Eficiencia operativa buena"
+                description={`${operationalEfficiencyData?.overall_efficiency ?? 0}% de eficiencia - Mantener estándares`}
+                type="info"
+                showIcon
+                style={{ marginTop: 8, fontSize: 11 }}
+              />
+            )}
+            
+            {(operationalEfficiencyData?.overall_efficiency ?? 0) >= 90 && (
+              <Alert
+                message="Excelente eficiencia operativa"
+                description={`${operationalEfficiencyData?.overall_efficiency ?? 0}% de eficiencia - Rendimiento excepcional`}
+                type="success"
+                showIcon
+                style={{ marginTop: 8, fontSize: 11 }}
+              />
+            )}
+            
+            {(operationalEfficiencyData?.growth_percentage ?? 0) < 0 && (
+              <Alert
+                message="Tendencia negativa"
+                description={`Disminución del ${Math.abs(operationalEfficiencyData?.growth_percentage ?? 0)}% vs mes anterior`}
+                type="warning"
+                showIcon
+                style={{ marginTop: 8, fontSize: 11 }}
+              />
+            )}
+            
+            {(operationalEfficiencyData?.growth_percentage ?? 0) > 10 && (
+              <Alert
+                message="Crecimiento excepcional"
+                description={`Aumento del ${operationalEfficiencyData?.growth_percentage ?? 0}% vs mes anterior`}
+                type="success"
+                showIcon
+                style={{ marginTop: 8, fontSize: 11 }}
+              />
+            )}
+
+            {/* Indicador de salud operativa */}
+            <div style={{ marginTop: 8 }}>
+              <Tooltip title={`Salud operativa: ${(() => {
+                const efficiency = operationalEfficiencyData?.overall_efficiency ?? 0;
+                return efficiency >= 90 ? 'EXCELENTE' :
+                       efficiency >= 70 ? 'BUENA' :
+                       efficiency >= 50 ? 'REGULAR' : 'CRÍTICA';
+              })()}`}>
+                                 <Tag 
+                   color={
+                     (operationalEfficiencyData?.overall_efficiency ?? 0) >= 90 ? 'success' :
+                     (operationalEfficiencyData?.overall_efficiency ?? 0) >= 70 ? 'processing' :
+                     (operationalEfficiencyData?.overall_efficiency ?? 0) >= 50 ? 'warning' : 'error'
+                   }
+                   style={{ fontSize: 10 }}
+                 >
+                   {(operationalEfficiencyData?.overall_efficiency ?? 0) >= 90 ? <RiseOutlined /> : 
+                    (operationalEfficiencyData?.overall_efficiency ?? 0) < 50 ? <FallOutlined /> : 
+                    <InfoCircleOutlined />} {
+                     (() => {
+                       const efficiency = operationalEfficiencyData?.overall_efficiency ?? 0;
+                       return efficiency >= 90 ? 'EXCELENTE' :
+                              efficiency >= 70 ? 'BUENA' :
+                              efficiency >= 50 ? 'REGULAR' : 'CRÍTICA';
+                     })()
+                   }
+                 </Tag>
+              </Tooltip>
+            </div>
+
+            
+          </div>
         </Card>
       </Col>
     </Row>
