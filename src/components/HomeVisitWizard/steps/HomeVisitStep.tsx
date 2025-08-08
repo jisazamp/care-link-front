@@ -1,19 +1,20 @@
 import React, { useEffect } from 'react';
-import { Card, Row, Col, Form, DatePicker, TimePicker, Select, Input, Typography, Descriptions } from 'antd';
+import { Card, Row, Col, Form, DatePicker, TimePicker, Select, Input, Typography, Descriptions, Alert } from 'antd';
 import { useFormContext } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { useGetProfessionals } from '../../../hooks/useGetProfessionals/useGetProfessionals';
 import dayjs from 'dayjs';
+import { HomeVisitStepProps, VisitaEstado } from '../types';
 
 const { TextArea } = Input;
 const { Title } = Typography;
 
-interface HomeVisitStepProps {
-  user: any;
-  onValidChange: (isValid: boolean) => void;
-}
-
-export const HomeVisitStep: React.FC<HomeVisitStepProps> = ({ user, onValidChange }) => {
+export const HomeVisitStep: React.FC<HomeVisitStepProps> = ({ 
+  user, 
+  isEditing, 
+  existingVisit, 
+  onValidChange 
+}) => {
   const { watch, formState: { errors } } = useFormContext();
   const professionalsQuery = useGetProfessionals();
 
@@ -32,11 +33,45 @@ export const HomeVisitStep: React.FC<HomeVisitStepProps> = ({ user, onValidChang
     onValidChange(!!isStepValid);
   }, [fecha_visita, hora_visita, profesional_asignado, onValidChange]);
 
+  // Determinar el estado actual de la visita
+  const getEstadoActual = (): VisitaEstado => {
+    if (!isEditing || !existingVisit) return 'PENDIENTE';
+    
+    if (!existingVisit.fecha_visita || !existingVisit.hora_visita) {
+      return 'PENDIENTE DE PROGRAMACIÓN';
+    }
+    
+    return existingVisit.estado_visita || 'PENDIENTE';
+  };
+
+  // Determinar el color del estado
+  const getEstadoColor = (estado: VisitaEstado) => {
+    const colors = {
+      'PENDIENTE': '#1890ff',
+      'PENDIENTE DE PROGRAMACIÓN': '#faad14',
+      'REALIZADA': '#52c41a',
+      'CANCELADA': '#ff4d4f',
+      'REPROGRAMADA': '#fa8c16',
+    };
+    return colors[estado] || '#1890ff';
+  };
+
   return (
     <div>
       <Title level={4} style={{ marginBottom: '24px' }}>
         Datos de la Visita Domiciliaria
       </Title>
+
+      {/* Alerta informativa para edición */}
+      {isEditing && existingVisit && (
+        <Alert
+          message="Modo de Edición"
+          description="Estás editando una visita existente. Los cambios se aplicarán inmediatamente."
+          type="info"
+          showIcon
+          style={{ marginBottom: '24px' }}
+        />
+      )}
 
       {/* Resumen del paciente */}
       <Card style={{ marginBottom: '24px' }}>
@@ -54,10 +89,18 @@ export const HomeVisitStep: React.FC<HomeVisitStepProps> = ({ user, onValidChang
             <strong>$25.000</strong>
           </Descriptions.Item>
           <Descriptions.Item label="Estado actual">
-            <span style={{ color: '#faad14' }}>PENDIENTE</span>
+            <span style={{ color: getEstadoColor(getEstadoActual()) }}>
+              {getEstadoActual()}
+            </span>
           </Descriptions.Item>
           <Descriptions.Item label="Profesional asignado">
-            <span style={{ color: '#d9d9d9' }}>Sin asignar</span>
+            {existingVisit?.profesional_asignado ? (
+              <span style={{ color: '#52c41a' }}>
+                {`${existingVisit.profesional_asignado.nombres} ${existingVisit.profesional_asignado.apellidos}`}
+              </span>
+            ) : (
+              <span style={{ color: '#d9d9d9' }}>Sin asignar</span>
+            )}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -73,6 +116,13 @@ export const HomeVisitStep: React.FC<HomeVisitStepProps> = ({ user, onValidChang
                   label="Fecha de Visita"
                   validateStatus={errors.fecha_visita ? "error" : ""}
                   help={errors.fecha_visita?.message?.toString()}
+                  extra={
+                    isEditing ? (
+                      <Typography.Text type="secondary" style={{ fontSize: "12px" }}>
+                        ! Cambiar la fecha cambiará automáticamente el estado a "REPROGRAMADA"
+                      </Typography.Text>
+                    ) : undefined
+                  }
                 >
                   <DatePicker
                     {...field}
@@ -80,8 +130,12 @@ export const HomeVisitStep: React.FC<HomeVisitStepProps> = ({ user, onValidChang
                     format="YYYY-MM-DD"
                     placeholder="Seleccione la fecha"
                     disabledDate={(current) => {
-                      // No permitir fechas pasadas
-                      return current && current < dayjs().startOf('day');
+                      // Para nuevas visitas, no permitir fechas pasadas
+                      if (!isEditing) {
+                        return current && current < dayjs().startOf('day');
+                      }
+                      // Para edición, permitir fechas pasadas
+                      return false;
                     }}
                   />
                 </Form.Item>
@@ -130,7 +184,7 @@ export const HomeVisitStep: React.FC<HomeVisitStepProps> = ({ user, onValidChang
                     }
                     options={
                       professionalsQuery.data?.data.data.map((p) => ({
-                        label: `${p.nombres} ${p.apellidos}`,
+                        label: `${p.nombres} ${p.apellidos} - ${p.especialidad}`,
                         value: p.id_profesional,
                       })) ?? []
                     }

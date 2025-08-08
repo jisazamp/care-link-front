@@ -99,7 +99,6 @@ export const NewUser: React.FC = () => {
     handleSubmit,
     reset,
     setValue,
-    watch,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
