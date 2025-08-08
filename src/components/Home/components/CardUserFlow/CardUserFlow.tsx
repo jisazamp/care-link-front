@@ -4,20 +4,12 @@ import {
   EllipsisOutlined,
   InfoCircleOutlined,
   UserAddOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
   ExclamationCircleOutlined,
   CalendarOutlined,
   DollarOutlined,
-  PhoneOutlined,
-  MailOutlined,
   EyeOutlined,
-  AlertOutlined,
-  RiseOutlined,
-  FallOutlined,
 } from "@ant-design/icons";
 import {
-  Badge,
   Card,
   Col,
   Divider,
@@ -42,13 +34,11 @@ import {
   ResponsiveContainer,
   XAxis,
   YAxis,
-  Bar,
-  BarChart,
 } from "recharts";
 import { useGetUserFlow } from "../../../../hooks/useGetUserFlow/useGetUserFlow";
 import { useNavigate } from "react-router-dom";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 // Datos ficticios para los gráficos mejorados
 const userChartData = [
@@ -71,117 +61,98 @@ export const CardUserFlow = () => {
   const { data: userFlowData, isLoading, error } = useGetUserFlow();
   const navigate = useNavigate();
 
-  // Columnas de la tabla mejoradas
+  // Columnas de la tabla mejoradas con tamaños aumentados y centrado
   const columnsUserFlow = [
     {
       title: "Usuarios",
       dataIndex: "nombre_completo",
       key: "nombre_completo",
+      align: "center" as const,
       render: (nombre: string, record: any) => (
-        <Space>
-          <Avatar size="small" style={{ backgroundColor: "#7f34b4" }}>
-            {nombre.charAt(0)}
-          </Avatar>
-          <div>
-            <Text strong style={{ fontSize: 12 }}>
-              {nombre}
-            </Text>
-            <br />
-            <Text type="secondary" style={{ fontSize: 10 }}>
-              {record.tipo_usuario}
-            </Text>
-          </div>
-        </Space>
+        <div style={{ textAlign: "center" }}>
+          <Space direction="vertical" size="small">
+            <Avatar size="default" style={{ backgroundColor: "#7f34b4" }}>
+              {nombre.charAt(0)}
+            </Avatar>
+            <div>
+              <Text strong style={{ fontSize: 14 }}>
+                {nombre}
+              </Text>
+              <br />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {record.tipo_usuario}
+              </Text>
+            </div>
+          </Space>
+        </div>
       ),
     },
     {
       title: "Contrato",
       dataIndex: "estado_contrato",
       key: "estado_contrato",
+      align: "center" as const,
       render: (estado: string, record: any) => (
-        <Space direction="vertical" size="small">
-          <Tag 
-            color={
-              estado === "ACTIVO" ? "success" :
-              estado === "PENDIENTE" ? "processing" :
-              estado === "VENCIDO" ? "error" : "default"
-            }
-            style={{ fontSize: 10 }}
-          >
-            {estado}
-          </Tag>
-          <Text type="secondary" style={{ fontSize: 10 }}>
-            ${record.valor_total_contrato?.toLocaleString()}
-          </Text>
-          <Button
-            type="link"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/usuarios/${record.id_usuario}/contrato/${record.id_contrato}`)}
-            style={{ padding: 0, height: 'auto', fontSize: 10 }}
-          >
-            Ver
-          </Button>
-        </Space>
+        <div style={{ textAlign: "center" }}>
+          <Space direction="vertical" size="small">
+            <Tag 
+              color={
+                estado === "ACTIVO" ? "success" :
+                estado === "PENDIENTE" ? "processing" :
+                estado === "VENCIDO" ? "error" : "default"
+              }
+              style={{ fontSize: 12 }}
+            >
+              {estado}
+            </Tag>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {record.valor_total_contrato?.toLocaleString()}
+            </Text>
+            <Button
+              type="link"
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/usuarios/${record.id_usuario}/contrato/${record.id_contrato}`)}
+              style={{ padding: 0, height: 'auto', fontSize: 12 }}
+            >
+              Ver
+            </Button>
+          </Space>
+        </div>
       ),
     },
     {
       title: "Visitas del mes",
       dataIndex: "visitas_mes",
       key: "visitas_mes",
+      align: "center" as const,
       render: (visitas: number, record: any) => (
-        <Space direction="vertical" size="small">
-          <Space>
-            <Badge color="purple" />
-            <Text strong>{visitas}</Text>
+        <div style={{ textAlign: "center" }}>
+          <Space direction="vertical" size="small">
+            <div style={{ textAlign: "center", marginBottom: 4 }}>
+              <Text strong style={{ fontSize: 16, color: "#7f34b4" }}>{visitas}</Text>
+            </div>
+            <div style={{ fontSize: 12 }}>
+              <Text type="success">{record.visitas_realizadas_mes}</Text>
+              <br />
+              <Text type="warning">{record.visitas_pendientes_mes}</Text>
+              <br />
+              <Text type="danger">{record.visitas_canceladas_mes}</Text>
+            </div>
+            <Progress
+              percent={record.tasa_asistencia_usuario}
+              size="small"
+              showInfo={false}
+              strokeColor={
+                record.tasa_asistencia_usuario >= 80 ? "#52c41a" :
+                record.tasa_asistencia_usuario >= 60 ? "#faad14" : "#ff4d4f"
+              }
+            />
           </Space>
-          <div style={{ fontSize: 10 }}>
-            <Text type="success">✓ {record.visitas_realizadas_mes}</Text>
-            <br />
-            <Text type="warning">⏳ {record.visitas_pendientes_mes}</Text>
-            <br />
-            <Text type="danger">✗ {record.visitas_canceladas_mes}</Text>
-          </div>
-          <Progress
-            percent={record.tasa_asistencia_usuario}
-            size="small"
-            showInfo={false}
-            strokeColor={
-              record.tasa_asistencia_usuario >= 80 ? "#52c41a" :
-              record.tasa_asistencia_usuario >= 60 ? "#faad14" : "#ff4d4f"
-            }
-          />
-        </Space>
+        </div>
       ),
     },
-    {
-      title: "Contacto",
-      key: "contacto",
-      render: (_, record: any) => (
-        <Space direction="vertical" size="small">
-          {record.telefono && (
-            <Space size="small">
-              <PhoneOutlined style={{ color: "#7f34b4" }} />
-              <Text style={{ fontSize: 10 }}>{record.telefono}</Text>
-            </Space>
-          )}
-          {record.email && (
-            <Space size="small">
-              <MailOutlined style={{ color: "#7f34b4" }} />
-              <Text style={{ fontSize: 10 }}>{record.email}</Text>
-            </Space>
-          )}
-          {record.proxima_visita && (
-            <Space size="small">
-              <CalendarOutlined style={{ color: "#7f34b4" }} />
-              <Text style={{ fontSize: 10 }}>
-                Próxima: {new Date(record.proxima_visita).toLocaleDateString()}
-              </Text>
-            </Space>
-          )}
-        </Space>
-      ),
-    },
+
   ];
 
   if (isLoading) {
@@ -269,13 +240,13 @@ export const CardUserFlow = () => {
                 valueStyle={{ color: "#7f34b4", fontSize: 20 }}
                 suffix={
                   <Space size="small">
-                    {userFlowData?.stats.usuarios_mes_trend > 0 ? (
+                    {userFlowData?.stats.usuarios_mes_trend && userFlowData.stats.usuarios_mes_trend > 0 ? (
                       <CaretUpOutlined style={{ color: "green" }} />
                     ) : (
                       <CaretDownOutlined style={{ color: "red" }} />
                     )}
                     <Text 
-                      type={userFlowData?.stats.usuarios_mes_trend > 0 ? "success" : "danger"}
+                      type={userFlowData?.stats.usuarios_mes_trend && userFlowData.stats.usuarios_mes_trend > 0 ? "success" : "danger"}
                       style={{ fontSize: 10 }}
                     >
                       {userFlowData?.stats.usuarios_mes_trend || 0}%
@@ -321,17 +292,16 @@ export const CardUserFlow = () => {
               
               <Statistic
                 value={userFlowData?.stats.tasa_asistencia || 0}
-                suffix="%"
                 valueStyle={{ color: "#7f34b4", fontSize: 20 }}
                 suffix={
                   <Space size="small">
-                    {userFlowData?.stats.tasa_asistencia_trend > 0 ? (
+                    {userFlowData?.stats.tasa_asistencia_trend && userFlowData.stats.tasa_asistencia_trend > 0 ? (
                       <CaretUpOutlined style={{ color: "green" }} />
                     ) : (
                       <CaretDownOutlined style={{ color: "red" }} />
                     )}
                     <Text 
-                      type={userFlowData?.stats.tasa_asistencia_trend > 0 ? "success" : "danger"}
+                      type={userFlowData?.stats.tasa_asistencia_trend && userFlowData.stats.tasa_asistencia_trend > 0 ? "success" : "danger"}
                       style={{ fontSize: 10 }}
                     >
                       {userFlowData?.stats.tasa_asistencia_trend || 0}%
@@ -403,9 +373,9 @@ export const CardUserFlow = () => {
               <Tag color="success" style={{ fontSize: 10 }}>
                 {userFlowData?.stats.contratos_activos || 0} activos
               </Tag>
-              {userFlowData?.stats.contratos_por_vencer > 0 && (
+              {userFlowData?.stats.contratos_por_vencer && userFlowData.stats.contratos_por_vencer > 0 && (
                 <Tag color="warning" style={{ fontSize: 10 }}>
-                  {userFlowData?.stats.contratos_por_vencer} por vencer
+                  {userFlowData.stats.contratos_por_vencer} por vencer
                 </Tag>
               )}
             </Space>
@@ -424,6 +394,7 @@ export const CardUserFlow = () => {
           rowKey="id_usuario"
           size="small"
           scroll={{ y: 200 }}
+          className="user-flow-table"
         />
 
         {/* Resumen ejecutivo */}
