@@ -1,16 +1,17 @@
 import { z } from "zod";
 
 export enum Profession {
-  Medico = "Médico",
-  Enfermero = "Enfermero",
+  Enfermero = "Enfermero(a)",
+  Gerontólogo = "Gerontólogo",
   Nutricionista = "Nutricionista",
   Psicologo = "Psicólogo",
   Fisioterapeuta = "Fisioterapeuta",
+  Médico = "Médico",  
 }
 
 export enum Specialty {
   Cardiologia = "Cardiología",
-  Pediatria = "Pediatría",
+  Gerontologia = "Gerontología",
   Nutricion = "Nutrición",
   PsicologiaClinica = "Psicología Clínica",
   Fisioterapia = "Fisioterapia",

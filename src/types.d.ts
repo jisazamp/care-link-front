@@ -59,6 +59,48 @@ export type AuthorizedUser = {
   role: string;
 };
 
+export type CreateAuthorizedUserPayload = {
+  id?: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  password: string;
+  role: string;
+  is_deleted?: boolean;
+  professional_user?: {
+    birthdate: string;
+    charge: string;
+    document_number: string;
+    email: string;
+    entry_date: string;
+    first_name: string;
+    home_address: string;
+    last_name: string;
+    phone_number: string;
+    profession: string;
+    professional_id_number: string;
+    specialty: string;
+  };
+};
+
+export type UpdateAuthorizedUserPayload = {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  password?: string;
+  role: string;
+  document_number?: string;
+  professional_id_number?: string;
+  birthdate?: string;
+  entry_date?: string;
+  profession?: string;
+  specialty?: string;
+  charge?: string;
+  phone_number?: string;
+  home_address?: string;
+};
+
 export type MedicalRecord = {
   id_historiaclinica?: number;
   id_profesional?: number | null;

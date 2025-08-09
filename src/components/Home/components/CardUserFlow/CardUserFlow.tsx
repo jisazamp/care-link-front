@@ -5,8 +5,6 @@ import {
   InfoCircleOutlined,
   UserAddOutlined,
   ExclamationCircleOutlined,
-  CalendarOutlined,
-  DollarOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
 import {
@@ -21,7 +19,6 @@ import {
   Spin,
   Tag,
   Alert,
-  Progress,
   Button,
   Avatar,
   Statistic,
@@ -67,22 +64,16 @@ export const CardUserFlow = () => {
       title: "Usuarios",
       dataIndex: "nombre_completo",
       key: "nombre_completo",
-      align: "center" as const,
-      render: (nombre: string, record: any) => (
-        <div style={{ textAlign: "center" }}>
-          <Space direction="vertical" size="small">
+      align: "left" as const,
+      render: (nombre: string, _record: any) => (
+        <div style={{ textAlign: "left" }}>
+          <Space direction="horizontal" size="small" align="center">
             <Avatar size="default" style={{ backgroundColor: "#7f34b4" }}>
               {nombre.charAt(0)}
             </Avatar>
-            <div>
-              <Text strong style={{ fontSize: 14 }}>
-                {nombre}
-              </Text>
-              <br />
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                {record.tipo_usuario}
-              </Text>
-            </div>
+            <Text strong style={{ fontSize: 14 }}>
+              {nombre}
+            </Text>
           </Space>
         </div>
       ),
@@ -92,32 +83,17 @@ export const CardUserFlow = () => {
       dataIndex: "estado_contrato",
       key: "estado_contrato",
       align: "center" as const,
-      render: (estado: string, record: any) => (
+      render: (_estado: string, record: any) => (
         <div style={{ textAlign: "center" }}>
-          <Space direction="vertical" size="small">
-            <Tag 
-              color={
-                estado === "ACTIVO" ? "success" :
-                estado === "PENDIENTE" ? "processing" :
-                estado === "VENCIDO" ? "error" : "default"
-              }
-              style={{ fontSize: 12 }}
-            >
-              {estado}
-            </Tag>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {record.valor_total_contrato?.toLocaleString()}
-            </Text>
-            <Button
-              type="link"
-              size="small"
-              icon={<EyeOutlined />}
-              onClick={() => navigate(`/usuarios/${record.id_usuario}/contrato/${record.id_contrato}`)}
-              style={{ padding: 0, height: 'auto', fontSize: 12 }}
-            >
-              Ver
-            </Button>
-          </Space>
+          <Button
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/usuarios/${record.id_usuario}/contrato/${record.id_contrato}`)}
+            style={{ padding: 0, height: 'auto', fontSize: 12 }}
+          >
+            Ver
+          </Button>
         </div>
       ),
     },
@@ -126,33 +102,14 @@ export const CardUserFlow = () => {
       dataIndex: "visitas_mes",
       key: "visitas_mes",
       align: "center" as const,
-      render: (visitas: number, record: any) => (
+      render: (visitas: number, _record: any) => (
         <div style={{ textAlign: "center" }}>
-          <Space direction="vertical" size="small">
-            <div style={{ textAlign: "center", marginBottom: 4 }}>
-              <Text strong style={{ fontSize: 16, color: "#7f34b4" }}>{visitas}</Text>
-            </div>
-            <div style={{ fontSize: 12 }}>
-              <Text type="success">{record.visitas_realizadas_mes}</Text>
-              <br />
-              <Text type="warning">{record.visitas_pendientes_mes}</Text>
-              <br />
-              <Text type="danger">{record.visitas_canceladas_mes}</Text>
-            </div>
-            <Progress
-              percent={record.tasa_asistencia_usuario}
-              size="small"
-              showInfo={false}
-              strokeColor={
-                record.tasa_asistencia_usuario >= 80 ? "#52c41a" :
-                record.tasa_asistencia_usuario >= 60 ? "#faad14" : "#ff4d4f"
-              }
-            />
-          </Space>
+          <Text strong style={{ fontSize: 16, color: "#7f34b4" }}>
+            {visitas || "—"}
+          </Text>
         </div>
       ),
     },
-
   ];
 
   if (isLoading) {
@@ -397,18 +354,7 @@ export const CardUserFlow = () => {
           className="user-flow-table"
         />
 
-        {/* Resumen ejecutivo */}
-        <div style={{ marginTop: 12 }}>
-          <Text type="secondary" style={{ fontSize: 10 }}>
-            <DollarOutlined style={{ marginRight: 4 }} />
-            Valor total contratos: ${userFlowData?.stats.valor_total_contratos?.toLocaleString() || 0}
-          </Text>
-          <br />
-          <Text type="secondary" style={{ fontSize: 10 }}>
-            <CalendarOutlined style={{ marginRight: 4 }} />
-            Promedio visitas: {userFlowData?.stats.promedio_visitas_por_usuario || 0}/usuario
-          </Text>
-        </div>
+
       </Card>
   );
 };
