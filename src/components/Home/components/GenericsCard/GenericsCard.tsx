@@ -14,6 +14,8 @@ import { useGetQuarterlyVisits } from "../../../../hooks/useGetQuarterlyVisits/u
 import { useGetMonthlyPayments } from "../../../../hooks/useGetMonthlyPayments/useGetMonthlyPayments";
 import { useGetOperationalEfficiency } from "../../../../hooks/useGetOperationalEfficiency/useGetOperationalEfficiency";
 import { useGetBillingStats } from "../../../../hooks/useGetBillingStats/useGetBillingStats";
+import { useGetUserInfo } from "../../../../hooks/useGetUserInfo/useGetUserInfo";
+import { RolesEnum } from "../../../CreateAuthorizedUser/index.schema";
 
 const { Title, Text } = Typography;
 
@@ -46,6 +48,9 @@ const dataEfficiency = [
 ];
 
 export const GenericsCards = () => {
+  const { data: userInfo } = useGetUserInfo();
+  const userRole = userInfo?.data.data.role;
+  
   const {
     data: quarterlyVisitsData,
     isLoading: isLoadingVisits,
@@ -485,9 +490,10 @@ export const GenericsCards = () => {
         </Card>
       </Col>
 
-      {/* Tarjeta 2: Pagos - INFORMATIVA SIN NAVEGACIÓN */}
-      <Col span={8}>
-        <Card className="generic-card">
+      {/* Tarjeta 2: Pagos - SOLO PARA ADMIN */}
+      {userRole === RolesEnum.Admin && (
+        <Col span={8}>
+          <Card className="generic-card">
           <div
             style={{
               display: "flex",
@@ -678,6 +684,7 @@ export const GenericsCards = () => {
           </div>
         </Card>
       </Col>
+      )}
 
       {/* Tarjeta 3: Eficiencia Operativa - MEJORADA CON MÁS INFORMACIÓN */}
       <Col span={8}>
