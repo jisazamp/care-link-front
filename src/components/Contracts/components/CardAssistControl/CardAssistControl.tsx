@@ -447,7 +447,7 @@ export const CardAsistControl = () => {
                 {selectedRows.length !== 1 ? "s" : ""}
               </Text>
             )}
-            3
+
             <Button type="primary" onClick={handleAddClick}>
               Ir al cronograma
             </Button>

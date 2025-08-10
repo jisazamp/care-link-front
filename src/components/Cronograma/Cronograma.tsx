@@ -29,6 +29,8 @@ import type {
 import { CronogramaBreadcrumb } from "./components/CronogramaBreadcrumb";
 import { CronogramaStats } from "./components/CronogramaStats";
 import { JustificacionModal } from "./components/JustificacionModal";
+import { PatientSearchBar } from "./components/PatientSearchBar";
+import { PatientAttendanceReport } from "./components/PatientAttendanceReport";
 
 const { Title, Text } = Typography;
 
@@ -54,6 +56,10 @@ export const Cronograma: React.FC = () => {
 
   // 🔴 NUEVO: Estado para el mes seleccionado en el calendario
   const [selectedMonth, setSelectedMonth] = useState<Dayjs>(dayjs());
+
+  // 🔴 NUEVO: Estados para el filtro por paciente
+  const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
+  const [reportDrawerVisible, setReportDrawerVisible] = useState(false);
 
   // 🔴 NUEVO: Obtener cronogramas del mes seleccionado (no siempre el actual)
   const startOfMonth = selectedMonth.startOf("month").format("YYYY-MM-DD");
@@ -332,6 +338,18 @@ export const Cronograma: React.FC = () => {
     setSelectedMonth(date);
   };
 
+  // 🔴 NUEVO: Manejar selección de paciente
+  const handlePatientSelect = (patientId: number) => {
+    setSelectedPatientId(patientId);
+    setReportDrawerVisible(true);
+  };
+
+  // 🔴 NUEVO: Cerrar drawer de informe
+  const handleCloseReport = () => {
+    setReportDrawerVisible(false);
+    setSelectedPatientId(null);
+  };
+
   const handleReagendar = (observaciones: string, nuevaFecha: string) => {
     if (!selectedPaciente) {
       console.error("No hay paciente seleccionado");
@@ -540,6 +558,9 @@ export const Cronograma: React.FC = () => {
           </div>
         </div>
 
+        {/* 🔴 NUEVO: Barra de búsqueda de pacientes */}
+        <PatientSearchBar onPatientSelect={handlePatientSelect} />
+
         {cronogramas?.data?.data && (
           <CronogramaStats cronogramas={cronogramas.data.data} />
         )}
@@ -607,6 +628,13 @@ export const Cronograma: React.FC = () => {
           onConfirm={handleJustificacionConfirm}
           onReagendar={handleReagendar}
           loading={loadingAction}
+        />
+
+        {/* 🔴 NUEVO: Drawer de informe de asistencia por paciente */}
+        <PatientAttendanceReport
+          patientId={selectedPatientId}
+          visible={reportDrawerVisible}
+          onClose={handleCloseReport}
         />
       </Card>
     </div>
