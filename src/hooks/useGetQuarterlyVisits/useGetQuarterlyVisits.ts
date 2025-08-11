@@ -6,6 +6,11 @@ interface MonthlyVisitData {
   visits: number;
 }
 
+interface ProfessionalVisitData {
+  id_profesional: number;
+  visit_count: number;
+}
+
 interface QuarterlyVisitsResponse {
   total_quarterly_visits: number;
   average_daily_visits: number;
@@ -13,6 +18,14 @@ interface QuarterlyVisitsResponse {
   current_month_visits: number;
   previous_month_visits: number;
   growth_percentage: number;
+  visits_by_status: Record<string, number>;
+  active_professionals: ProfessionalVisitData[];
+  completed_visits: number;
+  pending_visits: number;
+  cancelled_visits: number;
+  rescheduled_visits: number;
+  completion_rate: number;
+  efficiency_rate: number;
 }
 
 export const useGetQuarterlyVisits = () => {

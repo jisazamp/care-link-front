@@ -149,7 +149,7 @@ export const Sidebar = () => {
   const filteredMenuItems = menuItems
     .map((item) => {
       const filteredChildren = item.children.filter((child) =>
-        checkPermissions(child.path, userRole),
+        checkPermissions(child.path, userRole as any),
       );
       return filteredChildren.length > 0
         ? { ...item, children: filteredChildren }

@@ -75,7 +75,7 @@ export const CardSheduActivities = () => {
     return (
       <Card
         title={<Title level={5}>Actividades programadas</Title>}
-        style={{ flex: 1 }}
+        style={{ width: "100%" }}
       >
         <div style={{ textAlign: "center", padding: "40px" }}>
           <Spin size="large" />
@@ -91,7 +91,7 @@ export const CardSheduActivities = () => {
     return (
       <Card
         title={<Title level={5}>Actividades programadas</Title>}
-        style={{ flex: 1 }}
+        style={{ width: "100%" }}
       >
         <div style={{ textAlign: "center", padding: "40px", color: "red" }}>
           <Text type="danger">Error al cargar las actividades</Text>
@@ -105,7 +105,7 @@ export const CardSheduActivities = () => {
   return (
     <Card
       title={<Title level={5}>Actividades programadas</Title>}
-      style={{ flex: 1 }}
+      style={{ width: "100%" }}
     >
       {activitiesData.length > 0 ? (
         <Table

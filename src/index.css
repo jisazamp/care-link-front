@@ -753,7 +753,12 @@ body {
 
 .highlighted-patient-row {
   animation: highlightPulse 2s ease-in-out;
-  background: linear-gradient(90deg, #fff3cd 0%, #ffeaa7 50%, #fff3cd 100%) !important;
+  background: linear-gradient(
+    90deg,
+    #fff3cd 0%,
+    #ffeaa7 50%,
+    #fff3cd 100%
+  ) !important;
   border: 2px solid #f39c12 !important;
   box-shadow: 0 0 10px rgba(243, 156, 18, 0.3) !important;
 }
@@ -1176,5 +1181,132 @@ body {
   .transporte-detail-modal .ant-btn {
     width: 100%;
     margin-bottom: 8px;
+  }
+}
+
+/* =============================================================================
+   ESTILOS PARA LA TABLA DE FLUJO DE USUARIOS
+   ============================================================================= */
+
+/* Estilos personalizados para la tabla de flujo de usuarios */
+.user-flow-table .ant-table-thead > tr > th {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  background-color: #fafafa !important;
+  border-bottom: 2px solid #f0f0f0 !important;
+  padding: 16px 12px !important;
+  text-align: center !important;
+}
+
+.user-flow-table .ant-table-tbody > tr > td {
+  font-size: 14px !important;
+  padding: 16px 12px !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+
+/* Mejorar el espaciado de los iconos en la columna de contacto */
+.user-flow-table .ant-table-tbody > tr > td:last-child {
+  padding: 12px 8px !important;
+}
+
+/* Ajustar el tamaño de los badges y tags */
+.user-flow-table .ant-badge {
+  font-size: 14px !important;
+}
+
+.user-flow-table .ant-tag {
+  font-size: 12px !important;
+  padding: 4px 8px !important;
+}
+
+/* Mejorar la alineación de los botones */
+.user-flow-table .ant-btn-link {
+  font-size: 12px !important;
+  padding: 4px 6px !important;
+}
+
+/* Ajustar el progreso */
+.user-flow-table .ant-progress {
+  margin-top: 6px !important;
+}
+
+/* Mejorar la legibilidad de los textos */
+.user-flow-table .ant-typography {
+  line-height: 1.5 !important;
+}
+
+/* Estilos específicos para mejorar la legibilidad de la tabla */
+.user-flow-table .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%) !important;
+  border-bottom: 2px solid #e8e8e8 !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  text-transform: uppercase !important;
+  font-size: 13px !important;
+  letter-spacing: 0.5px !important;
+}
+
+.user-flow-table .ant-table-tbody > tr:hover > td {
+  background-color: #f6f8ff !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.user-flow-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #f0f0f0 !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Mejorar la apariencia de los avatares */
+.user-flow-table .ant-avatar {
+  border: 2px solid #fff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Estilos para los iconos de contacto */
+.user-flow-table .anticon {
+  font-size: 14px !important;
+  margin-right: 6px !important;
+}
+
+/* Mejorar la apariencia de los tags de estado */
+.user-flow-table .ant-tag {
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  font-size: 11px !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* Estilos para el progreso de asistencia */
+.user-flow-table .ant-progress-line {
+  border-radius: 4px !important;
+}
+
+.user-flow-table .ant-progress-bg {
+  border-radius: 4px !important;
+}
+
+/* Responsive para la tabla */
+@media (max-width: 768px) {
+  .user-flow-table .ant-table-thead > tr > th {
+    font-size: 12px !important;
+    padding: 12px 6px !important;
+  }
+
+  .user-flow-table .ant-table-tbody > tr > td {
+    font-size: 12px !important;
+    padding: 12px 6px !important;
+  }
+
+  .user-flow-table .ant-tag {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+
+  .user-flow-table .ant-btn-link {
+    font-size: 10px !important;
+    padding: 2px 4px !important;
   }
 }
