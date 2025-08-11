@@ -17,6 +17,7 @@ import { UserAddOutlined, EditOutlined } from "@ant-design/icons";
 import { useGetActivityUsers } from "../../hooks/useGetActivityUsers/useGetActivityUsers";
 import { useUpdateUserActivityStatus } from "../../hooks/useUpdateUserActivityStatus/useUpdateUserActivityStatus";
 import { AssignUsersModal } from "../AssignUsersModal/AssignUsersModal";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -109,7 +110,7 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
       key: "user",
       render: (nombres: string, record: ActivityUser) => (
         <div>
-          <Text strong>{`${nombres} ${record.apellidos || ""}`}</Text>
+          <Text strong>{upperCaseFullName(nombres, record.apellidos)}</Text>
           <br />
           <Text type="secondary">{record.n_documento}</Text>
         </div>
@@ -242,7 +243,7 @@ export const ActivityUsersModal: React.FC<ActivityUsersModalProps> = ({
             <div>
               <Text strong>Usuario:</Text>
               <br />
-              <Text>{`${editingUser.nombres} ${editingUser.apellidos}`}</Text>
+              <Text>{upperCaseFullName(editingUser.nombres, editingUser.apellidos)}</Text>
             </div>
             <div>
               <Text strong>Estado:</Text>

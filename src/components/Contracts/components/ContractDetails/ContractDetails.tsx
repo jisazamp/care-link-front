@@ -26,6 +26,7 @@ import { useState, useEffect } from "react";
 import { useCreateFactura } from "../../../../hooks/useCreateFactura";
 import { useUpdateFactura } from "../../../../hooks/useUpdateFactura";
 import type { Bill } from "../../../../types";
+import { upperCaseFullName } from "../../../../utils/stringUtils";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -349,7 +350,7 @@ export const ContractDetails: React.FC = () => {
           <Col lg={10}>
             <Flex vertical gap={10}>
               <Typography.Text style={{ textTransform: "uppercase" }}>
-                {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
+                {upperCaseFullName(user?.data.data.nombres, user?.data.data.apellidos)}
               </Typography.Text>
               <Flex gap={4}>
                 <Typography.Text style={{ fontWeight: "bold" }}>

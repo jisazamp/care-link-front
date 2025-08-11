@@ -25,6 +25,7 @@ import { useUpdateAttendanceStatus } from "../../../../hooks/useUpdateAttendance
 import { useUpdateEstadoAsistencia } from "../../../../hooks/useUpdateEstadoAsistencia";
 import { useReagendarPaciente } from "../../../../hooks/useReagendarPaciente";
 import dayjs from "dayjs";
+import { upperCaseFullName } from "../../../../utils/stringUtils";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -320,7 +321,7 @@ export const CardAsistControl = () => {
       render: (_: any, record: AsistenciaDiaria) => (
         <div>
           <div style={{ fontWeight: 500 }}>
-            {record.nombres} {record.apellidos}
+            {upperCaseFullName(record.nombres, record.apellidos)}
           </div>
           <Text type="secondary" style={{ fontSize: "12px" }}>
             ID: {record.id_usuario}

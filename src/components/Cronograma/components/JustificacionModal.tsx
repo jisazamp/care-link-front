@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import type React from "react";
 import { useEffect, useState } from "react";
 import type { CronogramaAsistenciaPaciente } from "../../../types";
+import { upperCaseFullName } from "../../../utils/stringUtils";
 
 const { TextArea } = Input;
 
@@ -107,7 +108,7 @@ export const JustificacionModal: React.FC<JustificacionModalProps> = ({
     >
       <div style={{ marginBottom: 16 }}>
         <p>
-          <strong>Paciente:</strong> {paciente?.nombres} {paciente?.apellidos}
+          <strong>Paciente:</strong> {upperCaseFullName(paciente?.nombres, paciente?.apellidos)}
         </p>
         <p>
           <strong>Documento:</strong> {paciente?.n_documento}

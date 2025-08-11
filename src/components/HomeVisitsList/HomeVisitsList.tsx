@@ -25,6 +25,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useGetAllHomeVisits } from "../../hooks/useGetAllHomeVisits/useGetAllHomeVisits";
 import dayjs from "dayjs";
+import { toUpperCase } from "../../utils/stringUtils";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -93,7 +94,7 @@ export const HomeVisitsList: React.FC = () => {
       dataIndex: "paciente_nombre",
       key: "paciente_nombre",
       render: (text: string) => (
-        <div style={{ fontWeight: 500 }}>{text || "Sin paciente"}</div>
+        <div style={{ fontWeight: 500 }}>{toUpperCase(text) || "Sin paciente"}</div>
       ),
     },
     {

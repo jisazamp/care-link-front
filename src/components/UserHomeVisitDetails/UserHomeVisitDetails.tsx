@@ -30,6 +30,7 @@ import { useGetUserMedicalRecord } from "../../hooks/useGetUserMedicalRecord/use
 import { useGetUserHomeVisits } from "../../hooks/useGetUserHomeVisits/useGetUserHomeVisits";
 import { queryClient } from "../../main";
 import type { HomeVisit } from "../../types";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -411,7 +412,7 @@ export const UserHomeVisitDetails: React.FC = () => {
           },
           {
             title: user?.data.data
-              ? `Detalles de ${user.data.data.nombres} ${user.data.data.apellidos}`
+              ? `Detalles de ${upperCaseFullName(user.data.data.nombres, user.data.data.apellidos)}`
               : "Vista detalle",
           },
         ]}
@@ -442,7 +443,7 @@ export const UserHomeVisitDetails: React.FC = () => {
       ) : (
         <>
           <Title level={3} className="page-title">
-            {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
+            {upperCaseFullName(user?.data.data.nombres, user?.data.data.apellidos)}
           </Title>
           <Card
             title={<Title level={4}>Información del Usuario</Title>}
@@ -533,7 +534,7 @@ export const UserHomeVisitDetails: React.FC = () => {
                             minWidth: 260,
                           }}
                         >
-                          {`${user?.data.data.nombres} ${user?.data.data.apellidos}`}
+                          {upperCaseFullName(user?.data.data.nombres, user?.data.data.apellidos)}
                         </div>
                         <div
                           style={{ color: "#222", fontSize: 15, minWidth: 220 }}
@@ -833,7 +834,7 @@ export const UserHomeVisitDetails: React.FC = () => {
                           title: "Profesional",
                           dataIndex: "profesional",
                           render: (_, record) => {
-                            return `${record.profesional?.nombres} ${record.profesional?.apellidos}`;
+                            return upperCaseFullName(record.profesional?.nombres, record.profesional?.apellidos);
                           },
                         },
                         {

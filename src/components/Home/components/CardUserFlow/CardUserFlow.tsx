@@ -26,6 +26,7 @@ import {
 } from "recharts";
 import { useGetUserFlow } from "../../../../hooks/useGetUserFlow/useGetUserFlow";
 import { useNavigate } from "react-router-dom";
+import { toUpperCase } from "../../../../utils/stringUtils";
 
 const { Title, Text } = Typography;
 
@@ -56,6 +57,7 @@ export const CardUserFlow = () => {
       title: "Usuarios",
       dataIndex: "nombre_completo",
       key: "nombre_completo",
+      render: (nombre_completo: string) => toUpperCase(nombre_completo),
     },
     {
       title: "Contrato",

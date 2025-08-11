@@ -32,6 +32,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDeleteUserMutation } from "../../hooks/useDeleteUserMutation/useDeleteUserMutation";
 import { useGetUsers } from "../../hooks/useGetUsers/useGetUsers";
 import type { User } from "../../types";
+import { upperCaseFullName } from "../../utils/stringUtils";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -257,7 +258,7 @@ export const UsersList: React.FC = () => {
                 width: "100%",
               }}
             >
-              {user.nombres} {user.apellidos}
+              {upperCaseFullName(user.nombres, user.apellidos)}
             </div>
             <div
               style={{
